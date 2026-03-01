@@ -1,6 +1,6 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "single" | "multi" | "info";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info";
   title: string;
   subtitle?: string;
   options?: string[];
@@ -17,24 +17,23 @@ export const onboardingSteps: OnboardingQuestion[] = [
   },
   {
     id: 1,
-    type: "single",
-    title: "Qual sua faixa etária?",
-    subtitle: "Isso nos ajuda a adaptar os exercícios para você.",
-    options: ["20-30 anos", "31-40 anos", "41-50 anos", "51-60 anos", "60+ anos"],
-    icon: "calendar",
+    type: "disclaimer",
+    title: "Aviso Importante",
+    subtitle: "O LipeVida é um aplicativo de apoio ao bem-estar e não substitui tratamento médico. As informações aqui são educativas e complementares ao acompanhamento profissional.",
+    icon: "shield",
   },
   {
     id: 2,
-    type: "single",
-    title: "Há quanto tempo você foi diagnosticada com lipedema?",
-    options: ["Menos de 1 ano", "1-3 anos", "3-5 anos", "Mais de 5 anos", "Ainda não tenho diagnóstico"],
-    icon: "stethoscope",
+    type: "name",
+    title: "Como podemos te chamar?",
+    subtitle: "Queremos personalizar sua experiência no LipeVida.",
+    icon: "smile",
   },
   {
     id: 3,
     type: "single",
     title: "Como você descreveria seu nível de dor no dia a dia?",
-    subtitle: "Seja honesta — não existe resposta errada.",
+    subtitle: "Onde está seu fogo interno? Seja honesta — não existe resposta errada.",
     options: ["Sem dor", "Dor leve", "Dor moderada", "Dor intensa", "Dor muito intensa"],
     icon: "thermometer",
   },
@@ -48,38 +47,116 @@ export const onboardingSteps: OnboardingQuestion[] = [
   },
   {
     id: 5,
-    type: "single",
-    title: "Qual seu nível de atividade física atual?",
-    options: ["Sedentária", "Atividade leve (caminhadas)", "Atividade moderada", "Atividade regular"],
-    icon: "activity",
+    type: "result",
+    title: "Seu Fogo Interno",
+    subtitle: "",
+    icon: "flame",
   },
   {
     id: 6,
     type: "multi",
-    title: "O que você gostaria de alcançar com o app?",
-    subtitle: "Selecione seus principais objetivos.",
-    options: ["Reduzir a dor", "Melhorar a mobilidade", "Controlar o inchaço", "Alimentação saudável", "Apoio emocional", "Rotina de exercícios"],
-    icon: "target",
+    title: "Seus Inimigos Inflamatórios",
+    subtitle: "Quais desses alimentos você consome com frequência? Selecione todos que se aplicam.",
+    options: [
+      "Açúcar refinado",
+      "Alimentos ultraprocessados",
+      "Refrigerantes",
+      "Frituras",
+      "Farinha branca",
+      "Embutidos (salsicha, presunto)",
+      "Doces e sobremesas industrializadas",
+      "Fast food",
+    ],
+    icon: "flame",
   },
   {
     id: 7,
-    type: "single",
-    title: "Quando você prefere fazer seus exercícios?",
-    options: ["Manhã", "Tarde", "Noite", "Varia conforme o dia"],
-    icon: "clock",
+    type: "multi",
+    title: "Seus Aliados Anti-inflamatórios",
+    subtitle: "Quais desses alimentos você já inclui na sua rotina? Selecione todos que se aplicam.",
+    options: [
+      "Cúrcuma / Açafrão",
+      "Gengibre",
+      "Frutas vermelhas",
+      "Peixes ricos em ômega-3",
+      "Vegetais verde-escuros",
+      "Azeite de oliva extra virgem",
+      "Chá verde",
+      "Sementes (chia, linhaça)",
+    ],
+    icon: "leaf",
   },
   {
     id: 8,
     type: "single",
-    title: "Você tem alguma restrição alimentar?",
-    options: ["Nenhuma", "Vegetariana/Vegana", "Sem glúten", "Sem lactose", "Outras"],
-    icon: "utensils",
+    title: "Seu Objetivo em 14 Dias",
+    subtitle: "Escolha o seu principal objetivo para as próximas duas semanas.",
+    options: [
+      "Reduzir a dor e o desconforto",
+      "Melhorar a mobilidade",
+      "Controlar o inchaço",
+      "Adotar alimentação anti-inflamatória",
+      "Criar uma rotina de exercícios",
+      "Melhorar o bem-estar emocional",
+    ],
+    icon: "target",
   },
   {
     id: 9,
     type: "info",
-    title: "Tudo pronto! 🎉",
+    title: "Pronto para Começar? 🎉",
     subtitle: "Preparamos um plano personalizado para você. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!",
     icon: "sparkles",
   },
 ];
+
+export interface FireResult {
+  level: string;
+  color: string;
+  colorClass: string;
+  bgClass: string;
+  description: string;
+}
+
+export const fireResults: Record<string, FireResult> = {
+  "Sem dor": {
+    level: "Brisa Leve",
+    color: "Verde",
+    colorClass: "text-primary",
+    bgClass: "bg-primary-light",
+    description:
+      "Seu corpo está em um bom equilíbrio! Você sente pouca ou nenhuma inflamação no momento. Continue cuidando de si — pequenas atitudes diárias mantêm esse equilíbrio e previnem crises futuras.",
+  },
+  "Dor leve": {
+    level: "Chamas Suaves",
+    color: "Amarelo",
+    colorClass: "text-yellow-600",
+    bgClass: "bg-yellow-50",
+    description:
+      "Há sinais leves de inflamação. Seu corpo está pedindo atenção com pequenos sinais. Com ajustes na alimentação, movimento suave e cuidado diário, você pode manter esse fogo bem controlado.",
+  },
+  "Dor moderada": {
+    level: "Chamas Moderadas",
+    color: "Laranja",
+    colorClass: "text-orange-600",
+    bgClass: "bg-orange-50",
+    description:
+      "A inflamação está presente e merece atenção. Seu corpo está sinalizando que precisa de mais cuidado. Vamos trabalhar juntas para reduzir esse desconforto com práticas anti-inflamatórias diárias.",
+  },
+  "Dor intensa": {
+    level: "Chamas Intensas",
+    color: "Vermelho",
+    colorClass: "text-red-600",
+    bgClass: "bg-red-50",
+    description:
+      "A inflamação está alta e seu corpo precisa de atenção especial. Não se preocupe — cada passo que você der aqui vai ajudar. Vamos focar em alívio, conforto e práticas gentis para o seu corpo.",
+  },
+  "Dor muito intensa": {
+    level: "Chamas Intensas",
+    color: "Vermelho",
+    colorClass: "text-red-600",
+    bgClass: "bg-red-50",
+    description:
+      "A inflamação está muito alta e seu corpo precisa de atenção especial. Além do acompanhamento médico, o LipeVida vai te apoiar com práticas gentis e diárias para aliviar o desconforto.",
+  },
+};

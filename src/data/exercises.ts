@@ -8,6 +8,8 @@ export interface Exercise {
   description: string;
   steps: string[];
   benefits: string;
+  safety?: string;
+  variations?: string[];
   icon: string;
 }
 
@@ -36,6 +38,7 @@ export const exercises: Exercise[] = [
       "Pausa de 2 segundos. Repita 10-15 vezes",
     ],
     benefits: "Reduz estresse e inflamação, melhora circulação linfática",
+    safety: "Exercício seguro para todos os níveis. Se sentir tontura, respire normalmente por alguns segundos antes de continuar.",
     icon: "wind",
   },
   {
@@ -53,6 +56,8 @@ export const exercises: Exercise[] = [
       "Repita 4-8 vezes",
     ],
     benefits: "Acalma o sistema nervoso, melhora o sono",
+    safety: "Se sentir desconforto ao segurar a respiração, reduza a contagem. Não force.",
+    variations: ["Comece com contagens menores (3-5-6) e aumente gradualmente"],
     icon: "moon",
   },
   {
@@ -70,6 +75,7 @@ export const exercises: Exercise[] = [
       "Repita subindo pelos tornozelos, panturrilhas e coxas",
     ],
     benefits: "Reduz tensão muscular e melhora a consciência corporal",
+    safety: "Contraia suavemente, sem forçar. Se alguma região estiver muito dolorida, pule para a próxima.",
     icon: "footprints",
   },
   {
@@ -87,6 +93,8 @@ export const exercises: Exercise[] = [
       "Troque de pé",
     ],
     benefits: "Melhora circulação, reduz inchaço nos tornozelos",
+    safety: "Movimentos lentos e controlados. Pare se sentir dor aguda.",
+    variations: ["Faça o exercício com os pés elevados para potencializar o efeito"],
     icon: "rotate-cw",
   },
   {
@@ -104,6 +112,7 @@ export const exercises: Exercise[] = [
       "Baixe lentamente. Repita 15-20 vezes",
     ],
     benefits: "Ativa retorno venoso e reduz acúmulo de líquido",
+    safety: "Ideal para fazer durante o trabalho ou longos períodos sentada. Sem contraindicações.",
     icon: "arrow-up",
   },
   {
@@ -121,6 +130,7 @@ export const exercises: Exercise[] = [
       "Finalize com movimentos circulares atrás do joelho",
     ],
     benefits: "Estimula drenagem linfática, reduz inchaço",
+    safety: "Use pressão muito leve — o sistema linfático é superficial. Evite áreas com feridas ou infecções. Em caso de trombose, consulte seu médico antes.",
     icon: "hand",
   },
   {
@@ -138,6 +148,8 @@ export const exercises: Exercise[] = [
       "Permaneça por 5-10 minutos",
     ],
     benefits: "Reduz inchaço e dor nas pernas pela ação da gravidade",
+    safety: "Evite se tiver pressão alta descontrolada. Levante-se lentamente ao terminar para evitar tontura.",
+    variations: ["Flexione e estenda os pés enquanto as pernas estão elevadas para potencializar a drenagem"],
     icon: "arrow-up-from-line",
   },
   {
@@ -155,6 +167,8 @@ export const exercises: Exercise[] = [
       "Repita 8-12 vezes",
     ],
     benefits: "Fortalece pernas com baixo impacto",
+    safety: "Mantenha os joelhos alinhados com os pés. Se sentir dor nos joelhos, reduza a amplitude do movimento. A cadeira serve como segurança.",
+    variations: ["Comece sentando completamente e levantando", "Segure na cadeira para apoio extra"],
     icon: "armchair",
   },
   {
@@ -172,6 +186,7 @@ export const exercises: Exercise[] = [
       "Mantenha 20-30 segundos. Troque de lado",
     ],
     benefits: "Alivia tensão e melhora flexibilidade",
+    safety: "Alongue até sentir uma leve tensão, nunca dor. Mantenha a respiração fluida.",
     icon: "stretch-horizontal",
   },
   {
@@ -189,6 +204,7 @@ export const exercises: Exercise[] = [
       "Aumente o tempo gradualmente conforme conforto",
     ],
     benefits: "Ativa circulação geral e melhora o humor",
+    safety: "Use calçado confortável. Se sentir dor, diminua o ritmo ou pare. Respeite seus limites.",
     icon: "footprints",
   },
 ];

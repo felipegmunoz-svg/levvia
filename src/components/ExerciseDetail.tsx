@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Dumbbell, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle } from "lucide-react";
 import type { Exercise } from "@/data/exercises";
 
 interface ExerciseDetailProps {
@@ -8,7 +8,7 @@ interface ExerciseDetailProps {
 
 const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-8">
       {/* Header */}
       <div className="gradient-primary px-6 pt-10 pb-8 rounded-b-3xl">
         <button
@@ -62,10 +62,37 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
         <section className="bg-primary-light rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle2 size={18} className="text-primary" />
-            <h2 className="text-sm font-bold text-foreground">Benefícios</h2>
+            <h2 className="text-sm font-bold text-foreground">Por que funciona</h2>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">{exercise.benefits}</p>
         </section>
+
+        {exercise.safety && (
+          <section className="bg-accent/10 rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertTriangle size={18} className="text-accent-foreground" />
+              <h2 className="text-sm font-bold text-foreground">Contraindicações e Segurança</h2>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{exercise.safety}</p>
+          </section>
+        )}
+
+        {exercise.variations && exercise.variations.length > 0 && (
+          <section className="bg-secondary rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Shuffle size={18} className="text-secondary-foreground" />
+              <h2 className="text-sm font-bold text-foreground">Variações</h2>
+            </div>
+            <ul className="space-y-1.5">
+              {exercise.variations.map((v, i) => (
+                <li key={i} className="text-sm text-muted-foreground leading-relaxed flex items-start gap-2">
+                  <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
+                  {v}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
     </div>
   );
