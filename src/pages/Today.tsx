@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { Droplets, HeartPulse, Sparkles, Apple } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Droplets, HeartPulse, Sparkles, Apple, X, ExternalLink } from "lucide-react";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import { dailyChecklist } from "@/data/checklist";
+import { getDailyPhrase } from "@/data/motivational";
 import BottomNav from "@/components/BottomNav";
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -12,16 +14,37 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const Today = () => {
+  const navigate = useNavigate();
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
     const saved = localStorage.getItem("lipevida_checklist");
     return saved ? JSON.parse(saved) : {};
   });
+  const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);
 
   useEffect(() => {
     localStorage.setItem("lipevida_checklist", JSON.stringify(checked));
   }, [checked]);
 
   const handleToggle = (id: string) => {
+    // Find the item to check for actions
+    for (const category of dailyChecklist) {
+      const item = category.items.find((i) => i.id === id);
+      if (item) {
+        if (!checked[id]) {
+          // Only trigger action when checking (not unchecking)
+          if (item.actionType === "modal" && item.actionContent) {
+            setModalContent({ title: item.label, text: item.actionContent });
+          } else if (item.actionType === "exercise" && item.actionTargetId) {
+            navigate(`/practices?tab=exercises&highlight=${item.actionTargetId}`);
+            return;
+          } else if (item.actionType === "recipe" && item.actionTargetId) {
+            navigate(`/practices?tab=recipes&highlight=${item.actionTargetId}`);
+            return;
+          }
+        }
+        break;
+      }
+    }
     setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -32,9 +55,18 @@ const Today = () => {
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Bom dia! ☀️";
-    if (hour < 18) return "Boa tarde! 🌤";
+    if (hour < 18) return "Boa tarde! 🌤️";
     return "Boa noite! 🌙";
   };
+
+  const userName = (() => {
+    const saved = localStorage.getItem("lipevida_onboarding");
+    if (saved) {
+      const data = JSON.parse(saved);
+      return data[2] || "";
+    }
+    return "";
+  })();
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -42,11 +74,16 @@ const Today = () => {
       <header className="gradient-primary px-6 pt-10 pb-8 rounded-b-3xl">
         <p className="text-primary-foreground/80 text-sm font-semibold">{getGreeting()}</p>
         <h1 className="text-2xl font-extrabold text-primary-foreground mt-1">
-          Seu dia de cuidado
+          {userName ? `${userName}, seu dia de cuidado` : "Seu dia de cuidado"}
         </h1>
 
+        {/* Motivational phrase */}
+        <p className="text-xs text-primary-foreground/70 mt-2 italic leading-relaxed">
+          {getDailyPhrase()}
+        </p>
+
         {/* Progress card */}
-        <div className="mt-6 bg-card/15 backdrop-blur-sm rounded-2xl p-4">
+        <div className="mt-5 bg-card/15 backdrop-blur-sm rounded-2xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-bold text-primary-foreground">Progresso de hoje</span>
             <span className="text-sm font-extrabold text-primary-foreground">
@@ -83,12 +120,36 @@ const Today = () => {
                   label={item.label}
                   checked={!!checked[item.id]}
                   onToggle={handleToggle}
+                  hasAction={item.actionType !== "none" && !!item.actionType}
+                  actionType={item.actionType}
                 />
               ))}
             </div>
           </section>
         ))}
       </main>
+
+      {/* Modal */}
+      {modalContent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm px-6">
+          <div className="bg-card rounded-2xl shadow-soft p-6 max-w-sm w-full relative">
+            <button
+              onClick={() => setModalContent(null)}
+              className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-base font-bold text-foreground mb-3">{modalContent.title}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{modalContent.text}</p>
+            <button
+              onClick={() => setModalContent(null)}
+              className="mt-5 w-full py-3 rounded-xl gradient-primary text-primary-foreground font-bold text-sm"
+            >
+              Entendi!
+            </button>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>

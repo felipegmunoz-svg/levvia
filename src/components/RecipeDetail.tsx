@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Users, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Clock, Users, UtensilsCrossed, ChefHat } from "lucide-react";
 import type { Recipe } from "@/data/recipes";
 
 interface RecipeDetailProps {
@@ -8,7 +8,7 @@ interface RecipeDetailProps {
 
 const RecipeDetail = ({ recipe, onBack }: RecipeDetailProps) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-8">
       {/* Header */}
       <div className="bg-accent/20 px-6 pt-10 pb-8 rounded-b-3xl">
         <button
@@ -49,6 +49,23 @@ const RecipeDetail = ({ recipe, onBack }: RecipeDetailProps) => {
               <div key={i} className="flex items-center gap-3 bg-card p-3 rounded-xl shadow-card">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary" />
                 <span className="text-sm text-foreground">{ingredient}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
+            <ChefHat size={18} className="text-primary" />
+            Modo de Fazer
+          </h2>
+          <div className="space-y-3">
+            {recipe.instructions.map((instruction, i) => (
+              <div key={i} className="flex items-start gap-3 bg-card p-3 rounded-xl shadow-card">
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
+                  <span className="text-xs font-bold text-accent-foreground">{i + 1}</span>
+                </div>
+                <p className="text-sm text-foreground leading-relaxed pt-0.5">{instruction}</p>
               </div>
             ))}
           </div>

@@ -1,13 +1,15 @@
-import { Check } from "lucide-react";
+import { Check, ExternalLink, Info } from "lucide-react";
 
 interface ChecklistItemProps {
   id: string;
   label: string;
   checked: boolean;
   onToggle: (id: string) => void;
+  hasAction?: boolean;
+  actionType?: "modal" | "exercise" | "recipe" | "none";
 }
 
-const ChecklistItemCard = ({ id, label, checked, onToggle }: ChecklistItemProps) => {
+const ChecklistItemCard = ({ id, label, checked, onToggle, hasAction, actionType }: ChecklistItemProps) => {
   return (
     <button
       onClick={() => onToggle(id)}
@@ -27,12 +29,21 @@ const ChecklistItemCard = ({ id, label, checked, onToggle }: ChecklistItemProps)
         {checked && <Check size={14} className="text-primary-foreground" strokeWidth={3} />}
       </div>
       <span
-        className={`text-sm font-medium transition-all duration-200 ${
+        className={`text-sm font-medium transition-all duration-200 flex-1 ${
           checked ? "line-through text-muted-foreground" : "text-foreground"
         }`}
       >
         {label}
       </span>
+      {hasAction && !checked && (
+        <span className="flex-shrink-0">
+          {actionType === "modal" ? (
+            <Info size={14} className="text-muted-foreground/50" />
+          ) : (
+            <ExternalLink size={14} className="text-muted-foreground/50" />
+          )}
+        </span>
+      )}
     </button>
   );
 };
