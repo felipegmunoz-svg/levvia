@@ -1,0 +1,72 @@
+import { ArrowLeft, Clock, Users, UtensilsCrossed } from "lucide-react";
+import type { Recipe } from "@/data/recipes";
+
+interface RecipeDetailProps {
+  recipe: Recipe;
+  onBack: () => void;
+}
+
+const RecipeDetail = ({ recipe, onBack }: RecipeDetailProps) => {
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-accent/20 px-6 pt-10 pb-8 rounded-b-3xl">
+        <button
+          onClick={onBack}
+          className="text-foreground/60 hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft size={22} />
+        </button>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-accent/30 flex items-center justify-center">
+            <UtensilsCrossed size={20} className="text-accent-foreground" />
+          </div>
+          <span className="text-xs font-bold text-muted-foreground bg-card px-3 py-1 rounded-full">
+            {recipe.category}
+          </span>
+        </div>
+        <h1 className="text-xl font-extrabold text-foreground">{recipe.title}</h1>
+        <div className="flex items-center gap-4 mt-3">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground font-semibold">
+            <Clock size={14} /> {recipe.time}
+          </span>
+          <span className="flex items-center gap-1 text-xs text-muted-foreground font-semibold">
+            <Users size={14} /> {recipe.servings}
+          </span>
+        </div>
+      </div>
+
+      <main className="px-6 py-6 space-y-6">
+        <section>
+          <h2 className="text-base font-bold text-foreground mb-2">Sobre</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{recipe.description}</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-bold text-foreground mb-3">Ingredientes</h2>
+          <div className="space-y-2">
+            {recipe.ingredients.map((ingredient, i) => (
+              <div key={i} className="flex items-center gap-3 bg-card p-3 rounded-xl shadow-card">
+                <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary" />
+                <span className="text-sm text-foreground">{ingredient}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="flex flex-wrap gap-2">
+          {recipe.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-xs px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground font-bold"
+            >
+              {tag}
+            </span>
+          ))}
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default RecipeDetail;
