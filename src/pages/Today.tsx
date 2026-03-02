@@ -12,7 +12,8 @@ import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 
 const Today = () => {
-  const navigate = useNavigate();
+  const [selectedExercise, setSelectedExercise] = useState<{ exercise: Exercise; activityId: string } | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: Recipe; activityId: string } | null>(null);
 
   // --- Onboarding data ---
   const { userName, painAnswer } = useMemo(() => {
