@@ -7,9 +7,9 @@ interface RecipeDetailProps {
   onMarkDone?: () => void;
 }
 
-const RecipeDetail = ({ recipe, onBack }: RecipeDetailProps) => {
+const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="bg-accent/20 px-6 pt-10 pb-8 rounded-b-3xl">
         <button

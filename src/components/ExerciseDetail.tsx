@@ -7,9 +7,9 @@ interface ExerciseDetailProps {
   onMarkDone?: () => void;
 }
 
-const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
+const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) => {
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="gradient-primary px-6 pt-10 pb-8 rounded-b-3xl">
         <button
