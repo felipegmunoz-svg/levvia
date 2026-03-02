@@ -61,13 +61,13 @@ const Today = () => {
     return "Boa noite! 🌙";
   };
 
-  const { userName, userObjective } = (() => {
+  const { userName, userObjective, painAnswer } = (() => {
     const saved = localStorage.getItem("lipevida_onboarding");
     if (saved) {
       const data = JSON.parse(saved);
-      return { userName: data[2] || "", userObjective: data[8] || "" };
+      return { userName: data[2] || "", userObjective: data[8] || "", painAnswer: data[3] || "" };
     }
-    return { userName: "", userObjective: "" };
+    return { userName: "", userObjective: "", painAnswer: "" };
   })();
 
   const [showWelcome, setShowWelcome] = useState(() => {
