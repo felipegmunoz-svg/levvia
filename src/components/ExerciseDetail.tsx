@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle } from "lucide-react";
+import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle, MapPin } from "lucide-react";
 import type { Exercise } from "@/data/exercises";
 
 interface ExerciseDetailProps {
@@ -45,6 +45,16 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
           <p className="text-sm text-muted-foreground leading-relaxed">{exercise.description}</p>
         </section>
 
+        {exercise.startPosition && (
+          <section className="bg-secondary rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin size={18} className="text-primary" />
+              <h2 className="text-sm font-bold text-foreground">Posição Inicial</h2>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{exercise.startPosition}</p>
+          </section>
+        )}
+
         <section>
           <h2 className="text-base font-bold text-foreground mb-3">Passo a Passo</h2>
           <div className="space-y-3">
@@ -62,7 +72,7 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
         <section className="bg-primary-light rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle2 size={18} className="text-primary" />
-            <h2 className="text-sm font-bold text-foreground">Por que funciona</h2>
+            <h2 className="text-sm font-bold text-foreground">Por que Funciona (para Lipedema)</h2>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">{exercise.benefits}</p>
         </section>
