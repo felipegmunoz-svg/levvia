@@ -118,6 +118,47 @@ const Today = () => {
 
   const dailyPhrase = isHighPain && todayData.phraseHighPain ? todayData.phraseHighPain : todayData.phrase;
 
+  const handleMarkExerciseDone = () => {
+    if (selectedExercise) {
+      setProgress((prev) => ({
+        ...prev,
+        [currentDay]: { ...prev[currentDay], [selectedExercise.activityId]: true },
+      }));
+      setSelectedExercise(null);
+    }
+  };
+
+  const handleMarkRecipeDone = () => {
+    if (selectedRecipe) {
+      setProgress((prev) => ({
+        ...prev,
+        [currentDay]: { ...prev[currentDay], [selectedRecipe.activityId]: true },
+      }));
+      setSelectedRecipe(null);
+    }
+  };
+
+  // --- Render inline detail views ---
+  if (selectedExercise) {
+    return (
+      <ExerciseDetail
+        exercise={selectedExercise.exercise}
+        onBack={() => setSelectedExercise(null)}
+        onMarkDone={handleMarkExerciseDone}
+      />
+    );
+  }
+
+  if (selectedRecipe) {
+    return (
+      <RecipeDetail
+        recipe={selectedRecipe.recipe}
+        onBack={() => setSelectedRecipe(null)}
+        onMarkDone={handleMarkRecipeDone}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
