@@ -83,6 +83,17 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
           ))}
         </section>
       </main>
+
+      {onMarkDone && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border">
+          <button
+            onClick={onMarkDone}
+            className="w-full py-3.5 rounded-xl gradient-primary text-primary-foreground font-bold text-sm"
+          >
+            ✅ Marcar como Feito
+          </button>
+        </div>
+      )}
     </div>
   );
 };
