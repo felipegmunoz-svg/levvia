@@ -15,6 +15,7 @@ const Profile = () => {
 
   const resetChecklist = () => {
     localStorage.removeItem("lipevida_checklist");
+    localStorage.removeItem("lipevida_challenge_progress");
     window.location.reload();
   };
 
@@ -22,6 +23,9 @@ const Profile = () => {
     localStorage.removeItem("lipevida_onboarded");
     localStorage.removeItem("lipevida_onboarding");
     localStorage.removeItem("lipevida_checklist");
+    localStorage.removeItem("lipevida_challenge_start");
+    localStorage.removeItem("lipevida_challenge_progress");
+    localStorage.removeItem("lipevida_welcome_dismissed");
     window.location.href = "/";
   };
 
