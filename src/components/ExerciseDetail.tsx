@@ -4,11 +4,12 @@ import type { Exercise } from "@/data/exercises";
 interface ExerciseDetailProps {
   exercise: Exercise;
   onBack: () => void;
+  onMarkDone?: () => void;
 }
 
-const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
+const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) => {
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="gradient-primary px-6 pt-10 pb-8 rounded-b-3xl">
         <button
@@ -104,6 +105,16 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
           </section>
         )}
       </main>
+      {onMarkDone && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border">
+          <button
+            onClick={onMarkDone}
+            className="w-full py-3.5 rounded-xl gradient-primary text-primary-foreground font-bold text-sm"
+          >
+            ✅ Marcar como Feito
+          </button>
+        </div>
+      )}
     </div>
   );
 };

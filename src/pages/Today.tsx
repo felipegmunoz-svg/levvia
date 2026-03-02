@@ -1,13 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info } from "lucide-react";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import { challengeDays, getIncentiveMessage } from "@/data/challengeDays";
 import type { ChallengeActivity } from "@/data/challengeDays";
+import { exercises } from "@/data/exercises";
+import { recipes } from "@/data/recipes";
+import type { Exercise } from "@/data/exercises";
+import type { Recipe } from "@/data/recipes";
+import ExerciseDetail from "@/components/ExerciseDetail";
+import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 
 const Today = () => {
-  const navigate = useNavigate();
+  const [selectedExercise, setSelectedExercise] = useState<{ exercise: Exercise; activityId: string } | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: Recipe; activityId: string } | null>(null);
 
   // --- Onboarding data ---
   const { userName, painAnswer } = useMemo(() => {
@@ -83,19 +89,17 @@ const Today = () => {
       if (activity.type === "habit" && activity.modalContent) {
         setModalContent({ title: activity.label, text: activity.modalContent });
       } else if (activity.type === "exercise" && activity.exerciseId) {
-        setProgress((prev) => ({
-          ...prev,
-          [currentDay]: { ...prev[currentDay], [id]: true },
-        }));
-        navigate(`/practices?tab=exercises&highlight=${activity.exerciseId}`);
-        return;
+        const ex = exercises.find((e) => e.id === activity.exerciseId);
+        if (ex) {
+          setSelectedExercise({ exercise: ex, activityId: id });
+          return;
+        }
       } else if (activity.type === "recipe" && activity.recipeId) {
-        setProgress((prev) => ({
-          ...prev,
-          [currentDay]: { ...prev[currentDay], [id]: true },
-        }));
-        navigate(`/practices?tab=recipes&highlight=${activity.recipeId}`);
-        return;
+        const rec = recipes.find((r) => r.id === activity.recipeId);
+        if (rec) {
+          setSelectedRecipe({ recipe: rec, activityId: id });
+          return;
+        }
       }
     }
 
@@ -113,6 +117,47 @@ const Today = () => {
   };
 
   const dailyPhrase = isHighPain && todayData.phraseHighPain ? todayData.phraseHighPain : todayData.phrase;
+
+  const handleMarkExerciseDone = () => {
+    if (selectedExercise) {
+      setProgress((prev) => ({
+        ...prev,
+        [currentDay]: { ...prev[currentDay], [selectedExercise.activityId]: true },
+      }));
+      setSelectedExercise(null);
+    }
+  };
+
+  const handleMarkRecipeDone = () => {
+    if (selectedRecipe) {
+      setProgress((prev) => ({
+        ...prev,
+        [currentDay]: { ...prev[currentDay], [selectedRecipe.activityId]: true },
+      }));
+      setSelectedRecipe(null);
+    }
+  };
+
+  // --- Render inline detail views ---
+  if (selectedExercise) {
+    return (
+      <ExerciseDetail
+        exercise={selectedExercise.exercise}
+        onBack={() => setSelectedExercise(null)}
+        onMarkDone={handleMarkExerciseDone}
+      />
+    );
+  }
+
+  if (selectedRecipe) {
+    return (
+      <RecipeDetail
+        recipe={selectedRecipe.recipe}
+        onBack={() => setSelectedRecipe(null)}
+        onMarkDone={handleMarkRecipeDone}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
