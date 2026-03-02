@@ -39,9 +39,21 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
 
       <main className="px-6 py-6 space-y-6">
         <section>
-          <h2 className="text-base font-bold text-foreground mb-2">Sobre</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">{recipe.description}</p>
+          <h2 className="text-base font-bold text-foreground mb-2">Por que Resfria</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {(recipe as any).por_que_resfria || recipe.description}
+          </p>
         </section>
+
+        {(recipe as any).dica && (
+          <section className="bg-primary-light rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-primary text-sm">💡</span>
+              <h2 className="text-sm font-bold text-foreground">Dica</h2>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{(recipe as any).dica}</p>
+          </section>
+        )}
 
         <section>
           <h2 className="text-base font-bold text-foreground mb-3">Ingredientes</h2>
