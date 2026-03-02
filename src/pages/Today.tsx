@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info } from "lucide-react";
+import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info, Coffee, Sun, Sunset } from "lucide-react";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import { challengeDays, getIncentiveMessage } from "@/data/challengeDays";
 import type { ChallengeActivity } from "@/data/challengeDays";
@@ -7,6 +7,8 @@ import { exercises } from "@/data/exercises";
 import { recipes } from "@/data/recipes";
 import type { Exercise } from "@/data/exercises";
 import type { Recipe } from "@/data/recipes";
+import { getMealPlanForDay, mealSlots } from "@/data/mealPlan";
+import type { MealSlot } from "@/data/mealPlan";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
@@ -41,6 +43,21 @@ const Today = () => {
 
   const todayData = challengeDays[currentDay - 1];
 
+  // --- Meal plan for today ---
+  const todayMeals = useMemo(() => getMealPlanForDay(currentDay), [currentDay]);
+
+  // Build meal activities from meal plan
+  const mealActivities: ChallengeActivity[] = useMemo(() => {
+    return mealSlots
+      .filter((slot) => todayMeals[slot] !== null)
+      .map((slot) => ({
+        id: `day${currentDay}-meal-${slot.replace(/\s/g, "")}`,
+        type: "recipe" as const,
+        label: `${slot}: ${todayMeals[slot]!.title}`,
+        recipeId: todayMeals[slot]!.id,
+      }));
+  }, [currentDay, todayMeals]);
+
   // --- Progress state ---
   const [progress, setProgress] = useState<Record<string, Record<string, boolean>>>(() => {
     const saved = localStorage.getItem("lipevida_challenge_progress");
@@ -55,10 +72,9 @@ const Today = () => {
 
   // --- All activities for today ---
   const allActivities: ChallengeActivity[] = useMemo(() => {
-    const acts = [...todayData.exercises, ...todayData.recipes, ...todayData.habits];
-    // For high-pain users in first 5 days, prioritize breathing/drainage exercises first (already ordered in data)
+    const acts = [...todayData.exercises, ...mealActivities, ...todayData.habits];
     return acts;
-  }, [todayData]);
+  }, [todayData, mealActivities]);
 
   const dayProgress = progress[currentDay] || {};
   const completedCount = allActivities.filter((a) => dayProgress[a.id]).length;
@@ -271,15 +287,15 @@ const Today = () => {
           </section>
         )}
 
-        {/* Recipes */}
-        {todayData.recipes.length > 0 && (
+        {/* Cardápio do Dia (5 refeições) */}
+        {mealActivities.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
               <UtensilsCrossed size={18} className="text-primary" />
-              <h2 className="text-base font-bold text-foreground">Receitas Sugeridas</h2>
+              <h2 className="text-base font-bold text-foreground">Cardápio do Dia</h2>
             </div>
             <div className="space-y-2">
-              {todayData.recipes.map((item) => (
+              {mealActivities.map((item) => (
                 <ChecklistItemCard
                   key={item.id}
                   id={item.id}
