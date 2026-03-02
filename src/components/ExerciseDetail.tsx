@@ -4,6 +4,7 @@ import type { Exercise } from "@/data/exercises";
 interface ExerciseDetailProps {
   exercise: Exercise;
   onBack: () => void;
+  onMarkDone?: () => void;
 }
 
 const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {

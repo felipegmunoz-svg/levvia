@@ -4,6 +4,7 @@ import type { Recipe } from "@/data/recipes";
 interface RecipeDetailProps {
   recipe: Recipe;
   onBack: () => void;
+  onMarkDone?: () => void;
 }
 
 const RecipeDetail = ({ recipe, onBack }: RecipeDetailProps) => {
