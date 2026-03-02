@@ -82,10 +82,10 @@ const Onboarding = () => {
           <div className="max-w-sm mx-auto w-full">
             <button
               onClick={() => setDisclaimerChecked(!disclaimerChecked)}
-              className={`flex items-center gap-3 w-full px-4 py-4 rounded-xl border-2 transition-all duration-200 text-left ${
+              className={`flex items-center gap-3 w-full px-4 py-4 rounded-xl border-2 transition-all duration-200 text-left shadow-sm ${
                 disclaimerChecked
                   ? "border-primary bg-primary-light"
-                  : "border-border bg-card"
+                  : "border-primary/40 bg-card"
               }`}
             >
               <div

@@ -35,9 +35,11 @@ const Today = () => {
           if (item.actionType === "modal" && item.actionContent) {
             setModalContent({ title: item.label, text: item.actionContent });
           } else if (item.actionType === "exercise" && item.actionTargetId) {
+            setChecked((prev) => ({ ...prev, [id]: true }));
             navigate(`/practices?tab=exercises&highlight=${item.actionTargetId}`);
             return;
           } else if (item.actionType === "recipe" && item.actionTargetId) {
+            setChecked((prev) => ({ ...prev, [id]: true }));
             navigate(`/practices?tab=recipes&highlight=${item.actionTargetId}`);
             return;
           }
@@ -59,14 +61,23 @@ const Today = () => {
     return "Boa noite! 🌙";
   };
 
-  const userName = (() => {
+  const { userName, userObjective } = (() => {
     const saved = localStorage.getItem("lipevida_onboarding");
     if (saved) {
       const data = JSON.parse(saved);
-      return data[2] || "";
+      return { userName: data[2] || "", userObjective: data[8] || "" };
     }
-    return "";
+    return { userName: "", userObjective: "" };
   })();
+
+  const [showWelcome, setShowWelcome] = useState(() => {
+    return !localStorage.getItem("lipevida_welcome_dismissed") && !!userName;
+  });
+
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    localStorage.setItem("lipevida_welcome_dismissed", "true");
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -103,6 +114,17 @@ const Today = () => {
           )}
         </div>
       </header>
+
+      {/* Welcome card */}
+      {showWelcome && userObjective && (
+        <div className="mx-5 mt-4 bg-primary-light rounded-2xl p-4 relative">
+          <button onClick={dismissWelcome} className="absolute top-2 right-2 text-muted-foreground hover:text-foreground">
+            <X size={16} />
+          </button>
+          <p className="text-sm font-bold text-foreground">Olá, {userName}! 👋</p>
+          <p className="text-xs text-muted-foreground mt-1">Seu objetivo principal: <span className="font-semibold text-foreground">{userObjective}</span></p>
+        </div>
+      )}
 
       {/* Checklists */}
       <main className="px-5 mt-6 space-y-6">
