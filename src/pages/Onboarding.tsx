@@ -32,7 +32,11 @@ const Onboarding = () => {
     if (current.type === "name") return nameInput.trim().length >= 2;
     if (current.type === "result" || current.type === "info") return true;
     if (current.type === "single") return !!answers[current.id];
-    if (current.type === "multi") return ((answers[current.id] as string[]) || []).length > 0;
+    if (current.type === "multi") {
+      // Restrições (id 9) e Preferências (id 10) são opcionais
+      if (current.id === 9 || current.id === 10) return true;
+      return ((answers[current.id] as string[]) || []).length > 0;
+    }
     return true;
   };
 
@@ -62,6 +66,8 @@ const Onboarding = () => {
   // Get user name and objective for final screen
   const userName = (answers[2] as string) || nameInput.trim();
   const userObjective = answers[8] as string;
+  const userRestrictions = (answers[9] as string[]) || [];
+  const userPreferences = (answers[10] as string[]) || [];
 
   const renderContent = () => {
     // Disclaimer screen
