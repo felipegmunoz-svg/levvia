@@ -171,8 +171,9 @@ const Onboarding = () => {
 
     // Final personalized screen
     if (current.type === "info") {
-      const personalizedSubtitle = userName && userObjective
-        ? `${userName}, você está pronta! Preparamos um plano de 14 dias focado no seu objetivo: ${userObjective}. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!`
+      const objective = answers[8] as string;
+      const personalizedSubtitle = userName && objective
+        ? `${userName}, você está pronta! Preparamos um plano de 14 dias focado no seu objetivo: ${objective}. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!`
         : current.subtitle;
 
       return (
