@@ -1,9 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info } from "lucide-react";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import { challengeDays, getIncentiveMessage } from "@/data/challengeDays";
 import type { ChallengeActivity } from "@/data/challengeDays";
+import { exercises } from "@/data/exercises";
+import { recipes } from "@/data/recipes";
+import type { Exercise } from "@/data/exercises";
+import type { Recipe } from "@/data/recipes";
+import ExerciseDetail from "@/components/ExerciseDetail";
+import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 
 const Today = () => {
