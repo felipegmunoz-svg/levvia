@@ -90,7 +90,7 @@ const Today = () => {
 
         {/* Motivational phrase */}
         <p className="text-xs text-primary-foreground/70 mt-2 italic leading-relaxed">
-          {getDailyPhrase()}
+          {getDailyPhrase(painAnswer)}
         </p>
 
         {/* Progress card */}
