@@ -89,19 +89,17 @@ const Today = () => {
       if (activity.type === "habit" && activity.modalContent) {
         setModalContent({ title: activity.label, text: activity.modalContent });
       } else if (activity.type === "exercise" && activity.exerciseId) {
-        setProgress((prev) => ({
-          ...prev,
-          [currentDay]: { ...prev[currentDay], [id]: true },
-        }));
-        navigate(`/practices?tab=exercises&highlight=${activity.exerciseId}`);
-        return;
+        const ex = exercises.find((e) => e.id === activity.exerciseId);
+        if (ex) {
+          setSelectedExercise({ exercise: ex, activityId: id });
+          return;
+        }
       } else if (activity.type === "recipe" && activity.recipeId) {
-        setProgress((prev) => ({
-          ...prev,
-          [currentDay]: { ...prev[currentDay], [id]: true },
-        }));
-        navigate(`/practices?tab=recipes&highlight=${activity.recipeId}`);
-        return;
+        const rec = recipes.find((r) => r.id === activity.recipeId);
+        if (rec) {
+          setSelectedRecipe({ recipe: rec, activityId: id });
+          return;
+        }
       }
     }
 
