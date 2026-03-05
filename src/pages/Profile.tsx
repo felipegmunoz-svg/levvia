@@ -26,6 +26,7 @@ const Profile = () => {
     localStorage.removeItem("lipevida_challenge_start");
     localStorage.removeItem("lipevida_challenge_progress");
     localStorage.removeItem("lipevida_welcome_dismissed");
+    localStorage.removeItem("lipevida_meal_plan");
     window.location.href = "/";
   };
 
