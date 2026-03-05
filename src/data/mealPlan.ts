@@ -60,7 +60,7 @@ function getRecipesForSlot(filtered: Recipe[], slot: MealSlot): Recipe[] {
   };
 
   const types = slotMapping[slot];
-  return filtered.filter((r) => r.tipo_refeicao.some((t) => types.some((st) => t.includes(st))));
+  return filtered.filter((r) => r.tipo_refeicao.some((t) => types.some((st) => t === st)));
 }
 
 export function generateMealPlan(): DailyMealPlan[] {
