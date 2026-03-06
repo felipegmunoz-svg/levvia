@@ -142,7 +142,7 @@ const Onboarding = () => {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
           <div className="flex justify-center mb-6">
-            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center ${fireResult?.bgClass || "bg-secondary/20"}`}>
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/[0.06] border border-white/10">
               <Flame size={36} strokeWidth={1.5} className={fireResult?.colorClass || "text-secondary"} />
             </div>
           </div>
@@ -152,7 +152,7 @@ const Onboarding = () => {
           <p className={`text-lg font-medium text-center mb-4 ${fireResult?.colorClass || "text-secondary"}`}>
             {fireResult?.level || "Brisa Leve"}
           </p>
-          <div className={`max-w-sm mx-auto rounded-2xl p-5 ${fireResult?.bgClass || "bg-secondary/20"}`}>
+          <div className="max-w-sm mx-auto rounded-2xl p-5 glass-card">
             <p className="text-sm text-foreground leading-relaxed text-center">
               {fireResult?.description || ""}
             </p>
