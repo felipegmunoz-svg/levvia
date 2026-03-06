@@ -5,7 +5,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const onboarded = localStorage.getItem("lipevida_onboarded");
+    const onboarded = localStorage.getItem("levvia_onboarded");
     if (onboarded === "true") {
       navigate("/today", { replace: true });
     } else {

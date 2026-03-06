@@ -248,7 +248,7 @@ export const challengeDays: ChallengeDay[] = [
     day: 14,
     title: "Foco na Celebração e Continuidade",
     objective: "Celebrar as conquistas e planejar a continuidade.",
-    phrase: "Você transformou sua jornada. O LipeVida é seu aliado para uma vida plena.",
+    phrase: "Você transformou sua jornada. O Levvia é seu aliado para uma vida plena.",
     exercises: [
       { id: "day14-ex1", type: "exercise", label: "Caminhada Consciente", exerciseId: 28 },
       { id: "day14-ex2", type: "exercise", label: "Relaxamento Progressivo (Scan Corporal)", exerciseId: 3 },
@@ -265,7 +265,7 @@ export const challengeDays: ChallengeDay[] = [
 
 // Incentive messages based on progress percentage
 export function getIncentiveMessage(progress: number): string {
-  if (progress === 0) return "Lembre-se: o LipeVida não faz milagres, mas seu esforço transforma!";
+  if (progress === 0) return "Lembre-se: o Levvia não faz milagres, mas seu esforço transforma!";
   if (progress < 30) return "Você já começou, isso é o mais importante! Continue!";
   if (progress < 60) return "Bom progresso! Cada atividade concluída faz diferença.";
   if (progress < 100) return "Quase lá! Falta pouco para completar o dia!";

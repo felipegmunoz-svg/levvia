@@ -19,7 +19,7 @@ const Today = () => {
 
   // --- Onboarding data ---
   const { userName, painAnswer } = useMemo(() => {
-    const saved = localStorage.getItem("lipevida_onboarding");
+    const saved = localStorage.getItem("levvia_onboarding");
     if (saved) {
       const data = JSON.parse(saved);
       return { userName: (data[2] as string) || "", painAnswer: (data[3] as string) || "" };
@@ -31,10 +31,10 @@ const Today = () => {
 
   // --- Challenge day calculation ---
   const currentDay = useMemo(() => {
-    let start = localStorage.getItem("lipevida_challenge_start");
+    let start = localStorage.getItem("levvia_challenge_start");
     if (!start) {
       start = new Date().toISOString();
-      localStorage.setItem("lipevida_challenge_start", start);
+      localStorage.setItem("levvia_challenge_start", start);
     }
     const diff = Date.now() - new Date(start).getTime();
     const day = Math.floor(diff / 86400000) + 1;
@@ -60,12 +60,12 @@ const Today = () => {
 
   // --- Progress state ---
   const [progress, setProgress] = useState<Record<string, Record<string, boolean>>>(() => {
-    const saved = localStorage.getItem("lipevida_challenge_progress");
+    const saved = localStorage.getItem("levvia_challenge_progress");
     return saved ? JSON.parse(saved) : {};
   });
 
   useEffect(() => {
-    localStorage.setItem("lipevida_challenge_progress", JSON.stringify(progress));
+    localStorage.setItem("levvia_challenge_progress", JSON.stringify(progress));
   }, [progress]);
 
   const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);

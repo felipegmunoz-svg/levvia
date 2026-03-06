@@ -7,26 +7,26 @@ const Profile = () => {
   const [activeSection, setActiveSection] = useState<"info" | "evolution" | "achievements" | "settings">("info");
 
   useEffect(() => {
-    const saved = localStorage.getItem("lipevida_onboarding");
+    const saved = localStorage.getItem("levvia_onboarding");
     if (saved) setOnboardingData(JSON.parse(saved));
   }, []);
 
   const userName = (onboardingData[2] as string) || "Usuária";
 
   const resetChecklist = () => {
-    localStorage.removeItem("lipevida_checklist");
-    localStorage.removeItem("lipevida_challenge_progress");
+    localStorage.removeItem("levvia_checklist");
+    localStorage.removeItem("levvia_challenge_progress");
     window.location.reload();
   };
 
   const resetOnboarding = () => {
-    localStorage.removeItem("lipevida_onboarded");
-    localStorage.removeItem("lipevida_onboarding");
-    localStorage.removeItem("lipevida_checklist");
-    localStorage.removeItem("lipevida_challenge_start");
-    localStorage.removeItem("lipevida_challenge_progress");
-    localStorage.removeItem("lipevida_welcome_dismissed");
-    localStorage.removeItem("lipevida_meal_plan");
+    localStorage.removeItem("levvia_onboarded");
+    localStorage.removeItem("levvia_onboarding");
+    localStorage.removeItem("levvia_checklist");
+    localStorage.removeItem("levvia_challenge_start");
+    localStorage.removeItem("levvia_challenge_progress");
+    localStorage.removeItem("levvia_welcome_dismissed");
+    localStorage.removeItem("levvia_meal_plan");
     window.location.href = "/";
   };
 
@@ -53,7 +53,7 @@ const Profile = () => {
           </div>
           <div>
             <h1 className="text-xl font-extrabold text-foreground">{userName}</h1>
-            <p className="text-sm text-muted-foreground">Membro LipeVida</p>
+            <p className="text-sm text-muted-foreground">Membro Levvia</p>
           </div>
         </div>
       </header>
@@ -208,7 +208,7 @@ const Profile = () => {
 
         {/* Disclaimer */}
         <p className="text-xs text-muted-foreground text-center leading-relaxed px-4">
-          Os conteúdos do LipeVida são informativos e não substituem orientação médica profissional.
+          Os conteúdos do Levvia são informativos e não substituem orientação médica profissional.
         </p>
       </main>
 
