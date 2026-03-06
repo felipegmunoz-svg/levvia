@@ -19,7 +19,6 @@ const Practices = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  // Handle deep link from Today page
   useEffect(() => {
     const tabParam = searchParams.get("tab");
     const highlightId = searchParams.get("highlight");
@@ -38,7 +37,6 @@ const Practices = () => {
     }
   }, [searchParams]);
 
-  // Collect all tags
   const allExerciseTags = Array.from(new Set(exercises.flatMap((e) => [e.category, e.level])));
   const allRecipeTags = Array.from(new Set(recipes.flatMap((r) => r.tags)));
 
@@ -61,9 +59,9 @@ const Practices = () => {
   const currentTags = tab === "exercises" ? allExerciseTags : allRecipeTags;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background gradient-page pb-24">
       <header className="px-6 pt-10 pb-4">
-        <h1 className="text-2xl font-extrabold text-foreground">Práticas</h1>
+        <h1 className="text-2xl font-light text-foreground">Práticas</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Exercícios e receitas pensados para você
         </p>
@@ -71,12 +69,12 @@ const Practices = () => {
 
       {/* Tab switcher */}
       <div className="px-6 mb-4">
-        <div className="flex bg-muted rounded-xl p-1">
+        <div className="flex bg-white/[0.06] border border-white/10 rounded-xl p-1">
           <button
             onClick={() => { setTab("exercises"); setActiveTag(null); }}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
               tab === "exercises"
-                ? "bg-card text-primary shadow-card"
+                ? "bg-white/[0.12] text-foreground"
                 : "text-muted-foreground"
             }`}
           >
@@ -84,9 +82,9 @@ const Practices = () => {
           </button>
           <button
             onClick={() => { setTab("recipes"); setActiveTag(null); }}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
               tab === "recipes"
-                ? "bg-card text-primary shadow-card"
+                ? "bg-white/[0.12] text-foreground"
                 : "text-muted-foreground"
             }`}
           >
@@ -100,10 +98,10 @@ const Practices = () => {
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <button
             onClick={() => setActiveTag(null)}
-            className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-bold transition-all ${
+            className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
               !activeTag
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
+                ? "bg-secondary text-foreground"
+                : "bg-white/[0.06] text-muted-foreground border border-white/10"
             }`}
           >
             Todos
@@ -112,10 +110,10 @@ const Practices = () => {
             <button
               key={tag}
               onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-              className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-bold transition-all ${
+              className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
                 activeTag === tag
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground"
+                  ? "bg-secondary text-foreground"
+                  : "bg-white/[0.06] text-muted-foreground border border-white/10"
               }`}
             >
               {tag}

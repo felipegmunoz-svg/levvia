@@ -45,14 +45,14 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background gradient-page pb-24">
       <header className="px-6 pt-10 pb-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-soft">
-            <Heart size={28} className="text-primary-foreground" />
+          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
+            <Heart size={28} strokeWidth={1.5} className="text-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-foreground">{userName}</h1>
+            <h1 className="text-xl font-light text-foreground">{userName}</h1>
             <p className="text-sm text-muted-foreground">Membro Levvia</p>
           </div>
         </div>
@@ -65,13 +65,13 @@ const Profile = () => {
             <button
               key={s.id}
               onClick={() => setActiveSection(s.id)}
-              className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-full font-bold transition-all ${
+              className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-full font-medium transition-all ${
                 activeSection === s.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground"
+                  ? "bg-secondary text-foreground"
+                  : "bg-white/[0.06] text-muted-foreground border border-white/10"
               }`}
             >
-              <s.icon size={14} />
+              <s.icon size={14} strokeWidth={1.5} />
               {s.label}
             </button>
           ))}
@@ -82,20 +82,20 @@ const Profile = () => {
         {/* Info section */}
         {activeSection === "info" && (
           <>
-            <section className="bg-card rounded-2xl shadow-card overflow-hidden">
-              <div className="px-4 py-3 border-b border-border">
-                <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Settings size={16} className="text-primary" />
+            <section className="glass-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-white/10">
+                <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <Settings size={16} strokeWidth={1.5} className="text-secondary" />
                   Suas Informações
                 </h2>
               </div>
               {profileItems.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between px-4 py-3 border-b border-border last:border-0"
+                  className="flex items-center justify-between px-4 py-3 border-b border-white/10 last:border-0"
                 >
                   <span className="text-sm text-muted-foreground">{item.label}</span>
-                  <span className="text-sm font-semibold text-foreground text-right max-w-[60%] truncate">
+                  <span className="text-sm font-medium text-foreground text-right max-w-[60%] truncate">
                     {typeof item.value === "string" ? item.value : "—"}
                   </span>
                 </div>
@@ -105,23 +105,23 @@ const Profile = () => {
             <section className="space-y-3">
               <button
                 onClick={resetChecklist}
-                className="flex items-center justify-between w-full px-4 py-3.5 bg-card rounded-xl shadow-card hover:shadow-soft transition-all"
+                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
               >
-                <span className="flex items-center gap-3 text-sm font-semibold text-foreground">
-                  <RotateCcw size={18} className="text-primary" />
+                <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                  <RotateCcw size={18} strokeWidth={1.5} className="text-secondary" />
                   Resetar checklist de hoje
                 </span>
-                <ChevronRight size={18} className="text-muted-foreground" />
+                <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
               </button>
               <button
                 onClick={resetOnboarding}
-                className="flex items-center justify-between w-full px-4 py-3.5 bg-card rounded-xl shadow-card hover:shadow-soft transition-all"
+                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
               >
-                <span className="flex items-center gap-3 text-sm font-semibold text-foreground">
-                  <RotateCcw size={18} className="text-destructive" />
+                <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                  <RotateCcw size={18} strokeWidth={1.5} className="text-destructive" />
                   Refazer questionário inicial
                 </span>
-                <ChevronRight size={18} className="text-muted-foreground" />
+                <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
               </button>
             </section>
           </>
@@ -129,19 +129,19 @@ const Profile = () => {
 
         {/* Evolution section */}
         {activeSection === "evolution" && (
-          <section className="bg-card rounded-2xl shadow-card p-6">
+          <section className="glass-card p-6">
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp size={20} className="text-primary" />
-              <h2 className="text-base font-bold text-foreground">Sua Evolução</h2>
+              <TrendingUp size={20} strokeWidth={1.5} className="text-secondary" />
+              <h2 className="text-base font-medium text-foreground">Sua Evolução</h2>
             </div>
             <div className="flex flex-col items-center justify-center py-8">
-              <div className="w-20 h-20 rounded-full bg-primary-light flex items-center justify-center mb-4">
-                <TrendingUp size={32} className="text-primary" />
+              <div className="w-20 h-20 rounded-full bg-secondary/20 flex items-center justify-center mb-4">
+                <TrendingUp size={32} strokeWidth={1.5} className="text-secondary" />
               </div>
               <p className="text-sm text-muted-foreground text-center max-w-xs leading-relaxed">
                 Em breve você poderá acompanhar sua evolução com gráficos de progresso diário, semanal e mensal.
               </p>
-              <span className="text-xs text-primary font-bold mt-3 bg-primary-light px-3 py-1 rounded-full">
+              <span className="text-xs text-secondary font-medium mt-3 bg-secondary/20 px-3 py-1 rounded-full">
                 Em breve
               </span>
             </div>
@@ -150,10 +150,10 @@ const Profile = () => {
 
         {/* Achievements section */}
         {activeSection === "achievements" && (
-          <section className="bg-card rounded-2xl shadow-card p-6">
+          <section className="glass-card p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Trophy size={20} className="text-accent-foreground" />
-              <h2 className="text-base font-bold text-foreground">Conquistas</h2>
+              <Trophy size={20} strokeWidth={1.5} className="text-accent" />
+              <h2 className="text-base font-medium text-foreground">Conquistas</h2>
             </div>
             <div className="grid grid-cols-3 gap-3 mb-4">
               {[
@@ -163,10 +163,10 @@ const Profile = () => {
               ].map((badge) => (
                 <div
                   key={badge.label}
-                  className="flex flex-col items-center p-3 rounded-xl bg-secondary/50"
+                  className="flex flex-col items-center p-3 rounded-xl bg-white/[0.06] border border-white/10"
                 >
                   <span className="text-2xl mb-1">{badge.emoji}</span>
-                  <span className="text-xs font-bold text-foreground text-center">{badge.label}</span>
+                  <span className="text-xs font-medium text-foreground text-center">{badge.label}</span>
                   <span className="text-[10px] text-muted-foreground text-center mt-0.5">{badge.desc}</span>
                 </div>
               ))}
@@ -187,19 +187,19 @@ const Profile = () => {
             ].map((item) => (
               <button
                 key={item.label}
-                className="flex items-center justify-between w-full px-4 py-3.5 bg-card rounded-xl shadow-card hover:shadow-soft transition-all"
+                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
               >
-                <span className="flex items-center gap-3 text-sm font-semibold text-foreground">
-                  <item.icon size={18} className="text-primary" />
+                <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                  <item.icon size={18} strokeWidth={1.5} className="text-secondary" />
                   {item.label}
                 </span>
                 <div className="flex items-center gap-2">
                   {item.desc && (
-                    <span className="text-xs text-primary font-bold bg-primary-light px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-secondary font-medium bg-secondary/20 px-2 py-0.5 rounded-full">
                       {item.desc}
                     </span>
                   )}
-                  <ChevronRight size={18} className="text-muted-foreground" />
+                  <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
                 </div>
               </button>
             ))}

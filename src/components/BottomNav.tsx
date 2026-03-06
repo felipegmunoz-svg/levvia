@@ -12,7 +12,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-soft">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[rgba(13,31,54,0.95)] backdrop-blur-[20px] border-t border-white/[0.08]">
       <div className="flex items-center justify-around max-w-md mx-auto h-16">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
@@ -23,20 +23,20 @@ const BottomNav = () => {
               onClick={() => navigate(tab.path)}
               className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? "text-primary"
+                  ? "text-secondary"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Icon
                 size={22}
-                strokeWidth={isActive ? 2.5 : 2}
-                className={isActive ? "text-primary" : ""}
+                strokeWidth={1.5}
+                className={isActive ? "text-secondary" : ""}
               />
-              <span className={`text-xs font-semibold ${isActive ? "text-primary" : ""}`}>
+              <span className={`text-xs ${isActive ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                 {tab.label}
               </span>
               {isActive && (
-                <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />
+                <div className="w-1 h-1 rounded-full bg-secondary mt-0.5" />
               )}
             </button>
           );
