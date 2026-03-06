@@ -101,7 +101,6 @@ const Today = () => {
     const isChecked = !!dayProgress[id];
 
     if (!isChecked) {
-      // Trigger action when checking
       if (activity.type === "habit" && activity.modalContent) {
         setModalContent({ title: activity.label, text: activity.modalContent });
       } else if (activity.type === "exercise" && activity.exerciseId) {
@@ -154,7 +153,6 @@ const Today = () => {
     }
   };
 
-  // --- Render inline detail views ---
   if (selectedExercise) {
     return (
       <ExerciseDetail
@@ -178,49 +176,49 @@ const Today = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <header className="gradient-primary px-6 pt-10 pb-8 rounded-b-3xl">
-        <p className="text-primary-foreground/80 text-sm font-semibold">{getGreeting()}</p>
-        <h1 className="text-2xl font-extrabold text-primary-foreground mt-1">
+      <header className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
+        <p className="text-muted-foreground text-sm font-medium">{getGreeting()}</p>
+        <h1 className="text-2xl font-light text-foreground mt-1">
           {userName ? `${userName}, seu dia de cuidado` : "Seu dia de cuidado"}
         </h1>
 
         {/* Day counter */}
-        <div className="mt-3 inline-flex items-center gap-2 bg-primary-foreground/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
-          <Sparkles size={14} className="text-primary-foreground" />
-          <span className="text-sm font-extrabold text-primary-foreground">
+        <div className="mt-3 inline-flex items-center gap-2 bg-white/[0.08] backdrop-blur-sm px-4 py-1.5 rounded-full">
+          <Sparkles size={14} strokeWidth={1.5} className="text-secondary" />
+          <span className="text-sm font-medium text-foreground">
             Dia {currentDay} de 14
           </span>
         </div>
 
         {/* Day title & objective */}
-        <p className="text-xs text-primary-foreground/80 mt-2 font-bold">
+        <p className="text-xs text-foreground/80 mt-2 font-medium">
           {todayData.title}
         </p>
-        <p className="text-xs text-primary-foreground/60 mt-0.5">
+        <p className="text-xs text-muted-foreground mt-0.5">
           {todayData.objective}
         </p>
 
         {/* Motivational phrase */}
-        <p className="text-xs text-primary-foreground/70 mt-2 italic leading-relaxed">
+        <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">
           "{dailyPhrase}"
         </p>
 
         {/* Progress bar */}
-        <div className="mt-5 bg-card/15 backdrop-blur-sm rounded-2xl p-4">
+        <div className="mt-5 glass-card p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold text-primary-foreground">Progresso de hoje</span>
-            <span className="text-sm font-extrabold text-primary-foreground">
+            <span className="text-sm font-medium text-foreground">Progresso de hoje</span>
+            <span className="text-sm font-medium text-foreground">
               {completedCount}/{totalCount}
             </span>
           </div>
-          <div className="w-full h-2.5 bg-primary-foreground/20 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary-foreground rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-secondary to-success rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
           {progressPercent === 100 && (
-            <p className="text-xs text-primary-foreground/90 font-semibold mt-2 text-center">
+            <p className="text-xs text-foreground/90 font-medium mt-2 text-center">
               🎉 Parabéns! Você completou todas as atividades!
             </p>
           )}
@@ -229,25 +227,23 @@ const Today = () => {
 
       {/* Previous day feedback */}
       {prevDayFeedback && (
-        <div className={`mx-5 mt-4 rounded-2xl p-4 ${
-          prevDayFeedback.allDone
-            ? "bg-primary-light"
-            : "bg-accent/10"
+        <div className={`mx-5 mt-4 glass-card p-4 ${
+          prevDayFeedback.allDone ? "border-success/30" : "border-accent/30"
         }`}>
           <div className="flex items-start gap-3">
             {prevDayFeedback.allDone ? (
-              <Trophy size={20} className="text-primary flex-shrink-0 mt-0.5" />
+              <Trophy size={20} strokeWidth={1.5} className="text-success flex-shrink-0 mt-0.5" />
             ) : (
-              <AlertTriangle size={20} className="text-accent-foreground flex-shrink-0 mt-0.5" />
+              <AlertTriangle size={20} strokeWidth={1.5} className="text-accent flex-shrink-0 mt-0.5" />
             )}
             <div>
               {prevDayFeedback.allDone ? (
                 <p className="text-sm text-foreground">
-                  <span className="font-bold">Parabéns!</span> Você concluiu todas as atividades do Dia {prevDayFeedback.day}! Continue assim! 🎉
+                  <span className="font-medium">Parabéns!</span> Você concluiu todas as atividades do Dia {prevDayFeedback.day}! Continue assim! 🎉
                 </p>
               ) : (
                 <p className="text-sm text-foreground">
-                  <span className="font-bold">Atenção!</span> Você deixou {prevDayFeedback.total - prevDayFeedback.completed} atividades pendentes no Dia {prevDayFeedback.day}. Seu comprometimento é a chave para o sucesso!
+                  <span className="font-medium">Atenção!</span> Você deixou {prevDayFeedback.total - prevDayFeedback.completed} atividades pendentes no Dia {prevDayFeedback.day}. Seu comprometimento é a chave para o sucesso!
                 </p>
               )}
             </div>
@@ -268,8 +264,8 @@ const Today = () => {
         {todayData.exercises.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <Dumbbell size={18} className="text-primary" />
-              <h2 className="text-base font-bold text-foreground">Exercícios</h2>
+              <Dumbbell size={18} strokeWidth={1.5} className="text-secondary" />
+              <h2 className="text-base font-medium text-foreground">Exercícios</h2>
             </div>
             <div className="space-y-2">
               {todayData.exercises.map((item) => (
@@ -287,12 +283,12 @@ const Today = () => {
           </section>
         )}
 
-        {/* Cardápio do Dia (5 refeições) */}
+        {/* Cardápio do Dia */}
         {mealActivities.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <UtensilsCrossed size={18} className="text-primary" />
-              <h2 className="text-base font-bold text-foreground">Cardápio do Dia</h2>
+              <UtensilsCrossed size={18} strokeWidth={1.5} className="text-secondary" />
+              <h2 className="text-base font-medium text-foreground">Cardápio do Dia</h2>
             </div>
             <div className="space-y-2">
               {mealActivities.map((item) => (
@@ -314,8 +310,8 @@ const Today = () => {
         {todayData.habits.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <Heart size={18} className="text-primary" />
-              <h2 className="text-base font-bold text-foreground">Hábitos do Dia</h2>
+              <Heart size={18} strokeWidth={1.5} className="text-secondary" />
+              <h2 className="text-base font-medium text-foreground">Hábitos do Dia</h2>
             </div>
             <div className="space-y-2">
               {todayData.habits.map((item) => (
@@ -336,19 +332,19 @@ const Today = () => {
 
       {/* Modal */}
       {modalContent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm px-6">
-          <div className="bg-card rounded-2xl shadow-soft p-6 max-w-sm w-full relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6">
+          <div className="glass-card p-6 max-w-sm w-full relative">
             <button
               onClick={() => setModalContent(null)}
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
             >
-              <X size={20} />
+              <X size={20} strokeWidth={1.5} />
             </button>
-            <h3 className="text-base font-bold text-foreground mb-3">{modalContent.title}</h3>
+            <h3 className="text-base font-medium text-foreground mb-3">{modalContent.title}</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{modalContent.text}</p>
             <button
               onClick={() => setModalContent(null)}
-              className="mt-5 w-full py-3 rounded-xl gradient-primary text-primary-foreground font-bold text-sm"
+              className="mt-5 w-full py-3 rounded-3xl gradient-primary text-foreground font-medium text-sm"
             >
               Entendi!
             </button>

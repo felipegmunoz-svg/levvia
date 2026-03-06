@@ -13,7 +13,7 @@ export default {
       },
     },
     fontFamily: {
-      sans: ['Nunito', 'sans-serif'],
+      sans: ['DM Sans', 'sans-serif'],
     },
     extend: {
       colors: {
@@ -49,7 +49,7 @@ export default {
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
+          DEFAULT: "rgba(255, 255, 255, 0.06)",
           foreground: "hsl(var(--card-foreground))",
         },
         success: {
@@ -74,20 +74,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
