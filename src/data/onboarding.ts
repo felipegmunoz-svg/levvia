@@ -11,22 +11,22 @@ export const onboardingSteps: OnboardingQuestion[] = [
   {
     id: 0,
     type: "welcome",
-    title: "Bem-vinda ao LipeVida",
-    subtitle: "Seu espaço de cuidado e bem-estar. Vamos conhecer você melhor para personalizar sua experiência.",
+    title: "Bem-vinda ao Levvia",
+    subtitle: "Seu caminho para a leveza. Vamos conhecer você melhor para personalizar sua experiência.",
     icon: "heart",
   },
   {
     id: 1,
     type: "disclaimer",
     title: "Aviso Importante",
-    subtitle: "O LipeVida é um aplicativo de apoio ao bem-estar e não substitui tratamento médico. As informações aqui são educativas e complementares ao acompanhamento profissional.",
+    subtitle: "O Levvia é um aplicativo de apoio ao bem-estar e não substitui tratamento médico. As informações aqui são educativas e complementares ao acompanhamento profissional.",
     icon: "shield",
   },
   {
     id: 2,
     type: "name",
     title: "Como podemos te chamar?",
-    subtitle: "Queremos personalizar sua experiência no LipeVida.",
+    subtitle: "Queremos personalizar sua experiência no Levvia.",
     icon: "smile",
   },
   {
@@ -186,6 +186,6 @@ export const fireResults: Record<string, FireResult> = {
     colorClass: "text-red-600",
     bgClass: "bg-red-50",
     description:
-      "A inflamação está muito alta e seu corpo precisa de atenção especial. Além do acompanhamento médico, o LipeVida vai te apoiar com práticas gentis e diárias para aliviar o desconforto.",
+      "A inflamação está muito alta e seu corpo precisa de atenção especial. Além do acompanhamento médico, o Levvia vai te apoiar com práticas gentis e diárias para aliviar o desconforto.",
   },
 };

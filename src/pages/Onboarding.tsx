@@ -47,8 +47,8 @@ const Onboarding = () => {
     if (step < total - 1) {
       setStep(step + 1);
     } else {
-      localStorage.setItem("lipevida_onboarding", JSON.stringify({ ...answers, [current.id]: current.type === "name" ? nameInput.trim() : answers[current.id] }));
-      localStorage.setItem("lipevida_onboarded", "true");
+      localStorage.setItem("levvia_onboarding", JSON.stringify({ ...answers, [current.id]: current.type === "name" ? nameInput.trim() : answers[current.id] }));
+      localStorage.setItem("levvia_onboarded", "true");
       navigate("/today");
     }
   };

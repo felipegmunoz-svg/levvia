@@ -17,7 +17,7 @@ export interface DailyMealPlan {
 }
 
 function getRestrictions(): string[] {
-  const saved = localStorage.getItem("lipevida_onboarding");
+  const saved = localStorage.getItem("levvia_onboarding");
   if (!saved) return [];
   const data = JSON.parse(saved);
   return (data[9] as string[]) || [];
@@ -64,7 +64,7 @@ function getRecipesForSlot(filtered: Recipe[], slot: MealSlot): Recipe[] {
 }
 
 export function generateMealPlan(): DailyMealPlan[] {
-  const cached = localStorage.getItem("lipevida_meal_plan");
+  const cached = localStorage.getItem("levvia_meal_plan");
   if (cached) {
     try {
       return JSON.parse(cached);
@@ -104,7 +104,7 @@ export function generateMealPlan(): DailyMealPlan[] {
     plan.push({ day, meals });
   }
 
-  localStorage.setItem("lipevida_meal_plan", JSON.stringify(plan));
+  localStorage.setItem("levvia_meal_plan", JSON.stringify(plan));
   return plan;
 }
 
@@ -121,6 +121,6 @@ export function getMealPlanForDay(day: number): Record<MealSlot, Recipe | null> 
 }
 
 export function regenerateMealPlan(): DailyMealPlan[] {
-  localStorage.removeItem("lipevida_meal_plan");
+  localStorage.removeItem("levvia_meal_plan");
   return generateMealPlan();
 }
