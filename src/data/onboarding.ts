@@ -157,7 +157,7 @@ export const fireResults: Record<string, FireResult> = {
       "Seu corpo está em um bom equilíbrio! Você sente pouca ou nenhuma inflamação no momento. Continue cuidando de si — pequenas atitudes diárias mantêm esse equilíbrio e previnem crises futuras.",
   },
   "Dor leve": {
-    level: "Chamas Suaves",
+    level: "Chamas Moderadas",
     color: "Amarelo",
     colorClass: "text-yellow-600",
     bgClass: "bg-yellow-50",
@@ -165,7 +165,7 @@ export const fireResults: Record<string, FireResult> = {
       "Há sinais leves de inflamação. Seu corpo está pedindo atenção com pequenos sinais. Com ajustes na alimentação, movimento suave e cuidado diário, você pode manter esse fogo bem controlado.",
   },
   "Dor moderada": {
-    level: "Chamas Moderadas",
+    level: "Incêndio Crescente",
     color: "Laranja",
     colorClass: "text-orange-600",
     bgClass: "bg-orange-50",
@@ -173,7 +173,7 @@ export const fireResults: Record<string, FireResult> = {
       "A inflamação está presente e merece atenção. Seu corpo está sinalizando que precisa de mais cuidado. Vamos trabalhar juntas para reduzir esse desconforto com práticas anti-inflamatórias diárias.",
   },
   "Dor intensa": {
-    level: "Chamas Intensas",
+    level: "Fogo Ardente",
     color: "Vermelho",
     colorClass: "text-red-600",
     bgClass: "bg-red-50",
@@ -181,7 +181,7 @@ export const fireResults: Record<string, FireResult> = {
       "A inflamação está alta e seu corpo precisa de atenção especial. Não se preocupe — cada passo que você der aqui vai ajudar. Vamos focar em alívio, conforto e práticas gentis para o seu corpo.",
   },
   "Dor muito intensa": {
-    level: "Chamas Intensas",
+    level: "Fogo Ardente",
     color: "Vermelho",
     colorClass: "text-red-600",
     bgClass: "bg-red-50",
