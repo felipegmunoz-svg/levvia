@@ -1,0 +1,18 @@
+{
+  "name": "Levvia",
+  "short_name": "Levvia",
+  "description": "Seu caminho para a leveza.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D1F36",
+  "theme_color": "#0D1F36",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo_app_livvia.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
