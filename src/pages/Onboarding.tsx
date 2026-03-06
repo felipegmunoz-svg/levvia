@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck } from "lucide-react";
+import logoFull from "@/assets/logo_livvia_branco.png";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -65,6 +66,20 @@ const Onboarding = () => {
   const userObjective = answers[8] as string;
 
   const renderContent = () => {
+    // Welcome screen
+    if (current.type === "welcome") {
+      return (
+        <div className="flex-1 flex flex-col justify-center px-6 py-8">
+          <div className="flex justify-center mb-6">
+            <img src={logoFull} alt="Levvia" className="w-[200px] h-auto" />
+          </div>
+          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">
+            Seu caminho para a leveza.
+          </p>
+        </div>
+      );
+    }
+
     // Disclaimer screen
     if (current.type === "disclaimer") {
       return (
