@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Heart, Settings, ChevronRight, RotateCcw, TrendingUp, Trophy, Bell, FileText, Shield } from "lucide-react";
+import { Settings, ChevronRight, RotateCcw, TrendingUp, Trophy, Bell, FileText, Shield } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
 const Profile = () => {
   const [onboardingData, setOnboardingData] = useState<Record<string, string | string[]>>({});
@@ -49,7 +50,7 @@ const Profile = () => {
       <header className="px-6 pt-10 pb-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
-            <Heart size={28} strokeWidth={1.5} className="text-foreground" />
+            <img src={logoIcon} alt="Levvia" className="w-10 h-auto" />
           </div>
           <div>
             <h1 className="text-xl font-light text-foreground">{userName}</h1>

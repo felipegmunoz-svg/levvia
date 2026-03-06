@@ -12,6 +12,7 @@ import type { MealSlot } from "@/data/mealPlan";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
+import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
 const Today = () => {
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: Exercise; activityId: string } | null>(null);
@@ -177,7 +178,10 @@ const Today = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
-        <p className="text-muted-foreground text-sm font-medium">{getGreeting()}</p>
+        <div className="flex items-center gap-3 mb-1">
+          <img src={logoIcon} alt="Levvia" className="w-8 h-auto" />
+          <p className="text-muted-foreground text-sm font-medium">{getGreeting()}</p>
+        </div>
         <h1 className="text-2xl font-light text-foreground mt-1">
           {userName ? `${userName}, seu dia de cuidado` : "Seu dia de cuidado"}
         </h1>
