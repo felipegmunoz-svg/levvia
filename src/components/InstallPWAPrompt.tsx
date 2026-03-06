@@ -1,5 +1,5 @@
 import logoFull from "@/assets/logo_livvia_branco.png";
-import { Share, MoreVertical } from "lucide-react";
+import { Share, MoreVertical, PlusSquare, CheckCircle } from "lucide-react";
 
 interface InstallPWAPromptProps {
   onDismiss: () => void;
@@ -10,14 +10,14 @@ const InstallPWAPrompt = ({ onDismiss }: InstallPWAPromptProps) => {
 
   const steps = isIOS
     ? [
-        { icon: <Share className="w-4 h-4" strokeWidth={1.5} />, text: 'Toque em "Compartilhar"' },
-        { text: 'Role e toque em "Adicionar à Tela de Início"' },
-        { text: 'Toque em "Adicionar"' },
+        { icon: <Share className="w-4 h-4" strokeWidth={1.5} />, title: "Toque nos 3 pontinhos", description: "No Safari, toque no ícone ••• no canto inferior direito da tela" },
+        { icon: <PlusSquare className="w-4 h-4" strokeWidth={1.5} />, title: "Toque em 'Tela de Início'", description: "Role a lista para baixo e toque em 'Adicionar à Tela de Início'" },
+        { icon: <CheckCircle className="w-4 h-4" strokeWidth={1.5} />, title: "Toque em 'Adicionar'", description: "Confirme no canto superior direito e o Levvia aparece na sua tela inicial" },
       ]
     : [
-        { icon: <MoreVertical className="w-4 h-4" strokeWidth={1.5} />, text: 'Toque nos 3 pontos do menu' },
-        { text: 'Toque em "Adicionar à tela inicial"' },
-        { text: "Confirme a instalação" },
+        { icon: <MoreVertical className="w-4 h-4" strokeWidth={1.5} />, title: "Toque nos 3 pontos do menu", description: "No Chrome, toque no ícone ⋮ no canto superior direito" },
+        { icon: <PlusSquare className="w-4 h-4" strokeWidth={1.5} />, title: "Adicionar à tela inicial", description: 'Toque em "Adicionar à tela inicial"' },
+        { icon: <CheckCircle className="w-4 h-4" strokeWidth={1.5} />, title: "Confirme a instalação", description: "Toque em 'Adicionar' para confirmar" },
       ];
 
   return (
@@ -36,15 +36,25 @@ const InstallPWAPrompt = ({ onDismiss }: InstallPWAPromptProps) => {
           <p className="text-xs text-muted-foreground font-medium mb-4 uppercase tracking-wider">
             {isIOS ? "iOS (Safari)" : "Android (Chrome)"}
           </p>
+
+          {isIOS && (
+            <p className="text-xs text-muted-foreground mb-3">
+              ⚠️ Funciona apenas no Safari. Se estiver no Chrome, abra este link no Safari primeiro.
+            </p>
+          )}
+
           <div className="space-y-4">
             {steps.map((step, i) => (
               <div key={i} className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center shrink-0 text-xs font-medium text-secondary-foreground">
                   {i + 1}
                 </div>
-                <div className="flex items-center gap-2 pt-0.5">
-                  {step.icon && <span className="text-secondary">{step.icon}</span>}
-                  <span className="text-sm text-foreground">{step.text}</span>
+                <div className="flex flex-col gap-0.5 pt-0.5">
+                  <div className="flex items-center gap-2">
+                    {step.icon && <span className="text-secondary">{step.icon}</span>}
+                    <span className="text-sm font-medium text-foreground">{step.title}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{step.description}</span>
                 </div>
               </div>
             ))}
