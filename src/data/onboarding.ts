@@ -1,10 +1,12 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics";
   title: string;
   subtitle?: string;
   options?: string[];
   icon: string;
+  /** For "number" type: input config */
+  numberConfig?: { min?: number; max?: number; unit?: string; placeholder?: string };
 }
 
 export const onboardingSteps: OnboardingQuestion[] = [
@@ -29,8 +31,63 @@ export const onboardingSteps: OnboardingQuestion[] = [
     subtitle: "Queremos personalizar sua experiência no Levvia.",
     icon: "smile",
   },
+  // ── Anamnese: dados pessoais ──
   {
     id: 3,
+    type: "number",
+    title: "Qual a sua idade?",
+    subtitle: "Precisamos saber para adaptar as recomendações ao seu perfil.",
+    icon: "calendar",
+    numberConfig: { min: 12, max: 120, unit: "anos", placeholder: "Ex: 35" },
+  },
+  {
+    id: 4,
+    type: "single",
+    title: "Qual o seu sexo biológico?",
+    subtitle: "Esta informação nos ajuda a personalizar melhor o seu plano.",
+    options: ["Feminino", "Masculino", "Prefiro não informar"],
+    icon: "user",
+  },
+  {
+    id: 5,
+    type: "body_metrics",
+    title: "Peso e Altura",
+    subtitle: "Esses dados nos ajudam a entender melhor o seu corpo. Pode ser aproximado.",
+    icon: "ruler",
+  },
+  {
+    id: 6,
+    type: "single",
+    title: "Qual o seu nível de atividade física atual?",
+    subtitle: "Seja honesta — vamos adaptar tudo ao seu ritmo real.",
+    options: [
+      "Sedentária (pouco ou nenhum exercício)",
+      "Leve (caminhadas leves, 1-2x por semana)",
+      "Moderado (exercícios regulares, 3-4x por semana)",
+      "Ativo (exercícios intensos, 5+ vezes por semana)",
+    ],
+    icon: "activity",
+  },
+  {
+    id: 7,
+    type: "multi",
+    title: "Condições de Saúde",
+    subtitle: "Você possui alguma dessas condições? Selecione todas que se aplicam. É opcional.",
+    options: [
+      "Lipedema diagnosticado",
+      "Linfedema",
+      "Problemas circulatórios",
+      "Artrite ou artrose",
+      "Fibromialgia",
+      "Diabetes",
+      "Hipertensão",
+      "Hipotireoidismo",
+    ],
+    icon: "stethoscope",
+  },
+  // ── Avaliação de dor (antigos IDs 3-5, agora 8-10) ──
+  {
+    id: 8,
     type: "single",
     title: "Como você descreveria seu nível de dor no dia a dia?",
     subtitle: "Onde está seu fogo interno? Seja honesta — não existe resposta errada.",
@@ -38,7 +95,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "thermometer",
   },
   {
-    id: 4,
+    id: 9,
     type: "multi",
     title: "Quais áreas do corpo são mais afetadas?",
     subtitle: "Selecione todas que se aplicam.",
@@ -46,14 +103,15 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "body",
   },
   {
-    id: 5,
+    id: 10,
     type: "result",
     title: "Seu Fogo Interno",
     subtitle: "",
     icon: "flame",
   },
+  // ── Alimentação (antigos IDs 6-10, agora 11-15) ──
   {
-    id: 6,
+    id: 11,
     type: "multi",
     title: "Seus Inimigos Inflamatórios",
     subtitle: "Quais desses alimentos você consome com frequência? Selecione todos que se aplicam.",
@@ -70,7 +128,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "flame",
   },
   {
-    id: 7,
+    id: 12,
     type: "multi",
     title: "Seus Aliados Anti-inflamatórios",
     subtitle: "Quais desses alimentos você já inclui na sua rotina? Selecione todos que se aplicam.",
@@ -87,7 +145,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "leaf",
   },
   {
-    id: 8,
+    id: 13,
     type: "single",
     title: "Seu Objetivo em 14 Dias",
     subtitle: "Escolha o seu principal objetivo para as próximas duas semanas.",
@@ -102,7 +160,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "target",
   },
   {
-    id: 9,
+    id: 14,
     type: "multi",
     title: "Restrições Alimentares",
     subtitle: "Você possui alguma restrição alimentar? Selecione todas que se aplicam.",
@@ -118,7 +176,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "shield",
   },
   {
-    id: 10,
+    id: 15,
     type: "multi",
     title: "Preferências Alimentares",
     subtitle: "Alguma preferência especial? Esta etapa é opcional — pode pular se quiser.",
@@ -131,7 +189,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "heart",
   },
   {
-    id: 11,
+    id: 16,
     type: "info",
     title: "Pronto para Começar? 🎉",
     subtitle: "Preparamos um plano personalizado para você. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!",

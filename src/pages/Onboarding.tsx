@@ -30,6 +30,9 @@ const Onboarding = () => {
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [nameInput, setNameInput] = useState("");
+  const [numberInput, setNumberInput] = useState("");
+  const [weightInput, setWeightInput] = useState("");
+  const [heightInput, setHeightInput] = useState("");
 
   const current = onboardingSteps[step];
   const total = onboardingSteps.length;
@@ -51,25 +54,48 @@ const Onboarding = () => {
     if (current.type === "welcome") return true;
     if (current.type === "disclaimer") return disclaimerChecked;
     if (current.type === "name") return nameInput.trim().length >= 2;
+    if (current.type === "number") {
+      const val = parseInt(numberInput);
+      const cfg = current.numberConfig;
+      return !isNaN(val) && (!cfg?.min || val >= cfg.min) && (!cfg?.max || val <= cfg.max);
+    }
+    if (current.type === "body_metrics") {
+      const w = parseFloat(weightInput);
+      const h = parseFloat(heightInput);
+      return !isNaN(w) && w > 20 && w < 400 && !isNaN(h) && h > 50 && h < 300;
+    }
     if (current.type === "result" || current.type === "info") return true;
     if (current.type === "single") return !!answers[current.id];
     if (current.type === "multi") {
-      if (current.id === 9 || current.id === 10) return true;
+      // Optional multi-select steps
+      if (current.id === 7 || current.id === 14 || current.id === 15) return true;
       return ((answers[current.id] as string[]) || []).length > 0;
     }
     return true;
   };
 
   const handleNext = async () => {
+    // Save current step's input
     if (current.type === "name") {
-      setAnswers({ ...answers, [current.id]: nameInput.trim() });
+      setAnswers((a) => ({ ...a, [current.id]: nameInput.trim() }));
     }
+    if (current.type === "number") {
+      setAnswers((a) => ({ ...a, [current.id]: numberInput.trim() }));
+    }
+    if (current.type === "body_metrics") {
+      setAnswers((a) => ({ ...a, [current.id]: [weightInput.trim(), heightInput.trim()] }));
+    }
+
     if (step < total - 1) {
       setDirection(1);
       setStep(step + 1);
     } else {
-      const finalAnswers = { ...answers, [current.id]: current.type === "name" ? nameInput.trim() : answers[current.id] };
-      
+      // Final save
+      const finalAnswers = { ...answers };
+      if (current.type === "name") finalAnswers[current.id] = nameInput.trim();
+      if (current.type === "number") finalAnswers[current.id] = numberInput.trim();
+      if (current.type === "body_metrics") finalAnswers[current.id] = [weightInput.trim(), heightInput.trim()];
+
       // Save to localStorage (legacy support)
       localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
       localStorage.setItem("levvia_onboarded", "true");
@@ -77,20 +103,33 @@ const Onboarding = () => {
       // Save to Supabase profile
       if (user?.id) {
         const name = (finalAnswers[2] as string) || "";
-        const painLevel = (finalAnswers[3] as string) || "";
-        const affectedAreas = (finalAnswers[4] as string[]) || [];
-        const objective = (finalAnswers[8] as string) || "";
+        const age = parseInt(finalAnswers[3] as string) || null;
+        const sex = (finalAnswers[4] as string) || "";
+        const bodyMetrics = (finalAnswers[5] as string[]) || [];
+        const weightKg = parseFloat(bodyMetrics[0]) || null;
+        const heightCm = parseFloat(bodyMetrics[1]) || null;
+        const activityLevel = (finalAnswers[6] as string) || "";
+        const healthConditions = (finalAnswers[7] as string[]) || [];
+        const painLevel = (finalAnswers[8] as string) || "";
+        const affectedAreas = (finalAnswers[9] as string[]) || [];
+        const objective = (finalAnswers[13] as string) || "";
 
         await supabase.from("profiles").update({
           name,
+          age,
+          sex,
+          weight_kg: weightKg,
+          height_cm: heightCm,
+          activity_level: activityLevel,
+          health_conditions: healthConditions,
           pain_level: painLevel,
           affected_areas: affectedAreas,
           objective,
           onboarding_data: {
-            enemies: finalAnswers[6] || [],
-            allies: finalAnswers[7] || [],
-            restrictions: finalAnswers[9] || [],
-            preferences: finalAnswers[10] || [],
+            enemies: finalAnswers[11] || [],
+            allies: finalAnswers[12] || [],
+            restrictions: finalAnswers[14] || [],
+            preferences: finalAnswers[15] || [],
             raw: finalAnswers,
           },
         }).eq("id", user.id);
@@ -98,7 +137,7 @@ const Onboarding = () => {
 
       // Clear cached meal plan so it regenerates with new profile
       localStorage.removeItem("levvia_meal_plan");
-      
+
       navigate("/today");
     }
   };
@@ -114,7 +153,7 @@ const Onboarding = () => {
     return answer === option;
   };
 
-  const painAnswer = answers[3] as string;
+  const painAnswer = answers[8] as string;
   const fireResult = painAnswer ? fireResults[painAnswer] : null;
 
   const userName = (answers[2] as string) || nameInput.trim();
@@ -203,6 +242,78 @@ const Onboarding = () => {
       );
     }
 
+    if (current.type === "number") {
+      const cfg = current.numberConfig;
+      return (
+        <div className="flex-1 flex flex-col justify-center px-6 py-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
+              <Heart size={28} strokeWidth={1.5} className="text-foreground" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
+          <div className="max-w-sm mx-auto w-full flex items-center gap-3">
+            <input
+              type="number"
+              inputMode="numeric"
+              value={numberInput}
+              onChange={(e) => setNumberInput(e.target.value)}
+              placeholder={cfg?.placeholder || ""}
+              min={cfg?.min}
+              max={cfg?.max}
+              className="flex-1 px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px] text-center"
+              autoFocus
+            />
+            {cfg?.unit && (
+              <span className="text-sm text-muted-foreground font-medium">{cfg.unit}</span>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (current.type === "body_metrics") {
+      return (
+        <div className="flex-1 flex flex-col justify-center px-6 py-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
+              <Heart size={28} strokeWidth={1.5} className="text-foreground" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
+          <div className="max-w-sm mx-auto w-full space-y-4">
+            <div className="flex items-center gap-3">
+              <label className="text-sm text-muted-foreground w-16">Peso</label>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={weightInput}
+                onChange={(e) => setWeightInput(e.target.value)}
+                placeholder="Ex: 68"
+                className="flex-1 px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px] text-center"
+                autoFocus
+              />
+              <span className="text-sm text-muted-foreground font-medium w-8">kg</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-sm text-muted-foreground w-16">Altura</label>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={heightInput}
+                onChange={(e) => setHeightInput(e.target.value)}
+                placeholder="Ex: 165"
+                className="flex-1 px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px] text-center"
+              />
+              <span className="text-sm text-muted-foreground font-medium w-8">cm</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (current.type === "result") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
@@ -241,7 +352,7 @@ const Onboarding = () => {
     }
 
     if (current.type === "info") {
-      const objective = answers[8] as string;
+      const objective = answers[13] as string;
       const personalizedSubtitle = userName && objective
         ? `${userName}, você está pronta! Preparamos um plano de 14 dias focado no seu objetivo: ${objective}. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!`
         : current.subtitle;
@@ -271,7 +382,7 @@ const Onboarding = () => {
       );
     }
 
-    // Standard question screens
+    // Standard question screens (single / multi)
     return (
       <div className="flex-1 flex flex-col justify-center px-6 py-8">
         <div className="flex justify-center mb-6">
