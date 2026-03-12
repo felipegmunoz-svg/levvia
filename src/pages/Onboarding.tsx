@@ -2,11 +2,28 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import logoFull from "@/assets/logo_livvia_branco.png";
+
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 80 : -80,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -80 : 80,
+    opacity: 0,
+  }),
+};
 
 const Onboarding = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [nameInput, setNameInput] = useState("");
@@ -45,12 +62,18 @@ const Onboarding = () => {
       setAnswers({ ...answers, [current.id]: nameInput.trim() });
     }
     if (step < total - 1) {
+      setDirection(1);
       setStep(step + 1);
     } else {
       localStorage.setItem("levvia_onboarding", JSON.stringify({ ...answers, [current.id]: current.type === "name" ? nameInput.trim() : answers[current.id] }));
       localStorage.setItem("levvia_onboarded", "true");
       navigate("/today");
     }
+  };
+
+  const handleBack = () => {
+    setDirection(-1);
+    setStep(step - 1);
   };
 
   const isSelected = (option: string) => {
@@ -63,24 +86,31 @@ const Onboarding = () => {
   const fireResult = painAnswer ? fireResults[painAnswer] : null;
 
   const userName = (answers[2] as string) || nameInput.trim();
-  const userObjective = answers[8] as string;
 
   const renderContent = () => {
-    // Welcome screen
     if (current.type === "welcome") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="flex justify-center mb-6"
+          >
             <img src={logoFull} alt="Levvia" className="w-[200px] h-auto" />
-          </div>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">
+          </motion.div>
+          <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
             Seu caminho para a leveza.
-          </p>
+          </motion.p>
         </div>
       );
     }
 
-    // Disclaimer screen
     if (current.type === "disclaimer") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
@@ -89,42 +119,34 @@ const Onboarding = () => {
               <ShieldCheck size={28} strokeWidth={1.5} className="text-accent" />
             </div>
           </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">
-            {current.title}
-          </h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">
-            {current.subtitle}
-          </p>
+          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
           <div className="max-w-sm mx-auto w-full">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.97 }}
               onClick={() => setDisclaimerChecked(!disclaimerChecked)}
               className={`flex items-center gap-3 w-full px-4 py-4 rounded-2xl border transition-all duration-200 text-left ${
-                disclaimerChecked
-                  ? "border-secondary bg-secondary/10"
-                  : "border-white/10 bg-white/[0.06]"
+                disclaimerChecked ? "border-secondary bg-secondary/10" : "border-white/10 bg-white/[0.06]"
               }`}
             >
-              <div
+              <motion.div
+                animate={disclaimerChecked ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 0.2 }}
                 className={`flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
-                  disclaimerChecked
-                    ? "border-secondary bg-secondary"
-                    : "border-muted-foreground/30"
+                  disclaimerChecked ? "border-secondary bg-secondary" : "border-muted-foreground/30"
                 }`}
               >
-                {disclaimerChecked && (
-                  <Check size={14} className="text-foreground" strokeWidth={3} />
-                )}
-              </div>
+                {disclaimerChecked && <Check size={14} className="text-foreground" strokeWidth={3} />}
+              </motion.div>
               <span className="text-sm font-medium text-foreground">
                 Li e entendi que este app não é um tratamento médico
               </span>
-            </button>
+            </motion.button>
           </div>
         </div>
       );
     }
 
-    // Name input screen
     if (current.type === "name") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
@@ -133,12 +155,8 @@ const Onboarding = () => {
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
           </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">
-            {current.title}
-          </h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">
-            {current.subtitle}
-          </p>
+          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
           <div className="max-w-sm mx-auto w-full">
             <input
               type="text"
@@ -146,32 +164,43 @@ const Onboarding = () => {
               onChange={(e) => setNameInput(e.target.value)}
               placeholder="Seu nome ou apelido"
               className="w-full px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px]"
+              autoFocus
             />
           </div>
         </div>
       );
     }
 
-    // Fire result screen
     if (current.type === "result") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/[0.06] border border-white/10">
               <Flame size={36} strokeWidth={1.5} className={fireResult?.colorClass || "text-secondary"} />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-1">
-            Seu Fogo Interno
-          </h1>
-          <p className={`text-lg font-medium text-center mb-4 ${fireResult?.colorClass || "text-secondary"}`}>
+          </motion.div>
+          <h1 className="text-2xl font-light text-foreground text-center mb-1">Seu Fogo Interno</h1>
+          <motion.p
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className={`text-lg font-medium text-center mb-4 ${fireResult?.colorClass || "text-secondary"}`}
+          >
             {fireResult?.level || "Brisa Leve"}
-          </p>
-          <div className="max-w-sm mx-auto rounded-2xl p-5 glass-card">
-            <p className="text-sm text-foreground leading-relaxed text-center">
-              {fireResult?.description || ""}
-            </p>
-          </div>
+          </motion.p>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            className="max-w-sm mx-auto rounded-2xl p-5 glass-card"
+          >
+            <p className="text-sm text-foreground leading-relaxed text-center">{fireResult?.description || ""}</p>
+          </motion.div>
           <p className="text-xs text-muted-foreground text-center mt-4 max-w-xs mx-auto">
             Com base nas suas respostas, preparamos práticas personalizadas para o seu nível.
           </p>
@@ -179,7 +208,6 @@ const Onboarding = () => {
       );
     }
 
-    // Final personalized screen
     if (current.type === "info") {
       const objective = answers[8] as string;
       const personalizedSubtitle = userName && objective
@@ -188,17 +216,25 @@ const Onboarding = () => {
 
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">
-            {current.title}
-          </h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">
+          </motion.div>
+          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <motion.p
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
             {personalizedSubtitle}
-          </p>
+          </motion.p>
         </div>
       );
     }
@@ -211,23 +247,21 @@ const Onboarding = () => {
             <Heart size={28} strokeWidth={1.5} className="text-foreground" />
           </div>
         </div>
-        <h1 className="text-2xl font-light text-foreground text-center mb-2">
-          {current.title}
-        </h1>
+        <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
         {current.subtitle && (
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">
-            {current.subtitle}
-          </p>
+          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
         )}
         {current.options && (
           <div className="space-y-3 max-w-sm mx-auto w-full">
-            {current.options.map((option) => (
-              <button
+            {current.options.map((option, i) => (
+              <motion.button
                 key={option}
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: i * 0.06, duration: 0.25 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() =>
-                  current.type === "multi"
-                    ? handleMultiSelect(option)
-                    : handleSingleSelect(option)
+                  current.type === "multi" ? handleMultiSelect(option) : handleSingleSelect(option)
                 }
                 className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-all duration-200 text-left ${
                   isSelected(option)
@@ -235,19 +269,17 @@ const Onboarding = () => {
                     : "border-white/10 bg-white/[0.06] hover:border-secondary/30"
                 }`}
               >
-                <div
+                <motion.div
+                  animate={isSelected(option) ? { scale: [1, 1.2, 1] } : {}}
+                  transition={{ duration: 0.2 }}
                   className={`flex-shrink-0 w-5 h-5 ${current.type === "multi" ? "rounded-md" : "rounded-full"} border-2 flex items-center justify-center transition-all ${
-                    isSelected(option)
-                      ? "border-secondary bg-secondary"
-                      : "border-muted-foreground/30"
+                    isSelected(option) ? "border-secondary bg-secondary" : "border-muted-foreground/30"
                   }`}
                 >
-                  {isSelected(option) && (
-                    <Check size={12} className="text-foreground" strokeWidth={3} />
-                  )}
-                </div>
+                  {isSelected(option) && <Check size={12} className="text-foreground" strokeWidth={3} />}
+                </motion.div>
                 <span className="text-sm font-medium text-foreground">{option}</span>
-              </button>
+              </motion.button>
             ))}
           </div>
         )}
@@ -261,30 +293,48 @@ const Onboarding = () => {
       <div className="px-6 pt-4">
         <div className="flex items-center justify-between mb-2">
           {step > 0 && (
-            <button
-              onClick={() => setStep(step - 1)}
+            <motion.button
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={handleBack}
               className="text-muted-foreground hover:text-foreground transition-colors p-1"
             >
               <ArrowLeft size={20} strokeWidth={1.5} />
-            </button>
+            </motion.button>
           )}
           <span className="text-xs text-muted-foreground font-medium ml-auto">
             {step + 1} de {total}
           </span>
         </div>
         <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-secondary to-success rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${progress}%` }}
+          <motion.div
+            className="h-full bg-gradient-to-r from-secondary to-success rounded-full"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           />
         </div>
       </div>
 
-      {renderContent()}
+      {/* Animated step content */}
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={step}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="flex-1 flex flex-col"
+        >
+          {renderContent()}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Bottom button */}
       <div className="px-6 pb-8">
-        <button
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           onClick={handleNext}
           disabled={!canProceed()}
           className={`w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base transition-all duration-200 ${
@@ -295,7 +345,7 @@ const Onboarding = () => {
         >
           {step === total - 1 ? "Começar Agora" : "Continuar"}
           <ArrowRight size={18} strokeWidth={1.5} />
-        </button>
+        </motion.button>
       </div>
     </div>
   );
