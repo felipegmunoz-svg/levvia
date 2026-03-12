@@ -115,49 +115,67 @@ export type Database = {
       }
       profiles: {
         Row: {
+          activity_level: string | null
           affected_areas: string[] | null
+          age: number | null
           challenge_progress: Json | null
           challenge_start: string | null
           created_at: string
           email: string
+          health_conditions: string[] | null
+          height_cm: number | null
           id: string
           name: string
           objective: string | null
           onboarding_data: Json | null
           pain_level: string | null
           phone: string | null
+          sex: string | null
           status: string
           updated_at: string
+          weight_kg: number | null
         }
         Insert: {
+          activity_level?: string | null
           affected_areas?: string[] | null
+          age?: number | null
           challenge_progress?: Json | null
           challenge_start?: string | null
           created_at?: string
           email?: string
+          health_conditions?: string[] | null
+          height_cm?: number | null
           id: string
           name?: string
           objective?: string | null
           onboarding_data?: Json | null
           pain_level?: string | null
           phone?: string | null
+          sex?: string | null
           status?: string
           updated_at?: string
+          weight_kg?: number | null
         }
         Update: {
+          activity_level?: string | null
           affected_areas?: string[] | null
+          age?: number | null
           challenge_progress?: Json | null
           challenge_start?: string | null
           created_at?: string
           email?: string
+          health_conditions?: string[] | null
+          height_cm?: number | null
           id?: string
           name?: string
           objective?: string | null
           onboarding_data?: Json | null
           pain_level?: string | null
           phone?: string | null
+          sex?: string | null
           status?: string
           updated_at?: string
+          weight_kg?: number | null
         }
         Relationships: []
       }
