@@ -18,6 +18,7 @@ import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 const Today = () => {
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: Exercise; activityId: string } | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: Recipe; activityId: string } | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   // --- Onboarding data ---
   const { userName, painAnswer } = useMemo(() => {
