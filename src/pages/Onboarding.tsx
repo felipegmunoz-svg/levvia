@@ -39,7 +39,15 @@ const Onboarding = () => {
   const progress = ((step + 1) / total) * 100;
 
   const handleSingleSelect = (option: string) => {
-    setAnswers({ ...answers, [current.id]: option });
+    const updated = { ...answers, [current.id]: option };
+    setAnswers(updated);
+    // Auto-advance for single select
+    setTimeout(() => {
+      if (step < total - 1) {
+        setDirection(1);
+        setStep((s) => s + 1);
+      }
+    }, 250);
   };
 
   const handleMultiSelect = (option: string) => {
@@ -474,22 +482,24 @@ const Onboarding = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottom button */}
-      <div className="px-6 pb-8">
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={handleNext}
-          disabled={!canProceed()}
-          className={`w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base transition-all duration-200 ${
-            canProceed()
-              ? "gradient-primary text-foreground hover:opacity-90"
-              : "bg-white/[0.06] text-muted-foreground cursor-not-allowed"
-          }`}
-        >
-          {step === total - 1 ? "Começar Agora" : "Continuar"}
-          <ArrowRight size={18} strokeWidth={1.5} />
-        </motion.button>
-      </div>
+      {/* Bottom button — hidden for single-select questions */}
+      {current.type !== "single" && (
+        <div className="px-6 pb-8">
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className={`w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base transition-all duration-200 ${
+              canProceed()
+                ? "gradient-primary text-foreground hover:opacity-90"
+                : "bg-white/[0.06] text-muted-foreground cursor-not-allowed"
+            }`}
+          >
+            {step === total - 1 ? "Começar Agora" : "Continuar"}
+            <ArrowRight size={18} strokeWidth={1.5} />
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 };
