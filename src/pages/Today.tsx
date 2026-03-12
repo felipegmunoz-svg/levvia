@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info, Coffee, Sun, Sunset } from "lucide-react";
+import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info, Coffee, Sun, Sunset, BarChart3 } from "lucide-react";
+import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import { challengeDays, getIncentiveMessage } from "@/data/challengeDays";
 import type { ChallengeActivity } from "@/data/challengeDays";
