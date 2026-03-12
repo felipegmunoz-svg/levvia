@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { exercises } from "@/data/exercises";
-import { recipes } from "@/data/recipes";
 import ExerciseCard from "@/components/ExerciseCard";
 import RecipeCard from "@/components/RecipeCard";
 import ExerciseDetail from "@/components/ExerciseDetail";
@@ -9,6 +7,49 @@ import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 import type { Exercise } from "@/data/exercises";
 import type { Recipe } from "@/data/recipes";
+import {
+  fetchExercises,
+  fetchRecipes,
+  type DbExercise,
+  type DbRecipe,
+} from "@/lib/profileEngine";
+
+// Convert DB types to view types
+function toExerciseView(ex: DbExercise): Exercise {
+  return {
+    id: 0,
+    title: ex.title,
+    category: ex.category,
+    level: ex.level,
+    duration: ex.duration,
+    frequency: ex.frequency || "",
+    description: ex.description,
+    startPosition: ex.start_position || "",
+    steps: ex.steps || [],
+    benefits: ex.benefits || "",
+    safety: ex.safety || undefined,
+    variations: ex.variations || undefined,
+    icon: ex.icon || "dumbbell",
+  };
+}
+
+function toRecipeView(rec: DbRecipe): Recipe {
+  return {
+    id: 0,
+    title: rec.title,
+    tipo_refeicao: rec.tipo_refeicao || [],
+    tags: rec.tags || [],
+    ingredients: rec.ingredients || [],
+    instructions: rec.instructions || [],
+    por_que_resfria: rec.por_que_resfria || "",
+    dica: rec.dica || "",
+    category: rec.category,
+    time: rec.time || "",
+    servings: rec.servings || "",
+    description: rec.description || "",
+    icon: rec.icon || "utensils",
+  };
+}
 
 const Practices = () => {
   const [searchParams] = useSearchParams();
@@ -18,22 +59,26 @@ const Practices = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch from Supabase
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const [exData, recData] = await Promise.all([fetchExercises(), fetchRecipes()]);
+      setExercises(exData.map(toExerciseView));
+      setRecipes(recData.map(toRecipeView));
+      setLoading(false);
+    };
+    load();
+  }, []);
 
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    const highlightId = searchParams.get("highlight");
     if (tabParam === "exercises" || tabParam === "recipes") {
       setTab(tabParam);
-    }
-    if (highlightId) {
-      const id = parseInt(highlightId);
-      if (tabParam === "exercises") {
-        const ex = exercises.find((e) => e.id === id);
-        if (ex) setSelectedExercise(ex);
-      } else if (tabParam === "recipes") {
-        const rec = recipes.find((r) => r.id === id);
-        if (rec) setSelectedRecipe(rec);
-      }
     }
   }, [searchParams]);
 
@@ -123,27 +168,34 @@ const Practices = () => {
       </div>
 
       <main className="px-5 space-y-3">
-        {tab === "exercises"
-          ? filteredExercises.map((ex) => (
-              <ExerciseCard
-                key={ex.id}
-                exercise={ex}
-                onClick={() => setSelectedExercise(ex)}
-              />
-            ))
-          : filteredRecipes.map((recipe) => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                onClick={() => setSelectedRecipe(recipe)}
-              />
-            ))}
-        {((tab === "exercises" && filteredExercises.length === 0) ||
-          (tab === "recipes" && filteredRecipes.length === 0)) && (
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Nenhum resultado encontrado para este filtro.
-          </p>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : tab === "exercises" ? (
+          filteredExercises.map((ex, i) => (
+            <ExerciseCard
+              key={`ex-${i}`}
+              exercise={ex}
+              onClick={() => setSelectedExercise(ex)}
+            />
+          ))
+        ) : (
+          filteredRecipes.map((recipe, i) => (
+            <RecipeCard
+              key={`rec-${i}`}
+              recipe={recipe}
+              onClick={() => setSelectedRecipe(recipe)}
+            />
+          ))
         )}
+        {!loading &&
+          ((tab === "exercises" && filteredExercises.length === 0) ||
+            (tab === "recipes" && filteredRecipes.length === 0)) && (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              Nenhum resultado encontrado para este filtro.
+            </p>
+          )}
       </main>
 
       <BottomNav />
