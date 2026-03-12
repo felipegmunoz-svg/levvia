@@ -8,6 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface UserProfile {
   name: string;
+  age: number | null;
+  sex: string;
+  weightKg: number | null;
+  heightCm: number | null;
+  activityLevel: string;
+  healthConditions: string[];
   painLevel: string;
   affectedAreas: string[];
   objective: string;
@@ -71,15 +77,22 @@ export function parseOnboardingFromLocal(): UserProfile {
   if (!saved) return defaultProfile();
   try {
     const data = JSON.parse(saved);
+    const bodyMetrics = (data[5] as string[]) || [];
     return {
       name: (data[2] as string) || "",
-      painLevel: (data[3] as string) || "Sem dor",
-      affectedAreas: (data[4] as string[]) || [],
-      objective: (data[8] as string) || "",
-      dietaryRestrictions: (data[9] as string[]) || [],
-      dietaryPreferences: (data[10] as string[]) || [],
-      inflammatoryEnemies: (data[6] as string[]) || [],
-      antiInflammatoryAllies: (data[7] as string[]) || [],
+      age: parseInt(data[3] as string) || null,
+      sex: (data[4] as string) || "",
+      weightKg: parseFloat(bodyMetrics[0]) || null,
+      heightCm: parseFloat(bodyMetrics[1]) || null,
+      activityLevel: (data[6] as string) || "",
+      healthConditions: (data[7] as string[]) || [],
+      painLevel: (data[8] as string) || "Sem dor",
+      affectedAreas: (data[9] as string[]) || [],
+      objective: (data[13] as string) || "",
+      dietaryRestrictions: (data[14] as string[]) || [],
+      dietaryPreferences: (data[15] as string[]) || [],
+      inflammatoryEnemies: (data[11] as string[]) || [],
+      antiInflammatoryAllies: (data[12] as string[]) || [],
     };
   } catch {
     return defaultProfile();
@@ -89,7 +102,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
   const { data } = await supabase
     .from("profiles")
-    .select("name, pain_level, affected_areas, objective, onboarding_data")
+    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objective, onboarding_data")
     .eq("id", userId)
     .maybeSingle();
 
@@ -99,6 +112,12 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
 
   return {
     name: data.name || "",
+    age: (data as any).age || null,
+    sex: (data as any).sex || "",
+    weightKg: (data as any).weight_kg || null,
+    heightCm: (data as any).height_cm || null,
+    activityLevel: (data as any).activity_level || "",
+    healthConditions: (data as any).health_conditions || [],
     painLevel: data.pain_level || "Sem dor",
     affectedAreas: data.affected_areas || [],
     objective: data.objective || "",
@@ -112,6 +131,12 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
 function defaultProfile(): UserProfile {
   return {
     name: "",
+    age: null,
+    sex: "",
+    weightKg: null,
+    heightCm: null,
+    activityLevel: "",
+    healthConditions: [],
     painLevel: "Sem dor",
     affectedAreas: [],
     objective: "",
