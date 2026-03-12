@@ -102,7 +102,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
   const { data } = await supabase
     .from("profiles")
-    .select("name, pain_level, affected_areas, objective, onboarding_data")
+    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objective, onboarding_data")
     .eq("id", userId)
     .maybeSingle();
 
