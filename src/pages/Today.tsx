@@ -1,65 +1,74 @@
 import { useState, useEffect, useMemo } from "react";
-import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info, Coffee, Sun, Sunset, BarChart3 } from "lucide-react";
+import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, BarChart3 } from "lucide-react";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
-import { challengeDays, getIncentiveMessage } from "@/data/challengeDays";
-import type { ChallengeActivity } from "@/data/challengeDays";
-import { exercises } from "@/data/exercises";
-import { recipes } from "@/data/recipes";
-import type { Exercise } from "@/data/exercises";
-import type { Recipe } from "@/data/recipes";
-import { getMealPlanForDay, mealSlots } from "@/data/mealPlan";
-import type { MealSlot } from "@/data/mealPlan";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
+import type { DbExercise, DbRecipe } from "@/lib/profileEngine";
+
+// Adapt DbExercise to the Exercise interface expected by ExerciseDetail
+function toExerciseView(ex: DbExercise) {
+  return {
+    id: 0, // not used for display
+    title: ex.title,
+    category: ex.category,
+    level: ex.level,
+    duration: ex.duration,
+    frequency: ex.frequency || "",
+    description: ex.description,
+    startPosition: ex.start_position || "",
+    steps: ex.steps || [],
+    benefits: ex.benefits || "",
+    safety: ex.safety || undefined,
+    variations: ex.variations || undefined,
+    icon: ex.icon || "dumbbell",
+  };
+}
+
+// Adapt DbRecipe to the Recipe interface expected by RecipeDetail
+function toRecipeView(rec: DbRecipe) {
+  return {
+    id: 0,
+    title: rec.title,
+    tipo_refeicao: rec.tipo_refeicao || [],
+    tags: rec.tags || [],
+    ingredients: rec.ingredients || [],
+    instructions: rec.instructions || [],
+    por_que_resfria: rec.por_que_resfria || "",
+    dica: rec.dica || "",
+    category: rec.category,
+    time: rec.time || "",
+    servings: rec.servings || "",
+    description: rec.description || "",
+    icon: rec.icon || "utensils",
+  };
+}
+
+function getIncentiveMessage(progress: number): string {
+  if (progress === 0) return "Lembre-se: o Levvia não faz milagres, mas seu esforço transforma!";
+  if (progress < 30) return "Você já começou, isso é o mais importante! Continue!";
+  if (progress < 60) return "Bom progresso! Cada atividade concluída faz diferença.";
+  if (progress < 100) return "Quase lá! Falta pouco para completar o dia!";
+  return "🎉 Incrível! Você completou todas as atividades de hoje!";
+}
 
 const Today = () => {
-  const [selectedExercise, setSelectedExercise] = useState<{ exercise: Exercise; activityId: string } | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: Recipe; activityId: string } | null>(null);
+  const {
+    profile,
+    currentDay,
+    todayData,
+    dayTitle,
+    dayObjective,
+    loading,
+  } = useChallengeData();
+
+  const [selectedExercise, setSelectedExercise] = useState<{ exercise: DbExercise; activityId: string } | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: DbRecipe; activityId: string } | null>(null);
   const [showDashboard, setShowDashboard] = useState(false);
-
-  // --- Onboarding data ---
-  const { userName, painAnswer } = useMemo(() => {
-    const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) {
-      const data = JSON.parse(saved);
-      return { userName: (data[2] as string) || "", painAnswer: (data[3] as string) || "" };
-    }
-    return { userName: "", painAnswer: "" };
-  }, []);
-
-  const isHighPain = painAnswer === "Dor intensa" || painAnswer === "Dor muito intensa";
-
-  // --- Challenge day calculation ---
-  const currentDay = useMemo(() => {
-    let start = localStorage.getItem("levvia_challenge_start");
-    if (!start) {
-      start = new Date().toISOString();
-      localStorage.setItem("levvia_challenge_start", start);
-    }
-    const diff = Date.now() - new Date(start).getTime();
-    const day = Math.floor(diff / 86400000) + 1;
-    return Math.min(Math.max(day, 1), 14);
-  }, []);
-
-  const todayData = challengeDays[currentDay - 1];
-
-  // --- Meal plan for today ---
-  const todayMeals = useMemo(() => getMealPlanForDay(currentDay), [currentDay]);
-
-  // Build meal activities from meal plan
-  const mealActivities: ChallengeActivity[] = useMemo(() => {
-    return mealSlots
-      .filter((slot) => todayMeals[slot] !== null)
-      .map((slot) => ({
-        id: `day${currentDay}-meal-${slot.replace(/\s/g, "")}`,
-        type: "recipe" as const,
-        label: `${slot}: ${todayMeals[slot]!.title}`,
-        recipeId: todayMeals[slot]!.id,
-      }));
-  }, [currentDay, todayMeals]);
+  const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);
 
   // --- Progress state ---
   const [progress, setProgress] = useState<Record<string, Record<string, boolean>>>(() => {
@@ -71,30 +80,16 @@ const Today = () => {
     localStorage.setItem("levvia_challenge_progress", JSON.stringify(progress));
   }, [progress]);
 
-  const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);
-
   // --- All activities for today ---
   const allActivities: ChallengeActivity[] = useMemo(() => {
-    const acts = [...todayData.exercises, ...mealActivities, ...todayData.habits];
-    return acts;
-  }, [todayData, mealActivities]);
+    if (!todayData) return [];
+    return [...todayData.exercises, ...todayData.meals, ...todayData.habits];
+  }, [todayData]);
 
   const dayProgress = progress[currentDay] || {};
   const completedCount = allActivities.filter((a) => dayProgress[a.id]).length;
   const totalCount = allActivities.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-
-  // --- Previous day feedback ---
-  const prevDayFeedback = useMemo(() => {
-    if (currentDay <= 1) return null;
-    const prevDay = currentDay - 1;
-    const prevData = challengeDays[prevDay - 1];
-    const prevProgress = progress[prevDay] || {};
-    const prevActivities = [...prevData.exercises, ...prevData.recipes, ...prevData.habits];
-    const prevCompleted = prevActivities.filter((a) => prevProgress[a.id]).length;
-    const allDone = prevCompleted === prevActivities.length;
-    return { day: prevDay, allDone, completed: prevCompleted, total: prevActivities.length };
-  }, [currentDay, progress]);
 
   // --- Handlers ---
   const handleToggle = (id: string) => {
@@ -106,18 +101,12 @@ const Today = () => {
     if (!isChecked) {
       if (activity.type === "habit" && activity.modalContent) {
         setModalContent({ title: activity.label, text: activity.modalContent });
-      } else if (activity.type === "exercise" && activity.exerciseId) {
-        const ex = exercises.find((e) => e.id === activity.exerciseId);
-        if (ex) {
-          setSelectedExercise({ exercise: ex, activityId: id });
-          return;
-        }
-      } else if (activity.type === "recipe" && activity.recipeId) {
-        const rec = recipes.find((r) => r.id === activity.recipeId);
-        if (rec) {
-          setSelectedRecipe({ recipe: rec, activityId: id });
-          return;
-        }
+      } else if (activity.type === "exercise" && activity.exercise) {
+        setSelectedExercise({ exercise: activity.exercise, activityId: id });
+        return;
+      } else if (activity.type === "recipe" && activity.recipe) {
+        setSelectedRecipe({ recipe: activity.recipe, activityId: id });
+        return;
       }
     }
 
@@ -133,8 +122,6 @@ const Today = () => {
     if (hour < 18) return "Boa tarde! 🌤️";
     return "Boa noite! 🌙";
   };
-
-  const dailyPhrase = isHighPain && todayData.phraseHighPain ? todayData.phraseHighPain : todayData.phrase;
 
   const handleMarkExerciseDone = () => {
     if (selectedExercise) {
@@ -159,7 +146,7 @@ const Today = () => {
   if (selectedExercise) {
     return (
       <ExerciseDetail
-        exercise={selectedExercise.exercise}
+        exercise={toExerciseView(selectedExercise.exercise)}
         onBack={() => setSelectedExercise(null)}
         onMarkDone={handleMarkExerciseDone}
       />
@@ -169,10 +156,21 @@ const Today = () => {
   if (selectedRecipe) {
     return (
       <RecipeDetail
-        recipe={selectedRecipe.recipe}
+        recipe={toRecipeView(selectedRecipe.recipe)}
         onBack={() => setSelectedRecipe(null)}
         onMarkDone={handleMarkRecipeDone}
       />
+    );
+  }
+
+  if (loading || !todayData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">Personalizando seu plano...</p>
+        </div>
+      </div>
     );
   }
 
@@ -185,7 +183,7 @@ const Today = () => {
           <p className="text-muted-foreground text-sm font-medium">{getGreeting()}</p>
         </div>
         <h1 className="text-2xl font-light text-foreground mt-1">
-          {userName ? `${userName}, seu dia de cuidado` : "Seu dia de cuidado"}
+          {profile.name ? `${profile.name}, seu dia de cuidado` : "Seu dia de cuidado"}
         </h1>
 
         {/* Day counter */}
@@ -197,16 +195,12 @@ const Today = () => {
         </div>
 
         {/* Day title & objective */}
-        <p className="text-xs text-foreground/80 mt-2 font-medium">
-          {todayData.title}
-        </p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {todayData.objective}
-        </p>
+        <p className="text-xs text-foreground/80 mt-2 font-medium">{dayTitle}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{dayObjective}</p>
 
         {/* Motivational phrase */}
         <p className="text-xs text-muted-foreground mt-2 italic leading-relaxed">
-          "{dailyPhrase}"
+          "{todayData.phrase}"
         </p>
 
         {/* Progress bar */}
@@ -230,32 +224,6 @@ const Today = () => {
           )}
         </div>
       </header>
-
-      {/* Previous day feedback */}
-      {prevDayFeedback && (
-        <div className={`mx-5 mt-4 glass-card p-4 ${
-          prevDayFeedback.allDone ? "border-success/30" : "border-accent/30"
-        }`}>
-          <div className="flex items-start gap-3">
-            {prevDayFeedback.allDone ? (
-              <Trophy size={20} strokeWidth={1.5} className="text-success flex-shrink-0 mt-0.5" />
-            ) : (
-              <AlertTriangle size={20} strokeWidth={1.5} className="text-accent flex-shrink-0 mt-0.5" />
-            )}
-            <div>
-              {prevDayFeedback.allDone ? (
-                <p className="text-sm text-foreground">
-                  <span className="font-medium">Parabéns!</span> Você concluiu todas as atividades do Dia {prevDayFeedback.day}! Continue assim! 🎉
-                </p>
-              ) : (
-                <p className="text-sm text-foreground">
-                  <span className="font-medium">Atenção!</span> Você deixou {prevDayFeedback.total - prevDayFeedback.completed} atividades pendentes no Dia {prevDayFeedback.day}. Seu comprometimento é a chave para o sucesso!
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Incentive message */}
       <div className="mx-5 mt-4">
@@ -292,6 +260,9 @@ const Today = () => {
             <div className="flex items-center gap-2 mb-3">
               <Dumbbell size={18} strokeWidth={1.5} className="text-secondary" />
               <h2 className="text-base font-medium text-foreground">Exercícios</h2>
+              <span className="text-xs text-muted-foreground ml-auto">
+                Personalizados para seu perfil
+              </span>
             </div>
             <div className="space-y-2">
               {todayData.exercises.map((item) => (
@@ -310,14 +281,17 @@ const Today = () => {
         )}
 
         {/* Cardápio do Dia */}
-        {mealActivities.length > 0 && (
+        {todayData.meals.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
               <UtensilsCrossed size={18} strokeWidth={1.5} className="text-secondary" />
               <h2 className="text-base font-medium text-foreground">Cardápio do Dia</h2>
+              <span className="text-xs text-muted-foreground ml-auto">
+                Adaptado às suas restrições
+              </span>
             </div>
             <div className="space-y-2">
-              {mealActivities.map((item) => (
+              {todayData.meals.map((item) => (
                 <ChecklistItemCard
                   key={item.id}
                   id={item.id}
@@ -338,6 +312,9 @@ const Today = () => {
             <div className="flex items-center gap-2 mb-3">
               <Heart size={18} strokeWidth={1.5} className="text-secondary" />
               <h2 className="text-base font-medium text-foreground">Hábitos do Dia</h2>
+              <span className="text-xs text-muted-foreground ml-auto">
+                Alinhados ao seu objetivo
+              </span>
             </div>
             <div className="space-y-2">
               {todayData.habits.map((item) => (
