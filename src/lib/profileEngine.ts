@@ -131,6 +131,12 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
 function defaultProfile(): UserProfile {
   return {
     name: "",
+    age: null,
+    sex: "",
+    weightKg: null,
+    heightCm: null,
+    activityLevel: "",
+    healthConditions: [],
     painLevel: "Sem dor",
     affectedAreas: [],
     objective: "",
