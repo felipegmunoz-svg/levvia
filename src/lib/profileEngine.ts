@@ -77,15 +77,22 @@ export function parseOnboardingFromLocal(): UserProfile {
   if (!saved) return defaultProfile();
   try {
     const data = JSON.parse(saved);
+    const bodyMetrics = (data[5] as string[]) || [];
     return {
       name: (data[2] as string) || "",
-      painLevel: (data[3] as string) || "Sem dor",
-      affectedAreas: (data[4] as string[]) || [],
-      objective: (data[8] as string) || "",
-      dietaryRestrictions: (data[9] as string[]) || [],
-      dietaryPreferences: (data[10] as string[]) || [],
-      inflammatoryEnemies: (data[6] as string[]) || [],
-      antiInflammatoryAllies: (data[7] as string[]) || [],
+      age: parseInt(data[3] as string) || null,
+      sex: (data[4] as string) || "",
+      weightKg: parseFloat(bodyMetrics[0]) || null,
+      heightCm: parseFloat(bodyMetrics[1]) || null,
+      activityLevel: (data[6] as string) || "",
+      healthConditions: (data[7] as string[]) || [],
+      painLevel: (data[8] as string) || "Sem dor",
+      affectedAreas: (data[9] as string[]) || [],
+      objective: (data[13] as string) || "",
+      dietaryRestrictions: (data[14] as string[]) || [],
+      dietaryPreferences: (data[15] as string[]) || [],
+      inflammatoryEnemies: (data[11] as string[]) || [],
+      antiInflammatoryAllies: (data[12] as string[]) || [],
     };
   } catch {
     return defaultProfile();
