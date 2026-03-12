@@ -60,7 +60,7 @@ const Onboarding = () => {
     return true;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (current.type === "name") {
       setAnswers({ ...answers, [current.id]: nameInput.trim() });
     }
@@ -68,8 +68,37 @@ const Onboarding = () => {
       setDirection(1);
       setStep(step + 1);
     } else {
-      localStorage.setItem("levvia_onboarding", JSON.stringify({ ...answers, [current.id]: current.type === "name" ? nameInput.trim() : answers[current.id] }));
+      const finalAnswers = { ...answers, [current.id]: current.type === "name" ? nameInput.trim() : answers[current.id] };
+      
+      // Save to localStorage (legacy support)
+      localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
       localStorage.setItem("levvia_onboarded", "true");
+
+      // Save to Supabase profile
+      if (user?.id) {
+        const name = (finalAnswers[2] as string) || "";
+        const painLevel = (finalAnswers[3] as string) || "";
+        const affectedAreas = (finalAnswers[4] as string[]) || [];
+        const objective = (finalAnswers[8] as string) || "";
+
+        await supabase.from("profiles").update({
+          name,
+          pain_level: painLevel,
+          affected_areas: affectedAreas,
+          objective,
+          onboarding_data: {
+            enemies: finalAnswers[6] || [],
+            allies: finalAnswers[7] || [],
+            restrictions: finalAnswers[9] || [],
+            preferences: finalAnswers[10] || [],
+            raw: finalAnswers,
+          },
+        }).eq("id", user.id);
+      }
+
+      // Clear cached meal plan so it regenerates with new profile
+      localStorage.removeItem("levvia_meal_plan");
+      
       navigate("/today");
     }
   };
