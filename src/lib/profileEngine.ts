@@ -8,6 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface UserProfile {
   name: string;
+  age: number | null;
+  sex: string;
+  weightKg: number | null;
+  heightCm: number | null;
+  activityLevel: string;
+  healthConditions: string[];
   painLevel: string;
   affectedAreas: string[];
   objective: string;
