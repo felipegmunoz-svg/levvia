@@ -264,6 +264,26 @@ const Today = () => {
         </p>
       </div>
 
+      {/* Dashboard toggle */}
+      <div className="mx-5 mt-3 flex justify-center">
+        <button
+          onClick={() => setShowDashboard(!showDashboard)}
+          className={`flex items-center gap-2 text-xs px-4 py-2 rounded-full font-medium transition-all ${
+            showDashboard
+              ? "bg-secondary/20 text-secondary"
+              : "bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-secondary/30"
+          }`}
+        >
+          <BarChart3 size={14} strokeWidth={1.5} />
+          {showDashboard ? "Ocultar progresso" : "Ver meu progresso"}
+        </button>
+      </div>
+
+      {/* Progress dashboard */}
+      {showDashboard && (
+        <ProgressDashboard currentDay={currentDay} progress={progress} />
+      )}
+
       {/* Daily activities */}
       <main className="px-5 mt-6 space-y-6">
         {/* Exercises */}
