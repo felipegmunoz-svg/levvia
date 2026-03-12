@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info, Coffee, Sun, Sunset } from "lucide-react";
+import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, Info, Coffee, Sun, Sunset, BarChart3 } from "lucide-react";
+import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import { challengeDays, getIncentiveMessage } from "@/data/challengeDays";
 import type { ChallengeActivity } from "@/data/challengeDays";
@@ -17,6 +18,7 @@ import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 const Today = () => {
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: Exercise; activityId: string } | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: Recipe; activityId: string } | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   // --- Onboarding data ---
   const { userName, painAnswer } = useMemo(() => {
@@ -261,6 +263,26 @@ const Today = () => {
           💡 {getIncentiveMessage(progressPercent)}
         </p>
       </div>
+
+      {/* Dashboard toggle */}
+      <div className="mx-5 mt-3 flex justify-center">
+        <button
+          onClick={() => setShowDashboard(!showDashboard)}
+          className={`flex items-center gap-2 text-xs px-4 py-2 rounded-full font-medium transition-all ${
+            showDashboard
+              ? "bg-secondary/20 text-secondary"
+              : "bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-secondary/30"
+          }`}
+        >
+          <BarChart3 size={14} strokeWidth={1.5} />
+          {showDashboard ? "Ocultar progresso" : "Ver meu progresso"}
+        </button>
+      </div>
+
+      {/* Progress dashboard */}
+      {showDashboard && (
+        <ProgressDashboard currentDay={currentDay} progress={progress} />
+      )}
 
       {/* Daily activities */}
       <main className="px-5 mt-6 space-y-6">
