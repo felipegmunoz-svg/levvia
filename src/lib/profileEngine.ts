@@ -112,6 +112,12 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
 
   return {
     name: data.name || "",
+    age: (data as any).age || null,
+    sex: (data as any).sex || "",
+    weightKg: (data as any).weight_kg || null,
+    heightCm: (data as any).height_cm || null,
+    activityLevel: (data as any).activity_level || "",
+    healthConditions: (data as any).health_conditions || [],
     painLevel: data.pain_level || "Sem dor",
     affectedAreas: data.affected_areas || [],
     objective: data.objective || "",
