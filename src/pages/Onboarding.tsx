@@ -39,7 +39,15 @@ const Onboarding = () => {
   const progress = ((step + 1) / total) * 100;
 
   const handleSingleSelect = (option: string) => {
-    setAnswers({ ...answers, [current.id]: option });
+    const updated = { ...answers, [current.id]: option };
+    setAnswers(updated);
+    // Auto-advance for single select
+    setTimeout(() => {
+      if (step < total - 1) {
+        setDirection(1);
+        setStep((s) => s + 1);
+      }
+    }, 250);
   };
 
   const handleMultiSelect = (option: string) => {
