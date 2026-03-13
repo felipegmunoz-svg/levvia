@@ -4,8 +4,6 @@ import { onboardingSteps, fireResults } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoFull from "@/assets/logo_livvia_branco.png";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 
 const slideVariants = {
   enter: (direction: number) => ({
