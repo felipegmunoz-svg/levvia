@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
+import Plans from "./pages/Plans";
 import Today from "./pages/Today";
 import Practices from "./pages/Practices";
 import Profile from "./pages/Profile";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/plans" element={<Plans />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/today" element={<ProtectedRoute><Today /></ProtectedRoute>} />
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
