@@ -42,13 +42,14 @@ const Onboarding = () => {
   const handleSingleSelect = (option: string) => {
     const updated = { ...answers, [current.id]: option };
     setAnswers(updated);
-    // Auto-advance for single select
+    setSelectedSingle(option);
     setTimeout(() => {
       if (step < total - 1) {
         setDirection(1);
         setStep((s) => s + 1);
+        setSelectedSingle(null);
       }
-    }, 250);
+    }, 400);
   };
 
   const handleMultiSelect = (option: string) => {
