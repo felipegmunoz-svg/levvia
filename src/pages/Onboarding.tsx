@@ -33,6 +33,7 @@ const Onboarding = () => {
   const [numberInput, setNumberInput] = useState("");
   const [weightInput, setWeightInput] = useState("");
   const [heightInput, setHeightInput] = useState("");
+  const [selectedSingle, setSelectedSingle] = useState<string | null>(null);
 
   const current = onboardingSteps[step];
   const total = onboardingSteps.length;
@@ -41,13 +42,14 @@ const Onboarding = () => {
   const handleSingleSelect = (option: string) => {
     const updated = { ...answers, [current.id]: option };
     setAnswers(updated);
-    // Auto-advance for single select
+    setSelectedSingle(option);
     setTimeout(() => {
       if (step < total - 1) {
         setDirection(1);
         setStep((s) => s + 1);
+        setSelectedSingle(null);
       }
-    }, 250);
+    }, 400);
   };
 
   const handleMultiSelect = (option: string) => {
@@ -408,8 +410,16 @@ const Onboarding = () => {
               <motion.button
                 key={option}
                 initial={{ x: 30, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: i * 0.06, duration: 0.25 }}
+                animate={
+                  selectedSingle === option && current.type === "single"
+                    ? { x: 0, opacity: 1, scale: [1, 1.04, 1], boxShadow: ["0 0 0px hsl(var(--secondary)/0)", "0 0 20px hsl(var(--secondary)/0.4)", "0 0 0px hsl(var(--secondary)/0)"] }
+                    : { x: 0, opacity: 1, scale: 1 }
+                }
+                transition={
+                  selectedSingle === option && current.type === "single"
+                    ? { duration: 0.35, ease: "easeOut" }
+                    : { delay: i * 0.06, duration: 0.25 }
+                }
                 whileTap={{ scale: 0.97 }}
                 onClick={() =>
                   current.type === "multi" ? handleMultiSelect(option) : handleSingleSelect(option)
