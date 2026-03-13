@@ -12,6 +12,8 @@ import Practices from "./pages/Practices";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import Dashboard from "./pages/admin/Dashboard";
 import Clients from "./pages/admin/Clients";
 import Exercises from "./pages/admin/Exercises";
