@@ -103,49 +103,14 @@ const Onboarding = () => {
       if (current.type === "number") finalAnswers[current.id] = numberInput.trim();
       if (current.type === "body_metrics") finalAnswers[current.id] = [weightInput.trim(), heightInput.trim()];
 
-      // Save to localStorage (legacy support)
+      // Save to localStorage only — Supabase sync happens after auth
       localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
       localStorage.setItem("levvia_onboarded", "true");
-
-      // Save to Supabase profile
-      if (user?.id) {
-        const name = (finalAnswers[2] as string) || "";
-        const age = parseInt(finalAnswers[3] as string) || null;
-        const sex = (finalAnswers[4] as string) || "";
-        const bodyMetrics = (finalAnswers[5] as string[]) || [];
-        const weightKg = parseFloat(bodyMetrics[0]) || null;
-        const heightCm = parseFloat(bodyMetrics[1]) || null;
-        const activityLevel = (finalAnswers[6] as string) || "";
-        const healthConditions = (finalAnswers[7] as string[]) || [];
-        const painLevel = (finalAnswers[8] as string) || "";
-        const affectedAreas = (finalAnswers[9] as string[]) || [];
-        const objective = (finalAnswers[13] as string) || "";
-
-        await supabase.from("profiles").update({
-          name,
-          age,
-          sex,
-          weight_kg: weightKg,
-          height_cm: heightCm,
-          activity_level: activityLevel,
-          health_conditions: healthConditions,
-          pain_level: painLevel,
-          affected_areas: affectedAreas,
-          objective,
-          onboarding_data: {
-            enemies: finalAnswers[11] || [],
-            allies: finalAnswers[12] || [],
-            restrictions: finalAnswers[14] || [],
-            preferences: finalAnswers[15] || [],
-            raw: finalAnswers,
-          },
-        }).eq("id", user.id);
-      }
 
       // Clear cached meal plan so it regenerates with new profile
       localStorage.removeItem("levvia_meal_plan");
 
-      navigate("/today");
+      navigate("/plans");
     }
   };
 
