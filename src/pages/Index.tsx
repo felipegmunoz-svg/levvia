@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [showInstall, setShowInstall] = useState(false);
   const [checked, setChecked] = useState(false);
 
@@ -21,12 +23,19 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    if (!checked || showInstall) return;
-    const onboarded = localStorage.getItem("levvia_onboarded");
-    navigate(onboarded === "true" ? "/today" : "/onboarding", { replace: true });
-  }, [checked, showInstall, navigate]);
+    if (!checked || showInstall || authLoading) return;
+    const onboarded = localStorage.getItem("levvia_onboarded") === "true";
 
-  if (!checked) return null;
+    if (!onboarded) {
+      navigate("/onboarding", { replace: true });
+    } else if (user) {
+      navigate("/today", { replace: true });
+    } else {
+      navigate("/plans", { replace: true });
+    }
+  }, [checked, showInstall, authLoading, user, navigate]);
+
+  if (!checked || authLoading) return null;
 
   if (showInstall) {
     return (

@@ -15,6 +15,54 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
+  /** Sync pending onboarding data from localStorage to Supabase profile */
+  const syncOnboardingData = async (userId?: string) => {
+    if (!userId) return;
+    const raw = localStorage.getItem("levvia_onboarding");
+    if (!raw) return;
+
+    try {
+      const answers = JSON.parse(raw) as Record<number, string | string[]>;
+      const userName = (answers[2] as string) || "";
+      const age = parseInt(answers[3] as string) || null;
+      const sex = (answers[4] as string) || "";
+      const bodyMetrics = (answers[5] as string[]) || [];
+      const weightKg = parseFloat(bodyMetrics[0]) || null;
+      const heightCm = parseFloat(bodyMetrics[1]) || null;
+      const activityLevel = (answers[6] as string) || "";
+      const healthConditions = (answers[7] as string[]) || [];
+      const painLevel = (answers[8] as string) || "";
+      const affectedAreas = (answers[9] as string[]) || [];
+      const objective = (answers[13] as string) || "";
+
+      await supabase.from("profiles").update({
+        name: userName,
+        age,
+        sex,
+        weight_kg: weightKg,
+        height_cm: heightCm,
+        activity_level: activityLevel,
+        health_conditions: healthConditions,
+        pain_level: painLevel,
+        affected_areas: affectedAreas,
+        objective,
+        onboarding_data: {
+          enemies: answers[11] || [],
+          allies: answers[12] || [],
+          restrictions: answers[14] || [],
+          preferences: answers[15] || [],
+          raw: answers,
+        },
+      }).eq("id", userId);
+
+      // Clean up after sync
+      localStorage.removeItem("levvia_onboarding");
+      localStorage.removeItem("levvia_selected_plan");
+    } catch (e) {
+      console.error("Failed to sync onboarding data:", e);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
