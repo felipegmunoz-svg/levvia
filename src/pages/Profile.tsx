@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Settings,
@@ -17,7 +17,16 @@ import {
   Stethoscope,
   Target,
   Flame,
+  Calendar,
+  CheckCircle2,
+  Droplets,
+  Dumbbell,
+  UtensilsCrossed,
+  Lock,
+  Star,
+  Zap,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import { useProfile } from "@/hooks/useProfile";
@@ -25,11 +34,173 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
+// ─── Achievement definitions ───
+interface Achievement {
+  id: string;
+  emoji: string;
+  label: string;
+  desc: string;
+  check: (progress: Record<string, Record<string, boolean>>) => boolean;
+}
+
+const achievements: Achievement[] = [
+  {
+    id: "first_step",
+    emoji: "🌱",
+    label: "Primeiro Passo",
+    desc: "Completou o onboarding",
+    check: () => true, // If they're on Profile, they completed onboarding
+  },
+  {
+    id: "day1_complete",
+    emoji: "⭐",
+    label: "Dia Perfeito",
+    desc: "Complete um dia 100%",
+    check: (p) => Object.values(p).some((day) => {
+      const vals = Object.values(day);
+      return vals.length > 0 && vals.every(Boolean);
+    }),
+  },
+  {
+    id: "streak_3",
+    emoji: "🔥",
+    label: "Fogo Aceso",
+    desc: "3 dias seguidos completos",
+    check: (p) => getMaxStreak(p) >= 3,
+  },
+  {
+    id: "streak_7",
+    emoji: "💎",
+    label: "Uma Semana!",
+    desc: "7 dias seguidos completos",
+    check: (p) => getMaxStreak(p) >= 7,
+  },
+  {
+    id: "halfway",
+    emoji: "🏔️",
+    label: "Metade do Caminho",
+    desc: "Chegou ao dia 7",
+    check: (p) => Object.keys(p).some((k) => parseInt(k) >= 7),
+  },
+  {
+    id: "five_days",
+    emoji: "🏃‍♀️",
+    label: "Em Movimento",
+    desc: "Complete 5 dias no total",
+    check: (p) => getCompletedDayCount(p) >= 5,
+  },
+  {
+    id: "ten_days",
+    emoji: "🦋",
+    label: "Transformação",
+    desc: "Complete 10 dias no total",
+    check: (p) => getCompletedDayCount(p) >= 10,
+  },
+  {
+    id: "challenge_done",
+    emoji: "👑",
+    label: "Desafio Completo",
+    desc: "Complete os 14 dias!",
+    check: (p) => getCompletedDayCount(p) >= 14,
+  },
+  {
+    id: "consistent",
+    emoji: "💪",
+    label: "Consistente",
+    desc: "Média acima de 80%",
+    check: (p) => {
+      const days = Object.values(p);
+      if (days.length < 3) return false;
+      const avg = days.reduce((sum, day) => {
+        const vals = Object.values(day);
+        return sum + (vals.length > 0 ? vals.filter(Boolean).length / vals.length : 0);
+      }, 0) / days.length;
+      return avg >= 0.8;
+    },
+  },
+];
+
+function getMaxStreak(progress: Record<string, Record<string, boolean>>): number {
+  let maxStreak = 0;
+  let current = 0;
+  for (let d = 1; d <= 14; d++) {
+    const day = progress[d];
+    if (day) {
+      const vals = Object.values(day);
+      if (vals.length > 0 && vals.every(Boolean)) {
+        current++;
+        maxStreak = Math.max(maxStreak, current);
+      } else {
+        current = 0;
+      }
+    } else {
+      current = 0;
+    }
+  }
+  return maxStreak;
+}
+
+function getCompletedDayCount(progress: Record<string, Record<string, boolean>>): number {
+  return Object.values(progress).filter((day) => {
+    const vals = Object.values(day);
+    return vals.length > 0 && vals.every(Boolean);
+  }).length;
+}
+
 const Profile = () => {
   const navigate = useNavigate();
   const { profile, loading } = useProfile();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [activeSection, setActiveSection] = useState<"info" | "evolution" | "achievements" | "settings">("info");
+  const [challengeProgress, setChallengeProgress] = useState<Record<string, Record<string, boolean>>>({});
+
+  // Load progress
+  useEffect(() => {
+    const load = async () => {
+      if (user?.id) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("challenge_progress")
+          .eq("id", user.id)
+          .single();
+        if (data?.challenge_progress && typeof data.challenge_progress === "object") {
+          setChallengeProgress(data.challenge_progress as Record<string, Record<string, boolean>>);
+        }
+      } else {
+        const saved = localStorage.getItem("levvia_challenge_progress");
+        if (saved) setChallengeProgress(JSON.parse(saved));
+      }
+    };
+    load();
+  }, [user?.id]);
+
+  // Evolution data
+  const evolutionData = useMemo(() => {
+    const days: { day: number; percent: number; completed: number; total: number }[] = [];
+    for (let d = 1; d <= 14; d++) {
+      const dayData = challengeProgress[d];
+      if (dayData) {
+        const vals = Object.values(dayData);
+        const total = vals.length;
+        const completed = vals.filter(Boolean).length;
+        days.push({ day: d, percent: total > 0 ? Math.round((completed / total) * 100) : 0, completed, total });
+      }
+    }
+    return days;
+  }, [challengeProgress]);
+
+  const daysCompleted = getCompletedDayCount(challengeProgress);
+  const maxStreak = getMaxStreak(challengeProgress);
+  const avgCompletion = useMemo(() => {
+    if (evolutionData.length === 0) return 0;
+    return Math.round(evolutionData.reduce((s, d) => s + d.percent, 0) / evolutionData.length);
+  }, [evolutionData]);
+
+  // Achievements
+  const unlockedAchievements = useMemo(
+    () => achievements.filter((a) => a.check(challengeProgress)),
+    [challengeProgress]
+  );
 
   const handleLogout = async () => {
     await signOut();
@@ -38,8 +209,6 @@ const Profile = () => {
 
   const resetChecklist = async () => {
     localStorage.removeItem("levvia_challenge_progress");
-    // Also reset in Supabase
-    const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       await supabase.from("profiles").update({ challenge_progress: {} }).eq("id", user.id);
     }
@@ -55,8 +224,6 @@ const Profile = () => {
     localStorage.removeItem("levvia_challenge_progress");
     localStorage.removeItem("levvia_welcome_dismissed");
     localStorage.removeItem("levvia_meal_plan");
-    // Reset profile in Supabase
-    const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       await supabase.from("profiles").update({
         onboarding_data: {},
@@ -120,6 +287,8 @@ const Profile = () => {
     );
   }
 
+  const maxBarHeight = 80;
+
   return (
     <div className="min-h-screen bg-background gradient-page pb-24">
       <header className="px-6 pt-10 pb-6">
@@ -165,7 +334,6 @@ const Profile = () => {
         {/* Info section */}
         {activeSection === "info" && (
           <>
-            {/* Personal data */}
             <section className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-white/10">
                 <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -174,22 +342,16 @@ const Profile = () => {
                 </h2>
               </div>
               {profileItems.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between px-4 py-3 border-b border-white/10 last:border-0"
-                >
+                <div key={i} className="flex items-center justify-between px-4 py-3 border-b border-white/10 last:border-0">
                   <span className="flex items-center gap-2 text-sm text-muted-foreground">
                     <item.icon size={14} strokeWidth={1.5} className="text-secondary/60" />
                     {item.label}
                   </span>
-                  <span className="text-sm font-medium text-foreground text-right max-w-[60%] truncate">
-                    {item.value}
-                  </span>
+                  <span className="text-sm font-medium text-foreground text-right max-w-[60%] truncate">{item.value}</span>
                 </div>
               ))}
             </section>
 
-            {/* Health conditions */}
             <section className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-white/10">
                 <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -198,10 +360,7 @@ const Profile = () => {
                 </h2>
               </div>
               {conditionItems.map((item, i) => (
-                <div
-                  key={i}
-                  className="px-4 py-3 border-b border-white/10 last:border-0"
-                >
+                <div key={i} className="px-4 py-3 border-b border-white/10 last:border-0">
                   <span className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                     <item.icon size={14} strokeWidth={1.5} className="text-secondary/60" />
                     {item.label}
@@ -211,22 +370,15 @@ const Profile = () => {
               ))}
             </section>
 
-            {/* Actions */}
             <section className="space-y-3">
-              <button
-                onClick={resetChecklist}
-                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
-              >
+              <button onClick={resetChecklist} className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all">
                 <span className="flex items-center gap-3 text-sm font-medium text-foreground">
                   <RotateCcw size={18} strokeWidth={1.5} className="text-secondary" />
                   Resetar checklist de hoje
                 </span>
                 <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
               </button>
-              <button
-                onClick={resetOnboarding}
-                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
-              >
+              <button onClick={resetOnboarding} className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all">
                 <span className="flex items-center gap-3 text-sm font-medium text-foreground">
                   <RotateCcw size={18} strokeWidth={1.5} className="text-destructive" />
                   Refazer questionário inicial
@@ -237,52 +389,171 @@ const Profile = () => {
           </>
         )}
 
-        {/* Evolution section */}
+        {/* Evolution section - REAL DATA */}
         {activeSection === "evolution" && (
-          <section className="glass-card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp size={20} strokeWidth={1.5} className="text-secondary" />
-              <h2 className="text-base font-medium text-foreground">Sua Evolução</h2>
+          <>
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-3">
+              <motion.div initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="glass-card p-3 flex flex-col items-center">
+                <div className="w-9 h-9 rounded-xl bg-secondary/20 flex items-center justify-center mb-1.5">
+                  <Trophy size={18} strokeWidth={1.5} className="text-secondary" />
+                </div>
+                <span className="text-xl font-light text-foreground">{daysCompleted}</span>
+                <span className="text-[10px] text-muted-foreground mt-0.5">Dias completos</span>
+              </motion.div>
+              <motion.div initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="glass-card p-3 flex flex-col items-center">
+                <div className="w-9 h-9 rounded-xl bg-accent/20 flex items-center justify-center mb-1.5">
+                  <Flame size={18} strokeWidth={1.5} className="text-accent" />
+                </div>
+                <span className="text-xl font-light text-foreground">{maxStreak}</span>
+                <span className="text-[10px] text-muted-foreground mt-0.5">Dias seguidos</span>
+              </motion.div>
+              <motion.div initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="glass-card p-3 flex flex-col items-center">
+                <div className="w-9 h-9 rounded-xl bg-success/20 flex items-center justify-center mb-1.5">
+                  <TrendingUp size={18} strokeWidth={1.5} className="text-success" />
+                </div>
+                <span className="text-xl font-light text-foreground">{avgCompletion}%</span>
+                <span className="text-[10px] text-muted-foreground mt-0.5">Média geral</span>
+              </motion.div>
             </div>
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="w-20 h-20 rounded-full bg-secondary/20 flex items-center justify-center mb-4">
-                <TrendingUp size={32} strokeWidth={1.5} className="text-secondary" />
+
+            {/* Bar chart */}
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }} className="glass-card p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar size={16} strokeWidth={1.5} className="text-secondary" />
+                <h3 className="text-sm font-medium text-foreground">Evolução por dia</h3>
               </div>
-              <p className="text-sm text-muted-foreground text-center max-w-xs leading-relaxed">
-                Em breve você poderá acompanhar sua evolução com gráficos de progresso diário, semanal e mensal.
+              <div className="flex items-end justify-between gap-1.5" style={{ height: maxBarHeight + 24 }}>
+                {Array.from({ length: 14 }, (_, i) => {
+                  const dayData = evolutionData.find((d) => d.day === i + 1);
+                  const percent = dayData?.percent ?? 0;
+                  const hasData = !!dayData;
+                  const isComplete = percent === 100;
+                  const barH = !hasData ? 4 : Math.max(4, (percent / 100) * maxBarHeight);
+
+                  return (
+                    <div key={i} className="flex flex-col items-center flex-1 gap-1">
+                      <motion.div
+                        initial={{ height: 4 }}
+                        animate={{ height: barH }}
+                        transition={{ delay: 0.4 + i * 0.04, duration: 0.4, ease: "easeOut" }}
+                        className={`w-full rounded-full ${
+                          !hasData
+                            ? "bg-white/[0.06]"
+                            : isComplete
+                            ? "bg-gradient-to-t from-secondary to-success"
+                            : percent > 0
+                            ? "bg-secondary/40"
+                            : "bg-white/[0.08]"
+                        }`}
+                      />
+                      <span className={`text-[9px] font-medium ${hasData ? "text-muted-foreground" : "text-muted-foreground/30"}`}>
+                        {i + 1}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* Timeline */}
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="glass-card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 size={16} strokeWidth={1.5} className="text-secondary" />
+                <h3 className="text-sm font-medium text-foreground">Linha do tempo</h3>
+              </div>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 14 }, (_, i) => {
+                  const dayData = evolutionData.find((d) => d.day === i + 1);
+                  const percent = dayData?.percent ?? 0;
+                  const hasData = !!dayData;
+                  const isComplete = percent === 100;
+
+                  return (
+                    <div
+                      key={i}
+                      className={`flex-1 h-2.5 rounded-full transition-all ${
+                        !hasData
+                          ? "bg-white/[0.06]"
+                          : isComplete
+                          ? "bg-success"
+                          : percent > 0
+                          ? "bg-secondary/40"
+                          : "bg-destructive/30"
+                      }`}
+                      title={`Dia ${i + 1}: ${hasData ? `${percent}%` : "—"}`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex justify-between mt-1.5">
+                <span className="text-[9px] text-muted-foreground">Dia 1</span>
+                <span className="text-[9px] text-muted-foreground">Dia 14</span>
+              </div>
+            </motion.div>
+
+            {evolutionData.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4 italic">
+                Complete atividades diárias para ver sua evolução aqui.
               </p>
-              <span className="text-xs text-secondary font-medium mt-3 bg-secondary/20 px-3 py-1 rounded-full">
-                Em breve
-              </span>
-            </div>
-          </section>
+            )}
+          </>
         )}
 
-        {/* Achievements section */}
+        {/* Achievements section - FUNCTIONAL */}
         {activeSection === "achievements" && (
-          <section className="glass-card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy size={20} strokeWidth={1.5} className="text-accent" />
-              <h2 className="text-base font-medium text-foreground">Conquistas</h2>
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trophy size={20} strokeWidth={1.5} className="text-accent" />
+                <h2 className="text-base font-medium text-foreground">Conquistas</h2>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {unlockedAchievements.length}/{achievements.length} desbloqueadas
+              </span>
             </div>
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {[
-                { emoji: "🌱", label: "Primeiro Passo", desc: "Completou o onboarding" },
-                { emoji: "💧", label: "Hidratada", desc: "Complete 7 dias de hidratação" },
-                { emoji: "🏃‍♀️", label: "Em Movimento", desc: "Complete 7 dias de exercícios" },
-              ].map((badge) => (
-                <div
-                  key={badge.label}
-                  className="flex flex-col items-center p-3 rounded-xl bg-white/[0.06] border border-white/10"
-                >
-                  <span className="text-2xl mb-1">{badge.emoji}</span>
-                  <span className="text-xs font-medium text-foreground text-center">{badge.label}</span>
-                  <span className="text-[10px] text-muted-foreground text-center mt-0.5">{badge.desc}</span>
-                </div>
-              ))}
+
+            <div className="grid grid-cols-3 gap-3">
+              {achievements.map((badge) => {
+                const unlocked = unlockedAchievements.includes(badge);
+                return (
+                  <motion.div
+                    key={badge.id}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.05 * achievements.indexOf(badge) }}
+                    className={`relative flex flex-col items-center p-3 rounded-xl border transition-all ${
+                      unlocked
+                        ? "bg-white/[0.08] border-secondary/30"
+                        : "bg-white/[0.03] border-white/[0.06] opacity-50"
+                    }`}
+                  >
+                    {!unlocked && (
+                      <div className="absolute top-1.5 right-1.5">
+                        <Lock size={10} className="text-muted-foreground/50" />
+                      </div>
+                    )}
+                    <span className={`text-2xl mb-1 ${unlocked ? "" : "grayscale"}`}>{badge.emoji}</span>
+                    <span className="text-xs font-medium text-foreground text-center leading-tight">{badge.label}</span>
+                    <span className="text-[10px] text-muted-foreground text-center mt-0.5 leading-tight">{badge.desc}</span>
+                    {unlocked && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center"
+                      >
+                        <CheckCircle2 size={10} className="text-foreground" />
+                      </motion.div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
+
             <p className="text-xs text-muted-foreground text-center">
-              Continue completando suas tarefas diárias para desbloquear mais conquistas!
+              {unlockedAchievements.length === achievements.length
+                ? "🎉 Parabéns! Você desbloqueou todas as conquistas!"
+                : "Continue completando suas tarefas diárias para desbloquear mais conquistas!"}
             </p>
           </section>
         )}
@@ -290,31 +561,27 @@ const Profile = () => {
         {/* Settings section */}
         {activeSection === "settings" && (
           <section className="space-y-3">
-            {[
-              { icon: Bell, label: "Notificações", desc: "Em breve" },
-              { icon: FileText, label: "Termos de Uso", desc: "" },
-              { icon: Shield, label: "Política de Privacidade", desc: "" },
-            ].map((item) => (
-              <button
-                key={item.label}
-                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
-              >
-                <span className="flex items-center gap-3 text-sm font-medium text-foreground">
-                  <item.icon size={18} strokeWidth={1.5} className="text-secondary" />
-                  {item.label}
-                </span>
-                <div className="flex items-center gap-2">
-                  {item.desc && (
-                    <span className="text-xs text-secondary font-medium bg-secondary/20 px-2 py-0.5 rounded-full">
-                      {item.desc}
-                    </span>
-                  )}
-                  <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
-                </div>
-              </button>
-            ))}
+            <button
+              onClick={() => navigate("/terms")}
+              className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
+            >
+              <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                <FileText size={18} strokeWidth={1.5} className="text-secondary" />
+                Termos de Uso
+              </span>
+              <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
+            </button>
+            <button
+              onClick={() => navigate("/privacy")}
+              className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
+            >
+              <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                <Shield size={18} strokeWidth={1.5} className="text-secondary" />
+                Política de Privacidade
+              </span>
+              <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
+            </button>
 
-            {/* Logout in settings too */}
             <button
               onClick={handleLogout}
               className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
@@ -328,7 +595,6 @@ const Profile = () => {
           </section>
         )}
 
-        {/* Disclaimer */}
         <p className="text-xs text-muted-foreground text-center leading-relaxed px-4">
           Os conteúdos do Levvia são informativos e não substituem orientação médica profissional.
         </p>
