@@ -139,8 +139,9 @@ export function useChallengeData() {
   const [recipes, setRecipes] = useState<DbRecipe[]>([]);
   const [habits, setHabits] = useState<DbHabit[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [challengeProgress, setChallengeProgress] = useState<Record<string, Record<string, boolean>>>({});
 
-  // Current challenge day
+  // Load challenge start from Supabase or localStorage
   const currentDay = useMemo(() => {
     let start = localStorage.getItem("levvia_challenge_start");
     if (!start) {
@@ -151,6 +152,42 @@ export function useChallengeData() {
     const day = Math.floor(diff / 86400000) + 1;
     return Math.min(Math.max(day, 1), 14);
   }, []);
+
+  // Load progress from Supabase
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (user?.id) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("challenge_progress, challenge_start")
+          .eq("id", user.id)
+          .single();
+        if (data?.challenge_progress && typeof data.challenge_progress === "object") {
+          setChallengeProgress(data.challenge_progress as Record<string, Record<string, boolean>>);
+        } else {
+          // Fallback to localStorage
+          const saved = localStorage.getItem("levvia_challenge_progress");
+          if (saved) setChallengeProgress(JSON.parse(saved));
+        }
+      } else {
+        const saved = localStorage.getItem("levvia_challenge_progress");
+        if (saved) setChallengeProgress(JSON.parse(saved));
+      }
+    };
+    loadProgress();
+  }, [user?.id]);
+
+  // Save progress to both localStorage and Supabase
+  const saveProgress = async (newProgress: Record<string, Record<string, boolean>>) => {
+    setChallengeProgress(newProgress);
+    localStorage.setItem("levvia_challenge_progress", JSON.stringify(newProgress));
+    if (user?.id) {
+      await supabase.from("profiles").update({
+        challenge_progress: newProgress as any,
+        challenge_start: localStorage.getItem("levvia_challenge_start"),
+      }).eq("id", user.id);
+    }
+  };
 
   // Fetch data from Supabase
   useEffect(() => {
@@ -235,5 +272,7 @@ export function useChallengeData() {
     allRecipes: recipes,
     filteredRecipes,
     allHabits: habits,
+    challengeProgress,
+    saveProgress,
   };
 }

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { Dumbbell, UtensilsCrossed, Heart, X, Trophy, AlertTriangle, Sparkles, BarChart3 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import ExerciseDetail from "@/components/ExerciseDetail";
@@ -12,7 +12,7 @@ import type { DbExercise, DbRecipe } from "@/lib/profileEngine";
 // Adapt DbExercise to the Exercise interface expected by ExerciseDetail
 function toExerciseView(ex: DbExercise) {
   return {
-    id: 0, // not used for display
+    id: 0,
     title: ex.title,
     category: ex.category,
     level: ex.level,
@@ -63,6 +63,8 @@ const Today = () => {
     dayTitle,
     dayObjective,
     loading,
+    challengeProgress,
+    saveProgress,
   } = useChallengeData();
 
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: DbExercise; activityId: string } | null>(null);
@@ -70,23 +72,13 @@ const Today = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);
 
-  // --- Progress state ---
-  const [progress, setProgress] = useState<Record<string, Record<string, boolean>>>(() => {
-    const saved = localStorage.getItem("levvia_challenge_progress");
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  useEffect(() => {
-    localStorage.setItem("levvia_challenge_progress", JSON.stringify(progress));
-  }, [progress]);
-
   // --- All activities for today ---
   const allActivities: ChallengeActivity[] = useMemo(() => {
     if (!todayData) return [];
     return [...todayData.exercises, ...todayData.meals, ...todayData.habits];
   }, [todayData]);
 
-  const dayProgress = progress[currentDay] || {};
+  const dayProgress = challengeProgress[currentDay] || {};
   const completedCount = allActivities.filter((a) => dayProgress[a.id]).length;
   const totalCount = allActivities.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
@@ -110,10 +102,11 @@ const Today = () => {
       }
     }
 
-    setProgress((prev) => ({
-      ...prev,
-      [currentDay]: { ...prev[currentDay], [id]: !isChecked },
-    }));
+    const newProgress = {
+      ...challengeProgress,
+      [currentDay]: { ...challengeProgress[currentDay], [id]: !isChecked },
+    };
+    saveProgress(newProgress);
   };
 
   const getGreeting = () => {
@@ -125,20 +118,22 @@ const Today = () => {
 
   const handleMarkExerciseDone = () => {
     if (selectedExercise) {
-      setProgress((prev) => ({
-        ...prev,
-        [currentDay]: { ...prev[currentDay], [selectedExercise.activityId]: true },
-      }));
+      const newProgress = {
+        ...challengeProgress,
+        [currentDay]: { ...challengeProgress[currentDay], [selectedExercise.activityId]: true },
+      };
+      saveProgress(newProgress);
       setSelectedExercise(null);
     }
   };
 
   const handleMarkRecipeDone = () => {
     if (selectedRecipe) {
-      setProgress((prev) => ({
-        ...prev,
-        [currentDay]: { ...prev[currentDay], [selectedRecipe.activityId]: true },
-      }));
+      const newProgress = {
+        ...challengeProgress,
+        [currentDay]: { ...challengeProgress[currentDay], [selectedRecipe.activityId]: true },
+      };
+      saveProgress(newProgress);
       setSelectedRecipe(null);
     }
   };
@@ -249,7 +244,7 @@ const Today = () => {
 
       {/* Progress dashboard */}
       {showDashboard && (
-        <ProgressDashboard currentDay={currentDay} progress={progress} />
+        <ProgressDashboard currentDay={currentDay} progress={challengeProgress} />
       )}
 
       {/* Daily activities */}
