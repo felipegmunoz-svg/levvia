@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
+import Plans from "./pages/Plans";
 import Today from "./pages/Today";
 import Practices from "./pages/Practices";
 import Profile from "./pages/Profile";
