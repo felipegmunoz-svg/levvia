@@ -272,5 +272,7 @@ export function useChallengeData() {
     allRecipes: recipes,
     filteredRecipes,
     allHabits: habits,
+    challengeProgress,
+    saveProgress,
   };
 }
