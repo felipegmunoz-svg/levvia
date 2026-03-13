@@ -22,7 +22,6 @@ const slideVariants = {
 
 const Onboarding = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
