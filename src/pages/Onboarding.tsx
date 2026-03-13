@@ -33,6 +33,7 @@ const Onboarding = () => {
   const [numberInput, setNumberInput] = useState("");
   const [weightInput, setWeightInput] = useState("");
   const [heightInput, setHeightInput] = useState("");
+  const [selectedSingle, setSelectedSingle] = useState<string | null>(null);
 
   const current = onboardingSteps[step];
   const total = onboardingSteps.length;
