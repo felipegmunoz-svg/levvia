@@ -31,8 +31,9 @@ const Auth = () => {
         });
         setMode("login");
       } else if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        await syncOnboardingData(data.user?.id);
         navigate("/today", { replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
