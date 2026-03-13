@@ -1,26 +1,53 @@
-import { useState, useEffect } from "react";
-import { Settings, ChevronRight, RotateCcw, TrendingUp, Trophy, Bell, FileText, Shield } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Settings,
+  ChevronRight,
+  RotateCcw,
+  TrendingUp,
+  Trophy,
+  Bell,
+  FileText,
+  Shield,
+  LogOut,
+  User,
+  Ruler,
+  Activity,
+  Heart,
+  Stethoscope,
+  Target,
+  Flame,
+} from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Profile = () => {
-  const [onboardingData, setOnboardingData] = useState<Record<string, string | string[]>>({});
+  const navigate = useNavigate();
+  const { profile, loading } = useProfile();
+  const { signOut } = useAuth();
   const [activeSection, setActiveSection] = useState<"info" | "evolution" | "achievements" | "settings">("info");
 
-  useEffect(() => {
-    const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) setOnboardingData(JSON.parse(saved));
-  }, []);
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/auth", { replace: true });
+  };
 
-  const userName = (onboardingData[2] as string) || "Usuária";
-
-  const resetChecklist = () => {
-    localStorage.removeItem("levvia_checklist");
+  const resetChecklist = async () => {
     localStorage.removeItem("levvia_challenge_progress");
+    // Also reset in Supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("profiles").update({ challenge_progress: {} }).eq("id", user.id);
+    }
+    toast({ title: "Checklist resetado", description: "Seu progresso de hoje foi reiniciado." });
     window.location.reload();
   };
 
-  const resetOnboarding = () => {
+  const resetOnboarding = async () => {
     localStorage.removeItem("levvia_onboarded");
     localStorage.removeItem("levvia_onboarding");
     localStorage.removeItem("levvia_checklist");
@@ -28,14 +55,54 @@ const Profile = () => {
     localStorage.removeItem("levvia_challenge_progress");
     localStorage.removeItem("levvia_welcome_dismissed");
     localStorage.removeItem("levvia_meal_plan");
-    window.location.href = "/";
+    // Reset profile in Supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("profiles").update({
+        onboarding_data: {},
+        challenge_progress: {},
+        challenge_start: null,
+        pain_level: "",
+        objective: "",
+        affected_areas: [],
+        age: null,
+        sex: "",
+        weight_kg: null,
+        height_cm: null,
+        activity_level: "",
+        health_conditions: [],
+      }).eq("id", user.id);
+    }
+    window.location.href = "/onboarding";
   };
 
+  const bmi = profile.weightKg && profile.heightCm
+    ? (profile.weightKg / ((profile.heightCm / 100) ** 2)).toFixed(1)
+    : null;
+
   const profileItems = [
-    { label: "Nome", value: onboardingData[2] || "—" },
-    { label: "Nível de dor", value: onboardingData[3] || "—" },
-    { label: "Áreas afetadas", value: Array.isArray(onboardingData[4]) ? onboardingData[4].join(", ") : "—" },
-    { label: "Objetivo principal", value: onboardingData[8] || "—" },
+    { icon: User, label: "Nome", value: profile.name || "—" },
+    { icon: User, label: "Idade", value: profile.age ? `${profile.age} anos` : "—" },
+    { icon: User, label: "Sexo", value: profile.sex || "—" },
+    { icon: Ruler, label: "Peso", value: profile.weightKg ? `${profile.weightKg} kg` : "—" },
+    { icon: Ruler, label: "Altura", value: profile.heightCm ? `${profile.heightCm} cm` : "—" },
+    { icon: Ruler, label: "IMC", value: bmi ? `${bmi}` : "—" },
+    { icon: Activity, label: "Nível de atividade", value: profile.activityLevel || "—" },
+    { icon: Flame, label: "Nível de dor", value: profile.painLevel || "—" },
+    { icon: Target, label: "Objetivo", value: profile.objective || "—" },
+  ];
+
+  const conditionItems = [
+    {
+      icon: Stethoscope,
+      label: "Condições de saúde",
+      value: profile.healthConditions?.length ? profile.healthConditions.join(", ") : "Nenhuma informada",
+    },
+    {
+      icon: Heart,
+      label: "Áreas afetadas",
+      value: profile.affectedAreas?.length ? profile.affectedAreas.join(", ") : "Nenhuma informada",
+    },
   ];
 
   const sections = [
@@ -45,6 +112,14 @@ const Profile = () => {
     { id: "settings" as const, label: "Configurações", icon: Settings },
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background gradient-page pb-24">
       <header className="px-6 pt-10 pb-6">
@@ -52,10 +127,17 @@ const Profile = () => {
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
             <img src={logoIcon} alt="Levvia" className="w-10 h-auto" />
           </div>
-          <div>
-            <h1 className="text-xl font-light text-foreground">{userName}</h1>
+          <div className="flex-1">
+            <h1 className="text-xl font-light text-foreground">{profile.name || "Usuária"}</h1>
             <p className="text-sm text-muted-foreground">Membro Levvia</p>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-xs px-3 py-2 rounded-full bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-destructive/30 hover:text-destructive transition-all"
+          >
+            <LogOut size={14} strokeWidth={1.5} />
+            Sair
+          </button>
         </div>
       </header>
 
@@ -83,11 +165,12 @@ const Profile = () => {
         {/* Info section */}
         {activeSection === "info" && (
           <>
+            {/* Personal data */}
             <section className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-white/10">
                 <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Settings size={16} strokeWidth={1.5} className="text-secondary" />
-                  Suas Informações
+                  <User size={16} strokeWidth={1.5} className="text-secondary" />
+                  Dados Pessoais
                 </h2>
               </div>
               {profileItems.map((item, i) => (
@@ -95,14 +178,40 @@ const Profile = () => {
                   key={i}
                   className="flex items-center justify-between px-4 py-3 border-b border-white/10 last:border-0"
                 >
-                  <span className="text-sm text-muted-foreground">{item.label}</span>
+                  <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <item.icon size={14} strokeWidth={1.5} className="text-secondary/60" />
+                    {item.label}
+                  </span>
                   <span className="text-sm font-medium text-foreground text-right max-w-[60%] truncate">
-                    {typeof item.value === "string" ? item.value : "—"}
+                    {item.value}
                   </span>
                 </div>
               ))}
             </section>
 
+            {/* Health conditions */}
+            <section className="glass-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-white/10">
+                <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <Stethoscope size={16} strokeWidth={1.5} className="text-secondary" />
+                  Saúde
+                </h2>
+              </div>
+              {conditionItems.map((item, i) => (
+                <div
+                  key={i}
+                  className="px-4 py-3 border-b border-white/10 last:border-0"
+                >
+                  <span className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                    <item.icon size={14} strokeWidth={1.5} className="text-secondary/60" />
+                    {item.label}
+                  </span>
+                  <p className="text-sm font-medium text-foreground pl-6">{item.value}</p>
+                </div>
+              ))}
+            </section>
+
+            {/* Actions */}
             <section className="space-y-3">
               <button
                 onClick={resetChecklist}
@@ -204,6 +313,18 @@ const Profile = () => {
                 </div>
               </button>
             ))}
+
+            {/* Logout in settings too */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
+            >
+              <span className="flex items-center gap-3 text-sm font-medium text-destructive">
+                <LogOut size={18} strokeWidth={1.5} />
+                Sair da conta
+              </span>
+              <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
+            </button>
           </section>
         )}
 
