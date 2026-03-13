@@ -1,18 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import ExerciseCard from "@/components/ExerciseCard";
 import RecipeCard from "@/components/RecipeCard";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
+import { useProfile } from "@/hooks/useProfile";
 import type { Exercise } from "@/data/exercises";
 import type { Recipe } from "@/data/recipes";
 import {
   fetchExercises,
   fetchRecipes,
+  filterRecipesForProfile,
   type DbExercise,
   type DbRecipe,
+  type UserProfile,
 } from "@/lib/profileEngine";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles } from "lucide-react";
 
 // Convert DB types to view types
 function toExerciseView(ex: DbExercise): Exercise {
@@ -51,25 +56,41 @@ function toRecipeView(rec: DbRecipe): Recipe {
   };
 }
 
+/** Filter exercises based on pain level */
+const painToLevels: Record<string, string[]> = {
+  "Sem dor": ["Muito Fácil", "Fácil", "Moderado"],
+  "Dor leve": ["Muito Fácil", "Fácil", "Moderado"],
+  "Dor moderada": ["Muito Fácil", "Fácil"],
+  "Dor intensa": ["Muito Fácil", "Fácil"],
+  "Dor muito intensa": ["Muito Fácil"],
+};
+
+function filterExercisesForProfile(exercises: DbExercise[], profile: UserProfile): DbExercise[] {
+  const allowedLevels = painToLevels[profile.painLevel] || ["Muito Fácil", "Fácil", "Moderado"];
+  return exercises.filter((ex) => allowedLevels.includes(ex.level));
+}
+
 const Practices = () => {
   const [searchParams] = useSearchParams();
+  const { profile, loading: profileLoading } = useProfile();
   const [tab, setTab] = useState<"exercises" | "recipes">(
     (searchParams.get("tab") as "exercises" | "recipes") || "exercises"
   );
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [rawExercises, setRawExercises] = useState<DbExercise[]>([]);
+  const [rawRecipes, setRawRecipes] = useState<DbRecipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   // Fetch from Supabase
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       const [exData, recData] = await Promise.all([fetchExercises(), fetchRecipes()]);
-      setExercises(exData.map(toExerciseView));
-      setRecipes(recData.map(toRecipeView));
+      setRawExercises(exData);
+      setRawRecipes(recData);
       setLoading(false);
     };
     load();
@@ -81,6 +102,20 @@ const Practices = () => {
       setTab(tabParam);
     }
   }, [searchParams]);
+
+  // Personalized filtering
+  const personalizedExercises = useMemo(() => {
+    if (showAll || profileLoading) return rawExercises;
+    return filterExercisesForProfile(rawExercises, profile);
+  }, [rawExercises, profile, profileLoading, showAll]);
+
+  const personalizedRecipes = useMemo(() => {
+    if (showAll || profileLoading) return rawRecipes;
+    return filterRecipesForProfile(rawRecipes, profile);
+  }, [rawRecipes, profile, profileLoading, showAll]);
+
+  const exercises = useMemo(() => personalizedExercises.map(toExerciseView), [personalizedExercises]);
+  const recipes = useMemo(() => personalizedRecipes.map(toRecipeView), [personalizedRecipes]);
 
   const allExerciseTags = Array.from(new Set(exercises.flatMap((e) => [e.category, e.level])));
   const allRecipeTags = Array.from(new Set(recipes.flatMap((r) => r.tags)));
@@ -102,6 +137,9 @@ const Practices = () => {
   }
 
   const currentTags = tab === "exercises" ? allExerciseTags : allRecipeTags;
+  const isPersonalized = !showAll && !profileLoading;
+  const totalRaw = tab === "exercises" ? rawExercises.length : rawRecipes.length;
+  const totalFiltered = tab === "exercises" ? personalizedExercises.length : personalizedRecipes.length;
 
   return (
     <div className="min-h-screen bg-background gradient-page pb-24">
@@ -137,6 +175,33 @@ const Practices = () => {
           </button>
         </div>
       </div>
+
+      {/* Personalization indicator */}
+      {!loading && !profileLoading && (
+        <div className="px-5 mb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isPersonalized && (
+                <Badge variant="secondary" className="bg-secondary/20 text-secondary border-0 text-xs gap-1">
+                  <Sparkles size={10} />
+                  Personalizado
+                </Badge>
+              )}
+              <span className="text-xs text-muted-foreground">
+                {isPersonalized && totalFiltered < totalRaw
+                  ? `${totalFiltered} de ${totalRaw} para seu perfil`
+                  : `${totalRaw} disponíveis`}
+              </span>
+            </div>
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="text-xs text-secondary hover:underline"
+            >
+              {showAll ? "Personalizar" : "Ver todos"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tag filters */}
       <div className="px-5 mb-4">

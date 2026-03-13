@@ -9,7 +9,7 @@ import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +20,17 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast({
+          title: "Email enviado!",
+          description: "Verifique sua caixa de entrada para redefinir sua senha.",
+        });
+        setMode("login");
+      } else if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate("/today", { replace: true });
@@ -58,17 +68,19 @@ const Auth = () => {
             <img src={logoIcon} alt="Levvia" className="w-10 h-auto" />
           </div>
           <h1 className="text-2xl font-light text-foreground">
-            {isLogin ? "Entrar" : "Criar conta"}
+            {mode === "login" ? "Entrar" : mode === "signup" ? "Criar conta" : "Recuperar senha"}
           </h1>
           <p className="text-sm text-muted-foreground text-center">
-            {isLogin
+            {mode === "login"
               ? "Acesse sua conta Levvia"
-              : "Comece sua jornada de cuidado"}
+              : mode === "signup"
+              ? "Comece sua jornada de cuidado"
+              : "Enviaremos um link para redefinir sua senha"}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          {mode === "signup" && (
             <div className="space-y-2">
               <Label htmlFor="name" className="text-foreground">Nome</Label>
               <Input
@@ -76,7 +88,7 @@ const Auth = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Seu nome"
-                required={!isLogin}
+                required
                 className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
               />
             </div>
@@ -93,36 +105,70 @@ const Auth = () => {
               className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
+          {mode !== "forgot" && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-foreground">Senha</Label>
+                {mode === "login" && (
+                  <button
+                    type="button"
+                    onClick={() => setMode("forgot")}
+                    className="text-xs text-secondary hover:underline"
+                  >
+                    Esqueci minha senha
+                  </button>
+                )}
+              </div>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+          )}
           <Button
             type="submit"
             disabled={loading}
             className="w-full gradient-primary text-foreground font-medium"
           >
-            {loading ? "Carregando..." : isLogin ? "Entrar" : "Criar conta"}
+            {loading
+              ? "Carregando..."
+              : mode === "login"
+              ? "Entrar"
+              : mode === "signup"
+              ? "Criar conta"
+              : "Enviar link de recuperação"}
           </Button>
         </form>
 
         <p className="text-sm text-center text-muted-foreground">
-          {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-secondary hover:underline font-medium"
-          >
-            {isLogin ? "Criar conta" : "Entrar"}
-          </button>
+          {mode === "login" ? (
+            <>
+              Não tem conta?{" "}
+              <button onClick={() => setMode("signup")} className="text-secondary hover:underline font-medium">
+                Criar conta
+              </button>
+            </>
+          ) : mode === "signup" ? (
+            <>
+              Já tem conta?{" "}
+              <button onClick={() => setMode("login")} className="text-secondary hover:underline font-medium">
+                Entrar
+              </button>
+            </>
+          ) : (
+            <>
+              Lembrou a senha?{" "}
+              <button onClick={() => setMode("login")} className="text-secondary hover:underline font-medium">
+                Voltar para login
+              </button>
+            </>
+          )}
         </p>
       </div>
     </div>
