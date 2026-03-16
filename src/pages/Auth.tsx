@@ -92,6 +92,15 @@ const Auth = () => {
     }
   };
 
+  const showSuccessAndNavigate = (destination: string, isSignup: boolean) => {
+    const message = isSignup ? "Conta criada com sucesso!" : "Bem-vinda de volta!";
+    setLoading(false);
+    setSuccess({ message, destination });
+    setTimeout(() => {
+      navigate(destination, { replace: true });
+    }, 1800);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -107,16 +116,13 @@ const Auth = () => {
           description: "Verifique sua caixa de entrada para redefinir sua senha.",
         });
         setMode("login");
+        setLoading(false);
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         await syncOnboardingData(data.user?.id, data.user?.email);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
-        if (hasPlan) {
-          navigate("/checkout", { replace: true });
-        } else {
-          navigate("/today", { replace: true });
-        }
+        showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", false);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -128,11 +134,7 @@ const Auth = () => {
         if (error) throw error;
         const hasPlan = localStorage.getItem("levvia_selected_plan");
         await syncOnboardingData(data.user?.id, data.user?.email);
-        if (hasPlan) {
-          navigate("/checkout", { replace: true });
-        } else {
-          navigate("/today", { replace: true });
-        }
+        showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", true);
       }
     } catch (error: any) {
       toast({
@@ -140,7 +142,6 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
