@@ -97,20 +97,17 @@ const Auth = () => {
         const hasPlan = localStorage.getItem("levvia_selected_plan");
         navigate(hasPlan ? "/checkout" : "/today", { replace: true });
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { name, phone },
-            emailRedirectTo: window.location.origin,
           },
         });
         if (error) throw error;
-        await syncOnboardingData(undefined);
-        toast({
-          title: "Conta criada!",
-          description: "Verifique seu email para confirmar o cadastro.",
-        });
+        await syncOnboardingData(data.user?.id);
+        const hasPlan = localStorage.getItem("levvia_selected_plan");
+        navigate(hasPlan ? "/checkout" : "/today", { replace: true });
       }
     } catch (error: any) {
       toast({
