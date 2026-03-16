@@ -158,6 +158,11 @@ const Today = () => {
     }
   };
 
+  // Show PWA install gate before everything else
+  if (showInstallGate) {
+    return <InstallPWAPrompt onDismiss={handleDismissInstall} />;
+  }
+
   if (selectedExercise) {
     return (
       <ExerciseDetail
