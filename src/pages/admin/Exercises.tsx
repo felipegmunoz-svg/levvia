@@ -26,6 +26,7 @@ interface ExerciseRow {
   icon: string;
   sort_order: number;
   is_active: boolean;
+  video_url: string;
 }
 
 const emptyExercise: Omit<ExerciseRow, "id"> = {
