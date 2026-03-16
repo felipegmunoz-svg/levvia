@@ -9,7 +9,9 @@ import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">(initialMode);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
