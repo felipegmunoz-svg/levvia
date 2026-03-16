@@ -457,9 +457,20 @@ const Onboarding = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottom button — hidden for single-select questions */}
-      {current.type !== "single" && (
-        <div className="px-6 pb-8">
+      {/* Bottom buttons */}
+      <div className="px-6 pb-8">
+        {current.type === "single" && step > 0 ? (
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleBack}
+            className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-3 rounded-3xl text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={16} strokeWidth={1.5} />
+            Voltar
+          </motion.button>
+        ) : current.type !== "single" ? (
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleNext}
@@ -473,8 +484,8 @@ const Onboarding = () => {
             {step === total - 1 ? "Começar Agora" : "Continuar"}
             <ArrowRight size={18} strokeWidth={1.5} />
           </motion.button>
-        </div>
-      )}
+        ) : null}
+      </div>
     </div>
   );
 };
