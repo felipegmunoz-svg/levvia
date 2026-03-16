@@ -219,6 +219,11 @@ const Today = () => {
             </p>
           )}
         </div>
+
+        {/* Push notification prompt */}
+        <div className="mt-4">
+          <PushNotificationPrompt />
+        </div>
       </header>
 
       {/* Incentive message */}
