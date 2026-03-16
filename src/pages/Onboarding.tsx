@@ -415,15 +415,18 @@ const Onboarding = () => {
       {/* Progress bar */}
       <div className="px-6 pt-4">
         <div className="flex items-center justify-between mb-2">
-          {step > 0 && (
+          {step > 0 ? (
             <motion.button
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               onClick={handleBack}
-              className="text-muted-foreground hover:text-foreground transition-colors p-1"
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors p-1"
             >
-              <ArrowLeft size={20} strokeWidth={1.5} />
+              <ArrowLeft size={18} strokeWidth={1.5} />
+              <span className="text-xs font-medium">Voltar</span>
             </motion.button>
+          ) : (
+            <div />
           )}
           <span className="text-xs text-muted-foreground font-medium ml-auto">
             {step + 1} de {total}
