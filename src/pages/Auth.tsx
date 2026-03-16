@@ -48,6 +48,7 @@ const Auth = () => {
 
       await supabase.from("profiles").update({
         name: userName,
+        phone: phone || null,
         age,
         sex,
         weight_kg: weightKg,
