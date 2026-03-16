@@ -205,7 +205,7 @@ const Practices = () => {
 
       {/* Tag filters */}
       <div className="px-5 mb-4">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setActiveTag(null)}
             className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
