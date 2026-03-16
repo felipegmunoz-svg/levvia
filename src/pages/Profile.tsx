@@ -26,6 +26,7 @@ import {
   Lock,
   Star,
   Zap,
+  Pencil,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
