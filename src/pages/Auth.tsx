@@ -13,7 +13,13 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() => {
+    const raw = localStorage.getItem("levvia_onboarding");
+    if (raw) {
+      try { return (JSON.parse(raw)[2] as string) || ""; } catch { return ""; }
+    }
+    return "";
+  });
 
   /** Sync pending onboarding data from localStorage to Supabase profile */
   const syncOnboardingData = async (userId?: string) => {

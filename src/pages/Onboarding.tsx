@@ -481,7 +481,7 @@ const Onboarding = () => {
                 : "bg-white/[0.06] text-muted-foreground cursor-not-allowed"
             }`}
           >
-            {step === total - 1 ? "Começar Agora" : "Continuar"}
+            {step === total - 1 ? "Ver Meu Diagnóstico" : "Continuar"}
             <ArrowRight size={18} strokeWidth={1.5} />
           </motion.button>
         ) : null}

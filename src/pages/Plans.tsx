@@ -113,11 +113,6 @@ const Plans = () => {
   const { hours, minutes, seconds, expired } = useCountdown();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  const raw = localStorage.getItem("levvia_onboarding");
-  const answers = raw ? JSON.parse(raw) : {};
-  const painLevel = answers[8] as string | undefined;
-  const fireResult = painLevel ? fireResults[painLevel] : null;
-  const userName = (answers[2] as string) || "";
 
   const handleSelectPlan = (planId: string) => {
     setSelectedPlan(planId);

@@ -32,7 +32,7 @@ const Index = () => {
     } else if (user) {
       navigate("/today", { replace: true });
     } else {
-      navigate("/plans", { replace: true });
+      navigate("/diagnosis", { replace: true });
     }
   }, [checked, showInstall, authLoading, user, navigate]);
 
