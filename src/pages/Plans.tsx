@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { fireResults } from "@/data/onboarding";
-import { Flame, Check, ArrowRight, Sparkles, Clock, Shield, Zap } from "lucide-react";
+import { Check, ArrowRight, Sparkles, Clock, Shield, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoFull from "@/assets/logo_livvia_branco.png";
 import { useState, useEffect } from "react";
