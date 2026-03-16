@@ -110,7 +110,7 @@ const Onboarding = () => {
       // Clear cached meal plan so it regenerates with new profile
       localStorage.removeItem("levvia_meal_plan");
 
-      navigate("/plans");
+      navigate("/diagnosis");
     }
   };
 
