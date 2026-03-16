@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
+import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import ExerciseDetail from "@/components/ExerciseDetail";
