@@ -105,8 +105,8 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        await syncOnboardingData(data.user?.id);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
+        await syncOnboardingData(data.user?.id);
         navigate(hasPlan ? "/checkout" : "/today", { replace: true });
       }
     } catch (error: any) {
