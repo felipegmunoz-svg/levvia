@@ -69,7 +69,7 @@ const Diagnosis = () => {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="px-6 pt-6 pb-2 flex justify-center"
+        className="px-6 pt-6 pb-6 flex justify-center"
       >
         <img src={logoFull} alt="Levvia" className="w-[120px] h-auto opacity-60" />
       </motion.div>
