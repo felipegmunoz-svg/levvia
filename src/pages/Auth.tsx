@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
 const Auth = () => {
@@ -14,6 +15,7 @@ const Auth = () => {
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
   const [mode, setMode] = useState<"login" | "signup" | "forgot">(initialMode);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState<{ message: string; destination: string } | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -90,6 +92,15 @@ const Auth = () => {
     }
   };
 
+  const showSuccessAndNavigate = (destination: string, isSignup: boolean) => {
+    const message = isSignup ? "Conta criada com sucesso!" : "Bem-vinda de volta!";
+    setLoading(false);
+    setSuccess({ message, destination });
+    setTimeout(() => {
+      navigate(destination, { replace: true });
+    }, 1800);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -105,16 +116,13 @@ const Auth = () => {
           description: "Verifique sua caixa de entrada para redefinir sua senha.",
         });
         setMode("login");
+        setLoading(false);
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         await syncOnboardingData(data.user?.id, data.user?.email);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
-        if (hasPlan) {
-          navigate("/checkout", { replace: true });
-        } else {
-          navigate("/today", { replace: true });
-        }
+        showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", false);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -126,11 +134,7 @@ const Auth = () => {
         if (error) throw error;
         const hasPlan = localStorage.getItem("levvia_selected_plan");
         await syncOnboardingData(data.user?.id, data.user?.email);
-        if (hasPlan) {
-          navigate("/checkout", { replace: true });
-        } else {
-          navigate("/today", { replace: true });
-        }
+        showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", true);
       }
     } catch (error: any) {
       toast({
@@ -138,13 +142,50 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      {/* Success overlay */}
+      <AnimatePresence>
+        {success && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+              className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center mb-6"
+            >
+              <Check className="w-10 h-10 text-foreground" strokeWidth={2.5} />
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-medium text-foreground mb-2"
+            >
+              {success.message}
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center gap-2 text-secondary"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">Preparando tudo para você...</span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center gap-3">
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
