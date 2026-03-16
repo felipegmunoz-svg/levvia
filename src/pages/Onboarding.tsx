@@ -326,7 +326,7 @@ const Onboarding = () => {
     if (current.type === "info") {
       const objective = answers[13] as string;
       const personalizedSubtitle = userName && objective
-        ? `${userName}, você está pronta! Preparamos um plano de 14 dias focado no seu objetivo: ${objective}. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!`
+        ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para o seu objetivo: ${objective}.`
         : current.subtitle;
 
       return (
