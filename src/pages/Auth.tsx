@@ -108,9 +108,13 @@ const Auth = () => {
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await syncOnboardingData(data.user?.id);
+        await syncOnboardingData(data.user?.id, data.user?.email);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
-        navigate(hasPlan ? "/checkout" : "/today", { replace: true });
+        if (hasPlan) {
+          navigate("/checkout", { replace: true });
+        } else {
+          navigate("/today", { replace: true });
+        }
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -121,8 +125,12 @@ const Auth = () => {
         });
         if (error) throw error;
         const hasPlan = localStorage.getItem("levvia_selected_plan");
-        await syncOnboardingData(data.user?.id);
-        navigate(hasPlan ? "/checkout" : "/today", { replace: true });
+        await syncOnboardingData(data.user?.id, data.user?.email);
+        if (hasPlan) {
+          navigate("/checkout", { replace: true });
+        } else {
+          navigate("/today", { replace: true });
+        }
       }
     } catch (error: any) {
       toast({
