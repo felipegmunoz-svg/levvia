@@ -27,14 +27,14 @@ const Auth = () => {
   });
 
   /** Sync pending onboarding data from localStorage to Supabase profile */
-  const syncOnboardingData = async (userId?: string) => {
+  const syncOnboardingData = async (userId?: string, userEmail?: string) => {
     if (!userId) return;
     const raw = localStorage.getItem("levvia_onboarding");
     if (!raw) return;
 
     try {
       const answers = JSON.parse(raw) as Record<number, string | string[]>;
-      const userName = (answers[2] as string) || "";
+      const userName = (answers[2] as string) || name || "";
       const age = parseInt(answers[3] as string) || null;
       const sex = (answers[4] as string) || "";
       const bodyMetrics = (answers[5] as string[]) || [];
@@ -46,10 +46,8 @@ const Auth = () => {
       const affectedAreas = (answers[9] as string[]) || [];
       const objective = (answers[13] as string) || "";
 
-      await supabase.from("profiles").upsert({
-        id: userId,
+      const profileData = {
         name: userName,
-        email: "", // will be filled by trigger if empty
         phone: phone || null,
         age,
         sex,
@@ -67,11 +65,26 @@ const Auth = () => {
           preferences: answers[15] || [],
           raw: answers,
         },
-      }, { onConflict: "id" });
+      };
 
-      // Clean up after sync
+      // Try update first (profile may already exist from trigger)
+      const { data: updated, error: updateError } = await supabase
+        .from("profiles")
+        .update(profileData)
+        .eq("id", userId)
+        .select("id");
+
+      // If no row was updated, insert
+      if (!updateError && (!updated || updated.length === 0)) {
+        await supabase.from("profiles").insert({
+          id: userId,
+          email: userEmail || email || "",
+          ...profileData,
+        });
+      }
+
+      // Clean up onboarding data only (keep selected plan for navigation)
       localStorage.removeItem("levvia_onboarding");
-      localStorage.removeItem("levvia_selected_plan");
     } catch (e) {
       console.error("Failed to sync onboarding data:", e);
     }
@@ -95,9 +108,13 @@ const Auth = () => {
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await syncOnboardingData(data.user?.id);
+        await syncOnboardingData(data.user?.id, data.user?.email);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
-        navigate(hasPlan ? "/checkout" : "/today", { replace: true });
+        if (hasPlan) {
+          navigate("/checkout", { replace: true });
+        } else {
+          navigate("/today", { replace: true });
+        }
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -108,8 +125,12 @@ const Auth = () => {
         });
         if (error) throw error;
         const hasPlan = localStorage.getItem("levvia_selected_plan");
-        await syncOnboardingData(data.user?.id);
-        navigate(hasPlan ? "/checkout" : "/today", { replace: true });
+        await syncOnboardingData(data.user?.id, data.user?.email);
+        if (hasPlan) {
+          navigate("/checkout", { replace: true });
+        } else {
+          navigate("/today", { replace: true });
+        }
       }
     } catch (error: any) {
       toast({
