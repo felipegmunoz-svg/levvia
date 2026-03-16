@@ -498,14 +498,33 @@ const Onboarding = () => {
     // Standard question screens (single / multi)
     return (
       <div className="flex-1 flex flex-col justify-center px-6 py-8">
-        <div className="flex justify-center mb-6">
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="flex justify-center mb-6"
+        >
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
             <Heart size={28} strokeWidth={1.5} className="text-foreground" />
           </div>
-        </div>
-        <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+        </motion.div>
+        <motion.h1
+          initial={{ y: 12, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="text-2xl font-light text-foreground text-center mb-2"
+        >
+          {current.title}
+        </motion.h1>
         {current.subtitle && (
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
         )}
         {current.options && (
           <div className="space-y-3 max-w-sm mx-auto w-full">
