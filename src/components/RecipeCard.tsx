@@ -7,13 +7,19 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ recipe, onClick }: RecipeCardProps) => {
+  const imageUrl = (recipe as any).image_url;
+
   return (
     <button
       onClick={onClick}
       className="flex items-center gap-4 w-full p-5 glass-card hover:bg-white/[0.09] transition-all duration-200 text-left group"
     >
-      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-        <UtensilsCrossed size={22} strokeWidth={1.5} className="text-accent" />
+      <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-accent/20 flex items-center justify-center">
+        {imageUrl ? (
+          <img src={imageUrl} alt={recipe.title} className="w-full h-full object-cover" />
+        ) : (
+          <UtensilsCrossed size={22} strokeWidth={1.5} className="text-accent" />
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <h3 className="text-sm font-medium text-foreground truncate">{recipe.title}</h3>

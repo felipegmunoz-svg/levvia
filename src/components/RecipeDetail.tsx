@@ -8,34 +8,65 @@ interface RecipeDetailProps {
 }
 
 const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
+  const imageUrl = (recipe as any).image_url;
+
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
-        <button
-          onClick={onBack}
-          className="text-muted-foreground hover:text-foreground transition-colors mb-4"
-        >
-          <ArrowLeft size={22} strokeWidth={1.5} />
-        </button>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
-            <UtensilsCrossed size={20} strokeWidth={1.5} className="text-accent" />
+      {/* Hero image or gradient header */}
+      {imageUrl ? (
+        <div className="relative">
+          <img src={imageUrl} alt={recipe.title} className="w-full h-52 object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <button
+            onClick={onBack}
+            className="absolute top-10 left-6 text-foreground hover:text-muted-foreground transition-colors z-10"
+          >
+            <ArrowLeft size={22} strokeWidth={1.5} />
+          </button>
+          <div className="absolute bottom-4 left-6 right-6">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-xs font-medium text-muted-foreground bg-white/[0.08] px-3 py-1 rounded-full backdrop-blur-sm">
+                {recipe.category}
+              </span>
+            </div>
+            <h1 className="text-xl font-light text-foreground">{recipe.title}</h1>
+            <div className="flex items-center gap-4 mt-2">
+              <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                <Clock size={14} strokeWidth={1.5} /> {recipe.time}
+              </span>
+              <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                <Users size={14} strokeWidth={1.5} /> {recipe.servings}
+              </span>
+            </div>
           </div>
-          <span className="text-xs font-medium text-muted-foreground bg-white/[0.08] px-3 py-1 rounded-full">
-            {recipe.category}
-          </span>
         </div>
-        <h1 className="text-xl font-light text-foreground">{recipe.title}</h1>
-        <div className="flex items-center gap-4 mt-3">
-          <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-            <Clock size={14} strokeWidth={1.5} /> {recipe.time}
-          </span>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-            <Users size={14} strokeWidth={1.5} /> {recipe.servings}
-          </span>
+      ) : (
+        <div className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
+          <button
+            onClick={onBack}
+            className="text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <ArrowLeft size={22} strokeWidth={1.5} />
+          </button>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+              <UtensilsCrossed size={20} strokeWidth={1.5} className="text-accent" />
+            </div>
+            <span className="text-xs font-medium text-muted-foreground bg-white/[0.08] px-3 py-1 rounded-full">
+              {recipe.category}
+            </span>
+          </div>
+          <h1 className="text-xl font-light text-foreground">{recipe.title}</h1>
+          <div className="flex items-center gap-4 mt-3">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+              <Clock size={14} strokeWidth={1.5} /> {recipe.time}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+              <Users size={14} strokeWidth={1.5} /> {recipe.servings}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       <main className="px-6 py-6 space-y-6">
         <section>

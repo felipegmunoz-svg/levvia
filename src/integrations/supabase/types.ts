@@ -33,6 +33,7 @@ export type Database = {
           title: string
           updated_at: string
           variations: string[] | null
+          video_url: string | null
         }
         Insert: {
           benefits?: string | null
@@ -52,6 +53,7 @@ export type Database = {
           title: string
           updated_at?: string
           variations?: string[] | null
+          video_url?: string | null
         }
         Update: {
           benefits?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           title?: string
           updated_at?: string
           variations?: string[] | null
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -187,6 +190,7 @@ export type Database = {
           dica: string | null
           icon: string | null
           id: string
+          image_url: string | null
           ingredients: string[] | null
           instructions: string[] | null
           is_active: boolean | null
@@ -206,6 +210,7 @@ export type Database = {
           dica?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           ingredients?: string[] | null
           instructions?: string[] | null
           is_active?: boolean | null
@@ -225,6 +230,7 @@ export type Database = {
           dica?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           ingredients?: string[] | null
           instructions?: string[] | null
           is_active?: boolean | null

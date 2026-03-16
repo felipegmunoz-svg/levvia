@@ -26,6 +26,7 @@ interface ExerciseRow {
   icon: string;
   sort_order: number;
   is_active: boolean;
+  video_url: string;
 }
 
 const emptyExercise: Omit<ExerciseRow, "id"> = {
@@ -43,6 +44,7 @@ const emptyExercise: Omit<ExerciseRow, "id"> = {
   icon: "dumbbell",
   sort_order: 0,
   is_active: true,
+  video_url: "",
 };
 
 const Exercises = () => {
@@ -215,6 +217,10 @@ const Exercises = () => {
             <div className="space-y-2">
               <Label className="text-foreground">Variações (uma por linha)</Label>
               <Textarea value={variationsText} onChange={(e) => setVariationsText(e.target.value)} rows={3} className="bg-white/[0.06] border-white/10 text-foreground" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-foreground">URL do Vídeo (opcional)</Label>
+              <Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://youtube.com/watch?v=... ou URL do vídeo" className="bg-white/[0.06] border-white/10 text-foreground" />
             </div>
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">

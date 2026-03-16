@@ -12,6 +12,7 @@ export interface Exercise {
   safety?: string;
   variations?: string[];
   icon: string;
+  video_url?: string;
 }
 
 export const exerciseCategories = [
