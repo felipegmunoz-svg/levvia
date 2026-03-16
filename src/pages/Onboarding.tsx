@@ -231,13 +231,32 @@ const Onboarding = () => {
     if (current.type === "disclaimer") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center">
               <ShieldCheck size={28} strokeWidth={1.5} className="text-accent" />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
           <div className="max-w-sm mx-auto w-full">
             <motion.button
               whileTap={{ scale: 0.97 }}
@@ -267,14 +286,38 @@ const Onboarding = () => {
     if (current.type === "name") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
-          <div className="max-w-sm mx-auto w-full">
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
+          <motion.div
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="max-w-sm mx-auto w-full"
+          >
             <input
               type="text"
               value={nameInput}
@@ -283,7 +326,7 @@ const Onboarding = () => {
               className="w-full px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px]"
               autoFocus
             />
-          </div>
+          </motion.div>
         </div>
       );
     }
@@ -292,14 +335,38 @@ const Onboarding = () => {
       const cfg = current.numberConfig;
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
-          <div className="max-w-sm mx-auto w-full flex items-center gap-3">
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
+          <motion.div
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="max-w-sm mx-auto w-full flex items-center gap-3"
+          >
             <input
               type="number"
               inputMode="numeric"
@@ -314,7 +381,7 @@ const Onboarding = () => {
             {cfg?.unit && (
               <span className="text-sm text-muted-foreground font-medium">{cfg.unit}</span>
             )}
-          </div>
+          </motion.div>
         </div>
       );
     }
@@ -322,14 +389,38 @@ const Onboarding = () => {
     if (current.type === "body_metrics") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
-          <div className="max-w-sm mx-auto w-full space-y-4">
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
+          <motion.div
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="max-w-sm mx-auto w-full space-y-4"
+          >
             <div className="flex items-center gap-3">
               <label className="text-sm text-muted-foreground w-16">Peso</label>
               <input
@@ -355,7 +446,7 @@ const Onboarding = () => {
               />
               <span className="text-sm text-muted-foreground font-medium w-8">cm</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       );
     }
@@ -384,7 +475,14 @@ const Onboarding = () => {
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
           </motion.div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
           <motion.p
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -400,14 +498,33 @@ const Onboarding = () => {
     // Standard question screens (single / multi)
     return (
       <div className="flex-1 flex flex-col justify-center px-6 py-8">
-        <div className="flex justify-center mb-6">
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="flex justify-center mb-6"
+        >
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
             <Heart size={28} strokeWidth={1.5} className="text-foreground" />
           </div>
-        </div>
-        <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+        </motion.div>
+        <motion.h1
+          initial={{ y: 12, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="text-2xl font-light text-foreground text-center mb-2"
+        >
+          {current.title}
+        </motion.h1>
         {current.subtitle && (
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
         )}
         {current.options && (
           <div className="space-y-3 max-w-sm mx-auto w-full">
