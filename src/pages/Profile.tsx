@@ -337,12 +337,21 @@ const Profile = () => {
         {/* Info section */}
         {activeSection === "info" && (
           <>
+            <EditProfileDialog open={editOpen} onOpenChange={setEditOpen} profile={profile} onSaved={refresh} />
+
             <section className="glass-card overflow-hidden">
-              <div className="px-4 py-3 border-b border-white/10">
+              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
                 <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
                   <User size={16} strokeWidth={1.5} className="text-secondary" />
                   Dados Pessoais
                 </h2>
+                <button
+                  onClick={() => setEditOpen(true)}
+                  className="flex items-center gap-1 text-xs text-secondary hover:text-secondary/80 transition-colors"
+                >
+                  <Pencil size={13} strokeWidth={1.5} />
+                  Editar
+                </button>
               </div>
               {profileItems.map((item, i) => (
                 <div key={i} className="flex items-center justify-between px-4 py-3 border-b border-white/10 last:border-0">
