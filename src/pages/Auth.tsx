@@ -143,17 +143,31 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">Nome</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Seu nome"
-                required
-                className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-foreground">Nome</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Seu nome"
+                  required
+                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-foreground">Celular / WhatsApp</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(11) 99999-9999"
+                  required
+                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            </>
           )}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-foreground">Email</Label>
