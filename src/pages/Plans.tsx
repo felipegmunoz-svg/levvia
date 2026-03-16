@@ -158,35 +158,6 @@ const Plans = () => {
       </motion.div>
 
       <div className="flex-1 overflow-y-auto px-6 pb-8">
-        {/* Fire Result Summary */}
-        {fireResult && (
-          <motion.div
-            initial={{ y: 30, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
-            className="glass-card rounded-2xl p-5 mb-5"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <motion.div
-                animate={{ rotate: [0, -5, 5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                className="w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center"
-              >
-                <Flame size={24} strokeWidth={1.5} className={fireResult.colorClass} />
-              </motion.div>
-              <div>
-                <p className="text-xs text-muted-foreground">Seu diagnóstico</p>
-                <p className={`text-base font-medium ${fireResult.colorClass}`}>
-                  {fireResult.level}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {userName ? `${userName}, b` : "B"}aseado nas suas respostas, preparamos um plano personalizado para ajudar você.
-            </p>
-          </motion.div>
-        )}
-
         {/* Countdown Banner */}
         {!expired && (
           <motion.div
