@@ -7,6 +7,7 @@ import {
   Dumbbell,
   UtensilsCrossed,
   Heart,
+  Bell,
   LogOut,
   ChevronLeft,
 } from "lucide-react";
