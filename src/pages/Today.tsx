@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
+import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
 import ExerciseDetail from "@/components/ExerciseDetail";
@@ -73,6 +74,24 @@ const Today = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);
 
+  // PWA install gate — show once per session if not installed
+  const [showInstallGate, setShowInstallGate] = useState(() => {
+    if (typeof window === "undefined") return false;
+    // Don't show if already in standalone mode (installed)
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+    if (isStandalone) return false;
+    // Don't show if already dismissed
+    if (sessionStorage.getItem("levvia_install_shown")) return false;
+    return true;
+  });
+
+  const handleDismissInstall = () => {
+    sessionStorage.setItem("levvia_install_shown", "1");
+    setShowInstallGate(false);
+  };
+
   // --- All activities for today ---
   const allActivities: ChallengeActivity[] = useMemo(() => {
     if (!todayData) return [];
@@ -138,6 +157,11 @@ const Today = () => {
       setSelectedRecipe(null);
     }
   };
+
+  // Show PWA install gate before everything else
+  if (showInstallGate) {
+    return <InstallPWAPrompt onDismiss={handleDismissInstall} />;
+  }
 
   if (selectedExercise) {
     return (
