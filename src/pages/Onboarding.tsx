@@ -475,7 +475,14 @@ const Onboarding = () => {
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
           </motion.div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
           <motion.p
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
