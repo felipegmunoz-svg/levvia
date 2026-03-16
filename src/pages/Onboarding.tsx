@@ -29,9 +29,9 @@ const fireConfettiColors: Record<string, string[]> = {
   "Dor muito intensa": ["#f87171", "#ef4444", "#fca5a5"],
 };
 
-const ResultScreen = ({ fireResult }: { fireResult: ReturnType<typeof Object.values<typeof fireResults>>[number] | null }) => {
+const ResultScreen = ({ fireResult, painAnswer }: { fireResult: import("@/data/onboarding").FireResult | null; painAnswer: string }) => {
   useEffect(() => {
-    const colors = fireConfettiColors[(Object.keys(fireResults).find(k => fireResults[k] === fireResult)) || ""] || ["#2dd4a8", "#34d399"];
+    const colors = fireConfettiColors[painAnswer] || ["#2dd4a8", "#34d399"];
     
     const end = Date.now() + 1500;
     const frame = () => {
