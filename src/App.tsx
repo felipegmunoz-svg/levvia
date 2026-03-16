@@ -12,6 +12,8 @@ import Today from "./pages/Today";
 import Practices from "./pages/Practices";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
+import Diagnosis from "./pages/Diagnosis";
+import Checkout from "./pages/Checkout";
 import ResetPassword from "./pages/ResetPassword";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
