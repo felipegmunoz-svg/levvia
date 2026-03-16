@@ -94,6 +94,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
+        await syncOnboardingData(undefined);
         toast({
           title: "Conta criada!",
           description: "Verifique seu email para confirmar o cadastro.",
