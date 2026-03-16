@@ -10,11 +10,6 @@ const Index = () => {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    // Clear onboarding state to allow re-testing the full flow
-    localStorage.removeItem("levvia_onboarded");
-    localStorage.removeItem("levvia_onboarding");
-    localStorage.removeItem("levvia_selected_plan");
-    localStorage.removeItem("levvia_offer_end");
 
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
