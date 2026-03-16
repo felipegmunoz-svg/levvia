@@ -16,6 +16,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState(() => {
     const raw = localStorage.getItem("levvia_onboarding");
     if (raw) {
