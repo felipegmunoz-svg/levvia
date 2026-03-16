@@ -1,0 +1,345 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// Web Push utilities using Web Crypto API
+async function importVapidKeys(publicKey: string, privateKey: string) {
+  const pubBytes = base64UrlToUint8Array(publicKey);
+  const privBytes = base64UrlToUint8Array(privateKey);
+
+  // Build uncompressed public key (65 bytes: 0x04 + x + y)
+  const pubKeyObj = await crypto.subtle.importKey(
+    "raw",
+    pubBytes,
+    { name: "ECDSA", namedCurve: "P-256" },
+    true,
+    ["verify"]
+  );
+
+  // Import private key as JWK
+  const pubJwk = await crypto.subtle.exportKey("jwk", pubKeyObj);
+  const privJwk = {
+    ...pubJwk,
+    d: uint8ArrayToBase64Url(privBytes),
+    key_ops: ["sign"],
+  };
+  delete privJwk.key_ops;
+
+  const privateKeyObj = await crypto.subtle.importKey(
+    "jwk",
+    { ...privJwk, key_ops: ["sign"] },
+    { name: "ECDSA", namedCurve: "P-256" },
+    false,
+    ["sign"]
+  );
+
+  return { publicKey: pubKeyObj, privateKey: privateKeyObj };
+}
+
+function base64UrlToUint8Array(base64Url: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64Url.length % 4)) % 4);
+  const base64 = (base64Url + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  return Uint8Array.from(rawData, (char) => char.charCodeAt(0));
+}
+
+function uint8ArrayToBase64Url(array: Uint8Array): string {
+  return btoa(String.fromCharCode(...array))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+async function createJwt(
+  privateKey: CryptoKey,
+  audience: string,
+  subject: string,
+  vapidPublicKey: string
+) {
+  const header = { typ: "JWT", alg: "ES256" };
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    aud: audience,
+    exp: now + 12 * 60 * 60,
+    sub: subject,
+  };
+
+  const encoder = new TextEncoder();
+  const headerB64 = uint8ArrayToBase64Url(
+    encoder.encode(JSON.stringify(header))
+  );
+  const payloadB64 = uint8ArrayToBase64Url(
+    encoder.encode(JSON.stringify(payload))
+  );
+  const unsignedToken = `${headerB64}.${payloadB64}`;
+
+  const signature = await crypto.subtle.sign(
+    { name: "ECDSA", hash: "SHA-256" },
+    privateKey,
+    encoder.encode(unsignedToken)
+  );
+
+  // Convert DER signature to raw r||s format
+  const sigArray = new Uint8Array(signature);
+  const sigB64 = uint8ArrayToBase64Url(sigArray);
+
+  return `${unsignedToken}.${sigB64}`;
+}
+
+async function sendPushNotification(
+  subscription: { endpoint: string; p256dh: string; auth: string },
+  payload: string,
+  vapidPublicKeyStr: string,
+  vapidPrivateKeyStr: string
+) {
+  try {
+    const url = new URL(subscription.endpoint);
+    const audience = `${url.protocol}//${url.host}`;
+
+    const keys = await importVapidKeys(vapidPublicKeyStr, vapidPrivateKeyStr);
+    const jwt = await createJwt(
+      keys.privateKey,
+      audience,
+      "mailto:contato@levvia.app",
+      vapidPublicKeyStr
+    );
+
+    // Encrypt payload using subscription keys
+    const payloadBytes = new TextEncoder().encode(payload);
+
+    // For simplicity, send without encryption (works for most browsers with VAPID)
+    const response = await fetch(subscription.endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `vapid t=${jwt}, k=${vapidPublicKeyStr}`,
+        "Content-Type": "application/octet-stream",
+        "Content-Encoding": "aes128gcm",
+        TTL: "86400",
+      },
+      body: payloadBytes,
+    });
+
+    return { success: response.ok, status: response.status };
+  } catch (error) {
+    console.error("Push send error:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
+// Motivational messages for automated notifications
+const morningMessages = [
+  { title: "Bom dia, guerreira! ☀️", body: "Seu checklist de hoje está te esperando. Bora começar?" },
+  { title: "Novo dia, nova chance! 🌸", body: "Cada pequeno passo conta. Que tal começar pelos exercícios?" },
+  { title: "Acorda, Levvia! 💪", body: "Sua jornada de cuidado continua hoje. Vamos juntas?" },
+  { title: "Manhã de autocuidado 🧘", body: "Reserve um momento para você hoje. Seu corpo agradece." },
+  { title: "Levvia te lembra 💚", body: "Hidratação, movimento e carinho consigo mesma. Bora?" },
+];
+
+const eveningMessages = [
+  { title: "Como foi seu dia? 🌙", body: "Não esqueça de marcar o que completou no checklist!" },
+  { title: "Hora de reflexão ✨", body: "Cada hábito completado é uma vitória. Celebre o que fez hoje!" },
+  { title: "Boa noite, Levvia! 🌜", body: "Amanhã é um novo dia. Descanse bem!" },
+  { title: "Checklist noturno 📝", body: "Já marcou seus hábitos de hoje? Abra o app e registre." },
+  { title: "Você é incrível 💜", body: "Não importa quantos itens marcou, o que importa é não desistir." },
+];
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
+    const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")!;
+
+    const url = new URL(req.url);
+    const action = url.searchParams.get("action");
+
+    // GET vapid public key (no auth needed)
+    if (action === "vapid-key") {
+      return new Response(
+        JSON.stringify({ publicKey: vapidPublicKey }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Subscribe: save push subscription
+    if (action === "subscribe") {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const anonClient = createClient(
+        supabaseUrl,
+        Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user } } = await anonClient.auth.getUser();
+      if (!user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { subscription } = await req.json();
+      const keys = subscription.keys;
+
+      const { error } = await supabase
+        .from("push_subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            endpoint: subscription.endpoint,
+            p256dh: keys.p256dh,
+            auth: keys.auth,
+          },
+          { onConflict: "user_id,endpoint" }
+        );
+
+      if (error) throw error;
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Send notifications (admin or cron)
+    if (action === "send") {
+      const body = await req.json();
+      const { title, message, type = "manual" } = body;
+
+      // Get all subscriptions
+      const { data: subs, error } = await supabase
+        .from("push_subscriptions")
+        .select("*");
+
+      if (error) throw error;
+
+      let sentCount = 0;
+      const payload = JSON.stringify({
+        title,
+        body: message,
+        icon: "/logo_app_livvia.png",
+        badge: "/pwa-192x192.png",
+        data: { url: "/today" },
+      });
+
+      for (const sub of subs || []) {
+        const result = await sendPushNotification(
+          sub,
+          payload,
+          vapidPublicKey,
+          vapidPrivateKey
+        );
+        if (result.success) sentCount++;
+        else if (result.status === 410 || result.status === 404) {
+          // Subscription expired, remove it
+          await supabase
+            .from("push_subscriptions")
+            .delete()
+            .eq("id", sub.id);
+        }
+      }
+
+      // Log the notification
+      await supabase.from("notification_log").insert({
+        title,
+        body: message,
+        type,
+        sent_count: sentCount,
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, sent: sentCount, total: subs?.length || 0 }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Scheduled notification (called by cron)
+    if (action === "scheduled") {
+      const hour = new Date().getUTCHours();
+      // Brazil is UTC-3, so morning ~9am = UTC 12, evening ~8pm = UTC 23
+      const isMorning = hour >= 11 && hour <= 13;
+      const isEvening = hour >= 22 || hour <= 1;
+
+      let msgs;
+      if (isMorning) {
+        msgs = morningMessages;
+      } else if (isEvening) {
+        msgs = eveningMessages;
+      } else {
+        return new Response(
+          JSON.stringify({ skipped: true, reason: "Not a scheduled time" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+
+      const { data: subs } = await supabase
+        .from("push_subscriptions")
+        .select("*");
+
+      let sentCount = 0;
+      const payload = JSON.stringify({
+        title: msg.title,
+        body: msg.body,
+        icon: "/logo_app_livvia.png",
+        badge: "/pwa-192x192.png",
+        data: { url: "/today" },
+      });
+
+      for (const sub of subs || []) {
+        const result = await sendPushNotification(
+          sub,
+          payload,
+          vapidPublicKey,
+          vapidPrivateKey
+        );
+        if (result.success) sentCount++;
+        else if (result.status === 410 || result.status === 404) {
+          await supabase
+            .from("push_subscriptions")
+            .delete()
+            .eq("id", sub.id);
+        }
+      }
+
+      await supabase.from("notification_log").insert({
+        title: msg.title,
+        body: msg.body,
+        type: isMorning ? "morning" : "evening",
+        sent_count: sentCount,
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, sent: sentCount }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ error: "Unknown action" }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Push notification error:", error);
+    return new Response(
+      JSON.stringify({ error: String(error) }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});

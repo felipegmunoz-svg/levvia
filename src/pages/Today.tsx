@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
@@ -217,6 +218,11 @@ const Today = () => {
               🎉 Parabéns! Você completou todas as atividades!
             </p>
           )}
+        </div>
+
+        {/* Push notification prompt */}
+        <div className="mt-4">
+          <PushNotificationPrompt />
         </div>
       </header>
 

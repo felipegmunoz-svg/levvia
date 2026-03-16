@@ -116,6 +116,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          sent_count: number | null
+          title: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          sent_count?: number | null
+          title: string
+          type?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          sent_count?: number | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           activity_level: string | null
@@ -179,6 +206,33 @@ export type Database = {
           status?: string
           updated_at?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
         }
         Relationships: []
       }
