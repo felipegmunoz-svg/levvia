@@ -44,6 +44,7 @@ const emptyExercise: Omit<ExerciseRow, "id"> = {
   icon: "dumbbell",
   sort_order: 0,
   is_active: true,
+  video_url: "",
 };
 
 const Exercises = () => {
