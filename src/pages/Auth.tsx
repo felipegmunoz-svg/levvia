@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
 const Auth = () => {
@@ -15,6 +16,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState(() => {
     const raw = localStorage.getItem("levvia_onboarding");
     if (raw) {
@@ -45,6 +48,7 @@ const Auth = () => {
 
       await supabase.from("profiles").update({
         name: userName,
+        phone: phone || null,
         age,
         sex,
         weight_kg: weightKg,
@@ -97,7 +101,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            data: { name },
+            data: { name, phone },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -140,17 +144,31 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">Nome</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Seu nome"
-                required
-                className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-foreground">Nome</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Seu nome"
+                  required
+                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-foreground">Celular / WhatsApp</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(11) 99999-9999"
+                  required
+                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            </>
           )}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-foreground">Email</Label>
@@ -178,16 +196,25 @@ const Auth = () => {
                   </button>
                 )}
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           )}
           <Button
