@@ -389,14 +389,38 @@ const Onboarding = () => {
     if (current.type === "body_metrics") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex justify-center mb-6"
+          >
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
               <Heart size={28} strokeWidth={1.5} className="text-foreground" />
             </div>
-          </div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-2">{current.title}</h1>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed">{current.subtitle}</p>
-          <div className="max-w-sm mx-auto w-full space-y-4">
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-8 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
+          <motion.div
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="max-w-sm mx-auto w-full space-y-4"
+          >
             <div className="flex items-center gap-3">
               <label className="text-sm text-muted-foreground w-16">Peso</label>
               <input
@@ -422,7 +446,7 @@ const Onboarding = () => {
               />
               <span className="text-sm text-muted-foreground font-medium w-8">cm</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       );
     }
