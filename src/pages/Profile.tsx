@@ -315,7 +315,7 @@ const Profile = () => {
 
       {/* Section tabs */}
       <div className="px-5 mb-5">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex gap-2 flex-wrap">
           {sections.map((s) => (
             <button
               key={s.id}
