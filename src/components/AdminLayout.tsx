@@ -19,6 +19,7 @@ const navItems = [
   { label: "Exercícios", icon: Dumbbell, path: "/admin/exercises" },
   { label: "Receitas", icon: UtensilsCrossed, path: "/admin/recipes" },
   { label: "Hábitos", icon: Heart, path: "/admin/habits" },
+  { label: "Notificações", icon: Bell, path: "/admin/notifications" },
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
