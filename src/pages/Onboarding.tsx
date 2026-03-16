@@ -110,7 +110,7 @@ const Onboarding = () => {
       // Clear cached meal plan so it regenerates with new profile
       localStorage.removeItem("levvia_meal_plan");
 
-      navigate("/plans");
+      navigate("/diagnosis");
     }
   };
 
@@ -326,7 +326,7 @@ const Onboarding = () => {
     if (current.type === "info") {
       const objective = answers[13] as string;
       const personalizedSubtitle = userName && objective
-        ? `${userName}, você está pronta! Preparamos um plano de 14 dias focado no seu objetivo: ${objective}. Lembre-se: cada pequeno passo conta. Vamos juntas nessa jornada!`
+        ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para o seu objetivo: ${objective}.`
         : current.subtitle;
 
       return (
@@ -481,7 +481,7 @@ const Onboarding = () => {
                 : "bg-white/[0.06] text-muted-foreground cursor-not-allowed"
             }`}
           >
-            {step === total - 1 ? "Começar Agora" : "Continuar"}
+            {step === total - 1 ? "Ver Meu Diagnóstico" : "Continuar"}
             <ArrowRight size={18} strokeWidth={1.5} />
           </motion.button>
         ) : null}

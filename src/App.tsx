@@ -12,6 +12,8 @@ import Today from "./pages/Today";
 import Practices from "./pages/Practices";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
+import Diagnosis from "./pages/Diagnosis";
+import Checkout from "./pages/Checkout";
 import ResetPassword from "./pages/ResetPassword";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -34,6 +36,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/diagnosis" element={<Diagnosis />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/onboarding" element={<Onboarding />} />

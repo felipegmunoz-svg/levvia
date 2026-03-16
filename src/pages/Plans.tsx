@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { fireResults } from "@/data/onboarding";
-import { Flame, Check, ArrowRight, Sparkles, Clock, Shield, Zap } from "lucide-react";
+import { Check, ArrowRight, Sparkles, Clock, Shield, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoFull from "@/assets/logo_livvia_branco.png";
 import { useState, useEffect } from "react";
@@ -114,11 +113,6 @@ const Plans = () => {
   const { hours, minutes, seconds, expired } = useCountdown();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  const raw = localStorage.getItem("levvia_onboarding");
-  const answers = raw ? JSON.parse(raw) : {};
-  const painLevel = answers[8] as string | undefined;
-  const fireResult = painLevel ? fireResults[painLevel] : null;
-  const userName = (answers[2] as string) || "";
 
   const handleSelectPlan = (planId: string) => {
     setSelectedPlan(planId);
@@ -158,35 +152,6 @@ const Plans = () => {
       </motion.div>
 
       <div className="flex-1 overflow-y-auto px-6 pb-8">
-        {/* Fire Result Summary */}
-        {fireResult && (
-          <motion.div
-            initial={{ y: 30, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
-            className="glass-card rounded-2xl p-5 mb-5"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <motion.div
-                animate={{ rotate: [0, -5, 5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                className="w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center"
-              >
-                <Flame size={24} strokeWidth={1.5} className={fireResult.colorClass} />
-              </motion.div>
-              <div>
-                <p className="text-xs text-muted-foreground">Seu diagnóstico</p>
-                <p className={`text-base font-medium ${fireResult.colorClass}`}>
-                  {fireResult.level}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {userName ? `${userName}, b` : "B"}aseado nas suas respostas, preparamos um plano personalizado para ajudar você.
-            </p>
-          </motion.div>
-        )}
-
         {/* Countdown Banner */}
         {!expired && (
           <motion.div
