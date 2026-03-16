@@ -54,7 +54,7 @@ export function usePushNotifications() {
       if (!publicKey) throw new Error("VAPID key not found");
 
       // Convert VAPID key
-      const applicationServerKey = urlBase64ToUint8Array(publicKey);
+      const applicationServerKey = urlBase64ToUint8Array(publicKey).buffer as ArrayBuffer;
 
       // Subscribe to push
       const reg = await navigator.serviceWorker.ready;
