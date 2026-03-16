@@ -159,7 +159,13 @@ const Auth = () => {
                   id="phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, "").slice(0, 11);
+                    let formatted = digits;
+                    if (digits.length > 2) formatted = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+                    if (digits.length > 7) formatted = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+                    setPhone(formatted);
+                  }}
                   placeholder="(11) 99999-9999"
                   required
                   className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
