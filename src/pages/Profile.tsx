@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import EditProfileDialog from "@/components/EditProfileDialog";
 import {
   Settings,
   ChevronRight,
