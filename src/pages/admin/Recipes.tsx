@@ -222,6 +222,13 @@ const Recipes = () => {
               <Label className="text-foreground">Dica</Label>
               <Textarea value={form.dica} onChange={(e) => setForm({ ...form, dica: e.target.value })} rows={2} className="bg-white/[0.06] border-white/10 text-foreground" />
             </div>
+            <div className="space-y-2">
+              <Label className="text-foreground">URL da Imagem</Label>
+              <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." className="bg-white/[0.06] border-white/10 text-foreground" />
+              {form.image_url && (
+                <img src={form.image_url} alt="Preview" className="w-full h-32 object-cover rounded-lg mt-1" />
+              )}
+            </div>
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
                 <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="rounded" />

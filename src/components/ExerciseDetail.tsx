@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle, MapPin } from "lucide-react";
+import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle, MapPin, Play } from "lucide-react";
 import type { Exercise } from "@/data/exercises";
 
 interface ExerciseDetailProps {
@@ -8,6 +8,8 @@ interface ExerciseDetailProps {
 }
 
 const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) => {
+  const videoUrl = (exercise as any).video_url;
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
@@ -41,6 +43,28 @@ const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) =
       </div>
 
       <main className="px-6 py-6 space-y-6">
+        {/* Video embed */}
+        {videoUrl && (
+          <section className="rounded-2xl overflow-hidden border border-white/10">
+            {videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be") ? (
+              <iframe
+                src={videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                className="w-full aspect-video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={exercise.title}
+              />
+            ) : (
+              <video
+                src={videoUrl}
+                controls
+                className="w-full aspect-video"
+                preload="metadata"
+              />
+            )}
+          </section>
+        )}
+
         <section>
           <h2 className="text-base font-medium text-foreground mb-2">Sobre</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">{exercise.description}</p>

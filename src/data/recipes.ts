@@ -12,6 +12,7 @@ export interface Recipe {
   servings: string;
   description: string;
   icon: string;
+  image_url?: string;
 }
 
 export const recipeCategories = [
