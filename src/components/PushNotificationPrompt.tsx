@@ -22,7 +22,7 @@ const PushNotificationPrompt = () => {
         title: "Notificações ativadas! 🔔",
         description: "Você receberá lembretes para cuidar de você.",
       });
-    } else if (permission === "denied") {
+    } else if (Notification.permission === "denied") {
       toast({
         title: "Notificações bloqueadas",
         description: "Ative nas configurações do navegador para receber lembretes.",
