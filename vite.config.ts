@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico", "logo_app_livvia.png"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        importScripts: ["/sw-push.js"],
         navigateFallbackDenylist: [/^\/~oauth/],
         runtimeCaching: [
           {
