@@ -46,8 +46,10 @@ const Auth = () => {
       const affectedAreas = (answers[9] as string[]) || [];
       const objective = (answers[13] as string) || "";
 
-      await supabase.from("profiles").update({
+      await supabase.from("profiles").upsert({
+        id: userId,
         name: userName,
+        email: "", // will be filled by trigger if empty
         phone: phone || null,
         age,
         sex,
@@ -65,7 +67,7 @@ const Auth = () => {
           preferences: answers[15] || [],
           raw: answers,
         },
-      }).eq("id", userId);
+      }, { onConflict: "id" });
 
       // Clean up after sync
       localStorage.removeItem("levvia_onboarding");
@@ -105,8 +107,8 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        await syncOnboardingData(data.user?.id);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
+        await syncOnboardingData(data.user?.id);
         navigate(hasPlan ? "/checkout" : "/today", { replace: true });
       }
     } catch (error: any) {
