@@ -151,10 +151,11 @@ function getCompletedDayCount(progress: Record<string, Record<string, boolean>>)
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { profile, loading } = useProfile();
+  const { profile, loading, refresh } = useProfile();
   const { signOut, user } = useAuth();
   const [activeSection, setActiveSection] = useState<"info" | "evolution" | "achievements" | "settings">("info");
   const [challengeProgress, setChallengeProgress] = useState<Record<string, Record<string, boolean>>>({});
+  const [editOpen, setEditOpen] = useState(false);
 
   // Load progress
   useEffect(() => {
