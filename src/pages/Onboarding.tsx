@@ -289,38 +289,7 @@ const Onboarding = () => {
 
     if (current.type === "result") {
       return (
-        <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="flex justify-center mb-6"
-          >
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/[0.06] border border-white/10">
-              <Flame size={36} strokeWidth={1.5} className={fireResult?.colorClass || "text-secondary"} />
-            </div>
-          </motion.div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-1">Seu Fogo Interno</h1>
-          <motion.p
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`text-lg font-medium text-center mb-4 ${fireResult?.colorClass || "text-secondary"}`}
-          >
-            {fireResult?.level || "Brisa Leve"}
-          </motion.p>
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            className="max-w-sm mx-auto rounded-2xl p-5 glass-card"
-          >
-            <p className="text-sm text-foreground leading-relaxed text-center">{fireResult?.description || ""}</p>
-          </motion.div>
-          <p className="text-xs text-muted-foreground text-center mt-4 max-w-xs mx-auto">
-            Com base nas suas respostas, preparamos práticas personalizadas para o seu nível.
-          </p>
-        </div>
+        <ResultScreen fireResult={fireResult} />
       );
     }
 
