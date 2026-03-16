@@ -44,6 +44,7 @@ const emptyRecipe: Omit<RecipeRow, "id"> = {
   icon: "utensils",
   sort_order: 0,
   is_active: true,
+  image_url: "",
 };
 
 const Recipes = () => {
