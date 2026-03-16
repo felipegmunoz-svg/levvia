@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
 import ProgressDashboard from "@/components/ProgressDashboard";
 import ChecklistItemCard from "@/components/ChecklistItemCard";
