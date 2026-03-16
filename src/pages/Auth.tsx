@@ -100,7 +100,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            data: { name },
+            data: { name, phone },
             emailRedirectTo: window.location.origin,
           },
         });
