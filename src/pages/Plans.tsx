@@ -118,7 +118,7 @@ const Plans = () => {
     setSelectedPlan(planId);
     setTimeout(() => {
       localStorage.setItem("levvia_selected_plan", planId);
-      navigate("/auth");
+      navigate("/auth?mode=signup");
     }, 400);
   };
 
