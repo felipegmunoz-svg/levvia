@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 import logoFull from "@/assets/logo_livvia_branco.png";
 
 const slideVariants = {
@@ -18,6 +19,79 @@ const slideVariants = {
     x: direction > 0 ? -80 : 80,
     opacity: 0,
   }),
+};
+
+const fireConfettiColors: Record<string, string[]> = {
+  "Sem dor": ["#2dd4a8", "#34d399", "#6ee7b7"],
+  "Dor leve": ["#f0c456", "#fbbf24", "#fcd34d"],
+  "Dor moderada": ["#fb923c", "#f97316", "#fdba74"],
+  "Dor intensa": ["#f87171", "#ef4444", "#fca5a5"],
+  "Dor muito intensa": ["#f87171", "#ef4444", "#fca5a5"],
+};
+
+const ResultScreen = ({ fireResult, painAnswer }: { fireResult: import("@/data/onboarding").FireResult | null; painAnswer: string }) => {
+  useEffect(() => {
+    const colors = fireConfettiColors[painAnswer] || ["#2dd4a8", "#34d399"];
+    
+    const end = Date.now() + 1500;
+    const frame = () => {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.6 },
+        colors,
+        gravity: 0.8,
+        scalar: 0.9,
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.6 },
+        colors,
+        gravity: 0.8,
+        scalar: 0.9,
+      });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+  }, [fireResult]);
+
+  return (
+    <div className="flex-1 flex flex-col justify-center px-6 py-8">
+      <motion.div
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        className="flex justify-center mb-6"
+      >
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/[0.06] border border-white/10">
+          <Flame size={36} strokeWidth={1.5} className={fireResult?.colorClass || "text-secondary"} />
+        </div>
+      </motion.div>
+      <h1 className="text-2xl font-light text-foreground text-center mb-1">Seu Fogo Interno</h1>
+      <motion.p
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className={`text-lg font-medium text-center mb-4 ${fireResult?.colorClass || "text-secondary"}`}
+      >
+        {fireResult?.level || "Brisa Leve"}
+      </motion.p>
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.35 }}
+        className="max-w-sm mx-auto rounded-2xl p-5 glass-card"
+      >
+        <p className="text-sm text-foreground leading-relaxed text-center">{fireResult?.description || ""}</p>
+      </motion.div>
+      <p className="text-xs text-muted-foreground text-center mt-4 max-w-xs mx-auto">
+        Com base nas suas respostas, preparamos práticas personalizadas para o seu nível.
+      </p>
+    </div>
+  );
 };
 
 const Onboarding = () => {
@@ -288,38 +362,7 @@ const Onboarding = () => {
 
     if (current.type === "result") {
       return (
-        <div className="flex-1 flex flex-col justify-center px-6 py-8">
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="flex justify-center mb-6"
-          >
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/[0.06] border border-white/10">
-              <Flame size={36} strokeWidth={1.5} className={fireResult?.colorClass || "text-secondary"} />
-            </div>
-          </motion.div>
-          <h1 className="text-2xl font-light text-foreground text-center mb-1">Seu Fogo Interno</h1>
-          <motion.p
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`text-lg font-medium text-center mb-4 ${fireResult?.colorClass || "text-secondary"}`}
-          >
-            {fireResult?.level || "Brisa Leve"}
-          </motion.p>
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            className="max-w-sm mx-auto rounded-2xl p-5 glass-card"
-          >
-            <p className="text-sm text-foreground leading-relaxed text-center">{fireResult?.description || ""}</p>
-          </motion.div>
-          <p className="text-xs text-muted-foreground text-center mt-4 max-w-xs mx-auto">
-            Com base nas suas respostas, preparamos práticas personalizadas para o seu nível.
-          </p>
-        </div>
+        <ResultScreen fireResult={fireResult} painAnswer={painAnswer} />
       );
     }
 
