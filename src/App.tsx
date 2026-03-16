@@ -23,6 +23,7 @@ import Clients from "./pages/admin/Clients";
 import Exercises from "./pages/admin/Exercises";
 import Recipes from "./pages/admin/Recipes";
 import Habits from "./pages/admin/Habits";
+import Notifications from "./pages/admin/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
