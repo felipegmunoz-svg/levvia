@@ -26,6 +26,7 @@ interface RecipeRow {
   icon: string;
   sort_order: number;
   is_active: boolean;
+  image_url: string;
 }
 
 const emptyRecipe: Omit<RecipeRow, "id"> = {
