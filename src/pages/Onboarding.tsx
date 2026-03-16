@@ -362,7 +362,7 @@ const Onboarding = () => {
 
     if (current.type === "result") {
       return (
-        <ResultScreen fireResult={fireResult} />
+        <ResultScreen fireResult={fireResult} painAnswer={painAnswer} />
       );
     }
 
