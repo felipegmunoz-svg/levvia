@@ -415,15 +415,18 @@ const Onboarding = () => {
       {/* Progress bar */}
       <div className="px-6 pt-4">
         <div className="flex items-center justify-between mb-2">
-          {step > 0 && (
+          {step > 0 ? (
             <motion.button
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               onClick={handleBack}
-              className="text-muted-foreground hover:text-foreground transition-colors p-1"
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors p-1"
             >
-              <ArrowLeft size={20} strokeWidth={1.5} />
+              <ArrowLeft size={18} strokeWidth={1.5} />
+              <span className="text-xs font-medium">Voltar</span>
             </motion.button>
+          ) : (
+            <div />
           )}
           <span className="text-xs text-muted-foreground font-medium ml-auto">
             {step + 1} de {total}
@@ -454,9 +457,20 @@ const Onboarding = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottom button — hidden for single-select questions */}
-      {current.type !== "single" && (
-        <div className="px-6 pb-8">
+      {/* Bottom buttons */}
+      <div className="px-6 pb-8">
+        {current.type === "single" && step > 0 ? (
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleBack}
+            className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-3 rounded-3xl text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={16} strokeWidth={1.5} />
+            Voltar
+          </motion.button>
+        ) : current.type !== "single" ? (
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleNext}
@@ -470,8 +484,8 @@ const Onboarding = () => {
             {step === total - 1 ? "Começar Agora" : "Continuar"}
             <ArrowRight size={18} strokeWidth={1.5} />
           </motion.button>
-        </div>
-      )}
+        ) : null}
+      </div>
     </div>
   );
 };
