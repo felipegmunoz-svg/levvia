@@ -99,11 +99,11 @@ const Financial = () => {
     ]);
   };
 
-  // Build chart data: last 30 days
+  // Build chart data based on selected period
   const { revenueData, subscribersData } = useMemo(() => {
     const today = new Date();
     const days: string[] = [];
-    for (let i = 29; i >= 0; i--) {
+    for (let i = period - 1; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       days.push(d.toISOString().slice(0, 10));
@@ -120,7 +120,6 @@ const Financial = () => {
       };
     });
 
-    // Cumulative active subscribers over time
     const subscribersData = days.map((day) => {
       const activeByDay = subscriptions.filter((s) => {
         const created = s.created_at.slice(0, 10);
@@ -135,7 +134,7 @@ const Financial = () => {
     });
 
     return { revenueData, subscribersData };
-  }, [subscriptions]);
+  }, [subscriptions, period]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
