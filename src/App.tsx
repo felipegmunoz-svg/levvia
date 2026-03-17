@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout";
 import ResetPassword from "./pages/ResetPassword";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Learn from "./pages/Learn";
 import Dashboard from "./pages/admin/Dashboard";
 import Clients from "./pages/admin/Clients";
 import Exercises from "./pages/admin/Exercises";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/today" element={<ProtectedRoute><Today /></ProtectedRoute>} />
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
+            <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />

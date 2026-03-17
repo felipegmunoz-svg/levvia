@@ -7,6 +7,7 @@ import ChecklistItemCard from "@/components/ChecklistItemCard";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
+import SymptomDiary from "@/components/SymptomDiary";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
 import type { DbExercise, DbRecipe } from "@/lib/profileEngine";
@@ -249,6 +250,9 @@ const Today = () => {
           <PushNotificationPrompt />
         </div>
       </header>
+
+      {/* Symptom diary */}
+      <SymptomDiary />
 
       {/* Incentive message */}
       <div className="mx-5 mt-4">

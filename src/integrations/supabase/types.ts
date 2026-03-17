@@ -119,6 +119,54 @@ export type Database = {
         }
         Relationships: []
       }
+      learn_modules: {
+        Row: {
+          content_paragraphs: string[]
+          created_at: string
+          day: number
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          practical_tip: string
+          reflection_question: string
+          sort_order: number | null
+          subtitle: string
+          surprising_fact: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_paragraphs?: string[]
+          created_at?: string
+          day: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          practical_tip?: string
+          reflection_question?: string
+          sort_order?: number | null
+          subtitle?: string
+          surprising_fact?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content_paragraphs?: string[]
+          created_at?: string
+          day?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          practical_tip?: string
+          reflection_question?: string
+          sort_order?: number | null
+          subtitle?: string
+          surprising_fact?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notification_log: {
         Row: {
           body: string
@@ -406,6 +454,68 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      symptom_entries: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          mood: string | null
+          notes: string | null
+          pain_level: number
+          swelling: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          mood?: string | null
+          notes?: string | null
+          pain_level?: number
+          swelling?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          mood?: string | null
+          notes?: string | null
+          pain_level?: number
+          swelling?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_module_progress: {
+        Row: {
+          completed_at: string
+          id: string
+          module_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          module_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          module_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_module_progress_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "learn_modules"
             referencedColumns: ["id"]
           },
         ]
