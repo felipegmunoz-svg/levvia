@@ -37,6 +37,43 @@ const objectiveOptions = [
 
 const sexOptions = ["Feminino", "Masculino", "Prefiro não informar"];
 
+const healthConditionOptions = [
+  "Lipedema diagnosticado",
+  "Linfedema",
+  "Problemas circulatórios",
+  "Artrite ou artrose",
+  "Fibromialgia",
+  "Diabetes",
+  "Hipertensão",
+  "Hipotireoidismo",
+];
+
+const affectedAreaOptions = ["Coxas", "Quadris", "Panturrilhas", "Braços", "Tornozelos", "Joelhos"];
+
+function ToggleChips({ options, selected, onChange }: { options: string[]; selected: string[]; onChange: (v: string[]) => void }) {
+  const toggle = (opt: string) => {
+    onChange(selected.includes(opt) ? selected.filter((s) => s !== opt) : [...selected, opt]);
+  };
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          onClick={() => toggle(opt)}
+          className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+            selected.includes(opt)
+              ? "bg-secondary text-foreground border-secondary"
+              : "bg-white/[0.06] text-muted-foreground border-white/10 hover:border-white/20"
+          }`}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function EditProfileDialog({ open, onOpenChange, profile, onSaved }: EditProfileDialogProps) {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
@@ -49,6 +86,8 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
   const [activityLevel, setActivityLevel] = useState(profile.activityLevel);
   const [painLevel, setPainLevel] = useState(profile.painLevel);
   const [objective, setObjective] = useState(profile.objective);
+  const [healthConditions, setHealthConditions] = useState<string[]>(profile.healthConditions || []);
+  const [affectedAreas, setAffectedAreas] = useState<string[]>(profile.affectedAreas || []);
 
   const handleSave = async () => {
     if (!user?.id) return;
@@ -63,6 +102,8 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
       activity_level: activityLevel,
       pain_level: painLevel,
       objective,
+      health_conditions: healthConditions,
+      affected_areas: affectedAreas,
     };
 
     const { error } = await supabase
@@ -156,6 +197,18 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
                 {objectiveOptions.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Health Conditions */}
+          <div className="space-y-1.5">
+            <Label className="text-muted-foreground text-xs">Condições de saúde</Label>
+            <ToggleChips options={healthConditionOptions} selected={healthConditions} onChange={setHealthConditions} />
+          </div>
+
+          {/* Affected Areas */}
+          <div className="space-y-1.5">
+            <Label className="text-muted-foreground text-xs">Áreas afetadas</Label>
+            <ToggleChips options={affectedAreaOptions} selected={affectedAreas} onChange={setAffectedAreas} />
           </div>
 
           <Button onClick={handleSave} disabled={saving || !name.trim()} className="w-full mt-2">
