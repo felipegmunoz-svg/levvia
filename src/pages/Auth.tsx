@@ -28,67 +28,85 @@ const Auth = () => {
     return "";
   });
 
-  /** Sync pending onboarding data from localStorage to Supabase profile */
-  const syncOnboardingData = async (userId?: string, userEmail?: string) => {
+  /** Ensure profile exists and sync onboarding data to Supabase */
+  const syncProfileData = async (userId?: string, userEmail?: string) => {
     if (!userId) return;
+
+    // Small delay to let trigger create the profile first
+    await new Promise((r) => setTimeout(r, 500));
+
     const raw = localStorage.getItem("levvia_onboarding");
-    if (!raw) return;
 
     try {
-      const answers = JSON.parse(raw) as Record<number, string | string[]>;
-      const userName = (answers[2] as string) || name || "";
-      const age = parseInt(answers[3] as string) || null;
-      const sex = (answers[4] as string) || "";
-      const bodyMetrics = (answers[5] as string[]) || [];
-      const weightKg = parseFloat(bodyMetrics[0]) || null;
-      const heightCm = parseFloat(bodyMetrics[1]) || null;
-      const activityLevel = (answers[6] as string) || "";
-      const healthConditions = (answers[7] as string[]) || [];
-      const painLevel = (answers[8] as string) || "";
-      const affectedAreas = (answers[9] as string[]) || [];
-      const objective = (answers[13] as string) || "";
-
-      const profileData = {
-        name: userName,
+      // Build profile payload from onboarding OR form fields
+      let profileData: Record<string, unknown> = {
+        name: name || "",
         phone: phone || null,
-        age,
-        sex,
-        weight_kg: weightKg,
-        height_cm: heightCm,
-        activity_level: activityLevel,
-        health_conditions: healthConditions,
-        pain_level: painLevel,
-        affected_areas: affectedAreas,
-        objective,
-        onboarding_data: {
-          enemies: answers[11] || [],
-          allies: answers[12] || [],
-          restrictions: answers[14] || [],
-          preferences: answers[15] || [],
-          raw: answers,
-        },
       };
 
-      // Try update first (profile may already exist from trigger)
+      if (raw) {
+        const answers = JSON.parse(raw) as Record<number, string | string[]>;
+        const userName = (answers[2] as string) || name || "";
+        const age = parseInt(answers[3] as string) || null;
+        const sex = (answers[4] as string) || "";
+        const bodyMetrics = (answers[5] as string[]) || [];
+        const weightKg = parseFloat(bodyMetrics[0]) || null;
+        const heightCm = parseFloat(bodyMetrics[1]) || null;
+        const activityLevel = (answers[6] as string) || "";
+        const healthConditions = (answers[7] as string[]) || [];
+        const painLevel = (answers[8] as string) || "";
+        const affectedAreas = (answers[9] as string[]) || [];
+        const objective = (answers[13] as string) || "";
+
+        profileData = {
+          name: userName,
+          phone: phone || null,
+          age,
+          sex,
+          weight_kg: weightKg,
+          height_cm: heightCm,
+          activity_level: activityLevel,
+          health_conditions: healthConditions,
+          pain_level: painLevel,
+          affected_areas: affectedAreas,
+          objective,
+          onboarding_data: {
+            enemies: answers[11] || [],
+            allies: answers[12] || [],
+            restrictions: answers[14] || [],
+            preferences: answers[15] || [],
+            raw: answers,
+          },
+        };
+      }
+
+      // Try update first (trigger should have created the row)
       const { data: updated, error: updateError } = await supabase
         .from("profiles")
         .update(profileData)
         .eq("id", userId)
         .select("id");
 
-      // If no row was updated, insert
+      if (updateError) {
+        console.error("Profile update failed:", updateError.message);
+      }
+
+      // If no row was updated, insert as fallback
       if (!updateError && (!updated || updated.length === 0)) {
-        await supabase.from("profiles").insert({
+        const { error: insertError } = await supabase.from("profiles").insert({
           id: userId,
           email: userEmail || email || "",
           ...profileData,
         });
+        if (insertError) {
+          console.error("Profile insert failed:", insertError.message);
+        }
       }
 
-      // Clean up onboarding data only (keep selected plan for navigation)
-      localStorage.removeItem("levvia_onboarding");
+      // Clean up onboarding data (keep selected plan for navigation)
+      if (raw) localStorage.removeItem("levvia_onboarding");
     } catch (e) {
-      console.error("Failed to sync onboarding data:", e);
+      console.error("Failed to sync profile data:", e);
     }
   };
 
