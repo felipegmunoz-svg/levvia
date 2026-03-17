@@ -19,7 +19,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Search, Plus, Edit2, Calendar } from "lucide-react";
+import { Search, Plus, Edit2, Calendar, CreditCard } from "lucide-react";
+
+const paymentMethodMap: Record<string, string> = {
+  pix: "Pix",
+  credit_card: "Cartão",
+  manual: "Manual",
+};
 
 interface Subscription {
   id: string;
@@ -79,6 +85,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
   const [editStatus, setEditStatus] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [editPlanId, setEditPlanId] = useState("");
+  const [editPaymentMethod, setEditPaymentMethod] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -157,6 +164,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
       status: editStatus,
       notes: editNotes,
       plan_id: editPlanId,
+      payment_method: editPaymentMethod,
       updated_at: new Date().toISOString(),
     };
 
@@ -179,6 +187,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
     setEditStatus(sub.status);
     setEditNotes(sub.notes || "");
     setEditPlanId(sub.plan_id);
+    setEditPaymentMethod(sub.payment_method || "manual");
   };
 
   const formatDate = (d: string) =>
@@ -263,6 +272,10 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
                         <Calendar size={12} />
                         <span>até {formatDate(sub.current_period_end)}</span>
                       </div>
+                    </div>
+                    <div className="hidden lg:flex items-center gap-1 text-xs text-muted-foreground">
+                      <CreditCard size={12} />
+                      <span>{paymentMethodMap[sub.payment_method] || sub.payment_method}</span>
                     </div>
                     <Badge variant={st.variant}>{st.label}</Badge>
                     <Edit2 size={14} className="text-muted-foreground" />
@@ -394,6 +407,19 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
                     <SelectItem value="past_due">Pendente</SelectItem>
                     <SelectItem value="canceled">Cancelada</SelectItem>
                     <SelectItem value="expired">Expirada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Método de Pagamento</label>
+                <Select value={editPaymentMethod} onValueChange={setEditPaymentMethod}>
+                  <SelectTrigger className="bg-muted/30 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pix">Pix</SelectItem>
+                    <SelectItem value="credit_card">Cartão de Crédito</SelectItem>
+                    <SelectItem value="manual">Manual</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
