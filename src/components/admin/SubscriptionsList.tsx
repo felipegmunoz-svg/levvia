@@ -411,6 +411,19 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
                 </Select>
               </div>
               <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Método de Pagamento</label>
+                <Select value={editPaymentMethod} onValueChange={setEditPaymentMethod}>
+                  <SelectTrigger className="bg-muted/30 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pix">Pix</SelectItem>
+                    <SelectItem value="credit_card">Cartão de Crédito</SelectItem>
+                    <SelectItem value="manual">Manual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Observações</label>
                 <Textarea
                   value={editNotes}
