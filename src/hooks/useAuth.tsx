@@ -22,17 +22,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const checkAdmin = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
-  };
+  const [authLoading, setAuthLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   useEffect(() => {
     const {
@@ -40,13 +31,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
-      setLoading(false);
+      setAuthLoading(false);
     });
 
     void supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
-      setLoading(false);
+      setAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -57,8 +48,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (!user?.id) {
       setIsAdmin(false);
+      setRoleLoading(false);
       return;
     }
+
+    setRoleLoading(true);
 
     const loadAdminState = async () => {
       const { data } = await supabase
@@ -70,6 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (!cancelled) {
         setIsAdmin(!!data);
+        setRoleLoading(false);
       }
     };
 
@@ -79,6 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       cancelled = true;
     };
   }, [user?.id]);
+
+  const loading = authLoading || roleLoading;
 
   const signOut = async () => {
     await supabase.auth.signOut();
