@@ -194,6 +194,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          evening_enabled: boolean
+          evening_time: string
+          id: string
+          morning_enabled: boolean
+          morning_time: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          evening_enabled?: boolean
+          evening_time?: string
+          id?: string
+          morning_enabled?: boolean
+          morning_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          evening_enabled?: boolean
+          evening_time?: string
+          id?: string
+          morning_enabled?: boolean
+          morning_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       plans: {
         Row: {
           created_at: string

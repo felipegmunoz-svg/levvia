@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import NotificationSettings from "@/components/NotificationSettings";
 import { useNavigate } from "react-router-dom";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import AvatarUpload from "@/components/AvatarUpload";
@@ -575,38 +576,40 @@ const Profile = () => {
 
         {/* Settings section */}
         {activeSection === "settings" && (
-          <section className="space-y-3">
-            <button
-              onClick={() => navigate("/terms")}
-              className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
-            >
-              <span className="flex items-center gap-3 text-sm font-medium text-foreground">
-                <FileText size={18} strokeWidth={1.5} className="text-secondary" />
-                Termos de Uso
-              </span>
-              <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
-            </button>
-            <button
-              onClick={() => navigate("/privacy")}
-              className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
-            >
-              <span className="flex items-center gap-3 text-sm font-medium text-foreground">
-                <Shield size={18} strokeWidth={1.5} className="text-secondary" />
-                Política de Privacidade
-              </span>
-              <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
-            >
-              <span className="flex items-center gap-3 text-sm font-medium text-destructive">
-                <LogOut size={18} strokeWidth={1.5} />
-                Sair da conta
-              </span>
-              <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
-            </button>
+          <section className="space-y-4">
+            <NotificationSettings />
+            <div className="space-y-3">
+              <button
+                onClick={() => navigate("/terms")}
+                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
+              >
+                <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                  <FileText size={18} strokeWidth={1.5} className="text-secondary" />
+                  Termos de Uso
+                </span>
+                <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => navigate("/privacy")}
+                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
+              >
+                <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                  <Shield size={18} strokeWidth={1.5} className="text-secondary" />
+                  Política de Privacidade
+                </span>
+                <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-between w-full px-4 py-3.5 glass-card hover:bg-white/[0.09] transition-all"
+              >
+                <span className="flex items-center gap-3 text-sm font-medium text-destructive">
+                  <LogOut size={18} strokeWidth={1.5} />
+                  Sair da conta
+                </span>
+                <ChevronRight size={18} strokeWidth={1.5} className="text-muted-foreground" />
+              </button>
+            </div>
           </section>
         )}
 
