@@ -81,7 +81,6 @@ const Exercises = () => {
     setForm(item);
     setStepsText(item.steps.join("\n"));
     setVariationsText(item.variations.join("\n"));
-    setImageUrlsText((item.image_urls || []).join("\n"));
     setDialogOpen(true);
   };
 
