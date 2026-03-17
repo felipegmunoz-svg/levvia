@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   LogOut,
   ChevronLeft,
+  BookOpen,
 } from "lucide-react";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
