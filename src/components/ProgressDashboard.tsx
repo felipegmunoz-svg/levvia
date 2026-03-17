@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Flame, Trophy, TrendingUp, Calendar, CheckCircle2 } from "lucide-react";
 import { challengeDays } from "@/data/challengeDays";
 import { motion } from "framer-motion";
+import SymptomEvolutionChart from "@/components/SymptomEvolutionChart";
 
 interface ProgressDashboardProps {
   currentDay: number;
