@@ -23,20 +23,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
-  const [roleLoading, setRoleLoading] = useState(false);
+  const [roleLoading, setRoleLoading] = useState(true);
 
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      const nextUser = nextSession?.user ?? null;
+      setRoleLoading(!!nextUser);
       setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+      setUser(nextUser);
       setAuthLoading(false);
     });
 
     void supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      const currentUser = currentSession?.user ?? null;
+      setRoleLoading(!!currentUser);
       setSession(currentSession);
-      setUser(currentSession?.user ?? null);
+      setUser(currentUser);
       setAuthLoading(false);
     });
 
@@ -45,6 +49,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let cancelled = false;
+
+    if (authLoading) return;
 
     if (!user?.id) {
       setIsAdmin(false);
@@ -55,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRoleLoading(true);
 
     const loadAdminState = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
@@ -63,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .maybeSingle();
 
       if (!cancelled) {
-        setIsAdmin(!!data);
+        setIsAdmin(!error && !!data);
         setRoleLoading(false);
       }
     };
@@ -73,7 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       cancelled = true;
     };
-  }, [user?.id]);
+  }, [user?.id, authLoading]);
 
   const loading = authLoading || roleLoading;
 
@@ -82,6 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setSession(null);
     setIsAdmin(false);
+    setRoleLoading(false);
   };
 
   return (
