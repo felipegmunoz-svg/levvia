@@ -24,6 +24,7 @@ import Exercises from "./pages/admin/Exercises";
 import Recipes from "./pages/admin/Recipes";
 import Habits from "./pages/admin/Habits";
 import Notifications from "./pages/admin/Notifications";
+import Financial from "./pages/admin/Financial";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/admin/recipes" element={<ProtectedRoute requireAdmin><Recipes /></ProtectedRoute>} />
             <Route path="/admin/habits" element={<ProtectedRoute requireAdmin><Habits /></ProtectedRoute>} />
             <Route path="/admin/notifications" element={<ProtectedRoute requireAdmin><Notifications /></ProtectedRoute>} />
+            <Route path="/admin/financial" element={<ProtectedRoute requireAdmin><Financial /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
