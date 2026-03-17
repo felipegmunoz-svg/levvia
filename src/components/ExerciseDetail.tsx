@@ -1,4 +1,5 @@
-import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle, MapPin, Play } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle, Shuffle, MapPin, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Exercise } from "@/data/exercises";
 
 interface ExerciseDetailProps {
