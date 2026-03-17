@@ -188,6 +188,9 @@ const ProgressDashboard = ({ currentDay, progress }: ProgressDashboardProps) => 
           <span className="text-[9px] text-muted-foreground">Dia 14</span>
         </div>
       </motion.div>
+
+      {/* Symptom evolution chart */}
+      <SymptomEvolutionChart />
     </section>
   );
 };
