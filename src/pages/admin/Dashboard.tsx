@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import {
@@ -24,6 +24,14 @@ interface ClientRow {
   challenge_progress: Record<string, Record<string, boolean>> | null;
 }
 
+type Period = 7 | 30 | 90;
+
+const PERIOD_OPTIONS: { label: string; value: Period }[] = [
+  { label: "7 dias", value: 7 },
+  { label: "30 dias", value: 30 },
+  { label: "90 dias", value: 90 },
+];
+
 const PIE_COLORS = [
   "hsl(var(--secondary))",
   "hsl(var(--accent))",
@@ -40,46 +48,57 @@ const tooltipStyle = {
 
 const axisTick = { fill: "hsl(var(--muted-foreground))", fontSize: 10 };
 
+function daysAgo(n: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+const PeriodSelector = ({ value, onChange }: { value: Period; onChange: (p: Period) => void }) => (
+  <div className="flex gap-1.5">
+    {PERIOD_OPTIONS.map((opt) => (
+      <button
+        key={opt.value}
+        onClick={() => onChange(opt.value)}
+        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+          value === opt.value
+            ? "bg-secondary text-foreground"
+            : "bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-secondary/30"
+        }`}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+);
+
 const Dashboard = () => {
   const [stats, setStats] = useState<Stats>({ clients: 0, exercises: 0, recipes: 0, habits: 0 });
   const [clients, setClients] = useState<ClientRow[]>([]);
-  const [symptomCount, setSymptomCount] = useState(0);
-  const [symptomActiveUsers, setSymptomActiveUsers] = useState(0);
-  const [moduleProgressCount, setModuleProgressCount] = useState(0);
-  const [moduleActiveUsers, setModuleActiveUsers] = useState(0);
+  const [allSymptoms, setAllSymptoms] = useState<{ user_id: string; created_at: string }[]>([]);
+  const [allModules, setAllModules] = useState<{ user_id: string; completed_at: string }[]>([]);
   const [pushSubCount, setPushSubCount] = useState(0);
   const [notifPrefCount, setNotifPrefCount] = useState(0);
-  const [recentSymptoms, setRecentSymptoms] = useState(0);
-  const [recentModules, setRecentModules] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<Period>(7);
 
   useEffect(() => {
     const fetchAll = async () => {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const sevenDaysStr = sevenDaysAgo.toISOString();
-
       const [
         clientsCount, exercisesCount, recipesCount, habitsCount, clientsData,
-        symptomsRes, symptomUsersRes, moduleProgressRes, moduleUsersRes,
+        symptomsRes, moduleProgressRes,
         pushSubsRes, notifPrefsRes,
-        recentSymptomsRes, recentModulesRes,
       ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("exercises").select("id", { count: "exact", head: true }),
         supabase.from("recipes").select("id", { count: "exact", head: true }),
         supabase.from("habits").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("created_at, status, challenge_start, challenge_progress"),
-        // Feature usage counts
-        supabase.from("symptom_entries").select("id", { count: "exact", head: true }),
-        supabase.from("symptom_entries").select("user_id"),
-        supabase.from("user_module_progress").select("id", { count: "exact", head: true }),
-        supabase.from("user_module_progress").select("user_id"),
+        supabase.from("symptom_entries").select("user_id, created_at"),
+        supabase.from("user_module_progress").select("user_id, completed_at"),
         supabase.from("push_subscriptions").select("id", { count: "exact", head: true }),
         supabase.from("notification_preferences").select("id", { count: "exact", head: true }),
-        // Recent activity (7 days)
-        supabase.from("symptom_entries").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysStr),
-        supabase.from("user_module_progress").select("id", { count: "exact", head: true }).gte("completed_at", sevenDaysStr),
       ]);
 
       setStats({
@@ -89,29 +108,48 @@ const Dashboard = () => {
         habits: habitsCount.count ?? 0,
       });
       setClients((clientsData.data as ClientRow[]) || []);
-
-      setSymptomCount(symptomsRes.count ?? 0);
-      const uniqueSymptomUsers = new Set((symptomUsersRes.data || []).map((r: { user_id: string }) => r.user_id));
-      setSymptomActiveUsers(uniqueSymptomUsers.size);
-
-      setModuleProgressCount(moduleProgressRes.count ?? 0);
-      const uniqueModuleUsers = new Set((moduleUsersRes.data || []).map((r: { user_id: string }) => r.user_id));
-      setModuleActiveUsers(uniqueModuleUsers.size);
-
+      setAllSymptoms((symptomsRes.data as { user_id: string; created_at: string }[]) || []);
+      setAllModules((moduleProgressRes.data as { user_id: string; completed_at: string }[]) || []);
       setPushSubCount(pushSubsRes.count ?? 0);
       setNotifPrefCount(notifPrefsRes.count ?? 0);
-      setRecentSymptoms(recentSymptomsRes.count ?? 0);
-      setRecentModules(recentModulesRes.count ?? 0);
-
       setLoading(false);
     };
     fetchAll();
   }, []);
 
-  // Signups per day (last 14 days)
+  const cutoffDate = useMemo(() => daysAgo(period), [period]);
+  const cutoffStr = useMemo(() => cutoffDate.toISOString(), [cutoffDate]);
+
+  // Filter clients by period
+  const periodClients = useMemo(
+    () => clients.filter((c) => new Date(c.created_at) >= cutoffDate),
+    [clients, cutoffDate]
+  );
+
+  // Symptoms in period
+  const periodSymptoms = useMemo(
+    () => allSymptoms.filter((s) => s.created_at >= cutoffStr),
+    [allSymptoms, cutoffStr]
+  );
+  const periodSymptomUsers = useMemo(
+    () => new Set(periodSymptoms.map((s) => s.user_id)).size,
+    [periodSymptoms]
+  );
+
+  // Modules in period
+  const periodModules = useMemo(
+    () => allModules.filter((m) => m.completed_at >= cutoffStr),
+    [allModules, cutoffStr]
+  );
+  const periodModuleUsers = useMemo(
+    () => new Set(periodModules.map((m) => m.user_id)).size,
+    [periodModules]
+  );
+
+  // Signups chart adapts to period
   const signupChart = useMemo(() => {
     const days: Record<string, number> = {};
-    for (let i = 13; i >= 0; i--) {
+    for (let i = period - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       days[d.toISOString().slice(0, 10)] = 0;
@@ -120,11 +158,23 @@ const Dashboard = () => {
       const key = c.created_at.slice(0, 10);
       if (key in days) days[key]++;
     });
+    // For 30d/90d, aggregate by week if too many points
+    if (period > 14) {
+      const entries = Object.entries(days);
+      const weeklyData: { date: string; Cadastros: number }[] = [];
+      for (let i = 0; i < entries.length; i += 7) {
+        const chunk = entries.slice(i, i + 7);
+        const total = chunk.reduce((s, [, v]) => s + v, 0);
+        const startDate = new Date(chunk[0][0]).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+        weeklyData.push({ date: startDate, Cadastros: total });
+      }
+      return weeklyData;
+    }
     return Object.entries(days).map(([date, count]) => ({
       date: new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
       Cadastros: count,
     }));
-  }, [clients]);
+  }, [clients, period]);
 
   // Challenge progress distribution
   const challengeDistribution = useMemo(() => {
@@ -148,7 +198,7 @@ const Dashboard = () => {
     ].filter((d) => d.value > 0);
   }, [clients]);
 
-  // Retention: users with challenge_start who have progress
+  // Retention
   const retentionRate = useMemo(() => {
     const started = clients.filter((c) => c.challenge_start).length;
     if (started === 0) return 0;
@@ -159,25 +209,18 @@ const Dashboard = () => {
     return Math.round((withProgress / started) * 100);
   }, [clients]);
 
-  // Active users (last 7 days) — users who signed up in last 7 days or have recent activity
-  const activeUsers7d = useMemo(() => {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    return clients.filter((c) => new Date(c.created_at) >= sevenDaysAgo).length;
-  }, [clients]);
-
   const totalClients = stats.clients || 1;
 
   const engagementCards = [
     { label: "Taxa de Retenção", value: `${retentionRate}%`, icon: Target, color: "text-secondary", desc: "Iniciaram e continuam ativos" },
-    { label: "Cadastros (7d)", value: activeUsers7d, icon: Users, color: "text-accent", desc: "Novos nos últimos 7 dias" },
+    { label: `Cadastros (${period}d)`, value: periodClients.length, icon: Users, color: "text-accent", desc: `Novos nos últimos ${period} dias` },
     { label: "Push Ativados", value: pushSubCount, icon: Bell, color: "text-secondary", desc: `${notifPrefCount} com horários configurados` },
-    { label: "Diários (7d)", value: recentSymptoms, icon: ClipboardList, color: "text-accent", desc: `${symptomActiveUsers} usuárias usaram` },
+    { label: `Diários (${period}d)`, value: periodSymptoms.length, icon: ClipboardList, color: "text-accent", desc: `${periodSymptomUsers} usuárias no período` },
   ];
 
   const featureUsage = [
-    { name: "Diário de Sintomas", users: symptomActiveUsers, entries: symptomCount, pct: Math.round((symptomActiveUsers / totalClients) * 100) },
-    { name: "Módulos Aprender", users: moduleActiveUsers, entries: moduleProgressCount, pct: Math.round((moduleActiveUsers / totalClients) * 100) },
+    { name: "Diário de Sintomas", users: periodSymptomUsers, entries: periodSymptoms.length, pct: Math.round((periodSymptomUsers / totalClients) * 100) },
+    { name: "Módulos Aprender", users: periodModuleUsers, entries: periodModules.length, pct: Math.round((periodModuleUsers / totalClients) * 100) },
     { name: "Push Notifications", users: pushSubCount, entries: notifPrefCount, pct: Math.round((pushSubCount / totalClients) * 100) },
   ];
 
@@ -190,7 +233,10 @@ const Dashboard = () => {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-light text-foreground mb-8">Dashboard</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <h1 className="text-2xl font-light text-foreground">Dashboard</h1>
+        <PeriodSelector value={period} onChange={setPeriod} />
+      </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -227,7 +273,9 @@ const Dashboard = () => {
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-6">
             <TrendingUp size={18} strokeWidth={1.5} className="text-secondary" />
-            <h2 className="text-sm font-medium text-foreground">Novos cadastros (14 dias)</h2>
+            <h2 className="text-sm font-medium text-foreground">
+              Novos cadastros ({period > 14 ? "por semana" : "por dia"})
+            </h2>
           </div>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
@@ -267,15 +315,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-4">
               <ResponsiveContainer width="50%" height={200}>
                 <PieChart>
-                  <Pie
-                    data={challengeDistribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={75}
-                    dataKey="value"
-                    stroke="none"
-                  >
+                  <Pie data={challengeDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value" stroke="none">
                     {challengeDistribution.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
@@ -297,11 +337,11 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Feature usage table */}
+      {/* Feature usage */}
       <div className="glass-card p-6 mb-8">
         <div className="flex items-center gap-2 mb-6">
           <Activity size={18} strokeWidth={1.5} className="text-secondary" />
-          <h2 className="text-sm font-medium text-foreground">Uso de Funcionalidades</h2>
+          <h2 className="text-sm font-medium text-foreground">Uso de Funcionalidades ({period}d)</h2>
         </div>
         {loading ? (
           <div className="h-24 flex items-center justify-center">
@@ -319,10 +359,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="w-full h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-secondary rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(feat.pct, 100)}%` }}
-                  />
+                  <div className="h-full bg-secondary rounded-full transition-all duration-500" style={{ width: `${Math.min(feat.pct, 100)}%` }} />
                 </div>
               </div>
             ))}
