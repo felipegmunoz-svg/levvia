@@ -251,6 +251,9 @@ const Today = () => {
         </div>
       </header>
 
+      {/* Symptom diary */}
+      <SymptomDiary />
+
       {/* Incentive message */}
       <div className="mx-5 mt-4">
         <p className="text-xs text-muted-foreground italic text-center leading-relaxed">

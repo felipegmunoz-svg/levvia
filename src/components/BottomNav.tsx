@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, BookOpen, User } from "lucide-react";
+import { Home, Dumbbell, GraduationCap, User } from "lucide-react";
 
 const tabs = [
   { path: "/today", label: "Hoje", icon: Home },
-  { path: "/practices", label: "Práticas", icon: BookOpen },
+  { path: "/practices", label: "Práticas", icon: Dumbbell },
+  { path: "/learn", label: "Aprender", icon: GraduationCap },
   { path: "/profile", label: "Perfil", icon: User },
 ];
 
