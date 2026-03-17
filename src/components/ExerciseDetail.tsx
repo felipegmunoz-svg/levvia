@@ -10,6 +10,8 @@ interface ExerciseDetailProps {
 
 const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) => {
   const videoUrl = (exercise as any).video_url;
+  const imageUrls: string[] = (exercise as any).image_urls || [];
+  const [currentImage, setCurrentImage] = useState(0);
 
   return (
     <div className="min-h-screen bg-background pb-24">
