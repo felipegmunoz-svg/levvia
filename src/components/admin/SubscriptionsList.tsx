@@ -273,6 +273,10 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
                         <span>até {formatDate(sub.current_period_end)}</span>
                       </div>
                     </div>
+                    <div className="hidden lg:flex items-center gap-1 text-xs text-muted-foreground">
+                      <CreditCard size={12} />
+                      <span>{paymentMethodMap[sub.payment_method] || sub.payment_method}</span>
+                    </div>
                     <Badge variant={st.variant}>{st.label}</Badge>
                     <Edit2 size={14} className="text-muted-foreground" />
                   </div>
