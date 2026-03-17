@@ -9,6 +9,7 @@ import {
   Heart,
   Bell,
   DollarSign,
+  ShieldCheck,
   LogOut,
   ChevronLeft,
 } from "lucide-react";
