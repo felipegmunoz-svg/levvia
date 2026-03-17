@@ -68,6 +68,49 @@ const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) =
           </section>
         )}
 
+        {/* Image sequence gallery */}
+        {imageUrls.length > 0 && (
+          <section className="rounded-2xl overflow-hidden border border-white/10 relative">
+            <img
+              src={imageUrls[currentImage]}
+              alt={`Passo ${currentImage + 1}`}
+              className="w-full aspect-[4/3] object-cover"
+            />
+            {/* Navigation */}
+            {imageUrls.length > 1 && (
+              <>
+                <button
+                  onClick={() => setCurrentImage((p) => (p > 0 ? p - 1 : imageUrls.length - 1))}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center text-foreground"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  onClick={() => setCurrentImage((p) => (p < imageUrls.length - 1 ? p + 1 : 0))}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center text-foreground"
+                >
+                  <ChevronRight size={18} />
+                </button>
+                {/* Dots */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {imageUrls.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImage(i)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        i === currentImage ? "bg-secondary" : "bg-white/40"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="absolute top-3 right-3 bg-background/70 backdrop-blur-sm text-foreground text-xs px-2 py-1 rounded-full">
+                  {currentImage + 1}/{imageUrls.length}
+                </div>
+              </>
+            )}
+          </section>
+        )}
+
         <section>
           <h2 className="text-base font-medium text-foreground mb-2">Sobre</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">{exercise.description}</p>
