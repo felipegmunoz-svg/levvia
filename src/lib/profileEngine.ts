@@ -94,6 +94,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       dietaryPreferences: (data[15] as string[]) || [],
       inflammatoryEnemies: (data[11] as string[]) || [],
       antiInflammatoryAllies: (data[12] as string[]) || [],
+      avatarUrl: null,
     };
   } catch {
     return defaultProfile();
