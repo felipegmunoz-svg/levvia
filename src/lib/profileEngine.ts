@@ -127,6 +127,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     dietaryPreferences: (onb.preferences as string[]) || [],
     inflammatoryEnemies: (onb.enemies as string[]) || [],
     antiInflammatoryAllies: (onb.allies as string[]) || [],
+    avatarUrl: (data as any).avatar_url || null,
   };
 }
 
