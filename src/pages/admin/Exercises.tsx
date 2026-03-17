@@ -59,7 +59,6 @@ const Exercises = () => {
   const [form, setForm] = useState(emptyExercise);
   const [stepsText, setStepsText] = useState("");
   const [variationsText, setVariationsText] = useState("");
-  const [imageUrlsText, setImageUrlsText] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("exercises").select("*").order("sort_order");
