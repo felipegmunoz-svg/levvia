@@ -85,6 +85,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
   const [editStatus, setEditStatus] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [editPlanId, setEditPlanId] = useState("");
+  const [editPaymentMethod, setEditPaymentMethod] = useState("");
 
   useEffect(() => {
     fetchData();
