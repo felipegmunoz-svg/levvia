@@ -24,6 +24,7 @@ export type Database = {
           frequency: string | null
           icon: string | null
           id: string
+          image_urls: string[]
           is_active: boolean | null
           level: string
           safety: string | null
@@ -44,6 +45,7 @@ export type Database = {
           frequency?: string | null
           icon?: string | null
           id?: string
+          image_urls?: string[]
           is_active?: boolean | null
           level?: string
           safety?: string | null
@@ -64,6 +66,7 @@ export type Database = {
           frequency?: string | null
           icon?: string | null
           id?: string
+          image_urls?: string[]
           is_active?: boolean | null
           level?: string
           safety?: string | null
