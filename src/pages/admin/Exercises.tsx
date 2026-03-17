@@ -225,17 +225,12 @@ const Exercises = () => {
               <Label className="text-foreground">URL do Vídeo (opcional)</Label>
               <Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://youtube.com/watch?v=... ou URL do vídeo" className="bg-white/[0.06] border-white/10 text-foreground" />
             </div>
-            <div className="space-y-2">
-              <Label className="text-foreground">Imagens da sequência (uma URL por linha)</Label>
-              <Textarea value={imageUrlsText} onChange={(e) => setImageUrlsText(e.target.value)} rows={4} placeholder="https://exemplo.com/passo1.jpg&#10;https://exemplo.com/passo2.jpg" className="bg-white/[0.06] border-white/10 text-foreground" />
-              {imageUrlsText.split("\n").filter(Boolean).length > 0 && (
-                <div className="flex gap-2 flex-wrap mt-2">
-                  {imageUrlsText.split("\n").filter(Boolean).map((url, i) => (
-                    <img key={i} src={url.trim()} alt={`Passo ${i + 1}`} className="w-16 h-16 rounded-lg object-cover border border-white/10" onError={(e) => (e.currentTarget.style.display = "none")} />
-                  ))}
-                </div>
-              )}
-            </div>
+            <ImageUploader
+              folder="exercises"
+              images={form.image_urls || []}
+              onChange={(urls) => setForm({ ...form, image_urls: urls })}
+              label="Galeria de Imagens"
+            />
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
                 <input
