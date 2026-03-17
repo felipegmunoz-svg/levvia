@@ -19,7 +19,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Search, Plus, Edit2, Calendar } from "lucide-react";
+import { Search, Plus, Edit2, Calendar, CreditCard } from "lucide-react";
+
+const paymentMethodMap: Record<string, string> = {
+  pix: "Pix",
+  credit_card: "Cartão",
+  manual: "Manual",
+};
 
 interface Subscription {
   id: string;
