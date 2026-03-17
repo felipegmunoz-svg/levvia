@@ -73,6 +73,7 @@ const Exercises = () => {
     setForm(emptyExercise);
     setStepsText("");
     setVariationsText("");
+    setImageUrlsText("");
     setDialogOpen(true);
   };
 
