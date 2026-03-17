@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import EditProfileDialog from "@/components/EditProfileDialog";
+import AvatarUpload from "@/components/AvatarUpload";
 import {
   Settings,
   ChevronRight,
@@ -296,9 +297,11 @@ const Profile = () => {
     <div className="min-h-screen bg-background gradient-page pb-24">
       <header className="px-6 pt-10 pb-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
-            <img src={logoIcon} alt="Levvia" className="w-10 h-auto" />
-          </div>
+          <AvatarUpload
+            avatarUrl={profile.avatarUrl}
+            name={profile.name || "Usuária"}
+            onUploaded={() => refresh()}
+          />
           <div className="flex-1">
             <h1 className="text-xl font-light text-foreground">{profile.name || "Usuária"}</h1>
             <p className="text-sm text-muted-foreground">Membro Levvia</p>

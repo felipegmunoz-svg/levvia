@@ -21,6 +21,7 @@ export interface UserProfile {
   dietaryPreferences: string[];
   inflammatoryEnemies: string[];
   antiInflammatoryAllies: string[];
+  avatarUrl: string | null;
 }
 
 export interface DbExercise {
@@ -93,6 +94,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       dietaryPreferences: (data[15] as string[]) || [],
       inflammatoryEnemies: (data[11] as string[]) || [],
       antiInflammatoryAllies: (data[12] as string[]) || [],
+      avatarUrl: null,
     };
   } catch {
     return defaultProfile();
@@ -102,7 +104,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
   const { data } = await supabase
     .from("profiles")
-    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objective, onboarding_data")
+    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objective, onboarding_data, avatar_url")
     .eq("id", userId)
     .maybeSingle();
 
@@ -125,6 +127,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     dietaryPreferences: (onb.preferences as string[]) || [],
     inflammatoryEnemies: (onb.enemies as string[]) || [],
     antiInflammatoryAllies: (onb.allies as string[]) || [],
+    avatarUrl: (data as any).avatar_url || null,
   };
 }
 
@@ -144,6 +147,7 @@ function defaultProfile(): UserProfile {
     dietaryPreferences: [],
     inflammatoryEnemies: [],
     antiInflammatoryAllies: [],
+    avatarUrl: null,
   };
 }
 

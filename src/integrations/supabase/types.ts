@@ -148,6 +148,7 @@ export type Database = {
           activity_level: string | null
           affected_areas: string[] | null
           age: number | null
+          avatar_url: string | null
           challenge_progress: Json | null
           challenge_start: string | null
           created_at: string
@@ -169,6 +170,7 @@ export type Database = {
           activity_level?: string | null
           affected_areas?: string[] | null
           age?: number | null
+          avatar_url?: string | null
           challenge_progress?: Json | null
           challenge_start?: string | null
           created_at?: string
@@ -190,6 +192,7 @@ export type Database = {
           activity_level?: string | null
           affected_areas?: string[] | null
           age?: number | null
+          avatar_url?: string | null
           challenge_progress?: Json | null
           challenge_start?: string | null
           created_at?: string
