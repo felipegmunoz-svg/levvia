@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import NotificationSettings from "@/components/NotificationSettings";
 import { useNavigate } from "react-router-dom";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import AvatarUpload from "@/components/AvatarUpload";
