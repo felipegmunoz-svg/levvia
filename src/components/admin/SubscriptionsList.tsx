@@ -73,6 +73,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
   const [newPlanId, setNewPlanId] = useState("");
   const [newStatus, setNewStatus] = useState("active");
   const [newNotes, setNewNotes] = useState("");
+  const [newPaymentMethod, setNewPaymentMethod] = useState("manual");
 
   // Edit form state
   const [editStatus, setEditStatus] = useState("");
@@ -131,7 +132,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
       current_period_end: periodEnd.toISOString(),
       trial_end: trialEnd,
       notes: newNotes,
-      payment_method: "manual",
+      payment_method: newPaymentMethod,
     });
 
     if (error) {
@@ -143,6 +144,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
       setNewPlanId("");
       setNewStatus("active");
       setNewNotes("");
+      setNewPaymentMethod("manual");
       fetchData();
       onUpdate();
     }
@@ -318,6 +320,19 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
                 <SelectContent>
                   <SelectItem value="active">Ativa</SelectItem>
                   <SelectItem value="trial">Trial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Método de Pagamento</label>
+              <Select value={newPaymentMethod} onValueChange={setNewPaymentMethod}>
+                <SelectTrigger className="bg-muted/30 border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pix">Pix</SelectItem>
+                  <SelectItem value="credit_card">Cartão de Crédito</SelectItem>
+                  <SelectItem value="manual">Manual</SelectItem>
                 </SelectContent>
               </Select>
             </div>
