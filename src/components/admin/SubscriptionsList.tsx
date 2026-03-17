@@ -144,6 +144,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
       setNewPlanId("");
       setNewStatus("active");
       setNewNotes("");
+      setNewPaymentMethod("manual");
       fetchData();
       onUpdate();
     }
