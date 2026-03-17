@@ -1,0 +1,1 @@
+ALTER TABLE public.exercises ADD COLUMN image_urls text[] NOT NULL DEFAULT '{}';
