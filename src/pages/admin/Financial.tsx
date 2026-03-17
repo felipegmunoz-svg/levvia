@@ -23,10 +23,17 @@ interface MetricCard {
   icon: React.ReactNode;
 }
 
+const PERIOD_OPTIONS = [
+  { label: "7d", days: 7 },
+  { label: "30d", days: 30 },
+  { label: "90d", days: 90 },
+] as const;
+
 const Financial = () => {
   const [metrics, setMetrics] = useState<MetricCard[]>([]);
   const [subscriptions, setSubscriptions] = useState<Sub[]>([]);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState(30);
 
   useEffect(() => {
     fetchData();
