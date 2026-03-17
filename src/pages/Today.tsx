@@ -252,6 +252,13 @@ const Today = () => {
         </div>
       </header>
 
+      {/* Pain relief mode */}
+      <div className="mx-5 mt-4">
+        <PainReliefMode
+          onSelectExercise={(ex) => setSelectedExercise({ exercise: ex, activityId: `relief-${ex.id}` })}
+        />
+      </div>
+
       {/* Symptom diary */}
       <SymptomDiary />
 
