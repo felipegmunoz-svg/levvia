@@ -89,7 +89,6 @@ const Exercises = () => {
       ...form,
       steps: stepsText.split("\n").filter(Boolean),
       variations: variationsText.split("\n").filter(Boolean),
-      image_urls: imageUrlsText.split("\n").map((u) => u.trim()).filter(Boolean),
     };
 
     if (editing) {
