@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   LogOut,
   ChevronLeft,
+  BookOpen,
 } from "lucide-react";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 
@@ -21,6 +22,7 @@ const navItems = [
   { label: "Exercícios", icon: Dumbbell, path: "/admin/exercises" },
   { label: "Receitas", icon: UtensilsCrossed, path: "/admin/recipes" },
   { label: "Hábitos", icon: Heart, path: "/admin/habits" },
+  { label: "Módulos", icon: BookOpen, path: "/admin/learn-modules" },
   { label: "Financeiro", icon: DollarSign, path: "/admin/financial" },
   { label: "Notificações", icon: Bell, path: "/admin/notifications" },
   { label: "Administradores", icon: ShieldCheck, path: "/admin/users" },
