@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Search, Dumbbell } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 interface ExerciseRow {
   id: string;
