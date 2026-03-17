@@ -257,7 +257,7 @@ const Financial = () => {
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Users size={16} className="text-secondary" />
-                  <h3 className="text-sm font-medium text-foreground">Assinantes Ativos (30 dias)</h3>
+                  <h3 className="text-sm font-medium text-foreground">Assinantes Ativos ({period}d)</h3>
                 </div>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
