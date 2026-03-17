@@ -8,6 +8,7 @@ import {
   UtensilsCrossed,
   Heart,
   Bell,
+  DollarSign,
   LogOut,
   ChevronLeft,
 } from "lucide-react";
