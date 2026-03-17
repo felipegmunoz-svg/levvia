@@ -11,7 +11,6 @@ async function importVapidKeys(publicKey: string, privateKey: string) {
   const pubBytes = base64UrlToUint8Array(publicKey);
   const privBytes = base64UrlToUint8Array(privateKey);
 
-  // Build uncompressed public key (65 bytes: 0x04 + x + y)
   const pubKeyObj = await crypto.subtle.importKey(
     "raw",
     pubBytes,
@@ -20,7 +19,6 @@ async function importVapidKeys(publicKey: string, privateKey: string) {
     ["verify"]
   );
 
-  // Import private key as JWK
   const pubJwk = await crypto.subtle.exportKey("jwk", pubKeyObj);
   const privJwk = {
     ...pubJwk,
@@ -58,7 +56,7 @@ async function createJwt(
   privateKey: CryptoKey,
   audience: string,
   subject: string,
-  vapidPublicKey: string
+  _vapidPublicKey: string
 ) {
   const header = { typ: "JWT", alg: "ES256" };
   const now = Math.floor(Date.now() / 1000);
@@ -69,12 +67,8 @@ async function createJwt(
   };
 
   const encoder = new TextEncoder();
-  const headerB64 = uint8ArrayToBase64Url(
-    encoder.encode(JSON.stringify(header))
-  );
-  const payloadB64 = uint8ArrayToBase64Url(
-    encoder.encode(JSON.stringify(payload))
-  );
+  const headerB64 = uint8ArrayToBase64Url(encoder.encode(JSON.stringify(header)));
+  const payloadB64 = uint8ArrayToBase64Url(encoder.encode(JSON.stringify(payload)));
   const unsignedToken = `${headerB64}.${payloadB64}`;
 
   const signature = await crypto.subtle.sign(
@@ -83,7 +77,6 @@ async function createJwt(
     encoder.encode(unsignedToken)
   );
 
-  // Convert DER signature to raw r||s format
   const sigArray = new Uint8Array(signature);
   const sigB64 = uint8ArrayToBase64Url(sigArray);
 
@@ -101,17 +94,10 @@ async function sendPushNotification(
     const audience = `${url.protocol}//${url.host}`;
 
     const keys = await importVapidKeys(vapidPublicKeyStr, vapidPrivateKeyStr);
-    const jwt = await createJwt(
-      keys.privateKey,
-      audience,
-      "mailto:contato@levvia.app",
-      vapidPublicKeyStr
-    );
+    const jwt = await createJwt(keys.privateKey, audience, "mailto:contato@levvia.app", vapidPublicKeyStr);
 
-    // Encrypt payload using subscription keys
     const payloadBytes = new TextEncoder().encode(payload);
 
-    // For simplicity, send without encryption (works for most browsers with VAPID)
     const response = await fetch(subscription.endpoint, {
       method: "POST",
       headers: {
@@ -130,7 +116,7 @@ async function sendPushNotification(
   }
 }
 
-// Motivational messages for automated notifications
+// Motivational messages
 const morningMessages = [
   { title: "Bom dia, guerreira! ☀️", body: "Seu checklist de hoje está te esperando. Bora começar?" },
   { title: "Novo dia, nova chance! 🌸", body: "Cada pequeno passo conta. Que tal começar pelos exercícios?" },
@@ -216,12 +202,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Send notifications (admin or cron)
+    // Send notifications (admin broadcast)
     if (action === "send") {
       const body = await req.json();
       const { title, message, type = "manual" } = body;
 
-      // Get all subscriptions
       const { data: subs, error } = await supabase
         .from("push_subscriptions")
         .select("*");
@@ -238,23 +223,13 @@ Deno.serve(async (req) => {
       });
 
       for (const sub of subs || []) {
-        const result = await sendPushNotification(
-          sub,
-          payload,
-          vapidPublicKey,
-          vapidPrivateKey
-        );
+        const result = await sendPushNotification(sub, payload, vapidPublicKey, vapidPrivateKey);
         if (result.success) sentCount++;
         else if (result.status === 410 || result.status === 404) {
-          // Subscription expired, remove it
-          await supabase
-            .from("push_subscriptions")
-            .delete()
-            .eq("id", sub.id);
+          await supabase.from("push_subscriptions").delete().eq("id", sub.id);
         }
       }
 
-      // Log the notification
       await supabase.from("notification_log").insert({
         title,
         body: message,
@@ -268,65 +243,129 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Scheduled notification (called by cron)
+    // Smart scheduled notification (called by cron every 30 min)
     if (action === "scheduled") {
-      const hour = new Date().getUTCHours();
-      // Brazil is UTC-3, so morning ~9am = UTC 12, evening ~8pm = UTC 23
-      const isMorning = hour >= 11 && hour <= 13;
-      const isEvening = hour >= 22 || hour <= 1;
+      // Get current time in Brazil
+      const now = new Date();
+      const brTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+      const currentHour = brTime.getHours();
+      const currentMinute = brTime.getMinutes();
+      const currentTimeStr = `${String(currentHour).padStart(2, "0")}:${currentMinute < 30 ? "00" : "30"}`;
 
-      let msgs;
-      if (isMorning) {
-        msgs = morningMessages;
-      } else if (isEvening) {
-        msgs = eveningMessages;
-      } else {
-        return new Response(
-          JSON.stringify({ skipped: true, reason: "Not a scheduled time" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      console.log(`Scheduled check at BR time: ${currentHour}:${String(currentMinute).padStart(2, "0")} (slot: ${currentTimeStr})`);
 
-      const msg = msgs[Math.floor(Math.random() * msgs.length)];
-
+      // Get all subscriptions with their user preferences
       const { data: subs } = await supabase
         .from("push_subscriptions")
         .select("*");
 
-      let sentCount = 0;
-      const payload = JSON.stringify({
-        title: msg.title,
-        body: msg.body,
-        icon: "/logo_app_livvia.png",
-        badge: "/pwa-192x192.png",
-        data: { url: "/today" },
-      });
-
-      for (const sub of subs || []) {
-        const result = await sendPushNotification(
-          sub,
-          payload,
-          vapidPublicKey,
-          vapidPrivateKey
+      if (!subs || subs.length === 0) {
+        return new Response(
+          JSON.stringify({ skipped: true, reason: "No subscriptions" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
-        if (result.success) sentCount++;
-        else if (result.status === 410 || result.status === 404) {
-          await supabase
-            .from("push_subscriptions")
-            .delete()
-            .eq("id", sub.id);
+      }
+
+      // Get notification preferences for all users with subscriptions
+      const userIds = [...new Set(subs.map((s) => s.user_id))];
+      const { data: prefs } = await supabase
+        .from("notification_preferences")
+        .select("*")
+        .in("user_id", userIds);
+
+      const prefsMap = new Map((prefs || []).map((p) => [p.user_id, p]));
+
+      // Default preferences for users without settings
+      const defaultPrefs = {
+        morning_enabled: true,
+        evening_enabled: true,
+        morning_time: "08:00",
+        evening_time: "20:00",
+      };
+
+      let totalSent = 0;
+      const morningUsers: typeof subs = [];
+      const eveningUsers: typeof subs = [];
+
+      for (const sub of subs) {
+        const userPref = prefsMap.get(sub.user_id) || defaultPrefs;
+
+        // Check if this user should receive a morning notification now
+        if (userPref.morning_enabled && userPref.morning_time === currentTimeStr) {
+          morningUsers.push(sub);
+        }
+        // Check if this user should receive an evening notification now
+        if (userPref.evening_enabled && userPref.evening_time === currentTimeStr) {
+          eveningUsers.push(sub);
         }
       }
 
-      await supabase.from("notification_log").insert({
-        title: msg.title,
-        body: msg.body,
-        type: isMorning ? "morning" : "evening",
-        sent_count: sentCount,
-      });
+      // Send morning notifications
+      if (morningUsers.length > 0) {
+        const msg = morningMessages[Math.floor(Math.random() * morningMessages.length)];
+        const payload = JSON.stringify({
+          title: msg.title,
+          body: msg.body,
+          icon: "/logo_app_livvia.png",
+          badge: "/pwa-192x192.png",
+          data: { url: "/today" },
+        });
+
+        for (const sub of morningUsers) {
+          const result = await sendPushNotification(sub, payload, vapidPublicKey, vapidPrivateKey);
+          if (result.success) totalSent++;
+          else if (result.status === 410 || result.status === 404) {
+            await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+          }
+        }
+
+        if (morningUsers.length > 0) {
+          await supabase.from("notification_log").insert({
+            title: msg.title,
+            body: msg.body,
+            type: "morning",
+            sent_count: totalSent,
+          });
+        }
+      }
+
+      // Send evening notifications
+      if (eveningUsers.length > 0) {
+        const msg = eveningMessages[Math.floor(Math.random() * eveningMessages.length)];
+        const payload = JSON.stringify({
+          title: msg.title,
+          body: msg.body,
+          icon: "/logo_app_livvia.png",
+          badge: "/pwa-192x192.png",
+          data: { url: "/today" },
+        });
+
+        let eveningSent = 0;
+        for (const sub of eveningUsers) {
+          const result = await sendPushNotification(sub, payload, vapidPublicKey, vapidPrivateKey);
+          if (result.success) eveningSent++;
+          else if (result.status === 410 || result.status === 404) {
+            await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+          }
+        }
+        totalSent += eveningSent;
+
+        await supabase.from("notification_log").insert({
+          title: msg.title,
+          body: msg.body,
+          type: "evening",
+          sent_count: eveningSent,
+        });
+      }
 
       return new Response(
-        JSON.stringify({ success: true, sent: sentCount }),
+        JSON.stringify({
+          success: true,
+          time_slot: currentTimeStr,
+          morning_targets: morningUsers.length,
+          evening_targets: eveningUsers.length,
+          total_sent: totalSent,
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
