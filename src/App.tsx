@@ -24,6 +24,7 @@ import Exercises from "./pages/admin/Exercises";
 import Recipes from "./pages/admin/Recipes";
 import Habits from "./pages/admin/Habits";
 import Notifications from "./pages/admin/Notifications";
+import Financial from "./pages/admin/Financial";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
