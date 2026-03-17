@@ -164,6 +164,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
       status: editStatus,
       notes: editNotes,
       plan_id: editPlanId,
+      payment_method: editPaymentMethod,
       updated_at: new Date().toISOString(),
     };
 
