@@ -23,6 +23,7 @@ const navItems = [
   { label: "Hábitos", icon: Heart, path: "/admin/habits" },
   { label: "Financeiro", icon: DollarSign, path: "/admin/financial" },
   { label: "Notificações", icon: Bell, path: "/admin/notifications" },
+  { label: "Administradores", icon: ShieldCheck, path: "/admin/users" },
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
