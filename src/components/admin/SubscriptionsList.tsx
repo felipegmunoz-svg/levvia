@@ -132,7 +132,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
       current_period_end: periodEnd.toISOString(),
       trial_end: trialEnd,
       notes: newNotes,
-      payment_method: "manual",
+      payment_method: newPaymentMethod,
     });
 
     if (error) {
