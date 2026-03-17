@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Flame, Trophy, TrendingUp, Calendar, CheckCircle2 } from "lucide-react";
 import { challengeDays } from "@/data/challengeDays";
 import { motion } from "framer-motion";
+import SymptomEvolutionChart from "@/components/SymptomEvolutionChart";
 
 interface ProgressDashboardProps {
   currentDay: number;
@@ -187,6 +188,9 @@ const ProgressDashboard = ({ currentDay, progress }: ProgressDashboardProps) => 
           <span className="text-[9px] text-muted-foreground">Dia 14</span>
         </div>
       </motion.div>
+
+      {/* Symptom evolution chart */}
+      <SymptomEvolutionChart />
     </section>
   );
 };
