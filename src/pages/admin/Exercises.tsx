@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Search, Dumbbell } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 interface ExerciseRow {
   id: string;
@@ -58,7 +59,6 @@ const Exercises = () => {
   const [form, setForm] = useState(emptyExercise);
   const [stepsText, setStepsText] = useState("");
   const [variationsText, setVariationsText] = useState("");
-  const [imageUrlsText, setImageUrlsText] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("exercises").select("*").order("sort_order");
@@ -73,7 +73,6 @@ const Exercises = () => {
     setForm(emptyExercise);
     setStepsText("");
     setVariationsText("");
-    setImageUrlsText("");
     setDialogOpen(true);
   };
 
@@ -82,7 +81,6 @@ const Exercises = () => {
     setForm(item);
     setStepsText(item.steps.join("\n"));
     setVariationsText(item.variations.join("\n"));
-    setImageUrlsText((item.image_urls || []).join("\n"));
     setDialogOpen(true);
   };
 
@@ -91,7 +89,6 @@ const Exercises = () => {
       ...form,
       steps: stepsText.split("\n").filter(Boolean),
       variations: variationsText.split("\n").filter(Boolean),
-      image_urls: imageUrlsText.split("\n").map((u) => u.trim()).filter(Boolean),
     };
 
     if (editing) {
@@ -228,17 +225,12 @@ const Exercises = () => {
               <Label className="text-foreground">URL do Vídeo (opcional)</Label>
               <Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://youtube.com/watch?v=... ou URL do vídeo" className="bg-white/[0.06] border-white/10 text-foreground" />
             </div>
-            <div className="space-y-2">
-              <Label className="text-foreground">Imagens da sequência (uma URL por linha)</Label>
-              <Textarea value={imageUrlsText} onChange={(e) => setImageUrlsText(e.target.value)} rows={4} placeholder="https://exemplo.com/passo1.jpg&#10;https://exemplo.com/passo2.jpg" className="bg-white/[0.06] border-white/10 text-foreground" />
-              {imageUrlsText.split("\n").filter(Boolean).length > 0 && (
-                <div className="flex gap-2 flex-wrap mt-2">
-                  {imageUrlsText.split("\n").filter(Boolean).map((url, i) => (
-                    <img key={i} src={url.trim()} alt={`Passo ${i + 1}`} className="w-16 h-16 rounded-lg object-cover border border-white/10" onError={(e) => (e.currentTarget.style.display = "none")} />
-                  ))}
-                </div>
-              )}
-            </div>
+            <ImageUploader
+              folder="exercises"
+              images={form.image_urls || []}
+              onChange={(urls) => setForm({ ...form, image_urls: urls })}
+              label="Galeria de Imagens"
+            />
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
                 <input
