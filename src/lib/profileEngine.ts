@@ -21,6 +21,7 @@ export interface UserProfile {
   dietaryPreferences: string[];
   inflammatoryEnemies: string[];
   antiInflammatoryAllies: string[];
+  avatarUrl: string | null;
 }
 
 export interface DbExercise {
