@@ -8,6 +8,7 @@ import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 import SymptomDiary from "@/components/SymptomDiary";
+import PainReliefMode from "@/components/PainReliefMode";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
 import type { DbExercise, DbRecipe } from "@/lib/profileEngine";
@@ -250,6 +251,13 @@ const Today = () => {
           <PushNotificationPrompt />
         </div>
       </header>
+
+      {/* Pain relief mode */}
+      <div className="mx-5 mt-4">
+        <PainReliefMode
+          onSelectExercise={(ex) => setSelectedExercise({ exercise: ex, activityId: `relief-${ex.id}` })}
+        />
+      </div>
 
       {/* Symptom diary */}
       <SymptomDiary />
