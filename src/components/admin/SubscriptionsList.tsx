@@ -187,6 +187,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
     setEditStatus(sub.status);
     setEditNotes(sub.notes || "");
     setEditPlanId(sub.plan_id);
+    setEditPaymentMethod(sub.payment_method || "manual");
   };
 
   const formatDate = (d: string) =>
