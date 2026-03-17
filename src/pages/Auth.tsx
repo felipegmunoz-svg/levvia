@@ -138,7 +138,7 @@ const Auth = () => {
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await syncOnboardingData(data.user?.id, data.user?.email);
+        await syncProfileData(data.user?.id, data.user?.email);
         const hasPlan = localStorage.getItem("levvia_selected_plan");
         showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", false);
       } else {
