@@ -33,15 +33,24 @@ const Clients = () => {
   const [selected, setSelected] = useState<Profile | null>(null);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchClients = async () => {
+      // Fetch admin user IDs to exclude them from the client list
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const adminIds = (adminRoles || []).map((r) => r.user_id);
+
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .order("created_at", { ascending: false });
-      setClients((data as Profile[]) || []);
+
+      const allProfiles = (data as Profile[]) || [];
+      setClients(allProfiles.filter((p) => !adminIds.includes(p.id)));
       setLoading(false);
     };
-    fetch();
+    fetchClients();
   }, []);
 
   const filtered = clients.filter(
