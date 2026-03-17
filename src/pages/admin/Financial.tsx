@@ -188,13 +188,32 @@ const Financial = () => {
 
         {/* Charts */}
         {!loading && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="space-y-4">
+            {/* Period filter */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Período:</span>
+              {PERIOD_OPTIONS.map((opt) => (
+                <button
+                  key={opt.days}
+                  onClick={() => setPeriod(opt.days)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                    period === opt.days
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Revenue chart */}
             <Card className="bg-muted/30 border-white/10">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <DollarSign size={16} className="text-success" />
-                  <h3 className="text-sm font-medium text-foreground">Receita (30 dias)</h3>
+                  <h3 className="text-sm font-medium text-foreground">Receita ({period}d)</h3>
                 </div>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
