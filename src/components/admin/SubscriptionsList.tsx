@@ -73,6 +73,7 @@ const SubscriptionsList = ({ onUpdate }: { onUpdate: () => void }) => {
   const [newPlanId, setNewPlanId] = useState("");
   const [newStatus, setNewStatus] = useState("active");
   const [newNotes, setNewNotes] = useState("");
+  const [newPaymentMethod, setNewPaymentMethod] = useState("manual");
 
   // Edit form state
   const [editStatus, setEditStatus] = useState("");
