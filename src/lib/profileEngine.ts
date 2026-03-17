@@ -147,6 +147,7 @@ function defaultProfile(): UserProfile {
     dietaryPreferences: [],
     inflammatoryEnemies: [],
     antiInflammatoryAllies: [],
+    avatarUrl: null,
   };
 }
 
