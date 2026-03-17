@@ -294,6 +294,7 @@ const Financial = () => {
                 </div>
               </CardContent>
             </Card>
+            </div>
           </div>
         )}
 
