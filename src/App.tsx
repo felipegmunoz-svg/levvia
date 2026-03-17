@@ -25,6 +25,7 @@ import Recipes from "./pages/admin/Recipes";
 import Habits from "./pages/admin/Habits";
 import Notifications from "./pages/admin/Notifications";
 import Financial from "./pages/admin/Financial";
+import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
