@@ -30,15 +30,6 @@ const Diagnosis = () => {
 
   const fireResult = painLevel ? fireResults[painLevel] : null;
 
-  // Calculate BMI
-  const heightM = heightCm / 100;
-  const bmi = weightKg && heightM ? (weightKg / (heightM * heightM)).toFixed(1) : null;
-  const getBmiLabel = (v: number) => {
-    if (v < 18.5) return "Abaixo do peso";
-    if (v < 25) return "Peso normal";
-    if (v < 30) return "Sobrepeso";
-    return "Obesidade";
-  };
 
   const persuasiveText = () => {
     const level = fireResult?.level || "Brisa Leve";
@@ -146,14 +137,6 @@ const Diagnosis = () => {
               <div className="bg-white/[0.04] rounded-xl px-3 py-2.5">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Altura</p>
                 <p className="text-sm font-medium text-foreground">{heightCm} cm</p>
-              </div>
-            )}
-            {bmi && (
-              <div className="col-span-2 bg-white/[0.04] rounded-xl px-3 py-2.5">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">IMC</p>
-                <p className="text-sm font-medium text-foreground">
-                  {bmi} — <span className="text-muted-foreground">{getBmiLabel(parseFloat(bmi))}</span>
-                </p>
               </div>
             )}
           </div>
