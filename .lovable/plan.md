@@ -1,34 +1,25 @@
 
 
-# Fix: HeatMap → Onboarding redirect
+# Fix: Loop entre Day1ClosingPublic e /today
 
-## Problem
-In `Day1Flow.tsx`, `handleHeatMapDone` has an early-exit path: if `levvia_day1_local_completed` and `levvia_day1_diary` exist in localStorage (set during public `/day1-journey`), it syncs the diary to the database and calls `onComplete()`, **completely exiting Day1Flow** — skipping the onboarding check.
-
-Additionally, when `levvia_onboarded` is already `"true"` (from public onboarding), the function jumps to `setStep(4)` (MealSuggestion) instead of verifying onboarding was done.
-
-## Root Cause
-The local diary sync block (lines 93-121 of `handleHeatMapDone`) runs BEFORE the onboarding check and can call `onComplete()` prematurely.
+## Problema
+Quando `Day1ClosingPublic` salva o diário no localStorage e navega para `/today`, o `Day1Flow` em `/today` vê `day1_completed = false` no banco e mostra step 4 (MealSuggestion) → step 5 (Day1Closing) → novo save → loop. A sincronização do diário local só existe em `handleHeatMapDone`, que não roda nesse cenário.
 
 ## Fix — `src/components/journey/Day1Flow.tsx`
 
-### Change `handleHeatMapDone`:
-1. Save heatmap to Supabase (keep as-is)
-2. **Move the local diary sync to AFTER the onboarding check** — do NOT let it short-circuit the flow
-3. If `levvia_onboarded !== "true"` → `navigate("/onboarding")` (this is the primary fix)
-4. If onboarding is done → check for local diary sync, then proceed to step 4
+No `determineStep`, ANTES de definir step 4, verificar se existe `levvia_day1_local_completed` no localStorage. Se existir, sincronizar o diário com o banco, marcar `day1_completed = true` e chamar `onComplete()` — quebrando o loop.
 
 ```text
-handleHeatMapDone flow (FIXED):
-  Save heatmap → Check onboarding done?
-    NO  → navigate("/onboarding")
-    YES → Sync local diary if exists → setStep(4)
+determineStep flow (FIXED):
+  ...
+  welcomeShown ✓, heatMapDone ✓, onboardingDone ✓
+    → Check levvia_day1_local_completed?
+      YES → sync diary to DB, mark day1_completed, call onComplete()
+      NO  → setStep(4) (normal flow)
 ```
 
-### Also verify:
-- `handleMultiSelect` in `Onboarding.tsx` references `current.id === 16` for objectives limit (was 13, should now be 16 after reorder) — confirm it's correct
-- No other component navigates away from the HeatMap independently
+Isso reutiliza a mesma lógica de sync que já existe em `handleHeatMapDone`, movida para uma função compartilhada.
 
-## Files changed
-- `src/components/journey/Day1Flow.tsx` — reorder logic in `handleHeatMapDone`
+## Arquivo alterado
+- `src/components/journey/Day1Flow.tsx` — adicionar sync do diário local no `determineStep`
 
