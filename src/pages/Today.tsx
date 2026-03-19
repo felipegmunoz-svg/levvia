@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
@@ -12,6 +12,9 @@ import PainReliefMode from "@/components/PainReliefMode";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import HeatMapCard from "@/components/HeatMapCard";
 import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
+import Day1Flow from "@/components/journey/Day1Flow";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
 import type { DbExercise, DbRecipe } from "@/lib/profileEngine";
 
@@ -62,6 +65,7 @@ function getIncentiveMessage(progress: number): string {
 }
 
 const Today = () => {
+  const { user } = useAuth();
   const {
     profile,
     currentDay,
@@ -72,6 +76,24 @@ const Today = () => {
     challengeProgress,
     saveProgress,
   } = useChallengeData();
+
+  const [day1Done, setDay1Done] = useState<boolean | null>(null);
+
+  // Check day1_completed from profile on mount
+  useEffect(() => {
+    if (!user?.id) {
+      setDay1Done(true);
+      return;
+    }
+    supabase
+      .from("profiles")
+      .select("day1_completed")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        setDay1Done((data as any)?.day1_completed === true);
+      });
+  }, [user?.id]);
 
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: DbExercise; activityId: string } | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: DbRecipe; activityId: string } | null>(null);
@@ -161,6 +183,19 @@ const Today = () => {
       setSelectedRecipe(null);
     }
   };
+
+  // Day 1 journey flow
+  if (day1Done === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (day1Done === false) {
+    return <Day1Flow onComplete={() => setDay1Done(true)} />;
+  }
 
   // Show PWA install gate before everything else
   if (showInstallGate) {
