@@ -180,7 +180,12 @@ const Onboarding = () => {
         .map(i => i.trim().toLowerCase())
         .filter(i => i.length > 0);
       const combined = Array.from(new Set([...checkboxItems, ...customItems]));
+      console.log('🔍 handleNext pantry — checkboxItems:', checkboxItems);
+      console.log('🔍 handleNext pantry — customItems:', customItems);
+      console.log('🔍 handleNext pantry — combined:', combined);
       setAnswers((a) => ({ ...a, [current.id]: combined }));
+      // Safety net: persist immediately to avoid React state race conditions
+      localStorage.setItem("levvia_pantry_items", JSON.stringify(combined));
     }
 
     if (step < total - 1) {
