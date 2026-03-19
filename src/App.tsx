@@ -32,6 +32,7 @@ import Notifications from "./pages/admin/Notifications";
 import Financial from "./pages/admin/Financial";
 import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
+import Day1Journey from "./pages/Day1Journey";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
