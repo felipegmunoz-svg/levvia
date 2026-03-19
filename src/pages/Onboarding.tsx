@@ -461,9 +461,9 @@ const Onboarding = () => {
     }
 
     if (current.type === "info") {
-      const objective = answers[13] as string;
-      const personalizedSubtitle = userName && objective
-        ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para o seu objetivo: ${objective}.`
+      const objectives = (answers[13] as string[]) || [];
+      const personalizedSubtitle = userName && objectives.length > 0
+        ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para seus objetivos: ${objectives.join(", ")}.`
         : current.subtitle;
 
       return (

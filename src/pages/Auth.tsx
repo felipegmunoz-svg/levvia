@@ -69,7 +69,7 @@ const Auth = () => {
           health_conditions: healthConditions,
           pain_level: painLevel,
           affected_areas: affectedAreas,
-          objective,
+          objectives,
           onboarding_data: {
             enemies: answers[11] || [],
             allies: answers[12] || [],
