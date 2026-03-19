@@ -180,7 +180,12 @@ const Onboarding = () => {
         .map(i => i.trim().toLowerCase())
         .filter(i => i.length > 0);
       const combined = Array.from(new Set([...checkboxItems, ...customItems]));
+      console.log('🔍 handleNext pantry — checkboxItems:', checkboxItems);
+      console.log('🔍 handleNext pantry — customItems:', customItems);
+      console.log('🔍 handleNext pantry — combined:', combined);
       setAnswers((a) => ({ ...a, [current.id]: combined }));
+      // Safety net: persist immediately to avoid React state race conditions
+      localStorage.setItem("levvia_pantry_items", JSON.stringify(combined));
     }
 
     if (step < total - 1) {
@@ -192,6 +197,18 @@ const Onboarding = () => {
       if (current.type === "name") finalAnswers[current.id] = nameInput.trim();
       if (current.type === "number") finalAnswers[current.id] = numberInput.trim();
       if (current.type === "body_metrics") finalAnswers[current.id] = [weightInput.trim(), heightInput.trim()];
+
+      // Pantry fallback: if answers[15] lost due to state race, recover from localStorage backup
+      if (!finalAnswers[15] || (Array.isArray(finalAnswers[15]) && (finalAnswers[15] as string[]).length === 0)) {
+        const pantryBackup = localStorage.getItem("levvia_pantry_items");
+        if (pantryBackup) {
+          try { finalAnswers[15] = JSON.parse(pantryBackup); } catch { /* ignore */ }
+        }
+      }
+
+      console.log('🔍 Final save — answers[15] (pantry):', finalAnswers[15]);
+      console.log('🔍 Final save — answers[16] (objectives):', finalAnswers[16]);
+      console.log('🔍 Final save — answers[13] (restrictions):', finalAnswers[13]);
 
       // Save to localStorage only — Supabase sync happens after auth
       localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
