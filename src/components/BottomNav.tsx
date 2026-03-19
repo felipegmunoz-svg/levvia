@@ -12,6 +12,10 @@ const tabs = [
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isInTrial } = useTrialStatus();
+
+  if (isInTrial) return null;
+
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[rgba(13,31,54,0.95)] backdrop-blur-[20px] border-t border-white/[0.08]">
