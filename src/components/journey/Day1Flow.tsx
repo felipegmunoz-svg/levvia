@@ -90,7 +90,14 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
         .eq("id", user.id);
     }
 
-    // Now that M1+M2 are done, check if there's a pre-auth diary to sync
+    // PRIORITY: Check onboarding FIRST — never skip it
+    const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
+    if (!onboardingDone) {
+      navigate("/onboarding", { replace: true });
+      return;
+    }
+
+    // Onboarding done — now check if there's a pre-auth diary to sync
     const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
     const localDiary = localStorage.getItem("levvia_day1_diary");
 
@@ -121,13 +128,8 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
       return;
     }
 
-    // Normal flow: check onboarding
-    const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
-    if (!onboardingDone) {
-      navigate("/onboarding", { replace: true });
-    } else {
-      setStep(4);
-    }
+    // Normal flow: proceed to meal suggestion
+    setStep(4);
   };
 
   if (loading) {
