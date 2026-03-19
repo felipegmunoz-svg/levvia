@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { fetchRecipes, filterRecipesForProfile, type DbRecipe, type UserProfile } from "@/lib/profileEngine";
+import { selectDay1Recipe, type DbRecipe, type UserProfile } from "@/lib/profileEngine";
 import RecipeDetail from "@/components/RecipeDetail";
 
 interface Day1MealSuggestionProps {
@@ -8,48 +8,38 @@ interface Day1MealSuggestionProps {
   onNext: () => void;
 }
 
-type MealSlot = "Café da Manhã" | "Lanche da Manhã" | "Almoço" | "Lanche da Tarde" | "Jantar";
-
-function getMealSlot(): { slot: MealSlot; label: string } {
+function getMealLabel(): string {
   const hour = new Date().getHours();
-  if (hour < 10) return { slot: "Café da Manhã", label: "Café da Manhã" };
-  if (hour < 12) return { slot: "Lanche da Manhã", label: "Lanche da Manhã" };
-  if (hour < 15) return { slot: "Almoço", label: "Almoço" };
-  if (hour < 18) return { slot: "Lanche da Tarde", label: "Lanche da Tarde" };
-  return { slot: "Jantar", label: "Jantar" };
-}
-
-function getRecipesForSlot(recipes: DbRecipe[], slot: MealSlot): DbRecipe[] {
-  const mapping: Record<MealSlot, string[]> = {
-    "Café da Manhã": ["Café da Manhã"],
-    "Lanche da Manhã": ["Lanche da Manhã", "Lanche"],
-    "Almoço": ["Almoço"],
-    "Lanche da Tarde": ["Lanche da Tarde", "Lanche"],
-    "Jantar": ["Jantar"],
-  };
-  const types = mapping[slot];
-  return recipes.filter((r) => r.tipo_refeicao?.some((t) => types.includes(t)));
+  if (hour < 10) return "Café da Manhã";
+  if (hour < 12) return "Lanche da Manhã";
+  if (hour < 15) return "Almoço";
+  if (hour < 18) return "Lanche da Tarde";
+  return "Jantar";
 }
 
 const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
-  const [recipes, setRecipes] = useState<DbRecipe[]>([]);
+  const [suggestedRecipe, setSuggestedRecipe] = useState<DbRecipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRecipe, setShowRecipe] = useState(false);
 
-  const { slot, label } = useMemo(() => getMealSlot(), []);
+  const label = useMemo(() => getMealLabel(), []);
 
   useEffect(() => {
-    fetchRecipes().then((data) => {
-      setRecipes(data);
-      setLoading(false);
-    });
-  }, []);
-
-  const suggestedRecipe = useMemo(() => {
-    const filtered = filterRecipesForProfile(recipes, profile);
-    const slotRecipes = getRecipesForSlot(filtered, slot);
-    return slotRecipes.length > 0 ? slotRecipes[0] : filtered[0] || null;
-  }, [recipes, profile, slot]);
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const recipe = await selectDay1Recipe(profile);
+        if (!cancelled) setSuggestedRecipe(recipe);
+      } catch (err) {
+        console.error("Erro ao carregar receita:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [profile]);
 
   if (loading) {
     return (
@@ -76,6 +66,7 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
           servings: suggestedRecipe.servings || "",
           description: suggestedRecipe.description || "",
           icon: suggestedRecipe.icon || "utensils",
+          image_url: suggestedRecipe.image_url || undefined,
         }}
         onBack={() => setShowRecipe(false)}
       />
@@ -84,7 +75,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-6 py-12">
-      {/* Label */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -94,7 +84,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
         SUA PRIMEIRA ESCOLHA CONSCIENTE
       </motion.p>
 
-      {/* Title */}
       <motion.h2
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -105,7 +94,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
         Sua Refeição de Resfriamento
       </motion.h2>
 
-      {/* Subtitle */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -117,7 +105,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
         que vai começar a acalmar seu corpo.
       </motion.p>
 
-      {/* Recipe Card */}
       {suggestedRecipe && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -125,9 +112,9 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
           transition={{ delay: 0.6 }}
           className="glass-card p-5 w-full max-w-sm mb-6"
         >
-          {(suggestedRecipe as any).image_url && (
+          {suggestedRecipe.image_url && (
             <img
-              src={(suggestedRecipe as any).image_url}
+              src={suggestedRecipe.image_url}
               alt={suggestedRecipe.title}
               className="w-full h-40 object-cover rounded-xl mb-4"
             />
@@ -143,7 +130,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
               {suggestedRecipe.por_que_resfria}
             </p>
           )}
-
           <button
             onClick={() => setShowRecipe(true)}
             className="w-full py-3 rounded-2xl border border-secondary/30 text-secondary text-sm font-medium hover:bg-secondary/10 transition-colors"
@@ -156,12 +142,11 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
       {!suggestedRecipe && (
         <div className="glass-card p-5 w-full max-w-sm mb-6">
           <p className="text-foreground/60 text-center text-sm">
-            Nenhuma receita disponível para este horário ainda.
+            Não encontramos uma receita perfeita para você hoje. Que tal explorar nossas opções?
           </p>
         </div>
       )}
 
-      {/* Bottom text */}
       <p
         className="text-foreground/50 text-center italic mb-8 max-w-xs"
         style={{ fontWeight: 300, fontSize: "0.85rem" }}
@@ -170,7 +155,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
         como você se sentiu.
       </p>
 
-      {/* CTA */}
       <button
         onClick={onNext}
         className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"

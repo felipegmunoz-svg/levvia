@@ -60,6 +60,21 @@ export interface DbRecipe {
   icon: string | null;
   sort_order: number | null;
   is_active: boolean | null;
+  journey_day: number | null;
+  journey_role: string | null;
+  diet_profile: string[] | null;
+  allergen_free: string[] | null;
+  pantry_complexity: string | null;
+  main_ingredients: string[] | null;
+  common_pantry_match: number | null;
+  health_goals: string[] | null;
+  inflammation_score: number | null;
+  theme_tags: string[] | null;
+  prep_time_minutes: number | null;
+  cook_time_minutes: number | null;
+  difficulty: string | null;
+  nutritional_highlights: string | null;
+  image_url: string | null;
 }
 
 export interface DbHabit {
@@ -493,3 +508,158 @@ export function getPainSeverity(painLevel: string): "low" | "moderate" | "high" 
   if (painLevel === "Dor moderada") return "moderate";
   return "high";
 }
+
+// ─── Intelligent Recipe Selection Engine (Day 1) ───
+
+const mapObjectivesToHealthGoals = (objectives: string[]): string[] => {
+  const mapping: Record<string, string[]> = {
+    "Reduzir a dor e o desconforto": ["desinflamar"],
+    "Melhorar a qualidade do sono": ["sono"],
+    "Aumentar a energia e disposição": ["energia"],
+    "Melhorar a mobilidade e flexibilidade": ["mobilidade"],
+    "Melhorar a mobilidade": ["mobilidade"],
+    "Desintoxicar o organismo": ["detox"],
+    "Reduzir o inchaço": ["desinflamar", "detox"],
+    "Controlar o inchaço": ["desinflamar", "detox"],
+    "Melhorar a digestão": ["detox"],
+    "Melhorar o bem-estar emocional": ["energia"],
+    "Criar uma rotina de exercícios": ["energia", "mobilidade"],
+    "Adotar alimentação anti-inflamatória": ["desinflamar"],
+  };
+
+  const goals = new Set<string>();
+  objectives.forEach(obj => {
+    const mapped = mapping[obj] || [];
+    mapped.forEach(goal => goals.add(goal));
+  });
+  return Array.from(goals);
+};
+
+const mapDietRestrictionToProfile = (restrictions: string[]): string => {
+  const lower = restrictions.map(r => r.toLowerCase());
+  if (lower.some(r => r.includes("vegan"))) return "vegana";
+  if (lower.some(r => r.includes("vegetarian"))) return "vegetariana";
+  return "onivora";
+};
+
+const mapAllergenRestrictions = (restrictions: string[]): string[] => {
+  const mapping: Record<string, string> = {
+    "sem glúten": "gluten",
+    "sem lactose": "lactose",
+    "alergia a oleaginosas": "nuts",
+    "alergia a soja": "soy",
+    "alergia a amendoim": "nuts",
+  };
+
+  return restrictions
+    .map(r => mapping[r.toLowerCase()])
+    .filter(Boolean) as string[];
+};
+
+export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe | null> => {
+  try {
+    const dietProfile = mapDietRestrictionToProfile(profile.dietaryRestrictions || []);
+    const allergens = mapAllergenRestrictions(profile.dietaryRestrictions || []);
+    const healthGoals = mapObjectivesToHealthGoals(profile.objectives || []);
+
+    // 1. HARD CONSTRAINT
+    let { data: candidates, error } = await supabase
+      .from('recipes')
+      .select('*')
+      .or('journey_day.eq.1,journey_day.is.null')
+      .contains('diet_profile', [dietProfile])
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('Erro ao buscar receitas:', error);
+      return null;
+    }
+
+    // Filter allergens client-side
+    if (allergens.length > 0 && candidates) {
+      candidates = candidates.filter(recipe => {
+        const free = (recipe as any).allergen_free || [];
+        return allergens.every(a => free.includes(a));
+      });
+    }
+
+    // Fallback to maintenance recipes
+    if (!candidates || candidates.length === 0) {
+      const { data: fallback } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('journey_role', 'maintenance')
+        .contains('diet_profile', [dietProfile])
+        .eq('is_active', true);
+
+      candidates = fallback || [];
+      if (allergens.length > 0) {
+        candidates = candidates.filter(recipe => {
+          const free = (recipe as any).allergen_free || [];
+          return allergens.every(a => free.includes(a));
+        });
+      }
+    }
+
+    if (!candidates || candidates.length === 0) return null;
+
+    // 2. SOFT CONSTRAINT: pantry match
+    const userPantry = (profile.pantryItems || []).map(i => i.toLowerCase());
+
+    const scored = candidates.map(recipe => {
+      const recipeIngs = ((recipe as any).main_ingredients || []).map((i: string) => i.toLowerCase());
+      const matchCount = recipeIngs.filter((ri: string) =>
+        userPantry.some(pi => pi.includes(ri) || ri.includes(pi))
+      ).length;
+      const pantryScore = recipeIngs.length > 0
+        ? (matchCount / recipeIngs.length) * 100
+        : (recipe as any).common_pantry_match || 50;
+
+      // 3. NARRATIVE FILTER: health goals overlap
+      const recipeGoals: string[] = (recipe as any).health_goals || [];
+      const goalOverlap = recipeGoals.filter(g => healthGoals.includes(g)).length;
+
+      return { ...recipe, pantryScore, goalOverlap } as DbRecipe & { pantryScore: number; goalOverlap: number };
+    });
+
+    // Sort: goalOverlap desc → inflammation_score desc → pantryScore desc
+    scored.sort((a, b) => {
+      if (b.goalOverlap !== a.goalOverlap) return b.goalOverlap - a.goalOverlap;
+      const infA = (a as any).inflammation_score || 0;
+      const infB = (b as any).inflammation_score || 0;
+      if (infB !== infA) return infB - infA;
+      return b.pantryScore - a.pantryScore;
+    });
+
+    // 4. Meal-time preference (non-blocking)
+    const hour = new Date().getHours();
+    let mealType = 'Jantar';
+    if (hour < 10) mealType = 'Café da Manhã';
+    else if (hour < 12) mealType = 'Lanche da Manhã';
+    else if (hour < 15) mealType = 'Almoço';
+    else if (hour < 18) mealType = 'Lanche da Tarde';
+
+    const top5 = scored.slice(0, 5);
+    const preferred = top5.find(r => r.tipo_refeicao?.includes(mealType));
+    const selected = preferred || scored[0];
+
+    if (import.meta.env.DEV) {
+      console.log('🍽️ Motor de Decisão — Receita:', {
+        title: selected.title,
+        dietProfile,
+        allergens,
+        healthGoals,
+        pantryScore: selected.pantryScore,
+        goalOverlap: selected.goalOverlap,
+        inflammationScore: (selected as any).inflammation_score,
+        mealType,
+        totalCandidates: candidates.length,
+      });
+    }
+
+    return selected;
+  } catch (err) {
+    console.error('Erro no Motor de Decisão:', err);
+    return null;
+  }
+};

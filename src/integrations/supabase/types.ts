@@ -421,60 +421,102 @@ export type Database = {
       }
       recipes: {
         Row: {
+          allergen_free: string[] | null
           category: string
+          common_pantry_match: number | null
+          cook_time_minutes: number | null
           created_at: string
           description: string | null
           dica: string | null
+          diet_profile: string[] | null
+          difficulty: string | null
+          health_goals: string[] | null
           icon: string | null
           id: string
           image_url: string | null
+          inflammation_score: number | null
           ingredients: string[] | null
           instructions: string[] | null
           is_active: boolean | null
+          journey_day: number | null
+          journey_role: string | null
+          main_ingredients: string[] | null
+          nutritional_highlights: string | null
+          pantry_complexity: string | null
           por_que_resfria: string | null
+          prep_time_minutes: number | null
           servings: string | null
           sort_order: number | null
           tags: string[] | null
+          theme_tags: string[] | null
           time: string | null
           tipo_refeicao: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
+          allergen_free?: string[] | null
           category?: string
+          common_pantry_match?: number | null
+          cook_time_minutes?: number | null
           created_at?: string
           description?: string | null
           dica?: string | null
+          diet_profile?: string[] | null
+          difficulty?: string | null
+          health_goals?: string[] | null
           icon?: string | null
           id?: string
           image_url?: string | null
+          inflammation_score?: number | null
           ingredients?: string[] | null
           instructions?: string[] | null
           is_active?: boolean | null
+          journey_day?: number | null
+          journey_role?: string | null
+          main_ingredients?: string[] | null
+          nutritional_highlights?: string | null
+          pantry_complexity?: string | null
           por_que_resfria?: string | null
+          prep_time_minutes?: number | null
           servings?: string | null
           sort_order?: number | null
           tags?: string[] | null
+          theme_tags?: string[] | null
           time?: string | null
           tipo_refeicao?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
+          allergen_free?: string[] | null
           category?: string
+          common_pantry_match?: number | null
+          cook_time_minutes?: number | null
           created_at?: string
           description?: string | null
           dica?: string | null
+          diet_profile?: string[] | null
+          difficulty?: string | null
+          health_goals?: string[] | null
           icon?: string | null
           id?: string
           image_url?: string | null
+          inflammation_score?: number | null
           ingredients?: string[] | null
           instructions?: string[] | null
           is_active?: boolean | null
+          journey_day?: number | null
+          journey_role?: string | null
+          main_ingredients?: string[] | null
+          nutritional_highlights?: string | null
+          pantry_complexity?: string | null
           por_que_resfria?: string | null
+          prep_time_minutes?: number | null
           servings?: string | null
           sort_order?: number | null
           tags?: string[] | null
+          theme_tags?: string[] | null
           time?: string | null
           tipo_refeicao?: string[] | null
           title?: string
