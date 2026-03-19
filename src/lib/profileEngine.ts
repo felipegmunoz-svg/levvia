@@ -122,7 +122,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     healthConditions: (data as any).health_conditions || [],
     painLevel: data.pain_level || "Sem dor",
     affectedAreas: data.affected_areas || [],
-    objective: data.objective || "",
+    objectives: (data as any).objectives || [],
     dietaryRestrictions: (onb.restrictions as string[]) || [],
     dietaryPreferences: (onb.preferences as string[]) || [],
     inflammatoryEnemies: (onb.enemies as string[]) || [],
