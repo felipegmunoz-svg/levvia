@@ -254,6 +254,12 @@ const Today = () => {
         </div>
       </header>
 
+      {/* Quick Reference Cards */}
+      <div className="mx-5 mt-4 grid grid-cols-2 gap-3">
+        <HeatMapCard profile={profile} />
+        <FoodTrafficLightCard profile={profile} />
+      </div>
+
       {/* Pain relief mode */}
       <div className="mx-5 mt-4">
         <PainReliefMode
