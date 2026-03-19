@@ -239,10 +239,12 @@ export function scoreExercise(exercise: DbExercise, profile: UserProfile): numbe
     score += (painCategories.length - painIdx) * 10;
   }
 
-  // Objective-based priority
-  const objCategories = objectiveToPriority[profile.objective] || [];
-  if (objCategories.includes(exercise.category)) {
-    score += 15;
+  // Objective-based priority (iterate all objectives)
+  for (const obj of profile.objectives) {
+    const objCategories = objectiveToPriority[obj] || [];
+    if (objCategories.includes(exercise.category)) {
+      score += 15;
+    }
   }
 
   // Affected areas relevance
