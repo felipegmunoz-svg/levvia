@@ -28,6 +28,11 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
     let cancelled = false;
     const load = async () => {
       setLoading(true);
+      console.debug('🔍 Day1MealSuggestion — Perfil recebido:', {
+        dietaryRestrictions: profile.dietaryRestrictions,
+        objectives: profile.objectives,
+        pantryItems: profile.pantryItems,
+      });
       try {
         const recipe = await selectDay1Recipe(profile);
         if (!cancelled) setSuggestedRecipe(recipe);

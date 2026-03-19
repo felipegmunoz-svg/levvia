@@ -643,19 +643,17 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
     const preferred = top5.find(r => r.tipo_refeicao?.includes(mealType));
     const selected = preferred || scored[0];
 
-    if (import.meta.env.DEV) {
-      console.log('🍽️ Motor de Decisão — Receita:', {
-        title: selected.title,
-        dietProfile,
-        allergens,
-        healthGoals,
-        pantryScore: selected.pantryScore,
-        goalOverlap: selected.goalOverlap,
-        inflammationScore: (selected as any).inflammation_score,
-        mealType,
-        totalCandidates: candidates.length,
-      });
-    }
+    console.debug('🍽️ Motor de Decisão — Receita:', {
+      title: selected.title,
+      dietProfile,
+      allergens,
+      healthGoals,
+      pantryScore: selected.pantryScore,
+      goalOverlap: selected.goalOverlap,
+      inflammationScore: (selected as any).inflammation_score,
+      mealType,
+      totalCandidates: candidates.length,
+    });
 
     return selected;
   } catch (err) {
