@@ -146,9 +146,9 @@ export const onboardingSteps: OnboardingQuestion[] = [
   },
   {
     id: 13,
-    type: "single",
+    type: "multi",
     title: "Seu Objetivo em 14 Dias",
-    subtitle: "Escolha o seu principal objetivo para as próximas duas semanas.",
+    subtitle: "Escolha até 3 objetivos para as próximas duas semanas.",
     options: [
       "Reduzir a dor e o desconforto",
       "Melhorar a mobilidade",

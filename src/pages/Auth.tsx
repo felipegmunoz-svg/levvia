@@ -56,7 +56,7 @@ const Auth = () => {
         const healthConditions = (answers[7] as string[]) || [];
         const painLevel = (answers[8] as string) || "";
         const affectedAreas = (answers[9] as string[]) || [];
-        const objective = (answers[13] as string) || "";
+        const objectives = (answers[13] as string[]) || [];
 
         profileData = {
           name: userName,
@@ -69,7 +69,7 @@ const Auth = () => {
           health_conditions: healthConditions,
           pain_level: painLevel,
           affected_areas: affectedAreas,
-          objective,
+          objectives,
           onboarding_data: {
             enemies: answers[11] || [],
             allies: answers[12] || [],

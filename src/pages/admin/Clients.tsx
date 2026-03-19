@@ -14,7 +14,7 @@ interface Profile {
   phone: string;
   status: string;
   pain_level: string;
-  objective: string;
+  objectives: string[];
   created_at: string;
   age: number | null;
   sex: string | null;
@@ -178,7 +178,7 @@ const Clients = () => {
                     <td className="px-4 py-3 text-sm text-muted-foreground">{client.age || "—"}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">{client.pain_level || "—"}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground truncate max-w-[150px]">
-                      {client.objective || "—"}
+                      {client.objectives?.join(", ") || "—"}
                     </td>
                     <td className="px-4 py-3">
                       {challengeDay ? (
@@ -296,8 +296,8 @@ const Clients = () => {
                   </h3>
                   <div className="space-y-3">
                     <div className="bg-white/[0.04] rounded-lg px-3 py-2">
-                      <p className="text-[10px] text-muted-foreground uppercase">Objetivo principal</p>
-                      <p className="text-sm text-foreground font-medium">{selected.objective || "—"}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">Objetivos</p>
+                      <p className="text-sm text-foreground font-medium">{selected.objectives?.join(", ") || "—"}</p>
                     </div>
                     <div className="bg-white/[0.04] rounded-lg px-3 py-2">
                       <p className="text-[10px] text-muted-foreground uppercase">Progresso do desafio</p>

@@ -16,7 +16,7 @@ export interface UserProfile {
   healthConditions: string[];
   painLevel: string;
   affectedAreas: string[];
-  objective: string;
+  objectives: string[];
   dietaryRestrictions: string[];
   dietaryPreferences: string[];
   inflammatoryEnemies: string[];
@@ -89,7 +89,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       healthConditions: (data[7] as string[]) || [],
       painLevel: (data[8] as string) || "Sem dor",
       affectedAreas: (data[9] as string[]) || [],
-      objective: (data[13] as string) || "",
+      objectives: (data[13] as string[]) || [],
       dietaryRestrictions: (data[14] as string[]) || [],
       dietaryPreferences: (data[15] as string[]) || [],
       inflammatoryEnemies: (data[11] as string[]) || [],
@@ -104,7 +104,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
   const { data } = await supabase
     .from("profiles")
-    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objective, onboarding_data, avatar_url")
+    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objectives, onboarding_data, avatar_url")
     .eq("id", userId)
     .maybeSingle();
 
@@ -122,7 +122,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     healthConditions: (data as any).health_conditions || [],
     painLevel: data.pain_level || "Sem dor",
     affectedAreas: data.affected_areas || [],
-    objective: data.objective || "",
+    objectives: (data as any).objectives || [],
     dietaryRestrictions: (onb.restrictions as string[]) || [],
     dietaryPreferences: (onb.preferences as string[]) || [],
     inflammatoryEnemies: (onb.enemies as string[]) || [],
@@ -142,7 +142,7 @@ function defaultProfile(): UserProfile {
     healthConditions: [],
     painLevel: "Sem dor",
     affectedAreas: [],
-    objective: "",
+    objectives: [],
     dietaryRestrictions: [],
     dietaryPreferences: [],
     inflammatoryEnemies: [],
@@ -239,10 +239,12 @@ export function scoreExercise(exercise: DbExercise, profile: UserProfile): numbe
     score += (painCategories.length - painIdx) * 10;
   }
 
-  // Objective-based priority
-  const objCategories = objectiveToPriority[profile.objective] || [];
-  if (objCategories.includes(exercise.category)) {
-    score += 15;
+  // Objective-based priority (iterate all objectives)
+  for (const obj of profile.objectives) {
+    const objCategories = objectiveToPriority[obj] || [];
+    if (objCategories.includes(exercise.category)) {
+      score += 15;
+    }
   }
 
   // Affected areas relevance
@@ -380,7 +382,14 @@ export function selectHabitsForDay(
   const active = allHabits.filter((h) => h.is_active !== false);
   if (active.length === 0) return [];
 
-  const priorityCategories = objectiveToHabitCategories[profile.objective] || [];
+  // Merge priority categories from all objectives
+  const priorityCategories: string[] = [];
+  for (const obj of profile.objectives) {
+    const cats = objectiveToHabitCategories[obj] || [];
+    for (const c of cats) {
+      if (!priorityCategories.includes(c)) priorityCategories.push(c);
+    }
+  }
 
   // Score habits
   const scored = active.map((h) => {

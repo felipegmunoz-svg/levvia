@@ -85,7 +85,7 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
   const [heightCm, setHeightCm] = useState(profile.heightCm?.toString() || "");
   const [activityLevel, setActivityLevel] = useState(profile.activityLevel);
   const [painLevel, setPainLevel] = useState(profile.painLevel);
-  const [objective, setObjective] = useState(profile.objective);
+  const [objectives, setObjectives] = useState<string[]>(profile.objectives || []);
   const [healthConditions, setHealthConditions] = useState<string[]>(profile.healthConditions || []);
   const [affectedAreas, setAffectedAreas] = useState<string[]>(profile.affectedAreas || []);
 
@@ -101,7 +101,7 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
       height_cm: heightCm ? parseFloat(heightCm) || null : null,
       activity_level: activityLevel,
       pain_level: painLevel,
-      objective,
+      objectives,
       health_conditions: healthConditions,
       affected_areas: affectedAreas,
     };
@@ -188,15 +188,14 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
             </Select>
           </div>
 
-          {/* Objective */}
+          {/* Objectives (max 3) */}
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground text-xs">Objetivo principal</Label>
-            <Select value={objective} onValueChange={setObjective}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {objectiveOptions.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <Label className="text-muted-foreground text-xs">Objetivos (até 3)</Label>
+            <ToggleChips
+              options={objectiveOptions}
+              selected={objectives}
+              onChange={(v) => setObjectives(v.slice(0, 3))}
+            />
           </div>
 
           {/* Health Conditions */}

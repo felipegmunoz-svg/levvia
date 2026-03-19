@@ -326,7 +326,7 @@ export type Database = {
           height_cm: number | null
           id: string
           name: string
-          objective: string | null
+          objectives: string[] | null
           onboarding_data: Json | null
           pain_level: string | null
           phone: string | null
@@ -352,7 +352,7 @@ export type Database = {
           height_cm?: number | null
           id: string
           name?: string
-          objective?: string | null
+          objectives?: string[] | null
           onboarding_data?: Json | null
           pain_level?: string | null
           phone?: string | null
@@ -378,7 +378,7 @@ export type Database = {
           height_cm?: number | null
           id?: string
           name?: string
-          objective?: string | null
+          objectives?: string[] | null
           onboarding_data?: Json | null
           pain_level?: string | null
           phone?: string | null

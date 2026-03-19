@@ -125,7 +125,10 @@ const Onboarding = () => {
 
   const handleMultiSelect = (option: string) => {
     const prev = (answers[current.id] as string[]) || [];
-    const updated = prev.includes(option)
+    const isDeselecting = prev.includes(option);
+    // Limit step 13 (objectives) to max 3 selections
+    if (!isDeselecting && current.id === 13 && prev.length >= 3) return;
+    const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
     setAnswers({ ...answers, [current.id]: updated });
@@ -458,9 +461,9 @@ const Onboarding = () => {
     }
 
     if (current.type === "info") {
-      const objective = answers[13] as string;
-      const personalizedSubtitle = userName && objective
-        ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para o seu objetivo: ${objective}.`
+      const objectives = (answers[13] as string[]) || [];
+      const personalizedSubtitle = userName && objectives.length > 0
+        ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para seus objetivos: ${objectives.join(", ")}.`
         : current.subtitle;
 
       return (

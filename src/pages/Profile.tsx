@@ -261,7 +261,7 @@ const Profile = () => {
     { icon: Ruler, label: "IMC", value: bmi ? `${bmi}` : "—" },
     { icon: Activity, label: "Nível de atividade", value: profile.activityLevel || "—" },
     { icon: Flame, label: "Nível de dor", value: profile.painLevel || "—" },
-    { icon: Target, label: "Objetivo", value: profile.objective || "—" },
+    { icon: Target, label: "Objetivos", value: profile.objectives?.length > 0 ? profile.objectives.join(", ") : "—" },
   ];
 
   const conditionItems = [
