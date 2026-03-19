@@ -139,8 +139,7 @@ const Auth = () => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         await syncProfileData(data.user?.id, data.user?.email);
-        const hasPlan = localStorage.getItem("levvia_selected_plan");
-        showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", false);
+        showSuccessAndNavigate("/today", false);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -150,9 +149,8 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        const hasPlan = localStorage.getItem("levvia_selected_plan");
         await syncProfileData(data.user?.id, data.user?.email);
-        showSuccessAndNavigate(hasPlan ? "/checkout" : "/today", true);
+        showSuccessAndNavigate("/today", true);
       }
     } catch (error: any) {
       toast({
