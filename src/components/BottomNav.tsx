@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Dumbbell, GraduationCap, User } from "lucide-react";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 const tabs = [
   { path: "/today", label: "Hoje", icon: Home },
