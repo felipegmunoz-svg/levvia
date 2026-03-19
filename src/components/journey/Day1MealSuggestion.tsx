@@ -77,7 +77,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
           description: suggestedRecipe.description || "",
           icon: suggestedRecipe.icon || "utensils",
         }}
-        }}
         onBack={() => setShowRecipe(false)}
       />
     );
