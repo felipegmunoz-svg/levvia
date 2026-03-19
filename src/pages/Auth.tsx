@@ -126,8 +126,9 @@ const Auth = () => {
         }
       }
 
-      // Clean up onboarding data (keep selected plan for navigation)
+      // Clean up onboarding data
       if (raw) localStorage.removeItem("levvia_onboarding");
+      localStorage.removeItem("levvia_pantry_items");
     } catch (e) {
       console.error("Failed to sync profile data:", e);
     }
