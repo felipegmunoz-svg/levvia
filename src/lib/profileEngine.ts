@@ -89,7 +89,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       healthConditions: (data[7] as string[]) || [],
       painLevel: (data[8] as string) || "Sem dor",
       affectedAreas: (data[9] as string[]) || [],
-      objective: (data[13] as string) || "",
+      objectives: (data[13] as string[]) || [],
       dietaryRestrictions: (data[14] as string[]) || [],
       dietaryPreferences: (data[15] as string[]) || [],
       inflammatoryEnemies: (data[11] as string[]) || [],
