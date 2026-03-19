@@ -99,6 +99,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       antiInflammatoryAllies: (data[12] as string[]) || [],
       pantryItems: (data[15] as string[]) || [],
       avatarUrl: null,
+      heatMapDay1: {},
     };
   } catch {
     return defaultProfile();
