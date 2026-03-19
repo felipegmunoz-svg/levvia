@@ -40,7 +40,7 @@ const Day1ClosingPublic = () => {
   };
 
   const handleGoToPlans = () => {
-    navigate("/plans", { replace: true });
+    navigate("/today", { replace: true });
   };
 
   if (saved) {
