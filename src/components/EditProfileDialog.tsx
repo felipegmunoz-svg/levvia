@@ -101,7 +101,7 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
       height_cm: heightCm ? parseFloat(heightCm) || null : null,
       activity_level: activityLevel,
       pain_level: painLevel,
-      objective,
+      objectives,
       health_conditions: healthConditions,
       affected_areas: affectedAreas,
     };
