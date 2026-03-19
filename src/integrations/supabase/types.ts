@@ -329,6 +329,7 @@ export type Database = {
           objectives: string[] | null
           onboarding_data: Json | null
           pain_level: string | null
+          pantry_items: string[] | null
           phone: string | null
           sex: string | null
           status: string
@@ -355,6 +356,7 @@ export type Database = {
           objectives?: string[] | null
           onboarding_data?: Json | null
           pain_level?: string | null
+          pantry_items?: string[] | null
           phone?: string | null
           sex?: string | null
           status?: string
@@ -381,6 +383,7 @@ export type Database = {
           objectives?: string[] | null
           onboarding_data?: Json | null
           pain_level?: string | null
+          pantry_items?: string[] | null
           phone?: string | null
           sex?: string | null
           status?: string
