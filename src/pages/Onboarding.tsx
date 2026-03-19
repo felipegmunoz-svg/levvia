@@ -125,7 +125,10 @@ const Onboarding = () => {
 
   const handleMultiSelect = (option: string) => {
     const prev = (answers[current.id] as string[]) || [];
-    const updated = prev.includes(option)
+    const isDeselecting = prev.includes(option);
+    // Limit step 13 (objectives) to max 3 selections
+    if (!isDeselecting && current.id === 13 && prev.length >= 3) return;
+    const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
     setAnswers({ ...answers, [current.id]: updated });
