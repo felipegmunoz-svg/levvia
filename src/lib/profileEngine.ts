@@ -60,6 +60,21 @@ export interface DbRecipe {
   icon: string | null;
   sort_order: number | null;
   is_active: boolean | null;
+  journey_day: number | null;
+  journey_role: string | null;
+  diet_profile: string[] | null;
+  allergen_free: string[] | null;
+  pantry_complexity: string | null;
+  main_ingredients: string[] | null;
+  common_pantry_match: number | null;
+  health_goals: string[] | null;
+  inflammation_score: number | null;
+  theme_tags: string[] | null;
+  prep_time_minutes: number | null;
+  cook_time_minutes: number | null;
+  difficulty: string | null;
+  nutritional_highlights: string | null;
+  image_url: string | null;
 }
 
 export interface DbHabit {
