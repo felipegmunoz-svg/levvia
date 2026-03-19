@@ -537,8 +537,8 @@ const mapObjectivesToHealthGoals = (objectives: string[]): string[] => {
 
 const mapDietRestrictionToProfile = (restrictions: string[]): string => {
   const lower = restrictions.map(r => r.toLowerCase());
-  if (lower.some(r => r.includes("vegan"))) return "vegana";
-  if (lower.some(r => r.includes("vegetarian"))) return "vegetariana";
+  if (lower.some(r => r.includes("vegan") || r === "vegano" || r === "vegana")) return "vegana";
+  if (lower.some(r => r.includes("vegetarian") || r === "vegetariano" || r === "vegetariana")) return "vegetariana";
   return "onivora";
 };
 
