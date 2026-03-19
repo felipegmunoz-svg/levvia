@@ -126,9 +126,9 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
           transition={{ delay: 0.6 }}
           className="glass-card p-5 w-full max-w-sm mb-6"
         >
-          {suggestedRecipe.image_url && (
+          {(suggestedRecipe as any).image_url && (
             <img
-              src={suggestedRecipe.image_url}
+              src={(suggestedRecipe as any).image_url}
               alt={suggestedRecipe.title}
               className="w-full h-40 object-cover rounded-xl mb-4"
             />
