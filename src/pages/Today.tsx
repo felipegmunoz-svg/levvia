@@ -79,22 +79,20 @@ const Today = () => {
   const [day1Done, setDay1Done] = useState<boolean | null>(null);
 
   // Check day1_completed from profile on mount
-  useState(() => {
+  useEffect(() => {
     if (!user?.id) {
-      setDay1Done(true); // no user = skip day1 flow
+      setDay1Done(true);
       return;
     }
-    import("@/integrations/supabase/client").then(({ supabase }) => {
-      supabase
-        .from("profiles")
-        .select("day1_completed")
-        .eq("id", user.id)
-        .single()
-        .then(({ data }) => {
-          setDay1Done((data as any)?.day1_completed === true);
-        });
-    });
-  });
+    supabase
+      .from("profiles")
+      .select("day1_completed")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        setDay1Done((data as any)?.day1_completed === true);
+      });
+  }, [user?.id]);
 
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: DbExercise; activityId: string } | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: DbRecipe; activityId: string } | null>(null);
