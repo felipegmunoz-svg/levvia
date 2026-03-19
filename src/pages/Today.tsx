@@ -10,6 +10,8 @@ import BottomNav from "@/components/BottomNav";
 import SymptomDiary from "@/components/SymptomDiary";
 import PainReliefMode from "@/components/PainReliefMode";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import HeatMapCard from "@/components/HeatMapCard";
+import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
 import type { DbExercise, DbRecipe } from "@/lib/profileEngine";
 
@@ -251,6 +253,12 @@ const Today = () => {
           <PushNotificationPrompt />
         </div>
       </header>
+
+      {/* Quick Reference Cards */}
+      <div className="mx-5 mt-4 grid grid-cols-2 gap-3">
+        <HeatMapCard profile={profile} />
+        <FoodTrafficLightCard profile={profile} />
+      </div>
 
       {/* Pain relief mode */}
       <div className="mx-5 mt-4">
