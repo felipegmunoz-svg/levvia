@@ -14,7 +14,7 @@ interface Profile {
   phone: string;
   status: string;
   pain_level: string;
-  objective: string;
+  objectives: string[];
   created_at: string;
   age: number | null;
   sex: string | null;
