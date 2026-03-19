@@ -134,6 +134,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     antiInflammatoryAllies: (onb.allies as string[]) || [],
     pantryItems: (data as any).pantry_items || [],
     avatarUrl: (data as any).avatar_url || null,
+    heatMapDay1: (data as any).heat_map_day1 && typeof (data as any).heat_map_day1 === 'object' ? (data as any).heat_map_day1 as Record<string, number> : {},
   };
 }
 
