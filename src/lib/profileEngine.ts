@@ -122,15 +122,28 @@ export function parseOnboardingFromLocal(): UserProfile {
 }
 
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
-  const { data } = await supabase
+  console.log('🔍 parseOnboardingFromSupabase — userId:', userId);
+
+  const { data, error } = await supabase
     .from("profiles")
     .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objectives, onboarding_data, avatar_url, pantry_items, heat_map_day1")
     .eq("id", userId)
     .maybeSingle();
 
-  if (!data) return parseOnboardingFromLocal(); // fallback
+  if (error) {
+    console.log('🔍 parseOnboardingFromSupabase — ERRO:', error.message);
+  }
+
+  if (!data) {
+    console.log('🔍 parseOnboardingFromSupabase — Sem dados no Supabase, fallback para localStorage');
+    return parseOnboardingFromLocal();
+  }
 
   const onb = (data.onboarding_data as Record<string, unknown>) || {};
+  console.log('🔍 parseOnboardingFromSupabase — onboarding_data bruto:', JSON.stringify(onb));
+  console.log('🔍 parseOnboardingFromSupabase — objectives:', data.objectives);
+  console.log('🔍 parseOnboardingFromSupabase — pantry_items:', (data as any).pantry_items);
+  console.log('🔍 parseOnboardingFromSupabase — restrictions (de onb):', onb.restrictions);
 
   return {
     name: data.name || "",
