@@ -1,27 +1,21 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Dumbbell, GraduationCap, User } from "lucide-react";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { Home, BookOpen, User } from "lucide-react";
 
 const tabs = [
   { path: "/today", label: "Hoje", icon: Home },
-  { path: "/practices", label: "Práticas", icon: Dumbbell },
-  { path: "/learn", label: "Aprender", icon: GraduationCap },
+  { path: "/history", label: "Histórico", icon: BookOpen },
   { path: "/profile", label: "Perfil", icon: User },
 ];
 
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isInTrial } = useTrialStatus();
-
-  if (isInTrial) return null;
-
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[rgba(13,31,54,0.95)] backdrop-blur-[20px] border-t border-white/[0.08]">
       <div className="flex items-center justify-around max-w-md mx-auto h-16">
         {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path;
+          const isActive = location.pathname === tab.path || location.pathname.startsWith(tab.path + "/");
           const Icon = tab.icon;
           return (
             <button

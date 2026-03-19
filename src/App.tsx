@@ -19,6 +19,10 @@ import ResetPassword from "./pages/ResetPassword";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Learn from "./pages/Learn";
+import History from "./pages/History";
+import HistoryRecipes from "./pages/HistoryRecipes";
+import HistoryExercises from "./pages/HistoryExercises";
+import HistoryKnowledge from "./pages/HistoryKnowledge";
 import Dashboard from "./pages/admin/Dashboard";
 import Clients from "./pages/admin/Clients";
 import Exercises from "./pages/admin/Exercises";
@@ -52,6 +56,10 @@ const App = () => (
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
             <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+            <Route path="/history/recipes" element={<ProtectedRoute><HistoryRecipes /></ProtectedRoute>} />
+            <Route path="/history/exercises" element={<ProtectedRoute><HistoryExercises /></ProtectedRoute>} />
+            <Route path="/history/knowledge" element={<ProtectedRoute><HistoryKnowledge /></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
