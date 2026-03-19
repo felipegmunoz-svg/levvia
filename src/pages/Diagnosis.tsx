@@ -202,8 +202,8 @@ const Diagnosis = () => {
           </motion.div>
         )}
 
-        {/* Objective */}
-        {objective && (
+        {/* Objectives */}
+        {objectives.length > 0 && (
           <motion.div
             custom={5}
             variants={itemVariants}
@@ -213,9 +213,9 @@ const Diagnosis = () => {
           >
             <div className="flex items-center gap-2 mb-2">
               <Target size={18} className="text-secondary" />
-              <h2 className="text-base font-medium text-foreground">Seu Objetivo</h2>
+              <h2 className="text-base font-medium text-foreground">Seus Objetivos</h2>
             </div>
-            <p className="text-sm text-foreground/80">{objective}</p>
+            <p className="text-sm text-foreground/80">{objectives.join(", ")}</p>
           </motion.div>
         )}
 
