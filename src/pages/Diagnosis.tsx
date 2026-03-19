@@ -324,7 +324,7 @@ const Diagnosis = () => {
           onClick={() => navigate("/day1-journey")}
           className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base gradient-primary text-foreground hover:opacity-90 transition-all"
         >
-          Ver Planos Disponíveis
+          Continuar
           <ArrowRight size={18} strokeWidth={1.5} />
         </motion.button>
       </div>
