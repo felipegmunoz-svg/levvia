@@ -32,6 +32,7 @@ import Notifications from "./pages/admin/Notifications";
 import Financial from "./pages/admin/Financial";
 import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
+import Day1Journey from "./pages/Day1Journey";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/day1-journey" element={<Day1Journey />} />
             <Route path="/today" element={<ProtectedRoute><Today /></ProtectedRoute>} />
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
             <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
