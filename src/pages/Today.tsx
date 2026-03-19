@@ -185,6 +185,19 @@ const Today = () => {
     }
   };
 
+  // Day 1 journey flow
+  if (day1Done === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (day1Done === false) {
+    return <Day1Flow onComplete={() => setDay1Done(true)} />;
+  }
+
   // Show PWA install gate before everything else
   if (showInstallGate) {
     return <InstallPWAPrompt onDismiss={handleDismissInstall} />;
