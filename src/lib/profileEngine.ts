@@ -16,7 +16,7 @@ export interface UserProfile {
   healthConditions: string[];
   painLevel: string;
   affectedAreas: string[];
-  objective: string;
+  objectives: string[];
   dietaryRestrictions: string[];
   dietaryPreferences: string[];
   inflammatoryEnemies: string[];
