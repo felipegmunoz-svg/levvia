@@ -23,6 +23,7 @@ export interface UserProfile {
   antiInflammatoryAllies: string[];
   pantryItems: string[];
   avatarUrl: string | null;
+  heatMapDay1: Record<string, number>;
 }
 
 export interface DbExercise {
@@ -98,6 +99,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       antiInflammatoryAllies: (data[12] as string[]) || [],
       pantryItems: (data[15] as string[]) || [],
       avatarUrl: null,
+      heatMapDay1: {},
     };
   } catch {
     return defaultProfile();
@@ -107,7 +109,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
   const { data } = await supabase
     .from("profiles")
-    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objectives, onboarding_data, avatar_url, pantry_items")
+    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objectives, onboarding_data, avatar_url, pantry_items, heat_map_day1")
     .eq("id", userId)
     .maybeSingle();
 
@@ -132,6 +134,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     antiInflammatoryAllies: (onb.allies as string[]) || [],
     pantryItems: (data as any).pantry_items || [],
     avatarUrl: (data as any).avatar_url || null,
+    heatMapDay1: (data as any).heat_map_day1 && typeof (data as any).heat_map_day1 === 'object' ? (data as any).heat_map_day1 as Record<string, number> : {},
   };
 }
 
@@ -153,6 +156,7 @@ function defaultProfile(): UserProfile {
     antiInflammatoryAllies: [],
     pantryItems: [],
     avatarUrl: null,
+    heatMapDay1: {},
   };
 }
 
