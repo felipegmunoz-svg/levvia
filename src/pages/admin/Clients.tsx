@@ -178,7 +178,7 @@ const Clients = () => {
                     <td className="px-4 py-3 text-sm text-muted-foreground">{client.age || "—"}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">{client.pain_level || "—"}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground truncate max-w-[150px]">
-                      {client.objective || "—"}
+                      {client.objectives?.join(", ") || "—"}
                     </td>
                     <td className="px-4 py-3">
                       {challengeDay ? (
