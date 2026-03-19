@@ -90,10 +90,40 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
         .eq("id", user.id);
     }
 
-    // Check if onboarding is done
+    // Now that M1+M2 are done, check if there's a pre-auth diary to sync
+    const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
+    const localDiary = localStorage.getItem("levvia_day1_diary");
+
+    if (localCompleted && localDiary && user?.id) {
+      try {
+        const diary = JSON.parse(localDiary);
+        await supabase.from("daily_diary").insert({
+          user_id: user.id,
+          day_number: 1,
+          leg_sensation: diary.leg_sensation,
+          guilt_before: diary.guilt_before,
+          guilt_after: diary.guilt_after,
+          notes: diary.notes || "",
+        });
+        await supabase
+          .from("profiles")
+          .update({
+            day1_completed: true,
+            day1_completed_at: new Date().toISOString(),
+          } as any)
+          .eq("id", user.id);
+      } catch (e) {
+        console.error("Error syncing day1 diary:", e);
+      }
+      localStorage.removeItem("levvia_day1_diary");
+      localStorage.removeItem("levvia_day1_local_completed");
+      onComplete();
+      return;
+    }
+
+    // Normal flow: check onboarding
     const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
     if (!onboardingDone) {
-      // Redirect to onboarding, will come back to /today after
       navigate("/onboarding", { replace: true });
     } else {
       setStep(4);
