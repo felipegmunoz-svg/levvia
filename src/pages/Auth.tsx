@@ -56,7 +56,7 @@ const Auth = () => {
         const healthConditions = (answers[7] as string[]) || [];
         const painLevel = (answers[8] as string) || "";
         const affectedAreas = (answers[9] as string[]) || [];
-        const objective = (answers[13] as string) || "";
+        const objectives = (answers[13] as string[]) || [];
 
         profileData = {
           name: userName,
