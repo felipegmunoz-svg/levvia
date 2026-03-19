@@ -382,7 +382,14 @@ export function selectHabitsForDay(
   const active = allHabits.filter((h) => h.is_active !== false);
   if (active.length === 0) return [];
 
-  const priorityCategories = objectiveToHabitCategories[profile.objective] || [];
+  // Merge priority categories from all objectives
+  const priorityCategories: string[] = [];
+  for (const obj of profile.objectives) {
+    const cats = objectiveToHabitCategories[obj] || [];
+    for (const c of cats) {
+      if (!priorityCategories.includes(c)) priorityCategories.push(c);
+    }
+  }
 
   // Score habits
   const scored = active.map((h) => {
