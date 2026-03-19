@@ -1,20 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CreditCard, Lock, ArrowLeft, Check } from "lucide-react";
+import { CreditCard, Lock, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import logoFull from "@/assets/logo_livvia_branco.png";
 
-const planDetails: Record<string, { name: string; price: string; period: string }> = {
-  monthly: { name: "Mensal", price: "R$ 29,90", period: "/mês" },
-  quarterly: { name: "Trimestral", price: "R$ 69,90", period: "/trimestre" },
-  annual: { name: "Anual", price: "R$ 199,90", period: "/ano" },
+const planDetails: Record<string, { name: string; price: string; subtitle: string }> = {
+  "challenge-14": {
+    name: "Desafio Levvia — 14 Dias",
+    price: "R$ 29,90",
+    subtitle: "pagamento único · sem recorrência",
+  },
 };
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const selectedPlanId = localStorage.getItem("levvia_selected_plan") || "monthly";
-  const plan = planDetails[selectedPlanId] || planDetails.monthly;
+  const selectedPlanId = localStorage.getItem("levvia_selected_plan") || "";
+  const plan = planDetails[selectedPlanId];
+
+  useEffect(() => {
+    if (!plan) {
+      navigate("/plans", { replace: true });
+    }
+  }, [plan, navigate]);
 
   const [loading, setLoading] = useState(false);
   const [cardNumber, setCardNumber] = useState("");
@@ -45,6 +53,8 @@ const Checkout = () => {
     }, 2000);
   };
 
+  if (!plan) return null;
+
   const inputClass =
     "w-full px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px]";
 
@@ -72,18 +82,12 @@ const Checkout = () => {
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Plano selecionado</p>
           <div className="flex items-baseline justify-between">
             <h2 className="text-xl font-medium text-foreground">{plan.name}</h2>
-            <div className="text-right">
-              <span className="text-2xl font-semibold text-foreground">{plan.price}</span>
-              <span className="text-sm text-muted-foreground">{plan.period}</span>
-            </div>
+            <span className="text-2xl font-semibold text-foreground">{plan.price}</span>
           </div>
-          <div className="flex items-center gap-2 mt-3 text-success">
-            <Check size={14} strokeWidth={2.5} />
-            <span className="text-xs font-medium">7 dias grátis inclusos</span>
-          </div>
+          <p className="text-sm text-muted-foreground mt-2">{plan.subtitle}</p>
         </motion.div>
 
-        {/* Payment Form (Mockup) */}
+        {/* Payment Form */}
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
