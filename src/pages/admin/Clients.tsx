@@ -296,8 +296,8 @@ const Clients = () => {
                   </h3>
                   <div className="space-y-3">
                     <div className="bg-white/[0.04] rounded-lg px-3 py-2">
-                      <p className="text-[10px] text-muted-foreground uppercase">Objetivo principal</p>
-                      <p className="text-sm text-foreground font-medium">{selected.objective || "—"}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">Objetivos</p>
+                      <p className="text-sm text-foreground font-medium">{selected.objectives?.join(", ") || "—"}</p>
                     </div>
                     <div className="bg-white/[0.04] rounded-lg px-3 py-2">
                       <p className="text-[10px] text-muted-foreground uppercase">Progresso do desafio</p>

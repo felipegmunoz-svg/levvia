@@ -188,15 +188,14 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
             </Select>
           </div>
 
-          {/* Objective */}
+          {/* Objectives (max 3) */}
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground text-xs">Objetivo principal</Label>
-            <Select value={objective} onValueChange={setObjective}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {objectiveOptions.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <Label className="text-muted-foreground text-xs">Objetivos (até 3)</Label>
+            <ToggleChips
+              options={objectiveOptions}
+              selected={objectives}
+              onChange={(v) => setObjectives(v.slice(0, 3))}
+            />
           </div>
 
           {/* Health Conditions */}
