@@ -605,11 +605,31 @@ const Onboarding = () => {
             ))}
           </div>
 
-          {selected.length === 0 && (
+          {/* Free text input for custom ingredients */}
+          <motion.div
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.3 }}
+            className="max-w-sm mx-auto w-full mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-4"
+          >
+            <label className="text-xs font-medium text-muted-foreground block mb-2">
+              ✍️ Não encontrou o que procura? Digite outros ingredientes:
+            </label>
+            <textarea
+              value={customPantryInput}
+              onChange={(e) => setCustomPantryInput(e.target.value)}
+              placeholder="Ex: feijão branco, coentro, hortelã, azeitona"
+              rows={2}
+              className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/[0.04] text-foreground text-sm placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors resize-none"
+            />
+            <p className="text-[10px] text-muted-foreground/60 mt-1">Separe por vírgula</p>
+          </motion.div>
+
+          {selected.length === 0 && !customPantryInput.trim() && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.6 }}
               className="text-xs text-muted-foreground/60 text-center mt-4 max-w-xs mx-auto"
             >
               Sem problema! Vamos sugerir receitas variadas e você escolhe o que funciona.
