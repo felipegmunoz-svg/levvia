@@ -270,38 +270,43 @@ export const pantryCategories: PantryCategory[] = [
   {
     emoji: "🥚",
     label: "Proteínas",
-    items: ["Ovos", "Frango", "Queijo branco", "Atum", "Sardinha"],
+    items: ["Ovos", "Frango", "Queijo branco", "Atum em lata", "Sardinha", "Queijo cottage"],
   },
   {
     emoji: "🌾",
     label: "Carboidratos",
-    items: ["Aveia", "Tapioca", "Batata-doce", "Quinoa", "Arroz integral"],
+    items: ["Aveia", "Tapioca", "Batata-doce", "Quinoa", "Arroz integral", "Feijão preto", "Feijão carioca", "Grão-de-bico", "Batata inglesa", "Macarrão integral", "Pão integral"],
   },
   {
     emoji: "🥑",
     label: "Gorduras boas",
-    items: ["Abacate", "Azeite de oliva", "Castanhas", "Pasta de amendoim natural"],
+    items: ["Abacate", "Azeite de oliva", "Castanhas", "Pasta de amendoim natural", "Coco ralado", "Linhaça", "Chia"],
   },
   {
     emoji: "🥬",
     label: "Vegetais",
-    items: ["Tomate", "Alface", "Pepino", "Cenoura", "Abóbora", "Espinafre", "Brócolis"],
+    items: ["Tomate", "Alface", "Pepino", "Cenoura", "Abóbora", "Espinafre", "Brócolis", "Cebola", "Cebola roxa", "Couve", "Couve-flor", "Pimentão", "Rúcula", "Berinjela", "Abobrinha"],
+  },
+  {
+    emoji: "🍋",
+    label: "Frutas",
+    items: ["Banana", "Maçã", "Limão", "Abacaxi", "Mamão", "Laranja", "Morango"],
   },
   {
     emoji: "🧂",
     label: "Especiarias",
-    items: ["Cúrcuma", "Gengibre fresco", "Alho", "Pimenta-do-reino"],
+    items: ["Cúrcuma", "Gengibre fresco", "Alho", "Pimenta-do-reino", "Canela", "Cominho", "Orégano", "Manjericão"],
   },
   {
     emoji: "🥛",
     label: "Laticínios/Probióticos",
-    items: ["Iogurte natural", "Kefir", "Leite vegetal (amêndoa, coco, aveia)", "Iogurte vegetal"],
+    items: ["Iogurte natural", "Kefir", "Leite vegetal (amêndoa, coco, aveia)", "Iogurte vegetal", "Requeijão"],
   },
 ];
 
-const animalProteins = ["Ovos", "Frango", "Queijo branco", "Atum", "Sardinha"];
-const meatFish = ["Frango", "Atum", "Sardinha"];
-const dairyItems = ["Queijo branco", "Iogurte natural", "Kefir"];
+const animalProteins = ["Ovos", "Frango", "Queijo branco", "Atum em lata", "Sardinha", "Queijo cottage"];
+const meatFish = ["Frango", "Atum em lata", "Sardinha"];
+const dairyItems = ["Queijo branco", "Iogurte natural", "Kefir", "Queijo cottage", "Requeijão"];
 const dairySubstitutes = ["Iogurte vegetal", "Leite vegetal (amêndoa, coco, aveia)"];
 const glutenItems = ["Aveia"]; // regular oats may contain gluten
 
