@@ -172,6 +172,17 @@ const Onboarding = () => {
       setAnswers((a) => ({ ...a, [current.id]: [weightInput.trim(), heightInput.trim()] }));
     }
 
+    // Pantry: merge checkboxes + free text
+    if (current.type === "pantry") {
+      const checkboxItems = ((answers[current.id] as string[]) || []).map(i => i.toLowerCase());
+      const customItems = customPantryInput
+        .split(',')
+        .map(i => i.trim().toLowerCase())
+        .filter(i => i.length > 0);
+      const combined = Array.from(new Set([...checkboxItems, ...customItems]));
+      setAnswers((a) => ({ ...a, [current.id]: combined }));
+    }
+
     if (step < total - 1) {
       setDirection(1);
       setStep(step + 1);
