@@ -176,6 +176,9 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Capture snapshot BEFORE auth — deterministic read
+    const snapshot = readOnboardingSnapshot();
+
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -191,7 +194,7 @@ const Auth = () => {
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await syncProfileData(data.user?.id, data.user?.email);
+        await syncProfileData(snapshot, data.user?.id, data.user?.email);
         showSuccessAndNavigate("/today", false);
       } else {
         const { data, error } = await supabase.auth.signUp({
@@ -202,7 +205,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        await syncProfileData(data.user?.id, data.user?.email);
+        await syncProfileData(snapshot, data.user?.id, data.user?.email);
         showSuccessAndNavigate("/today", true);
       }
     } catch (error: any) {
