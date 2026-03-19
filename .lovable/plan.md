@@ -1,25 +1,30 @@
 
 
-# Redesenhar SVG da silhueta no HeatMapInteractive
+# Ajustar SVG do HeatMapInteractive — cobertura completa + braços maiores + preenchimento base
 
-## Escopo
+## Arquivo: `src/components/journey/HeatMapInteractive.tsx`
 
-Alterar **apenas os paths SVG** em `src/components/journey/HeatMapInteractive.tsx` para uma silhueta feminina com curvas naturais. Zero mudanças em lógica, áreas, IDs ou qualquer outro elemento.
+Apenas o bloco `<svg>` (linhas 93-218) será alterado.
 
-## O que muda
+## Mudanças
 
-- **Contorno do corpo** (cabeça, pescoço, torso): redesenhar com curvas Bézier — cintura estreita (~80px), quadris largos (~130px), ombros arredondados (~115px)
-- **9 áreas clicáveis**: redesenhar os paths para se encaixar na nova silhueta, mantendo mesmos IDs (`braco_esq`, `braco_dir`, `abdomen`, `quadril_esq`, `quadril_dir`, `coxa_esq`, `coxa_dir`, `panturrilha_esq`, `panturrilha_dir`)
-- ViewBox pode ajustar levemente para acomodar proporções melhores
+1. **Preenchimento base nas áreas clicáveis (nível 0)**
+   - O nível 0 em `intensityColors` já é `rgba(237,242,247,0.08)` — confirmar que está aplicado. As áreas clicáveis sempre mostram a silhueta completa, mesmo sem clique.
+
+2. **Adicionar paths decorativos (não-clicáveis)** preenchidos com `rgba(237,242,247,0.12)`:
+   - Cabeça e pescoço (manter existentes)
+   - Mãos esquerda e direita (pequenos paths no final dos braços)
+   - Pés esquerdo e direito (paths abaixo das panturrilhas)
+
+3. **Alargar paths dos braços** (`braco_esq`, `braco_dir`) em ~60% para melhor toque mobile
+
+4. **Ajustar áreas clicáveis para cobrir corpo sem gaps**:
+   - Abdômen: trocar `<rect>` por `<path>` que preenche de ombros até cintura
+   - Quadris: encaixar entre abdômen e coxas
+   - Coxas e panturrilhas: ajustar para continuidade perfeita
+
+5. **Remover outline duplicado do torso/pernas** — as áreas clicáveis com preenchimento base passam a formar a silhueta
 
 ## O que NÃO muda
-
-- `AreaId` type, `areaLabels`, `intensityColors`
-- Estado inicial, `toggleArea`, `handleSubmit`
-- Legenda, texto, botão CTA
-- Estilos CSS, animações framer-motion
-
-## Arquivo alterado
-
-`src/components/journey/HeatMapInteractive.tsx` — apenas o bloco `<svg>` (~linhas 90-175)
+- IDs, labels, estado, toggleArea, handleSubmit, intensityColors, legenda, botão, animações
 
