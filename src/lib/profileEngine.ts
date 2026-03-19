@@ -156,6 +156,7 @@ function defaultProfile(): UserProfile {
     antiInflammatoryAllies: [],
     pantryItems: [],
     avatarUrl: null,
+    heatMapDay1: {},
   };
 }
 
