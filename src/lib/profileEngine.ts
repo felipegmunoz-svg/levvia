@@ -142,7 +142,7 @@ function defaultProfile(): UserProfile {
     healthConditions: [],
     painLevel: "Sem dor",
     affectedAreas: [],
-    objective: "",
+    objectives: [],
     dietaryRestrictions: [],
     dietaryPreferences: [],
     inflammatoryEnemies: [],
