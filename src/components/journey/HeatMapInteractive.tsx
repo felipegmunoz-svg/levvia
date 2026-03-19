@@ -91,20 +91,48 @@ const HeatMapInteractive = ({ onNext }: HeatMapInteractiveProps) => {
         style={{ height: "380px" }}
       >
         <svg
-          viewBox="0 0 200 400"
+          viewBox="0 0 220 440"
           className="w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Body outline */}
-          <ellipse cx="100" cy="42" rx="22" ry="28" fill="rgba(237,242,247,0.15)" stroke="rgba(237,242,247,0.3)" strokeWidth="1" />
+          {/* Body outline - feminine silhouette */}
+          {/* Head */}
+          <ellipse cx="110" cy="38" rx="20" ry="25" fill="rgba(237,242,247,0.12)" stroke="rgba(237,242,247,0.3)" strokeWidth="1.2" />
           {/* Neck */}
-          <rect x="92" y="68" width="16" height="14" rx="4" fill="rgba(237,242,247,0.15)" stroke="rgba(237,242,247,0.3)" strokeWidth="1" />
-          {/* Torso */}
-          <path d="M72 82 L128 82 L132 180 L68 180 Z" fill="rgba(237,242,247,0.15)" stroke="rgba(237,242,247,0.3)" strokeWidth="1" />
+          <path d="M102 62 Q102 70 100 75 L120 75 Q118 70 118 62" fill="rgba(237,242,247,0.12)" stroke="rgba(237,242,247,0.3)" strokeWidth="1.2" />
+          {/* Shoulders & upper torso */}
+          <path
+            d="M100 75 Q82 78 68 88 Q60 94 58 105 L58 120 Q58 125 60 128
+               L60 128 Q72 130 80 130
+               L80 130 L80 120
+               Q85 108 100 105 L120 105 Q135 108 140 120
+               L140 130 Q148 130 160 128
+               L160 128 Q162 125 162 120 L162 105 Q160 94 152 88 Q138 78 120 75 Z"
+            fill="rgba(237,242,247,0.12)" stroke="rgba(237,242,247,0.3)" strokeWidth="1.2"
+          />
+          {/* Torso - waist & hips curves */}
+          <path
+            d="M80 130 Q78 145 76 155 Q74 165 72 172
+               Q68 182 65 192 Q62 202 62 210
+               L158 210 Q158 202 155 192 Q152 182 148 172
+               Q146 165 144 155 Q142 145 140 130 Z"
+            fill="rgba(237,242,247,0.12)" stroke="rgba(237,242,247,0.3)" strokeWidth="1.2"
+          />
+          {/* Legs outline */}
+          <path
+            d="M62 210 Q64 220 66 230 L66 310 Q66 315 68 320 L68 370 Q68 378 72 385 L72 400 Q72 408 78 412 L92 412 Q96 408 96 400 L96 385 Q98 378 98 370 L98 320 Q100 315 100 310 L100 230 Q102 220 104 210"
+            fill="rgba(237,242,247,0.08)" stroke="rgba(237,242,247,0.3)" strokeWidth="1.2"
+          />
+          <path
+            d="M116 210 Q118 220 120 230 L120 310 Q120 315 122 320 L122 370 Q122 378 124 385 L124 400 Q124 408 128 412 L142 412 Q146 408 146 400 L146 385 Q148 378 148 370 L148 320 Q150 315 150 310 L150 230 Q152 220 158 210"
+            fill="rgba(237,242,247,0.08)" stroke="rgba(237,242,247,0.3)" strokeWidth="1.2"
+          />
+
+          {/* === CLICKABLE AREAS === */}
 
           {/* Left Arm */}
           <path
-            d="M72 85 L52 90 L42 150 L48 152 L60 95 L72 92"
+            d="M68 88 Q60 94 56 108 L52 135 Q48 155 46 170 L42 168 Q44 150 48 130 L52 105 Q56 92 65 85 Z"
             fill={intensityColors[areas.braco_esq]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
@@ -113,7 +141,7 @@ const HeatMapInteractive = ({ onNext }: HeatMapInteractiveProps) => {
           />
           {/* Right Arm */}
           <path
-            d="M128 85 L148 90 L158 150 L152 152 L140 95 L128 92"
+            d="M152 88 Q160 94 164 108 L168 135 Q172 155 174 170 L178 168 Q176 150 172 130 L168 105 Q164 92 155 85 Z"
             fill={intensityColors[areas.braco_dir]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
@@ -123,7 +151,7 @@ const HeatMapInteractive = ({ onNext }: HeatMapInteractiveProps) => {
 
           {/* Abdomen */}
           <rect
-            x="78" y="120" width="44" height="50" rx="6"
+            x="82" y="130" width="56" height="50" rx="8"
             fill={intensityColors[areas.abdomen]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
@@ -131,18 +159,18 @@ const HeatMapInteractive = ({ onNext }: HeatMapInteractiveProps) => {
             className="cursor-pointer transition-all duration-200"
           />
 
-          {/* Left Hip */}
+          {/* Left Hip / Quadril */}
           <path
-            d="M68 175 L80 175 L78 210 L65 210 Z"
+            d="M66 182 Q64 192 62 205 L62 212 L98 212 L98 205 Q96 192 94 182 Z"
             fill={intensityColors[areas.quadril_esq]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
             onClick={() => toggleArea("quadril_esq")}
             className="cursor-pointer transition-all duration-200"
           />
-          {/* Right Hip */}
+          {/* Right Hip / Quadril */}
           <path
-            d="M120 175 L132 175 L135 210 L122 210 Z"
+            d="M126 182 Q128 192 130 205 L130 212 L158 212 L158 205 Q156 192 154 182 Z"
             fill={intensityColors[areas.quadril_dir]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
@@ -150,18 +178,18 @@ const HeatMapInteractive = ({ onNext }: HeatMapInteractiveProps) => {
             className="cursor-pointer transition-all duration-200"
           />
 
-          {/* Left Thigh */}
+          {/* Left Thigh / Coxa */}
           <path
-            d="M65 212 L80 212 L76 290 L68 290 Z"
+            d="M64 214 L98 214 L98 310 Q96 312 94 314 L68 314 Q66 312 64 310 Z"
             fill={intensityColors[areas.coxa_esq]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
             onClick={() => toggleArea("coxa_esq")}
             className="cursor-pointer transition-all duration-200"
           />
-          {/* Right Thigh */}
+          {/* Right Thigh / Coxa */}
           <path
-            d="M120 212 L135 212 L132 290 L124 290 Z"
+            d="M122 214 L156 214 L156 310 Q154 312 152 314 L124 314 Q122 312 120 310 Z"
             fill={intensityColors[areas.coxa_dir]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
@@ -169,18 +197,18 @@ const HeatMapInteractive = ({ onNext }: HeatMapInteractiveProps) => {
             className="cursor-pointer transition-all duration-200"
           />
 
-          {/* Left Calf */}
+          {/* Left Calf / Panturrilha */}
           <path
-            d="M68 292 L76 292 L74 370 L70 370 Z"
+            d="M66 316 L96 316 L96 380 Q94 385 92 388 L72 388 Q70 385 68 380 Z"
             fill={intensityColors[areas.panturrilha_esq]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
             onClick={() => toggleArea("panturrilha_esq")}
             className="cursor-pointer transition-all duration-200"
           />
-          {/* Right Calf */}
+          {/* Right Calf / Panturrilha */}
           <path
-            d="M124 292 L132 292 L130 370 L126 370 Z"
+            d="M124 316 L154 316 L154 380 Q152 385 150 388 L128 388 Q126 385 124 380 Z"
             fill={intensityColors[areas.panturrilha_dir]}
             stroke="rgba(237,242,247,0.3)"
             strokeWidth="1"
