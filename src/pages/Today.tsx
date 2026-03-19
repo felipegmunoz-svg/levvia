@@ -57,7 +57,7 @@ function toRecipeView(rec: DbRecipe) {
 }
 
 function getIncentiveMessage(progress: number): string {
-  if (progress === 0) return "Lembre-se: o Levvia não faz milagres, mas seu esforço transforma!";
+  if (progress === 0) return "";
   if (progress < 30) return "Você já começou, isso é o mais importante! Continue!";
   if (progress < 60) return "Bom progresso! Cada atividade concluída faz diferença.";
   if (progress < 100) return "Quase lá! Falta pouco para completar o dia!";
