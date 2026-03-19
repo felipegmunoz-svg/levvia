@@ -18,6 +18,8 @@ function getMealLabel(): string {
 }
 
 const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
+  console.log('🔍 Day1MealSuggestion RENDERIZADO');
+
   const [suggestedRecipe, setSuggestedRecipe] = useState<DbRecipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRecipe, setShowRecipe] = useState(false);
@@ -26,15 +28,18 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
 
   useEffect(() => {
     let cancelled = false;
+    console.log('🔍 Day1MealSuggestion useEffect executado, profile:', {
+      name: profile.name,
+      dietaryRestrictions: profile.dietaryRestrictions,
+      objectives: profile.objectives,
+      pantryItems: profile.pantryItems,
+    });
     const load = async () => {
       setLoading(true);
-      console.debug('🔍 Day1MealSuggestion — Perfil recebido:', {
-        dietaryRestrictions: profile.dietaryRestrictions,
-        objectives: profile.objectives,
-        pantryItems: profile.pantryItems,
-      });
+      console.log('🔍 Chamando selectDay1Recipe...');
       try {
         const recipe = await selectDay1Recipe(profile);
+        console.log('🔍 Receita retornada:', recipe ? recipe.title : 'NENHUMA');
         if (!cancelled) setSuggestedRecipe(recipe);
       } catch (err) {
         console.error("Erro ao carregar receita:", err);

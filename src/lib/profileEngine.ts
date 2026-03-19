@@ -656,7 +656,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
     const preferred = top5.find(r => r.tipo_refeicao?.includes(mealType));
     const selected = preferred || scored[0];
 
-    console.debug('🍽️ Motor de Decisão — Receita:', {
+    console.log('🍽️ Motor de Decisão Inteligente — Receita Selecionada:', {
       title: selected.title,
       dietProfile,
       allergens,

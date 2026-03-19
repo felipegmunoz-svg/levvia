@@ -44,6 +44,8 @@ const Auth = () => {
         phone: phone || null,
       };
 
+      console.log('🔍 syncProfileData — raw localStorage:', raw ? 'EXISTE' : 'VAZIO');
+
       if (raw) {
         const answers = JSON.parse(raw) as Record<number, string | string[]>;
         const userName = (answers[2] as string) || name || "";
@@ -59,6 +61,13 @@ const Auth = () => {
         // New IDs: 13=restrictions, 14=preferences, 15=pantry, 16=objectives
         const objectives = (answers[16] as string[]) || [];
         const pantryItems = (answers[15] as string[]) || [];
+
+        console.log('🔍 syncProfileData — dados do onboarding:', {
+          restrictions: answers[13],
+          preferences: answers[14],
+          pantryItems: answers[15],
+          objectives: answers[16],
+        });
 
         profileData = {
           name: userName,
@@ -81,6 +90,8 @@ const Auth = () => {
             raw: answers,
           },
         };
+
+        console.log('🔍 syncProfileData — onboarding_data a salvar:', JSON.stringify(profileData.onboarding_data));
       }
 
       // Try update first (trigger should have created the row)
@@ -92,6 +103,8 @@ const Auth = () => {
 
       if (updateError) {
         console.error("Profile update failed:", updateError.message);
+      } else {
+        console.log('🔍 syncProfileData — update result:', updated?.length, 'rows');
       }
 
       // If no row was updated, insert as fallback
@@ -103,6 +116,8 @@ const Auth = () => {
         });
         if (insertError) {
           console.error("Profile insert failed:", insertError.message);
+        } else {
+          console.log('🔍 syncProfileData — insert OK');
         }
       }
 
