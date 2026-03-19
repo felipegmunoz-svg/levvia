@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { onboardingSteps, fireResults } from "@/data/onboarding";
-import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck } from "lucide-react";
+import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/data/onboarding";
+import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import logoFull from "@/assets/logo_livvia_branco.png";
@@ -126,8 +126,8 @@ const Onboarding = () => {
   const handleMultiSelect = (option: string) => {
     const prev = (answers[current.id] as string[]) || [];
     const isDeselecting = prev.includes(option);
-    // Limit step 13 (objectives) to max 3 selections
-    if (!isDeselecting && current.id === 13 && prev.length >= 3) return;
+    // Limit step 16 (objectives) to max 3 selections
+    if (!isDeselecting && current.id === 16 && prev.length >= 3) return;
     const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
@@ -149,10 +149,11 @@ const Onboarding = () => {
       return !isNaN(w) && w > 20 && w < 400 && !isNaN(h) && h > 50 && h < 300;
     }
     if (current.type === "result" || current.type === "info") return true;
+    if (current.type === "pantry") return true; // optional
     if (current.type === "single") return !!answers[current.id];
     if (current.type === "multi") {
       // Optional multi-select steps
-      if (current.id === 7 || current.id === 14 || current.id === 15) return true;
+      if (current.id === 7 || current.id === 13 || current.id === 14) return true;
       return ((answers[current.id] as string[]) || []).length > 0;
     }
     return true;
@@ -206,6 +207,22 @@ const Onboarding = () => {
   const fireResult = painAnswer ? fireResults[painAnswer] : null;
 
   const userName = (answers[2] as string) || nameInput.trim();
+
+  // Filtered pantry categories based on restrictions (step 13)
+  const filteredPantry = useMemo(() => {
+    const restrictions = (answers[13] as string[]) || [];
+    return getFilteredPantryCategories(restrictions);
+  }, [answers[13]]);
+
+  const allFilteredPantryItems = useMemo(() => {
+    return filteredPantry.flatMap((c) => c.items);
+  }, [filteredPantry]);
+
+  const handleSelectMostPantry = () => {
+    const count = Math.ceil(allFilteredPantryItems.length * 0.75);
+    const selected = allFilteredPantryItems.slice(0, count);
+    setAnswers({ ...answers, [current.id]: selected });
+  };
 
   const renderContent = () => {
     if (current.type === "welcome") {
@@ -461,7 +478,7 @@ const Onboarding = () => {
     }
 
     if (current.type === "info") {
-      const objectives = (answers[13] as string[]) || [];
+      const objectives = (answers[16] as string[]) || [];
       const personalizedSubtitle = userName && objectives.length > 0
         ? `${userName}, reunimos todas as suas informações! Vamos ver seu diagnóstico personalizado e descobrir o melhor caminho para seus objetivos: ${objectives.join(", ")}.`
         : current.subtitle;
@@ -494,6 +511,98 @@ const Onboarding = () => {
           >
             {personalizedSubtitle}
           </motion.p>
+        </div>
+      );
+    }
+
+    // Pantry step
+    if (current.type === "pantry") {
+      const selected = (answers[current.id] as string[]) || [];
+      return (
+        <div className="flex-1 flex flex-col px-6 py-8 overflow-y-auto">
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex justify-center mb-4"
+          >
+            <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
+              <ShoppingBag size={28} strokeWidth={1.5} className="text-foreground" />
+            </div>
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-light text-foreground text-center mb-2"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-sm text-muted-foreground text-center mb-4 max-w-sm mx-auto leading-relaxed"
+          >
+            {current.subtitle}
+          </motion.p>
+
+          {/* "Tenho a maioria" button */}
+          <motion.div
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.3 }}
+            className="max-w-sm mx-auto w-full mb-4"
+          >
+            <button
+              onClick={handleSelectMostPantry}
+              className="w-full text-xs px-4 py-2.5 rounded-2xl border border-secondary/30 bg-secondary/10 text-secondary font-medium hover:bg-secondary/20 transition-all"
+            >
+              ✨ Tenho a maioria
+            </button>
+          </motion.div>
+
+          <div className="max-w-sm mx-auto w-full space-y-4">
+            {filteredPantry.map((cat, catIdx) => (
+              <motion.div
+                key={cat.label}
+                initial={{ y: 15, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 + catIdx * 0.05, duration: 0.3 }}
+              >
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                  {cat.emoji} {cat.label}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {cat.items.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => handleMultiSelect(item)}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                        selected.includes(item)
+                          ? "bg-secondary text-foreground border-secondary"
+                          : "bg-white/[0.06] text-muted-foreground border-white/10 hover:border-white/20"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {selected.length === 0 && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-xs text-muted-foreground/60 text-center mt-4 max-w-xs mx-auto"
+            >
+              Sem problema! Vamos sugerir receitas variadas e você escolhe o que funciona.
+            </motion.p>
+          )}
         </div>
       );
     }

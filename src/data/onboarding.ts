@@ -1,6 +1,6 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry";
   title: string;
   subtitle?: string;
   options?: string[];
@@ -85,7 +85,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     ],
     icon: "stethoscope",
   },
-  // ── Avaliação de dor (antigos IDs 3-5, agora 8-10) ──
+  // ── Avaliação de dor (8-10) ──
   {
     id: 8,
     type: "single",
@@ -109,7 +109,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     subtitle: "",
     icon: "flame",
   },
-  // ── Alimentação (antigos IDs 6-10, agora 11-15) ──
+  // ── Alimentação (11-15) ──
   {
     id: 11,
     type: "multi",
@@ -147,21 +147,6 @@ export const onboardingSteps: OnboardingQuestion[] = [
   {
     id: 13,
     type: "multi",
-    title: "Seu Objetivo em 14 Dias",
-    subtitle: "Escolha até 3 objetivos para as próximas duas semanas.",
-    options: [
-      "Reduzir a dor e o desconforto",
-      "Melhorar a mobilidade",
-      "Controlar o inchaço",
-      "Adotar alimentação anti-inflamatória",
-      "Criar uma rotina de exercícios",
-      "Melhorar o bem-estar emocional",
-    ],
-    icon: "target",
-  },
-  {
-    id: 14,
-    type: "multi",
     title: "Restrições Alimentares",
     subtitle: "Você possui alguma restrição alimentar? Selecione todas que se aplicam.",
     options: [
@@ -176,7 +161,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "shield",
   },
   {
-    id: 15,
+    id: 14,
     type: "multi",
     title: "Preferências Alimentares",
     subtitle: "Alguma preferência especial? Esta etapa é opcional — pode pular se quiser.",
@@ -188,8 +173,33 @@ export const onboardingSteps: OnboardingQuestion[] = [
     ],
     icon: "heart",
   },
+  // ── Despensa (novo passo 15) ──
+  {
+    id: 15,
+    type: "pantry",
+    title: "O que você costuma ter em casa?",
+    subtitle: "Vamos sugerir receitas com ingredientes que você já tem.",
+    icon: "shopping-bag",
+  },
+  // ── Objetivos (movido para 16) ──
   {
     id: 16,
+    type: "multi",
+    title: "Seu Objetivo em 14 Dias",
+    subtitle: "Escolha até 3 objetivos para as próximas duas semanas.",
+    options: [
+      "Reduzir a dor e o desconforto",
+      "Melhorar a mobilidade",
+      "Controlar o inchaço",
+      "Adotar alimentação anti-inflamatória",
+      "Criar uma rotina de exercícios",
+      "Melhorar o bem-estar emocional",
+    ],
+    icon: "target",
+  },
+  // ── Análise Completa (movido para 17) ──
+  {
+    id: 17,
     type: "info",
     title: "Análise Completa! ✨",
     subtitle: "Reunimos todas as suas informações. Vamos ver seu diagnóstico personalizado e descobrir como o Levvia pode te ajudar!",
@@ -247,3 +257,81 @@ export const fireResults: Record<string, FireResult> = {
       "A inflamação está muito alta e seu corpo precisa de atenção especial. Além do acompanhamento médico, o Levvia vai te apoiar com práticas gentis e diárias para aliviar o desconforto.",
   },
 };
+
+// ─── Pantry ingredients by category ───
+
+export interface PantryCategory {
+  emoji: string;
+  label: string;
+  items: string[];
+}
+
+export const pantryCategories: PantryCategory[] = [
+  {
+    emoji: "🥚",
+    label: "Proteínas",
+    items: ["Ovos", "Frango", "Queijo branco", "Atum", "Sardinha"],
+  },
+  {
+    emoji: "🌾",
+    label: "Carboidratos",
+    items: ["Aveia", "Tapioca", "Batata-doce", "Quinoa", "Arroz integral"],
+  },
+  {
+    emoji: "🥑",
+    label: "Gorduras boas",
+    items: ["Abacate", "Azeite de oliva", "Castanhas", "Pasta de amendoim natural"],
+  },
+  {
+    emoji: "🥬",
+    label: "Vegetais",
+    items: ["Tomate", "Alface", "Pepino", "Cenoura", "Abóbora", "Espinafre", "Brócolis"],
+  },
+  {
+    emoji: "🧂",
+    label: "Especiarias",
+    items: ["Cúrcuma", "Gengibre fresco", "Alho", "Pimenta-do-reino"],
+  },
+  {
+    emoji: "🥛",
+    label: "Laticínios/Probióticos",
+    items: ["Iogurte natural", "Kefir", "Leite vegetal (amêndoa, coco, aveia)", "Iogurte vegetal"],
+  },
+];
+
+const animalProteins = ["Ovos", "Frango", "Queijo branco", "Atum", "Sardinha"];
+const meatFish = ["Frango", "Atum", "Sardinha"];
+const dairyItems = ["Queijo branco", "Iogurte natural", "Kefir"];
+const dairySubstitutes = ["Iogurte vegetal", "Leite vegetal (amêndoa, coco, aveia)"];
+const glutenItems = ["Aveia"]; // regular oats may contain gluten
+
+export function getFilteredPantryCategories(restrictions: string[]): PantryCategory[] {
+  const isVegan = restrictions.includes("Vegano");
+  const isVegetarian = restrictions.includes("Vegetariano");
+  const noLactose = restrictions.includes("Sem Lactose");
+  const noGluten = restrictions.includes("Sem Glúten");
+
+  return pantryCategories.map((cat) => {
+    let items = [...cat.items];
+
+    if (isVegan) {
+      items = items.filter((i) => !animalProteins.includes(i) && !dairyItems.includes(i));
+    } else if (isVegetarian) {
+      items = items.filter((i) => !meatFish.includes(i));
+    }
+
+    if (noLactose) {
+      items = items.filter((i) => !dairyItems.includes(i));
+      // Ensure substitutes are present
+      for (const sub of dairySubstitutes) {
+        if (!items.includes(sub)) items.push(sub);
+      }
+    }
+
+    if (noGluten) {
+      items = items.filter((i) => !glutenItems.includes(i));
+    }
+
+    return { ...cat, items };
+  }).filter((cat) => cat.items.length > 0);
+}

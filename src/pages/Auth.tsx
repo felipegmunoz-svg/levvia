@@ -56,7 +56,9 @@ const Auth = () => {
         const healthConditions = (answers[7] as string[]) || [];
         const painLevel = (answers[8] as string) || "";
         const affectedAreas = (answers[9] as string[]) || [];
-        const objectives = (answers[13] as string[]) || [];
+        // New IDs: 13=restrictions, 14=preferences, 15=pantry, 16=objectives
+        const objectives = (answers[16] as string[]) || [];
+        const pantryItems = (answers[15] as string[]) || [];
 
         profileData = {
           name: userName,
@@ -70,11 +72,12 @@ const Auth = () => {
           pain_level: painLevel,
           affected_areas: affectedAreas,
           objectives,
+          pantry_items: pantryItems,
           onboarding_data: {
             enemies: answers[11] || [],
             allies: answers[12] || [],
-            restrictions: answers[14] || [],
-            preferences: answers[15] || [],
+            restrictions: answers[13] || [],
+            preferences: answers[14] || [],
             raw: answers,
           },
         };
