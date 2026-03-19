@@ -23,6 +23,7 @@ export interface UserProfile {
   antiInflammatoryAllies: string[];
   pantryItems: string[];
   avatarUrl: string | null;
+  heatMapDay1: Record<string, number>;
 }
 
 export interface DbExercise {
