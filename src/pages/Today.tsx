@@ -57,7 +57,7 @@ function toRecipeView(rec: DbRecipe) {
 }
 
 function getIncentiveMessage(progress: number): string {
-  if (progress === 0) return "Lembre-se: o Levvia não faz milagres, mas seu esforço transforma!";
+  if (progress === 0) return "";
   if (progress < 30) return "Você já começou, isso é o mais importante! Continue!";
   if (progress < 60) return "Bom progresso! Cada atividade concluída faz diferença.";
   if (progress < 100) return "Quase lá! Falta pouco para completar o dia!";
@@ -306,11 +306,13 @@ const Today = () => {
       <SymptomDiary />
 
       {/* Incentive message */}
-      <div className="mx-5 mt-4">
-        <p className="text-xs text-muted-foreground italic text-center leading-relaxed">
-          💡 {getIncentiveMessage(progressPercent)}
-        </p>
-      </div>
+      {getIncentiveMessage(progressPercent) && (
+        <div className="mx-5 mt-4">
+          <p className="text-xs text-muted-foreground italic text-center leading-relaxed">
+            💡 {getIncentiveMessage(progressPercent)}
+          </p>
+        </div>
+      )}
 
       {/* Dashboard toggle */}
       <div className="mx-5 mt-3 flex justify-center">
