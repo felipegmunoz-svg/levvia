@@ -60,14 +60,19 @@ const Auth = () => {
         const affectedAreas = (answers[9] as string[]) || [];
         // New IDs: 13=restrictions, 14=preferences, 15=pantry, 16=objectives
         const objectives = (answers[16] as string[]) || [];
-        const pantryItems = (answers[15] as string[]) || [];
+        let pantryItems = (answers[15] as string[]) || [];
 
-        console.log('🔍 syncProfileData — dados do onboarding:', {
-          restrictions: answers[13],
-          preferences: answers[14],
-          pantryItems: answers[15],
-          objectives: answers[16],
-        });
+        // Fallback: if pantry_items empty in onboarding data, try backup key
+        if (!pantryItems || pantryItems.length === 0) {
+          const pantryBackup = localStorage.getItem("levvia_pantry_items");
+          if (pantryBackup) {
+            try { pantryItems = JSON.parse(pantryBackup); } catch { /* ignore */ }
+          }
+        }
+
+        console.log('🔍 syncProfileData — pantry_items a salvar:', JSON.stringify(pantryItems));
+        console.log('🔍 syncProfileData — objectives a salvar:', JSON.stringify(objectives));
+        console.log('🔍 syncProfileData — restrictions:', JSON.stringify(answers[13]));
 
         profileData = {
           name: userName,
