@@ -28,26 +28,62 @@ const Auth = () => {
     return "";
   });
 
+  /** Read onboarding snapshot from localStorage BEFORE auth changes anything */
+  const readOnboardingSnapshot = () => {
+    const raw = localStorage.getItem("levvia_onboarding");
+    const pantryBackup = localStorage.getItem("levvia_pantry_items");
+
+    console.log('📸 Snapshot — raw localStorage:', raw ? 'EXISTE (' + raw.length + ' chars)' : 'VAZIO');
+    console.log('📸 Snapshot — backup levvia_pantry_items:', pantryBackup);
+
+    let answers: Record<number, string | string[]> = {};
+    if (raw) {
+      try { answers = JSON.parse(raw); } catch { /* ignore */ }
+    }
+
+    console.log('📸 Snapshot — answers completo:', JSON.stringify(answers));
+    console.log('📸 Snapshot — answers[15] (pantry):', JSON.stringify(answers[15]));
+    console.log('📸 Snapshot — answers[16] (objectives):', JSON.stringify(answers[16]));
+
+    // Resolve pantry with fallback
+    let pantryItems = (answers[15] as string[]) || [];
+    if (!pantryItems || pantryItems.length === 0) {
+      if (pantryBackup) {
+        try {
+          pantryItems = JSON.parse(pantryBackup);
+          console.log('📸 Snapshot — usando backup pantry_items:', pantryItems);
+        } catch { /* ignore */ }
+      }
+    }
+
+    console.log('📸 Snapshot — pantryItems FINAL:', JSON.stringify(pantryItems));
+
+    return { answers, pantryItems, hasData: !!raw };
+  };
+
   /** Ensure profile exists and sync onboarding data to Supabase */
-  const syncProfileData = async (userId?: string, userEmail?: string) => {
+  const syncProfileData = async (
+    snapshot: ReturnType<typeof readOnboardingSnapshot>,
+    userId?: string,
+    userEmail?: string,
+  ) => {
     if (!userId) return;
 
     // Small delay to let trigger create the profile first
     await new Promise((r) => setTimeout(r, 500));
 
-    const raw = localStorage.getItem("levvia_onboarding");
+    console.log('💾 Sync — snapshot recebido, hasData:', snapshot.hasData);
+    console.log('💾 Sync — pantry_items FINAL a salvar:', JSON.stringify(snapshot.pantryItems));
 
     try {
-      // Build profile payload from onboarding OR form fields
+      // Build profile payload from snapshot OR form fields
       let profileData: Record<string, unknown> = {
         name: name || "",
         phone: phone || null,
       };
 
-      console.log('🔍 syncProfileData — raw localStorage:', raw ? 'EXISTE' : 'VAZIO');
-
-      if (raw) {
-        const answers = JSON.parse(raw) as Record<number, string | string[]>;
+      if (snapshot.hasData) {
+        const { answers, pantryItems } = snapshot;
         const userName = (answers[2] as string) || name || "";
         const age = parseInt(answers[3] as string) || null;
         const sex = (answers[4] as string) || "";
@@ -58,21 +94,7 @@ const Auth = () => {
         const healthConditions = (answers[7] as string[]) || [];
         const painLevel = (answers[8] as string) || "";
         const affectedAreas = (answers[9] as string[]) || [];
-        // New IDs: 13=restrictions, 14=preferences, 15=pantry, 16=objectives
         const objectives = (answers[16] as string[]) || [];
-        let pantryItems = (answers[15] as string[]) || [];
-
-        // Fallback: if pantry_items empty in onboarding data, try backup key
-        if (!pantryItems || pantryItems.length === 0) {
-          const pantryBackup = localStorage.getItem("levvia_pantry_items");
-          if (pantryBackup) {
-            try { pantryItems = JSON.parse(pantryBackup); } catch { /* ignore */ }
-          }
-        }
-
-        console.log('🔍 syncProfileData — pantry_items a salvar:', JSON.stringify(pantryItems));
-        console.log('🔍 syncProfileData — objectives a salvar:', JSON.stringify(objectives));
-        console.log('🔍 syncProfileData — restrictions:', JSON.stringify(answers[13]));
 
         profileData = {
           name: userName,
@@ -95,9 +117,9 @@ const Auth = () => {
             raw: answers,
           },
         };
-
-        console.log('🔍 syncProfileData — onboarding_data a salvar:', JSON.stringify(profileData.onboarding_data));
       }
+
+      console.log('💾 Sync — payload completo:', JSON.stringify(profileData));
 
       // Try update first (trigger should have created the row)
       const { data: updated, error: updateError } = await supabase
@@ -107,9 +129,9 @@ const Auth = () => {
         .select("id");
 
       if (updateError) {
-        console.error("Profile update failed:", updateError.message);
+        console.error("💾 Sync — update failed:", updateError.message);
       } else {
-        console.log('🔍 syncProfileData — update result:', updated?.length, 'rows');
+        console.log('💾 Sync — update result:', updated?.length, 'rows');
       }
 
       // If no row was updated, insert as fallback
@@ -120,17 +142,24 @@ const Auth = () => {
           ...profileData,
         });
         if (insertError) {
-          console.error("Profile insert failed:", insertError.message);
+          console.error("💾 Sync — insert failed:", insertError.message);
         } else {
-          console.log('🔍 syncProfileData — insert OK');
+          console.log('💾 Sync — insert OK');
         }
       }
 
-      // Clean up onboarding data
-      if (raw) localStorage.removeItem("levvia_onboarding");
-      localStorage.removeItem("levvia_pantry_items");
+      // Only clean up AFTER successful sync
+      const syncSuccess = !updateError || (updated && updated.length > 0);
+      if (syncSuccess) {
+        console.log('💾 Sync — sucesso! Limpando localStorage...');
+        localStorage.removeItem("levvia_onboarding");
+        localStorage.removeItem("levvia_pantry_items");
+      } else {
+        console.warn('💾 Sync — falhou, mantendo localStorage para retry');
+      }
     } catch (e) {
-      console.error("Failed to sync profile data:", e);
+      console.error("💾 Sync — erro geral:", e);
+      // Do NOT clear localStorage on error — data preserved for retry
     }
   };
 
@@ -147,6 +176,9 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Capture snapshot BEFORE auth — deterministic read
+    const snapshot = readOnboardingSnapshot();
+
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -162,7 +194,7 @@ const Auth = () => {
       } else if (mode === "login") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await syncProfileData(data.user?.id, data.user?.email);
+        await syncProfileData(snapshot, data.user?.id, data.user?.email);
         showSuccessAndNavigate("/today", false);
       } else {
         const { data, error } = await supabase.auth.signUp({
@@ -173,7 +205,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        await syncProfileData(data.user?.id, data.user?.email);
+        await syncProfileData(snapshot, data.user?.id, data.user?.email);
         showSuccessAndNavigate("/today", true);
       }
     } catch (error: any) {
