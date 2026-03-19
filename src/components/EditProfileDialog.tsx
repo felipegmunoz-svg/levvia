@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import type { UserProfile } from "@/lib/profileEngine";
 import { Loader2 } from "lucide-react";
+import { getFilteredPantryCategories } from "@/data/onboarding";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -88,6 +89,10 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
   const [objectives, setObjectives] = useState<string[]>(profile.objectives || []);
   const [healthConditions, setHealthConditions] = useState<string[]>(profile.healthConditions || []);
   const [affectedAreas, setAffectedAreas] = useState<string[]>(profile.affectedAreas || []);
+  const [pantryItems, setPantryItems] = useState<string[]>(profile.pantryItems || []);
+
+  // Get filtered pantry based on dietary restrictions
+  const filteredPantry = getFilteredPantryCategories(profile.dietaryRestrictions || []);
 
   const handleSave = async () => {
     if (!user?.id) return;
@@ -104,6 +109,7 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
       objectives,
       health_conditions: healthConditions,
       affected_areas: affectedAreas,
+      pantry_items: pantryItems,
     };
 
     const { error } = await supabase
@@ -208,6 +214,23 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
           <div className="space-y-1.5">
             <Label className="text-muted-foreground text-xs">Áreas afetadas</Label>
             <ToggleChips options={affectedAreaOptions} selected={affectedAreas} onChange={setAffectedAreas} />
+          </div>
+
+          {/* Pantry Items */}
+          <div className="space-y-2">
+            <Label className="text-muted-foreground text-xs">🛒 Minha Despensa</Label>
+            {filteredPantry.map((cat) => (
+              <div key={cat.label}>
+                <p className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider mb-1">
+                  {cat.emoji} {cat.label}
+                </p>
+                <ToggleChips
+                  options={cat.items}
+                  selected={pantryItems}
+                  onChange={setPantryItems}
+                />
+              </div>
+            ))}
           </div>
 
           <Button onClick={handleSave} disabled={saving || !name.trim()} className="w-full mt-2">

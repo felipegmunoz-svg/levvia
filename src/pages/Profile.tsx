@@ -235,7 +235,7 @@ const Profile = () => {
         challenge_progress: {},
         challenge_start: null,
         pain_level: "",
-        objective: "",
+        objectives: [],
         affected_areas: [],
         age: null,
         sex: "",
@@ -243,6 +243,7 @@ const Profile = () => {
         height_cm: null,
         activity_level: "",
         health_conditions: [],
+        pantry_items: [],
       }).eq("id", user.id);
     }
     window.location.href = "/onboarding";
