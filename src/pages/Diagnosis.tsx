@@ -30,15 +30,6 @@ const Diagnosis = () => {
 
   const fireResult = painLevel ? fireResults[painLevel] : null;
 
-  // Calculate BMI
-  const heightM = heightCm / 100;
-  const bmi = weightKg && heightM ? (weightKg / (heightM * heightM)).toFixed(1) : null;
-  const getBmiLabel = (v: number) => {
-    if (v < 18.5) return "Abaixo do peso";
-    if (v < 25) return "Peso normal";
-    if (v < 30) return "Sobrepeso";
-    return "Obesidade";
-  };
 
   const persuasiveText = () => {
     const level = fireResult?.level || "Brisa Leve";
