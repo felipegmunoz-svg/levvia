@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_diary: {
+        Row: {
+          created_at: string
+          day_number: number
+          guilt_after: number | null
+          guilt_before: number | null
+          id: string
+          leg_sensation: string | null
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          guilt_after?: number | null
+          guilt_before?: number | null
+          id?: string
+          leg_sensation?: string | null
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          guilt_after?: number | null
+          guilt_before?: number | null
+          id?: string
+          leg_sensation?: string | null
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           benefits: string | null
@@ -284,8 +317,12 @@ export type Database = {
           challenge_progress: Json | null
           challenge_start: string | null
           created_at: string
+          day1_completed: boolean
+          day1_completed_at: string | null
+          day1_welcome_shown: boolean
           email: string
           health_conditions: string[] | null
+          heat_map_day1: Json | null
           height_cm: number | null
           id: string
           name: string
@@ -306,8 +343,12 @@ export type Database = {
           challenge_progress?: Json | null
           challenge_start?: string | null
           created_at?: string
+          day1_completed?: boolean
+          day1_completed_at?: string | null
+          day1_welcome_shown?: boolean
           email?: string
           health_conditions?: string[] | null
+          heat_map_day1?: Json | null
           height_cm?: number | null
           id: string
           name?: string
@@ -328,8 +369,12 @@ export type Database = {
           challenge_progress?: Json | null
           challenge_start?: string | null
           created_at?: string
+          day1_completed?: boolean
+          day1_completed_at?: string | null
+          day1_welcome_shown?: boolean
           email?: string
           health_conditions?: string[] | null
+          heat_map_day1?: Json | null
           height_cm?: number | null
           id?: string
           name?: string
