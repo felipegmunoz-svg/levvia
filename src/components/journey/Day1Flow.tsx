@@ -140,7 +140,11 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
 
   if (step === 1) return <Day1Welcome onNext={handleWelcomeDone} />;
   if (step === 2) return <HeatMapInteractive onNext={handleHeatMapDone} />;
-  // Step 3 = redirect to onboarding (handled in handleHeatMapDone)
+  // Step 3 = onboarding not done; redirect immediately
+  if (step === 3) {
+    navigate("/onboarding", { replace: true });
+    return null;
+  }
   if (step === 4) return <Day1MealSuggestion profile={profile} onNext={() => setStep(5)} />;
   if (step === 5 && user?.id) return <Day1Closing userId={user.id} onComplete={onComplete} />;
 

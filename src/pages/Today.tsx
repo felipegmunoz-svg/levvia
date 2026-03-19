@@ -306,11 +306,13 @@ const Today = () => {
       <SymptomDiary />
 
       {/* Incentive message */}
-      <div className="mx-5 mt-4">
-        <p className="text-xs text-muted-foreground italic text-center leading-relaxed">
-          💡 {getIncentiveMessage(progressPercent)}
-        </p>
-      </div>
+      {getIncentiveMessage(progressPercent) && (
+        <div className="mx-5 mt-4">
+          <p className="text-xs text-muted-foreground italic text-center leading-relaxed">
+            💡 {getIncentiveMessage(progressPercent)}
+          </p>
+        </div>
+      )}
 
       {/* Dashboard toggle */}
       <div className="mx-5 mt-3 flex justify-center">
