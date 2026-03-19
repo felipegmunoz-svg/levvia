@@ -85,7 +85,7 @@ export default function EditProfileDialog({ open, onOpenChange, profile, onSaved
   const [heightCm, setHeightCm] = useState(profile.heightCm?.toString() || "");
   const [activityLevel, setActivityLevel] = useState(profile.activityLevel);
   const [painLevel, setPainLevel] = useState(profile.painLevel);
-  const [objective, setObjective] = useState(profile.objective);
+  const [objectives, setObjectives] = useState<string[]>(profile.objectives || []);
   const [healthConditions, setHealthConditions] = useState<string[]>(profile.healthConditions || []);
   const [affectedAreas, setAffectedAreas] = useState<string[]>(profile.affectedAreas || []);
 
