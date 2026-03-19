@@ -25,7 +25,7 @@ const Diagnosis = () => {
   const affectedAreas = (answers[9] as string[]) || [];
   const enemies = (answers[11] as string[]) || [];
   const allies = (answers[12] as string[]) || [];
-  const objective = (answers[13] as string) || "";
+  const objectives = (answers[13] as string[]) || [];
   const restrictions = (answers[14] as string[]) || [];
 
   const fireResult = painLevel ? fireResults[painLevel] : null;
