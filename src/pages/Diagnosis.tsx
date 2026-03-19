@@ -139,14 +139,6 @@ const Diagnosis = () => {
                 <p className="text-sm font-medium text-foreground">{heightCm} cm</p>
               </div>
             )}
-            {bmi && (
-              <div className="col-span-2 bg-white/[0.04] rounded-xl px-3 py-2.5">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">IMC</p>
-                <p className="text-sm font-medium text-foreground">
-                  {bmi} — <span className="text-muted-foreground">{getBmiLabel(parseFloat(bmi))}</span>
-                </p>
-              </div>
-            )}
           </div>
         </motion.div>
 
