@@ -235,7 +235,7 @@ const Profile = () => {
         challenge_progress: {},
         challenge_start: null,
         pain_level: "",
-        objective: "",
+        objectives: [],
         affected_areas: [],
         age: null,
         sex: "",
@@ -243,6 +243,7 @@ const Profile = () => {
         height_cm: null,
         activity_level: "",
         health_conditions: [],
+        pantry_items: [],
       }).eq("id", user.id);
     }
     window.location.href = "/onboarding";
@@ -384,6 +385,35 @@ const Profile = () => {
                   <p className="text-sm font-medium text-foreground pl-6">{item.value}</p>
                 </div>
               ))}
+            </section>
+
+            {/* Pantry section */}
+            <section className="glass-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
+                  🛒 Minha Despensa
+                </h2>
+                <button
+                  onClick={() => setEditOpen(true)}
+                  className="flex items-center gap-1 text-xs text-secondary hover:text-secondary/80 transition-colors"
+                >
+                  <Pencil size={13} strokeWidth={1.5} />
+                  Atualizar
+                </button>
+              </div>
+              <div className="px-4 py-3">
+                {profile.pantryItems?.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {profile.pantryItems.map((item) => (
+                      <span key={item} className="text-[11px] px-2.5 py-1 rounded-full bg-success/10 text-success">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Nenhum ingrediente adicionado ainda.</p>
+                )}
+              </div>
             </section>
 
             <section className="space-y-3">

@@ -20,7 +20,7 @@ function getRestrictions(): string[] {
   const saved = localStorage.getItem("levvia_onboarding");
   if (!saved) return [];
   const data = JSON.parse(saved);
-  return (data[9] as string[]) || [];
+  return (data[13] as string[]) || [];
 }
 
 function filterByRestrictions(allRecipes: Recipe[], restrictions: string[]): Recipe[] {

@@ -21,6 +21,7 @@ export interface UserProfile {
   dietaryPreferences: string[];
   inflammatoryEnemies: string[];
   antiInflammatoryAllies: string[];
+  pantryItems: string[];
   avatarUrl: string | null;
 }
 
@@ -89,11 +90,13 @@ export function parseOnboardingFromLocal(): UserProfile {
       healthConditions: (data[7] as string[]) || [],
       painLevel: (data[8] as string) || "Sem dor",
       affectedAreas: (data[9] as string[]) || [],
-      objectives: (data[13] as string[]) || [],
-      dietaryRestrictions: (data[14] as string[]) || [],
-      dietaryPreferences: (data[15] as string[]) || [],
+      // New IDs: 13=restrictions, 14=preferences, 15=pantry, 16=objectives
+      objectives: (data[16] as string[]) || [],
+      dietaryRestrictions: (data[13] as string[]) || [],
+      dietaryPreferences: (data[14] as string[]) || [],
       inflammatoryEnemies: (data[11] as string[]) || [],
       antiInflammatoryAllies: (data[12] as string[]) || [],
+      pantryItems: (data[15] as string[]) || [],
       avatarUrl: null,
     };
   } catch {
@@ -104,7 +107,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
   const { data } = await supabase
     .from("profiles")
-    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objectives, onboarding_data, avatar_url")
+    .select("name, age, sex, weight_kg, height_cm, activity_level, health_conditions, pain_level, affected_areas, objectives, onboarding_data, avatar_url, pantry_items")
     .eq("id", userId)
     .maybeSingle();
 
@@ -127,6 +130,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     dietaryPreferences: (onb.preferences as string[]) || [],
     inflammatoryEnemies: (onb.enemies as string[]) || [],
     antiInflammatoryAllies: (onb.allies as string[]) || [],
+    pantryItems: (data as any).pantry_items || [],
     avatarUrl: (data as any).avatar_url || null,
   };
 }
@@ -147,6 +151,7 @@ function defaultProfile(): UserProfile {
     dietaryPreferences: [],
     inflammatoryEnemies: [],
     antiInflammatoryAllies: [],
+    pantryItems: [],
     avatarUrl: null,
   };
 }
@@ -354,7 +359,32 @@ export function filterRecipesForProfile(
     );
   }
 
+  // Pantry-based boost: sort recipes that match more pantry items higher
+  if (profile.pantryItems.length > 0) {
+    const pantryLower = profile.pantryItems.map((p) => p.toLowerCase());
+    filtered.sort((a, b) => {
+      const scoreA = scorePantryMatch(a, pantryLower);
+      const scoreB = scorePantryMatch(b, pantryLower);
+      return scoreB - scoreA; // higher match first
+    });
+  }
+
   return filtered;
+}
+
+function scorePantryMatch(recipe: DbRecipe, pantryLower: string[]): number {
+  if (!recipe.ingredients || recipe.ingredients.length === 0) return 0;
+  let matches = 0;
+  for (const ing of recipe.ingredients) {
+    const ingLower = ing.toLowerCase();
+    for (const p of pantryLower) {
+      if (ingLower.includes(p) || p.includes(ingLower.split(" ")[0])) {
+        matches++;
+        break;
+      }
+    }
+  }
+  return matches;
 }
 
 function parseMinutes(time: string): number {

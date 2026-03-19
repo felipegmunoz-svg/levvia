@@ -1,0 +1,1 @@
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS pantry_items text[] DEFAULT '{}'::text[];
