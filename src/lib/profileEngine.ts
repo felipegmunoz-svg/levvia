@@ -635,38 +635,63 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       return { ...recipe, pantryScore, goalOverlap } as DbRecipe & { pantryScore: number; goalOverlap: number };
     });
 
-    // Sort: goalOverlap desc → inflammation_score desc → pantryScore desc
-    scored.sort((a, b) => {
-      if (b.goalOverlap !== a.goalOverlap) return b.goalOverlap - a.goalOverlap;
-      const infA = (a as any).inflammation_score || 0;
-      const infB = (b as any).inflammation_score || 0;
-      if (infB !== infA) return infB - infA;
-      return b.pantryScore - a.pantryScore;
+    // --- Composite score with dynamic weights ---
+    const pantrySize = userPantry.length;
+    const commonWeight = pantrySize >= 15 ? 0.4 : pantrySize >= 10 ? 0.7 : 1.0;
+
+    const withFinal = scored.map(r => {
+      const commonWeighted = ((r as any).common_pantry_match || 0) * commonWeight;
+      const inflammationScore = (r as any).inflammation_score || 0;
+      const finalScore =
+        r.pantryScore * 2.0 +
+        r.goalOverlap * 10 +
+        inflammationScore * 5 +
+        commonWeighted * 3;
+      return { ...r, commonWeighted, finalScore, inflammationScore };
     });
 
-    // 4. Meal-time preference (non-blocking)
-    const hour = new Date().getHours();
-    let mealType = 'Jantar';
-    if (hour < 10) mealType = 'Café da Manhã';
-    else if (hour < 12) mealType = 'Lanche da Manhã';
-    else if (hour < 15) mealType = 'Almoço';
-    else if (hour < 18) mealType = 'Lanche da Tarde';
+    withFinal.sort((a, b) => b.finalScore - a.finalScore);
 
-    const top5 = scored.slice(0, 5);
-    const preferred = top5.find(r => r.tipo_refeicao?.includes(mealType));
-    const selected = preferred || scored[0];
-
-    console.log('🍽️ Motor de Decisão Inteligente — Receita Selecionada:', {
-      title: selected.title,
-      dietProfile,
-      allergens,
-      healthGoals,
-      pantryScore: selected.pantryScore,
-      goalOverlap: selected.goalOverlap,
-      inflammationScore: (selected as any).inflammation_score,
-      mealType,
-      totalCandidates: candidates.length,
+    console.log('🔍 Motor — Perfil recebido:', {
+      pantrySize,
+      commonWeight,
+      objectives: healthGoals,
+      restrictions: dietProfile,
     });
+    console.log('🔍 Motor — Top 5 receitas:', withFinal.slice(0, 5).map(r => ({
+      title: r.title,
+      pantryScore: r.pantryScore.toFixed(1) + '%',
+      goalOverlap: r.goalOverlap,
+      inflammation: r.inflammationScore,
+      commonWeighted: r.commonWeighted.toFixed(1),
+      finalScore: r.finalScore.toFixed(1),
+    })));
+
+    // Controlled randomization among top 3 if scores are close
+    let selected: typeof withFinal[0] | undefined;
+    const top3 = withFinal.slice(0, 3);
+    if (top3.length >= 3 && (top3[0].finalScore - top3[2].finalScore) <= 5) {
+      const randomIndex = Math.floor(Math.random() * 3);
+      selected = top3[randomIndex];
+      console.log('🎲 Randomização ativada — scores próximos, escolhendo index', randomIndex);
+    }
+
+    // Meal-time preference within top 5 (if no randomization)
+    if (!selected) {
+      const hour = new Date().getHours();
+      let mealType = 'Jantar';
+      if (hour < 10) mealType = 'Café da Manhã';
+      else if (hour < 12) mealType = 'Lanche da Manhã';
+      else if (hour < 15) mealType = 'Almoço';
+      else if (hour < 18) mealType = 'Lanche da Tarde';
+
+      const top5 = withFinal.slice(0, 5);
+      selected = top5.find(r => r.tipo_refeicao?.includes(mealType)) || withFinal[0];
+    }
+
+    console.log('🏆 Receita vencedora:', selected.title, '| finalScore:', selected.finalScore.toFixed(1),
+      '| breakdown: pantry', selected.pantryScore.toFixed(1), '× 2 + goals', selected.goalOverlap,
+      '× 10 + inflam', selected.inflammationScore, '× 5 + common', selected.commonWeighted.toFixed(1), '× 3');
 
     return selected;
   } catch (err) {
