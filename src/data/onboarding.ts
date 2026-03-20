@@ -63,8 +63,8 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: [
       "Sedentária (pouco ou nenhum exercício)",
       "Leve (caminhadas leves, 1-2x por semana)",
-      "Moderado (exercícios regulares, 3-4x por semana)",
-      "Ativo (exercícios intensos, 5+ vezes por semana)",
+      "Moderada (exercícios regulares, 3-4x por semana)",
+      "Ativa (exercícios intensos, 5+ vezes por semana)",
     ],
     icon: "activity",
   },
@@ -76,6 +76,9 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: [
       "Lipedema diagnosticado",
       "Linfedema",
+      "SOP (Síndrome do Ovário Policístico)",
+      "Doença de Hashimoto",
+      "Insuficiência venosa crônica",
       "Problemas circulatórios",
       "Artrite ou artrose",
       "Fibromialgia",
@@ -99,7 +102,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     type: "multi",
     title: "Quais áreas do corpo são mais afetadas?",
     subtitle: "Selecione todas que se aplicam.",
-    options: ["Coxas", "Quadris", "Panturrilhas", "Braços", "Tornozelos", "Joelhos"],
+    options: ["Coxas", "Pernas", "Quadris", "Panturrilhas", "Pés", "Braços", "Tornozelos", "Joelhos", "Abdômen/Barriga", "Glúteos"],
     icon: "body",
   },
   {
