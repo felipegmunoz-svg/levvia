@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { selectDay1Recipe, type DbRecipe, type UserProfile } from "@/lib/profileEngine";
 import RecipeDetail from "@/components/RecipeDetail";
@@ -18,28 +18,31 @@ function getMealLabel(): string {
 }
 
 const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
-  console.log('🔍 Day1MealSuggestion RENDERIZADO');
-
   const [suggestedRecipe, setSuggestedRecipe] = useState<DbRecipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRecipe, setShowRecipe] = useState(false);
+  const hasExecuted = useRef(false);
 
   const label = useMemo(() => getMealLabel(), []);
 
   useEffect(() => {
+    if (hasExecuted.current) return;
+    if (!profile.name && !profile.pantryItems?.length) return;
+
+    hasExecuted.current = true;
     let cancelled = false;
-    console.log('🔍 Day1MealSuggestion useEffect executado, profile:', {
-      name: profile.name,
-      dietaryRestrictions: profile.dietaryRestrictions,
-      objectives: profile.objectives,
-      pantryItems: profile.pantryItems,
-    });
+
     const load = async () => {
       setLoading(true);
-      console.log('🔍 Chamando selectDay1Recipe...');
+      console.log('🍽️ Motor de Decisão — executando (única vez)', {
+        name: profile.name,
+        pantryItems: profile.pantryItems,
+        objectives: profile.objectives,
+        dietaryRestrictions: profile.dietaryRestrictions,
+      });
       try {
         const recipe = await selectDay1Recipe(profile);
-        console.log('🔍 Receita retornada:', recipe ? recipe.title : 'NENHUMA');
+        console.log('🍽️ Receita selecionada:', recipe?.title || 'NENHUMA');
         if (!cancelled) setSuggestedRecipe(recipe);
       } catch (err) {
         console.error("Erro ao carregar receita:", err);
