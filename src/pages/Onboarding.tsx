@@ -284,7 +284,8 @@ const Onboarding = () => {
   const handleSelectMostPantry = () => {
     const count = Math.ceil(allFilteredPantryItems.length * 0.75);
     const selected = allFilteredPantryItems.slice(0, count);
-    setAnswers({ ...answers, [current.id]: selected });
+    setAnswers((a) => ({ ...a, [current.id]: selected }));
+    localStorage.setItem("levvia_pantry_items", JSON.stringify(selected));
   };
 
   const renderContent = () => {

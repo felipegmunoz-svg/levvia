@@ -46,37 +46,31 @@ const Auth = () => {
     console.log('📸 Snapshot — answers[16] (objectives):', JSON.stringify(answers[16]));
     console.log('📸 Snapshot — answers[13] (restrictions):', JSON.stringify(answers[13]));
 
-    // Resolve pantry with fallback
-    let pantryItems = (answers[15] as string[]) || [];
-    if (!pantryItems || pantryItems.length === 0) {
-      if (pantryBackup) {
-        try {
-          pantryItems = JSON.parse(pantryBackup);
-          console.log('📸 Snapshot — usando backup pantry_items:', pantryItems);
-        } catch { /* ignore */ }
-      }
+    // Resolve pantry: PREFER backup over answers (backup is written synchronously at interaction time)
+    let pantryItems: string[] = [];
+    if (pantryBackup) {
+      try { pantryItems = JSON.parse(pantryBackup); } catch { /* ignore */ }
+    }
+    if ((!pantryItems || pantryItems.length === 0) && answers[15]) {
+      pantryItems = (answers[15] as string[]) || [];
     }
 
-    // Resolve objectives with fallback
-    let objectives = (answers[16] as string[]) || [];
-    if (!objectives || objectives.length === 0) {
-      if (objectivesBackup) {
-        try {
-          objectives = JSON.parse(objectivesBackup);
-          console.log('📸 Snapshot — usando backup objectives:', objectives);
-        } catch { /* ignore */ }
-      }
+    // Resolve objectives: PREFER backup over answers
+    let objectives: string[] = [];
+    if (objectivesBackup) {
+      try { objectives = JSON.parse(objectivesBackup); } catch { /* ignore */ }
+    }
+    if ((!objectives || objectives.length === 0) && answers[16]) {
+      objectives = (answers[16] as string[]) || [];
     }
 
-    // Resolve restrictions with fallback
-    let restrictions = (answers[13] as string[]) || [];
-    if (!restrictions || restrictions.length === 0) {
-      if (restrictionsBackup) {
-        try {
-          restrictions = JSON.parse(restrictionsBackup);
-          console.log('📸 Snapshot — usando backup restrictions:', restrictions);
-        } catch { /* ignore */ }
-      }
+    // Resolve restrictions: PREFER backup over answers
+    let restrictions: string[] = [];
+    if (restrictionsBackup) {
+      try { restrictions = JSON.parse(restrictionsBackup); } catch { /* ignore */ }
+    }
+    if ((!restrictions || restrictions.length === 0) && answers[13]) {
+      restrictions = (answers[13] as string[]) || [];
     }
 
     console.log('📸 Snapshot — pantryItems FINAL:', JSON.stringify(pantryItems));
