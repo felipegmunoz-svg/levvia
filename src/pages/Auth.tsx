@@ -108,7 +108,7 @@ const Auth = () => {
       };
 
       if (snapshot.hasData) {
-        const { answers, pantryItems } = snapshot;
+        const { answers, pantryItems, objectives, restrictions } = snapshot;
         const userName = (answers[2] as string) || name || "";
         const age = parseInt(answers[3] as string) || null;
         const sex = (answers[4] as string) || "";
@@ -119,7 +119,10 @@ const Auth = () => {
         const healthConditions = (answers[7] as string[]) || [];
         const painLevel = (answers[8] as string) || "";
         const affectedAreas = (answers[9] as string[]) || [];
-        const objectives = (answers[16] as string[]) || [];
+
+        console.log('💾 Sync — objectives FINAL a salvar:', JSON.stringify(objectives));
+        console.log('💾 Sync — restrictions FINAL a salvar:', JSON.stringify(restrictions));
+        console.log('💾 Sync — pantry_items FINAL a salvar:', JSON.stringify(pantryItems));
 
         profileData = {
           name: userName,
@@ -137,7 +140,7 @@ const Auth = () => {
           onboarding_data: {
             enemies: answers[11] || [],
             allies: answers[12] || [],
-            restrictions: answers[13] || [],
+            restrictions,
             preferences: answers[14] || [],
             raw: answers,
           },
