@@ -188,6 +188,20 @@ const Onboarding = () => {
       localStorage.setItem("levvia_pantry_items", JSON.stringify(combined));
     }
 
+    // Backup restrictions (step 13) — same safety net pattern as pantry
+    if (current.type === "multi" && current.id === 13) {
+      const items = (answers[current.id] as string[]) || [];
+      localStorage.setItem("levvia_restrictions", JSON.stringify(items));
+      console.log('🔒 Backup restrictions:', items);
+    }
+
+    // Backup objectives (step 16) — same safety net pattern as pantry
+    if (current.type === "multi" && current.id === 16) {
+      const items = (answers[current.id] as string[]) || [];
+      localStorage.setItem("levvia_objectives", JSON.stringify(items));
+      console.log('🎯 Backup objectives:', items);
+    }
+
     if (step < total - 1) {
       setDirection(1);
       setStep(step + 1);
@@ -202,7 +216,23 @@ const Onboarding = () => {
       if (!finalAnswers[15] || (Array.isArray(finalAnswers[15]) && (finalAnswers[15] as string[]).length === 0)) {
         const pantryBackup = localStorage.getItem("levvia_pantry_items");
         if (pantryBackup) {
-          try { finalAnswers[15] = JSON.parse(pantryBackup); } catch { /* ignore */ }
+          try { finalAnswers[15] = JSON.parse(pantryBackup); console.log('🛒 Usando backup pantry no save final:', finalAnswers[15]); } catch { /* ignore */ }
+        }
+      }
+
+      // Restrictions fallback
+      if (!finalAnswers[13] || (Array.isArray(finalAnswers[13]) && (finalAnswers[13] as string[]).length === 0)) {
+        const restrictionsBackup = localStorage.getItem("levvia_restrictions");
+        if (restrictionsBackup) {
+          try { finalAnswers[13] = JSON.parse(restrictionsBackup); console.log('🔒 Usando backup restrictions no save final:', finalAnswers[13]); } catch { /* ignore */ }
+        }
+      }
+
+      // Objectives fallback
+      if (!finalAnswers[16] || (Array.isArray(finalAnswers[16]) && (finalAnswers[16] as string[]).length === 0)) {
+        const objectivesBackup = localStorage.getItem("levvia_objectives");
+        if (objectivesBackup) {
+          try { finalAnswers[16] = JSON.parse(objectivesBackup); console.log('🎯 Usando backup objectives no save final:', finalAnswers[16]); } catch { /* ignore */ }
         }
       }
 
