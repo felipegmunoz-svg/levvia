@@ -642,12 +642,70 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
     const withFinal = scored.map(r => {
       const commonWeighted = ((r as any).common_pantry_match || 0) * commonWeight;
       const inflammationScore = (r as any).inflammation_score || 0;
+
+      // 1. BÔNUS DE COMPLEXIDADE
+      const ingredientCount = ((r as any).main_ingredients || []).length;
+      const complexityBonus = pantrySize >= 10
+        ? (Math.min(ingredientCount, 6) / 6) * 50
+        : 0;
+
+      // 2. DIVERSITY SCORE
+      const categories = new Set<string>();
+      const themeTags: string[] = (r as any).theme_tags || [];
+      const mainIngredients: string[] = (r as any).main_ingredients || [];
+
+      if (
+        themeTags.some((tag: string) => ['proteina-nobre', 'proteina-vegetal', 'proteico'].includes(tag)) ||
+        mainIngredients.some((ing: string) => ['frango', 'salmão', 'peixe', 'atum', 'ovo', 'tofu', 'grão-de-bico', 'lentilha'].some(p => ing.toLowerCase().includes(p)))
+      ) {
+        categories.add('proteina');
+      }
+      if (
+        mainIngredients.some((ing: string) => ['couve', 'brócolis', 'espinafre', 'tomate', 'cenoura', 'abobrinha', 'pimentão'].some(v => ing.toLowerCase().includes(v)))
+      ) {
+        categories.add('vegetal');
+      }
+      if (
+        themeTags.includes('omega-3') || themeTags.includes('gorduras-boas') ||
+        mainIngredients.some((ing: string) => ['salmão', 'azeite', 'abacate', 'castanhas', 'nozes'].some(g => ing.toLowerCase().includes(g)))
+      ) {
+        categories.add('gordura-boa');
+      }
+      if (
+        mainIngredients.some((ing: string) => ['arroz integral', 'quinoa', 'batata-doce', 'aveia'].some(c => ing.toLowerCase().includes(c)))
+      ) {
+        categories.add('carboidrato');
+      }
+      const diversityScore = categories.size * 15;
+
+      // 3. BOOST POR NÍVEL DE ATIVIDADE
+      const activityLevel = profile.activityLevel || '';
+      const hasProtein = categories.has('proteina');
+      const activityBoost =
+        (activityLevel.toLowerCase().includes('intensa') || activityLevel.toLowerCase().includes('intense')) && hasProtein
+          ? 100
+          : 0;
+
+      // 4. FINAL SCORE COM TRIPLO AJUSTE
       const finalScore =
         r.pantryScore * 2.0 +
         r.goalOverlap * 10 +
         inflammationScore * 5 +
-        commonWeighted * 3;
-      return { ...r, commonWeighted, finalScore, inflammationScore };
+        commonWeighted * 3 +
+        complexityBonus +
+        diversityScore +
+        activityBoost;
+
+      return {
+        ...r,
+        commonWeighted,
+        finalScore,
+        inflammationScore,
+        complexityBonus,
+        diversityScore,
+        diversityCategories: Array.from(categories),
+        activityBoost,
+      };
     });
 
     withFinal.sort((a, b) => b.finalScore - a.finalScore);
@@ -657,6 +715,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       commonWeight,
       objectives: healthGoals,
       restrictions: dietProfile,
+      activityLevel: profile.activityLevel,
     });
     console.log('🔍 Motor — Top 5 receitas:', withFinal.slice(0, 5).map(r => ({
       title: r.title,
@@ -664,6 +723,9 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       goalOverlap: r.goalOverlap,
       inflammation: r.inflammationScore,
       commonWeighted: r.commonWeighted.toFixed(1),
+      complexity: r.complexityBonus.toFixed(1),
+      diversity: r.diversityScore + ' (' + r.diversityCategories.join(', ') + ')',
+      activityBoost: r.activityBoost,
       finalScore: r.finalScore.toFixed(1),
     })));
 
@@ -691,7 +753,9 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
 
     console.log('🏆 Receita vencedora:', selected.title, '| finalScore:', selected.finalScore.toFixed(1),
       '| breakdown: pantry', selected.pantryScore.toFixed(1), '× 2 + goals', selected.goalOverlap,
-      '× 10 + inflam', selected.inflammationScore, '× 5 + common', selected.commonWeighted.toFixed(1), '× 3');
+      '× 10 + inflam', selected.inflammationScore, '× 5 + common', selected.commonWeighted.toFixed(1), '× 3',
+      '+ complexity', selected.complexityBonus.toFixed(1), '+ diversity', selected.diversityScore,
+      '(' + selected.diversityCategories.join(', ') + ') + activityBoost', selected.activityBoost);
 
     return selected;
   } catch (err) {
