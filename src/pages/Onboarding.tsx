@@ -188,6 +188,20 @@ const Onboarding = () => {
       localStorage.setItem("levvia_pantry_items", JSON.stringify(combined));
     }
 
+    // Backup restrictions (step 13) — same safety net pattern as pantry
+    if (current.type === "multi" && current.id === 13) {
+      const items = (answers[current.id] as string[]) || [];
+      localStorage.setItem("levvia_restrictions", JSON.stringify(items));
+      console.log('🔒 Backup restrictions:', items);
+    }
+
+    // Backup objectives (step 16) — same safety net pattern as pantry
+    if (current.type === "multi" && current.id === 16) {
+      const items = (answers[current.id] as string[]) || [];
+      localStorage.setItem("levvia_objectives", JSON.stringify(items));
+      console.log('🎯 Backup objectives:', items);
+    }
+
     if (step < total - 1) {
       setDirection(1);
       setStep(step + 1);
