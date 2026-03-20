@@ -430,6 +430,7 @@ export type Database = {
           dica: string | null
           diet_profile: string[] | null
           difficulty: string | null
+          food_categories: string[] | null
           health_goals: string[] | null
           icon: string | null
           id: string
@@ -441,6 +442,7 @@ export type Database = {
           journey_day: number | null
           journey_role: string | null
           main_ingredients: string[] | null
+          nutrient_density_score: number | null
           nutritional_highlights: string | null
           pantry_complexity: string | null
           por_que_resfria: string | null
@@ -464,6 +466,7 @@ export type Database = {
           dica?: string | null
           diet_profile?: string[] | null
           difficulty?: string | null
+          food_categories?: string[] | null
           health_goals?: string[] | null
           icon?: string | null
           id?: string
@@ -475,6 +478,7 @@ export type Database = {
           journey_day?: number | null
           journey_role?: string | null
           main_ingredients?: string[] | null
+          nutrient_density_score?: number | null
           nutritional_highlights?: string | null
           pantry_complexity?: string | null
           por_que_resfria?: string | null
@@ -498,6 +502,7 @@ export type Database = {
           dica?: string | null
           diet_profile?: string[] | null
           difficulty?: string | null
+          food_categories?: string[] | null
           health_goals?: string[] | null
           icon?: string | null
           id?: string
@@ -509,6 +514,7 @@ export type Database = {
           journey_day?: number | null
           journey_role?: string | null
           main_ingredients?: string[] | null
+          nutrient_density_score?: number | null
           nutritional_highlights?: string | null
           pantry_complexity?: string | null
           por_que_resfria?: string | null
