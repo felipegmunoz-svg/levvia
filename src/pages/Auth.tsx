@@ -182,6 +182,8 @@ const Auth = () => {
         console.log('💾 Sync — sucesso! Limpando localStorage...');
         localStorage.removeItem("levvia_onboarding");
         localStorage.removeItem("levvia_pantry_items");
+        localStorage.removeItem("levvia_objectives");
+        localStorage.removeItem("levvia_restrictions");
       } else {
         console.warn('💾 Sync — falhou, mantendo localStorage para retry');
       }
