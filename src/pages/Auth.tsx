@@ -32,18 +32,19 @@ const Auth = () => {
   const readOnboardingSnapshot = () => {
     const raw = localStorage.getItem("levvia_onboarding");
     const pantryBackup = localStorage.getItem("levvia_pantry_items");
+    const objectivesBackup = localStorage.getItem("levvia_objectives");
+    const restrictionsBackup = localStorage.getItem("levvia_restrictions");
 
     console.log('📸 Snapshot — raw localStorage:', raw ? 'EXISTE (' + raw.length + ' chars)' : 'VAZIO');
-    console.log('📸 Snapshot — backup levvia_pantry_items:', pantryBackup);
 
     let answers: Record<number, string | string[]> = {};
     if (raw) {
       try { answers = JSON.parse(raw); } catch { /* ignore */ }
     }
 
-    console.log('📸 Snapshot — answers completo:', JSON.stringify(answers));
     console.log('📸 Snapshot — answers[15] (pantry):', JSON.stringify(answers[15]));
     console.log('📸 Snapshot — answers[16] (objectives):', JSON.stringify(answers[16]));
+    console.log('📸 Snapshot — answers[13] (restrictions):', JSON.stringify(answers[13]));
 
     // Resolve pantry with fallback
     let pantryItems = (answers[15] as string[]) || [];
@@ -56,9 +57,33 @@ const Auth = () => {
       }
     }
 
-    console.log('📸 Snapshot — pantryItems FINAL:', JSON.stringify(pantryItems));
+    // Resolve objectives with fallback
+    let objectives = (answers[16] as string[]) || [];
+    if (!objectives || objectives.length === 0) {
+      if (objectivesBackup) {
+        try {
+          objectives = JSON.parse(objectivesBackup);
+          console.log('📸 Snapshot — usando backup objectives:', objectives);
+        } catch { /* ignore */ }
+      }
+    }
 
-    return { answers, pantryItems, hasData: !!raw };
+    // Resolve restrictions with fallback
+    let restrictions = (answers[13] as string[]) || [];
+    if (!restrictions || restrictions.length === 0) {
+      if (restrictionsBackup) {
+        try {
+          restrictions = JSON.parse(restrictionsBackup);
+          console.log('📸 Snapshot — usando backup restrictions:', restrictions);
+        } catch { /* ignore */ }
+      }
+    }
+
+    console.log('📸 Snapshot — pantryItems FINAL:', JSON.stringify(pantryItems));
+    console.log('📸 Snapshot — objectives FINAL:', JSON.stringify(objectives));
+    console.log('📸 Snapshot — restrictions FINAL:', JSON.stringify(restrictions));
+
+    return { answers, pantryItems, objectives, restrictions, hasData: !!raw };
   };
 
   /** Ensure profile exists and sync onboarding data to Supabase */
