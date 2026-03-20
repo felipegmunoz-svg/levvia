@@ -1,91 +1,71 @@
 
 
-# Fix: Day1MealSuggestion infinite loading spinner
+# Fix: Onboarding Data Not Persisting to Database
 
 ## Root Cause
 
-The `useEffect` depends on `[profile]`. The `useProfile` hook emits twice: first with localStorage data, then with Supabase data. Here's the race:
+Two compounding issues:
 
-1. First profile emission (localStorage, has name "Tere") → effect runs, `hasExecuted = true`, starts async `load()`
-2. Second profile emission (Supabase data arrives) → React runs **cleanup** of previous effect, setting `cancelled = true`
-3. New effect runs but `hasExecuted.current` is already `true` → returns early, no new load
-4. Original async `load()` completes, but `cancelled === true` → `setSuggestedRecipe()` and `setLoading(false)` are both skipped
+1. **Stale closure in `handleMultiSelect`** (Onboarding.tsx line 135): Uses `setAnswers({ ...answers, ... })` instead of functional form. If React batches updates or the user interacts rapidly, previous step data can be silently lost from the `answers` object.
 
-Result: loading stays `true` forever.
+2. **Backup keys treated as fallback** (Auth.tsx `readOnboardingSnapshot`): The backup localStorage keys (`levvia_pantry_items`, `levvia_objectives`, `levvia_restrictions`) are only read when `levvia_onboarding` has empty/missing data. But `levvia_onboarding` might EXIST with stale/incomplete data, causing the backups to be skipped.
 
-## Fix — `src/components/journey/Day1MealSuggestion.tsx` (line 55)
+## Changes
 
-Change the effect dependency from `[profile]` to an empty array `[]`, and move the profile guard inside the load function with a retry pattern. Since `hasExecuted` already prevents re-execution, the `[profile]` dependency only causes harm.
+### File 1: `src/pages/Onboarding.tsx`
 
-Alternatively (simpler, minimal change): decouple the `cancelled` flag from the effect cleanup by using a ref instead of a local variable. But the cleanest fix is:
-
-**Change line 55 from:**
+**A. Fix `handleMultiSelect` (line 135)** — use functional state updater to prevent stale closures:
 ```typescript
-  }, [profile]);
+const handleMultiSelect = (option: string) => {
+  const prev = (answers[current.id] as string[]) || [];
+  const isDeselecting = prev.includes(option);
+  if (!isDeselecting && current.id === 16 && prev.length >= 3) return;
+  const updated = isDeselecting
+    ? prev.filter((o) => o !== option)
+    : [...prev, option];
+  
+  setAnswers((a) => ({ ...a, [current.id]: updated }));
+  
+  // Immediate backup for critical steps
+  if (current.id === 13) localStorage.setItem("levvia_restrictions", JSON.stringify(updated));
+  if (current.id === 16) localStorage.setItem("levvia_objectives", JSON.stringify(updated));
+};
 ```
 
-**To:**
+**B. Fix `handleSelectMostPantry` (line 280-284)** — also use functional updater + immediate backup:
 ```typescript
-  }, [profile.name, profile.pantryItems]);
+const handleSelectMostPantry = () => {
+  const count = Math.ceil(allFilteredPantryItems.length * 0.75);
+  const selected = allFilteredPantryItems.slice(0, count);
+  setAnswers((a) => ({ ...a, [current.id]: selected }));
+  localStorage.setItem("levvia_pantry_items", JSON.stringify(selected));
+};
 ```
 
-Wait — this still has the same problem (cleanup runs on dependency change). The real fix:
+### File 2: `src/pages/Auth.tsx`
 
-**Move `cancelled` to a ref, so cleanup doesn't kill in-flight requests:**
-
-```typescript
-const cancelledRef = useRef(false);
-
-useEffect(() => {
-  if (hasExecuted.current) return;
-  if (!profile.name && !profile.pantryItems?.length) return;
-
-  hasExecuted.current = true;
-
-  const load = async () => {
-    setLoading(true);
-    // ... same logic ...
-    try {
-      const recipe = await selectDay1Recipe(profile);
-      if (!cancelledRef.current) setSuggestedRecipe(recipe);
-    } catch (err) {
-      console.error("Erro ao carregar receita:", err);
-    } finally {
-      if (!cancelledRef.current) setLoading(false);
-    }
-  };
-  load();
-}, [profile]);
-```
-
-The `cancelledRef` is only set on unmount, not on dependency change. This way, when profile updates and cleanup runs, it does NOT cancel the in-flight load.
-
-**Or even simpler** — since `hasExecuted` already guarantees single execution, just remove the cleanup entirely and the `cancelled` variable:
+**Flip priority in `readOnboardingSnapshot`** — always prefer backup keys over parsed JSON answers. The backups are written synchronously at interaction time (more reliable), while the JSON might have stale data:
 
 ```typescript
-useEffect(() => {
-  if (hasExecuted.current) return;
-  if (!profile.name && !profile.pantryItems?.length) return;
+// Resolve pantry: PREFER backup over answers
+let pantryItems: string[] = [];
+if (pantryBackup) {
+  try { pantryItems = JSON.parse(pantryBackup); } catch {}
+}
+if ((!pantryItems || pantryItems.length === 0) && answers[15]) {
+  pantryItems = (answers[15] as string[]) || [];
+}
 
-  hasExecuted.current = true;
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const recipe = await selectDay1Recipe(profile);
-      setSuggestedRecipe(recipe);
-    } catch (err) {
-      console.error("Erro ao carregar receita:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  load();
-}, [profile]);
+// Same pattern for objectives and restrictions
 ```
 
-This is safe because `hasExecuted` prevents any re-execution, and we only need cancellation for unmount scenarios (which would unmount the spinner anyway).
+### File 3: Enhanced logging in both files
 
-## Single file change
-- `src/components/journey/Day1MealSuggestion.tsx` — remove `cancelled` variable and cleanup function from the useEffect (lines 28-55)
+Add debug logs at critical points to trace data flow in future issues.
+
+## Summary
+
+- 2 files changed: `Onboarding.tsx`, `Auth.tsx`
+- Core fix: functional state updates + backup-first reads
+- No database changes needed
 
