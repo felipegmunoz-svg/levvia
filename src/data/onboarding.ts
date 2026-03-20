@@ -102,7 +102,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     type: "multi",
     title: "Quais áreas do corpo são mais afetadas?",
     subtitle: "Selecione todas que se aplicam.",
-    options: ["Coxas", "Quadris", "Panturrilhas", "Braços", "Tornozelos", "Joelhos"],
+    options: ["Coxas", "Pernas", "Quadris", "Panturrilhas", "Pés", "Braços", "Tornozelos", "Joelhos", "Abdômen/Barriga", "Glúteos"],
     icon: "body",
   },
   {
