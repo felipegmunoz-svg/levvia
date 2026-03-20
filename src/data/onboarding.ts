@@ -76,6 +76,9 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: [
       "Lipedema diagnosticado",
       "Linfedema",
+      "SOP (Síndrome do Ovário Policístico)",
+      "Doença de Hashimoto",
+      "Insuficiência venosa crônica",
       "Problemas circulatórios",
       "Artrite ou artrose",
       "Fibromialgia",
