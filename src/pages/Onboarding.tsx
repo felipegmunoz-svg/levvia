@@ -132,7 +132,11 @@ const Onboarding = () => {
     const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
-    setAnswers({ ...answers, [current.id]: updated });
+    setAnswers((a) => ({ ...a, [current.id]: updated }));
+
+    // Immediate backup for critical steps
+    if (current.id === 13) localStorage.setItem("levvia_restrictions", JSON.stringify(updated));
+    if (current.id === 16) localStorage.setItem("levvia_objectives", JSON.stringify(updated));
   };
 
   const canProceed = () => {
@@ -280,7 +284,8 @@ const Onboarding = () => {
   const handleSelectMostPantry = () => {
     const count = Math.ceil(allFilteredPantryItems.length * 0.75);
     const selected = allFilteredPantryItems.slice(0, count);
-    setAnswers({ ...answers, [current.id]: selected });
+    setAnswers((a) => ({ ...a, [current.id]: selected }));
+    localStorage.setItem("levvia_pantry_items", JSON.stringify(selected));
   };
 
   const renderContent = () => {
