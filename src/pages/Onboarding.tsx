@@ -132,7 +132,11 @@ const Onboarding = () => {
     const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
-    setAnswers({ ...answers, [current.id]: updated });
+    setAnswers((a) => ({ ...a, [current.id]: updated }));
+
+    // Immediate backup for critical steps
+    if (current.id === 13) localStorage.setItem("levvia_restrictions", JSON.stringify(updated));
+    if (current.id === 16) localStorage.setItem("levvia_objectives", JSON.stringify(updated));
   };
 
   const canProceed = () => {
