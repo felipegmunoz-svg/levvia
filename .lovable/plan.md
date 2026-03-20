@@ -1,44 +1,39 @@
 
 
-# Fix: Card "Seu Fogo Interno" — mostrar áreas do heat_map_day1
+# Implementar Triplo Ajuste no Motor de Decisão
 
 ## Problema
-O `HeatMapCard` usa `profile.affectedAreas` e `profile.painLevel` (onboarding antigo) mas os dados reais estão em `heat_map_day1` no banco — JSON como `{"abdomen": 2, "coxa_esq": 1}`. O card nunca lê esse campo.
+O código atual (linhas 642-651) calcula `finalScore` com apenas 4 componentes. Os 3 novos componentes aprovados (complexityBonus, diversityScore, activityBoost) nunca foram escritos no arquivo.
 
-## Solução
+## Mudança — `src/lib/profileEngine.ts` (linhas 642-651)
 
-### 1. Adicionar `heatMapDay1` ao `UserProfile` (`src/lib/profileEngine.ts`)
-- Novo campo: `heatMapDay1: Record<string, number>`
-- Em `parseOnboardingFromSupabase`: adicionar `heat_map_day1` ao SELECT e mapear
-- Em `defaultProfile` e `parseOnboardingFromLocal`: default `{}`
+Expandir o `.map()` para incluir os 3 novos componentes antes do cálculo do `finalScore`:
 
-### 2. Reescrever `HeatMapCard` (`src/components/HeatMapCard.tsx`)
-- Ler `profile.heatMapDay1` em vez de `profile.affectedAreas`
-- Usar o mesmo SVG do `HeatMapInteractive.tsx` (mesmos paths)
-- Cores por intensidade:
-  - 0: transparente
-  - 1: `rgba(244,165,53,0.4)` (laranja claro)
-  - 2: `rgba(244,165,53,0.75)` (laranja médio)
-  - 3: `rgba(198,40,40,0.85)` (vermelho)
+**1. Complexity Bonus** (até 50 pts para despensas ≥10 itens):
+```typescript
+const ingredientCount = ((r as any).main_ingredients || []).length;
+const complexityBonus = pantrySize >= 10 
+  ? (Math.min(ingredientCount, 6) / 6) * 50 
+  : 0;
+```
 
-**Perfil de Fogo** — soma das intensidades:
-- 0-4: "Brisa Leve"
-- 5-9: "Chamas Moderadas"
-- 10-14: "Incêndio Crescente"
-- 15-18: "Fogo Ardente"
+**2. Diversity Score** (+15 pts por categoria nutricional detectada):
+- Proteína (frango, salmão, ovo, tofu, lentilha, etc.)
+- Vegetal (couve, brócolis, espinafre, cenoura, etc.)
+- Gordura boa (salmão, azeite, abacate, castanhas, etc.)
+- Carboidrato (arroz integral, quinoa, batata-doce, aveia)
 
-**Card miniatura**: SVG compacto com paths preenchidos conforme intensidade.
+**3. Activity Boost** (+100 pts se atividade intensa + proteína presente)
 
-**Modal expandido**:
-- SVG maior com mesmas cores
-- Badge com perfil de fogo
-- Lista de áreas afetadas com labels legíveis (usando `areaLabels` do HeatMapInteractive)
-- Legenda (Leve/Moderado/Intenso)
-- Texto: "Este é o seu mapa do Dia 1. Você poderá compará-lo com mapas futuros para ver sua evolução."
-- Somente visualização (sem edição)
-- Se `heatMapDay1` vazio ou soma=0: "Brisa Leve" + "Nenhuma área registrada"
+**4. Novo finalScore**:
+```
+finalScore = pantryScore×2 + goalOverlap×10 + inflammation×5 
+           + commonWeighted×3 + complexityBonus + diversityScore + activityBoost
+```
 
-## Arquivos alterados
-- `src/lib/profileEngine.ts` — adicionar `heatMapDay1` ao UserProfile e parsing
-- `src/components/HeatMapCard.tsx` — reescrever com SVG real e dados de `heatMapDay1`
+## Logs atualizados
+Adicionar `complexity`, `diversity` (com categorias), e `activityBoost` nos logs do Top 5 e do vencedor.
+
+## Após implementação
+Clicar em **Publish → Update** para enviar a produção.
 
