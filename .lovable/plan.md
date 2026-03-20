@@ -1,39 +1,91 @@
 
 
-# Implementar Triplo Ajuste no Motor de Decisão
+# Fix: Day1MealSuggestion infinite loading spinner
 
-## Problema
-O código atual (linhas 642-651) calcula `finalScore` com apenas 4 componentes. Os 3 novos componentes aprovados (complexityBonus, diversityScore, activityBoost) nunca foram escritos no arquivo.
+## Root Cause
 
-## Mudança — `src/lib/profileEngine.ts` (linhas 642-651)
+The `useEffect` depends on `[profile]`. The `useProfile` hook emits twice: first with localStorage data, then with Supabase data. Here's the race:
 
-Expandir o `.map()` para incluir os 3 novos componentes antes do cálculo do `finalScore`:
+1. First profile emission (localStorage, has name "Tere") → effect runs, `hasExecuted = true`, starts async `load()`
+2. Second profile emission (Supabase data arrives) → React runs **cleanup** of previous effect, setting `cancelled = true`
+3. New effect runs but `hasExecuted.current` is already `true` → returns early, no new load
+4. Original async `load()` completes, but `cancelled === true` → `setSuggestedRecipe()` and `setLoading(false)` are both skipped
 
-**1. Complexity Bonus** (até 50 pts para despensas ≥10 itens):
+Result: loading stays `true` forever.
+
+## Fix — `src/components/journey/Day1MealSuggestion.tsx` (line 55)
+
+Change the effect dependency from `[profile]` to an empty array `[]`, and move the profile guard inside the load function with a retry pattern. Since `hasExecuted` already prevents re-execution, the `[profile]` dependency only causes harm.
+
+Alternatively (simpler, minimal change): decouple the `cancelled` flag from the effect cleanup by using a ref instead of a local variable. But the cleanest fix is:
+
+**Change line 55 from:**
 ```typescript
-const ingredientCount = ((r as any).main_ingredients || []).length;
-const complexityBonus = pantrySize >= 10 
-  ? (Math.min(ingredientCount, 6) / 6) * 50 
-  : 0;
+  }, [profile]);
 ```
 
-**2. Diversity Score** (+15 pts por categoria nutricional detectada):
-- Proteína (frango, salmão, ovo, tofu, lentilha, etc.)
-- Vegetal (couve, brócolis, espinafre, cenoura, etc.)
-- Gordura boa (salmão, azeite, abacate, castanhas, etc.)
-- Carboidrato (arroz integral, quinoa, batata-doce, aveia)
-
-**3. Activity Boost** (+100 pts se atividade intensa + proteína presente)
-
-**4. Novo finalScore**:
-```
-finalScore = pantryScore×2 + goalOverlap×10 + inflammation×5 
-           + commonWeighted×3 + complexityBonus + diversityScore + activityBoost
+**To:**
+```typescript
+  }, [profile.name, profile.pantryItems]);
 ```
 
-## Logs atualizados
-Adicionar `complexity`, `diversity` (com categorias), e `activityBoost` nos logs do Top 5 e do vencedor.
+Wait — this still has the same problem (cleanup runs on dependency change). The real fix:
 
-## Após implementação
-Clicar em **Publish → Update** para enviar a produção.
+**Move `cancelled` to a ref, so cleanup doesn't kill in-flight requests:**
+
+```typescript
+const cancelledRef = useRef(false);
+
+useEffect(() => {
+  if (hasExecuted.current) return;
+  if (!profile.name && !profile.pantryItems?.length) return;
+
+  hasExecuted.current = true;
+
+  const load = async () => {
+    setLoading(true);
+    // ... same logic ...
+    try {
+      const recipe = await selectDay1Recipe(profile);
+      if (!cancelledRef.current) setSuggestedRecipe(recipe);
+    } catch (err) {
+      console.error("Erro ao carregar receita:", err);
+    } finally {
+      if (!cancelledRef.current) setLoading(false);
+    }
+  };
+  load();
+}, [profile]);
+```
+
+The `cancelledRef` is only set on unmount, not on dependency change. This way, when profile updates and cleanup runs, it does NOT cancel the in-flight load.
+
+**Or even simpler** — since `hasExecuted` already guarantees single execution, just remove the cleanup entirely and the `cancelled` variable:
+
+```typescript
+useEffect(() => {
+  if (hasExecuted.current) return;
+  if (!profile.name && !profile.pantryItems?.length) return;
+
+  hasExecuted.current = true;
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const recipe = await selectDay1Recipe(profile);
+      setSuggestedRecipe(recipe);
+    } catch (err) {
+      console.error("Erro ao carregar receita:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  load();
+}, [profile]);
+```
+
+This is safe because `hasExecuted` prevents any re-execution, and we only need cancellation for unmount scenarios (which would unmount the spinner anyway).
+
+## Single file change
+- `src/components/journey/Day1MealSuggestion.tsx` — remove `cancelled` variable and cleanup function from the useEffect (lines 28-55)
 
