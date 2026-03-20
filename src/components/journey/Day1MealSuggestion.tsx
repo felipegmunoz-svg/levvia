@@ -30,7 +30,6 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
     if (!profile.name && !profile.pantryItems?.length) return;
 
     hasExecuted.current = true;
-    let cancelled = false;
 
     const load = async () => {
       setLoading(true);
@@ -43,15 +42,14 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
       try {
         const recipe = await selectDay1Recipe(profile);
         console.log('🍽️ Receita selecionada:', recipe?.title || 'NENHUMA');
-        if (!cancelled) setSuggestedRecipe(recipe);
+        setSuggestedRecipe(recipe);
       } catch (err) {
         console.error("Erro ao carregar receita:", err);
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     };
     load();
-    return () => { cancelled = true; };
   }, [profile]);
 
   if (loading) {
