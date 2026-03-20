@@ -63,8 +63,8 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: [
       "Sedentária (pouco ou nenhum exercício)",
       "Leve (caminhadas leves, 1-2x por semana)",
-      "Moderado (exercícios regulares, 3-4x por semana)",
-      "Ativo (exercícios intensos, 5+ vezes por semana)",
+      "Moderada (exercícios regulares, 3-4x por semana)",
+      "Ativa (exercícios intensos, 5+ vezes por semana)",
     ],
     icon: "activity",
   },
