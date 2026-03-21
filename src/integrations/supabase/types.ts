@@ -371,6 +371,9 @@ export type Database = {
           day1_completed: boolean
           day1_completed_at: string | null
           day1_welcome_shown: boolean
+          day2_completed: boolean
+          day2_completed_at: string | null
+          day2_inflammation_map: Json | null
           email: string
           health_conditions: string[] | null
           heat_map_day1: Json | null
@@ -398,6 +401,9 @@ export type Database = {
           day1_completed?: boolean
           day1_completed_at?: string | null
           day1_welcome_shown?: boolean
+          day2_completed?: boolean
+          day2_completed_at?: string | null
+          day2_inflammation_map?: Json | null
           email?: string
           health_conditions?: string[] | null
           heat_map_day1?: Json | null
@@ -425,6 +431,9 @@ export type Database = {
           day1_completed?: boolean
           day1_completed_at?: string | null
           day1_welcome_shown?: boolean
+          day2_completed?: boolean
+          day2_completed_at?: string | null
+          day2_inflammation_map?: Json | null
           email?: string
           health_conditions?: string[] | null
           heat_map_day1?: Json | null
