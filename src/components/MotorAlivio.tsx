@@ -87,30 +87,21 @@ const reliefTips = [
 // ─── Fetch helpers ───
 
 async function buscarExercicios(respostas: Respostas): Promise<DbExercise[]> {
-  const { pain_min, pain_max } = intensidadeMap[respostas.intensidade];
+  const mapping = intensidadeMap[respostas.intensidade];
+  if (!mapping) {
+    console.error('❌ [Motor Alívio] Intensidade não mapeada:', respostas.intensidade);
+    return [];
+  }
+
+  const { pain_min, pain_max } = mapping;
   const bodyParts = regiaoMap[respostas.regiao];
   const environments = ambienteMap[respostas.ambiente];
 
-  // Primary query
-  let query = supabase
-    .from("exercises")
-    .select("*")
-    .eq("is_active", true)
-    .gte("pain_suitability", pain_min)
-    .lte("pain_suitability", pain_max);
+  console.log('🔍 [Motor Alívio] Buscando:', { intensidade: respostas.intensidade, painRange: `${pain_min}-${pain_max}`, bodyParts, environments });
 
-  if (bodyParts) {
-    query = query.overlaps("body_part", bodyParts);
-  }
-
-  query = query.overlaps("environment", environments).order("pain_suitability", { ascending: false }).limit(5);
-
-  const { data } = await query;
-  let results = (data as DbExercise[]) || [];
-
-  // Fallback 1: relax environment
-  if (results.length < 3) {
-    let q2 = supabase
+  try {
+    // Primary query
+    let query = supabase
       .from("exercises")
       .select("*")
       .eq("is_active", true)
@@ -118,28 +109,59 @@ async function buscarExercicios(respostas: Respostas): Promise<DbExercise[]> {
       .lte("pain_suitability", pain_max);
 
     if (bodyParts) {
-      q2 = q2.overlaps("body_part", bodyParts);
+      query = query.overlaps("body_part", bodyParts);
     }
 
-    q2 = q2.order("pain_suitability", { ascending: false }).limit(5);
-    const { data: d2 } = await q2;
-    results = (d2 as DbExercise[]) || [];
-  }
+    query = query.overlaps("environment", environments).order("pain_suitability", { ascending: false }).limit(5);
 
-  // Fallback 2: relax region too (never relax pain)
-  if (results.length < 3) {
-    const { data: d3 } = await supabase
-      .from("exercises")
-      .select("*")
-      .eq("is_active", true)
-      .gte("pain_suitability", pain_min)
-      .lte("pain_suitability", pain_max)
-      .order("pain_suitability", { ascending: false })
-      .limit(5);
-    results = (d3 as DbExercise[]) || [];
-  }
+    const { data, error } = await query;
+    if (error) console.warn('⚠️ [Motor Alívio] Erro query primária:', error.message);
+    let results = (data as DbExercise[]) || [];
+    console.log(`📊 [Motor Alívio] Query primária: ${results.length} resultados`);
 
-  return results;
+    // Fallback 1: relax environment
+    if (results.length < 3) {
+      console.log('🔄 [Motor Alívio] Fallback 1: relaxando ambiente...');
+      let q2 = supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_active", true)
+        .gte("pain_suitability", pain_min)
+        .lte("pain_suitability", pain_max);
+
+      if (bodyParts) {
+        q2 = q2.overlaps("body_part", bodyParts);
+      }
+
+      q2 = q2.order("pain_suitability", { ascending: false }).limit(5);
+      const { data: d2, error: e2 } = await q2;
+      if (e2) console.warn('⚠️ [Motor Alívio] Erro fallback 1:', e2.message);
+      results = (d2 as DbExercise[]) || [];
+      console.log(`📊 [Motor Alívio] Fallback 1: ${results.length} resultados`);
+    }
+
+    // Fallback 2: relax region too (never relax pain)
+    if (results.length < 3) {
+      console.log('🔄 [Motor Alívio] Fallback 2: relaxando região...');
+      const { data: d3, error: e3 } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_active", true)
+        .gte("pain_suitability", pain_min)
+        .lte("pain_suitability", pain_max)
+        .order("pain_suitability", { ascending: false })
+        .limit(5);
+      if (e3) console.warn('⚠️ [Motor Alívio] Erro fallback 2:', e3.message);
+      results = (d3 as DbExercise[]) || [];
+      console.log(`📊 [Motor Alívio] Fallback 2: ${results.length} resultados`);
+    }
+
+    console.log(`✅ [Motor Alívio] ${results.length} exercícios retornados`);
+    return results;
+  } catch (error) {
+    console.error('❌ [Motor Alívio] Erro inesperado em buscarExercicios:', error);
+    return [];
+  }
 }
 
 async function verificarCriseProlongada(userId: string): Promise<{ mostrar: boolean; mensagem: string }> {
