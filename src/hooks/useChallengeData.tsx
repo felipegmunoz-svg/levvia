@@ -188,13 +188,21 @@ export function useChallengeData() {
 
   // Save progress to both localStorage and Supabase
   const saveProgress = async (newProgress: Record<string, Record<string, boolean>>) => {
+    console.log("💾 Salvando progresso...", Object.keys(newProgress));
     setChallengeProgress(newProgress);
     localStorage.setItem("levvia_challenge_progress", JSON.stringify(newProgress));
     if (user?.id) {
-      await supabase.from("profiles").update({
+      const { error } = await supabase.from("profiles").update({
         challenge_progress: newProgress as any,
         challenge_start: localStorage.getItem("levvia_challenge_start"),
       }).eq("id", user.id);
+      if (error) {
+        console.error("❌ Erro ao salvar progresso:", error);
+      } else {
+        console.log("✅ Progresso salvo no banco");
+      }
+    } else {
+      console.log("⚠️ Sem usuário autenticado, salvo apenas em localStorage");
     }
   };
 
