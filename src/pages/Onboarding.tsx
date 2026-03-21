@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
+import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import logoFull from "@/assets/logo_livvia_branco.png";
@@ -140,6 +141,7 @@ const Onboarding = () => {
 
   const canProceed = () => {
     if (current.type === "welcome") return true;
+    if (current.type === "install_pwa") return true;
     if (current.type === "disclaimer") return disclaimerChecked;
     if (current.type === "name") return nameInput.trim().length >= 2;
     if (current.type === "number") {
@@ -288,6 +290,34 @@ const Onboarding = () => {
   };
 
   const renderContent = () => {
+    if (current.type === "install_pwa") {
+      // Auto-skip on desktop or already installed
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (navigator as any).standalone === true;
+      const dismissed = localStorage.getItem("levvia_install_dismissed") === "true";
+
+      if (!isMobile || isStandalone || dismissed) {
+        // Auto-advance past this step
+        setTimeout(() => {
+          setDirection(1);
+          setStep((s) => s + 1);
+        }, 0);
+        return null;
+      }
+
+      return (
+        <InstallPWAPrompt
+          onDismiss={() => {
+            localStorage.setItem("levvia_install_dismissed", "true");
+            setDirection(1);
+            setStep((s) => s + 1);
+          }}
+        />
+      );
+    }
+
     if (current.type === "welcome") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">

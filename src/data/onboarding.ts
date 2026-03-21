@@ -1,6 +1,6 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry" | "install_pwa";
   title: string;
   subtitle?: string;
   options?: string[];
@@ -16,6 +16,13 @@ export const onboardingSteps: OnboardingQuestion[] = [
     title: "Bem-vinda ao Levvia",
     subtitle: "Seu caminho para a leveza. Vamos conhecer você melhor para personalizar sua experiência.",
     icon: "heart",
+  },
+  {
+    id: 99,
+    type: "install_pwa",
+    title: "Instale o Levvia",
+    subtitle: "Para a melhor experiência, adicione à sua tela inicial.",
+    icon: "smartphone",
   },
   {
     id: 1,
