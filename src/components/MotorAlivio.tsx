@@ -312,21 +312,26 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
     setRespostas(r);
     setLoadingExercises(true);
     setViewState("results");
-    await loadExercisesFromCheckIn(yesterdayCheckIn);
-    setLoadingExercises(false);
+    try {
+      await loadExercisesFromCheckIn(yesterdayCheckIn);
 
-    if (user?.id) {
-      await supabase.from("daily_check_ins").upsert(
-        {
-          user_id: user.id,
-          data_checkin: hoje,
-          intensidade: r.intensidade,
-          regiao: r.regiao,
-          ambiente: r.ambiente,
-          exercicios_ids: yesterdayCheckIn.exercicios_ids,
-        },
-        { onConflict: "user_id,data_checkin" }
-      );
+      if (user?.id) {
+        await supabase.from("daily_check_ins").upsert(
+          {
+            user_id: user.id,
+            data_checkin: hoje,
+            intensidade: r.intensidade,
+            regiao: r.regiao,
+            ambiente: r.ambiente,
+            exercicios_ids: yesterdayCheckIn.exercicios_ids,
+          },
+          { onConflict: "user_id,data_checkin" }
+        );
+      }
+    } catch (error) {
+      console.error('❌ [Motor Alívio] Erro em handleRepeatYesterday:', error);
+    } finally {
+      setLoadingExercises(false);
     }
   };
 
