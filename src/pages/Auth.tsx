@@ -56,9 +56,6 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Capture snapshot BEFORE auth — deterministic read
-    const snapshot = readOnboardingSnapshot();
-
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
