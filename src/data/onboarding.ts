@@ -1,6 +1,6 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry" | "install_pwa";
   title: string;
   subtitle?: string;
   options?: string[];
