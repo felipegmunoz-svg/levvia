@@ -135,6 +135,7 @@ const Today = () => {
     if (!activity) return;
 
     const isChecked = !!dayProgress[id];
+    console.log(`🔄 Toggle: ${id} → ${isChecked ? "desmarcar" : "marcar"} (tipo: ${activity.type})`);
 
     if (!isChecked) {
       if (activity.type === "habit" && activity.modalContent) {

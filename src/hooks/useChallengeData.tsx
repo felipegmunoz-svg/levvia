@@ -159,20 +159,26 @@ export function useChallengeData() {
   // Load progress from Supabase
   useEffect(() => {
     const loadProgress = async () => {
+      console.log("📂 Carregando progresso...");
       if (user?.id) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("profiles")
           .select("challenge_progress, challenge_start")
           .eq("id", user.id)
           .single();
+        if (error) {
+          console.error("❌ Erro ao carregar progresso:", error);
+        }
         if (data?.challenge_progress && typeof data.challenge_progress === "object") {
+          console.log("✅ Progresso carregado do Supabase");
           setChallengeProgress(data.challenge_progress as Record<string, Record<string, boolean>>);
         } else {
-          // Fallback to localStorage
+          console.log("⚠️ Sem progresso no Supabase, usando localStorage");
           const saved = localStorage.getItem("levvia_challenge_progress");
           if (saved) setChallengeProgress(JSON.parse(saved));
         }
       } else {
+        console.log("⚠️ Sem usuário, usando localStorage");
         const saved = localStorage.getItem("levvia_challenge_progress");
         if (saved) setChallengeProgress(JSON.parse(saved));
       }
@@ -182,13 +188,21 @@ export function useChallengeData() {
 
   // Save progress to both localStorage and Supabase
   const saveProgress = async (newProgress: Record<string, Record<string, boolean>>) => {
+    console.log("💾 Salvando progresso...", Object.keys(newProgress));
     setChallengeProgress(newProgress);
     localStorage.setItem("levvia_challenge_progress", JSON.stringify(newProgress));
     if (user?.id) {
-      await supabase.from("profiles").update({
+      const { error } = await supabase.from("profiles").update({
         challenge_progress: newProgress as any,
         challenge_start: localStorage.getItem("levvia_challenge_start"),
       }).eq("id", user.id);
+      if (error) {
+        console.error("❌ Erro ao salvar progresso:", error);
+      } else {
+        console.log("✅ Progresso salvo no banco");
+      }
+    } else {
+      console.log("⚠️ Sem usuário autenticado, salvo apenas em localStorage");
     }
   };
 
