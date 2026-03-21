@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
 import Day1Welcome from "./Day1Welcome";
 import HeatMapInteractive from "./HeatMapInteractive";
 import Day1MealSuggestion from "./Day1MealSuggestion";
@@ -22,6 +23,24 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
   const navigate = useNavigate();
   const [step, setStep] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const syncAttempted = useRef(false);
+
+  // Sync onboarding data from localStorage to Supabase (if pending)
+  useEffect(() => {
+    if (!user?.id || syncAttempted.current) return;
+    syncAttempted.current = true;
+
+    const snapshot = readOnboardingSnapshot();
+    if (!snapshot.hasData) return;
+
+    console.log('🔄 Day1Flow — Sincronizando onboarding para o Supabase...');
+    syncOnboardingToSupabase(snapshot, user.id, { name: undefined, phone: undefined, email: undefined })
+      .then((ok) => {
+        if (ok) console.log('✅ Day1Flow — Onboarding sincronizado com sucesso');
+        else console.warn('⚠️ Day1Flow — Sync parcial, dados mantidos em localStorage');
+      })
+      .catch((e) => console.error('❌ Day1Flow — Erro no sync:', e));
+  }, [user?.id]);
 
   // Determine which step to show based on saved state
   useEffect(() => {
