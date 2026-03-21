@@ -155,7 +155,7 @@ export function useChallengeData() {
     return Math.min(Math.max(day, 1), 14);
   }, [challengeStart]);
 
-  // Load progress from Supabase
+  // Load progress and challenge_start from Supabase
   useEffect(() => {
     const loadProgress = async () => {
       console.log("📂 Carregando progresso...");
@@ -167,6 +167,12 @@ export function useChallengeData() {
           .single();
         if (error) {
           console.error("❌ Erro ao carregar progresso:", error);
+        }
+        // Sync challenge_start from Supabase (cross-device)
+        if (data?.challenge_start) {
+          console.log("✅ challenge_start carregado do Supabase:", data.challenge_start);
+          setChallengeStart(data.challenge_start);
+          localStorage.setItem("levvia_challenge_start", data.challenge_start);
         }
         if (data?.challenge_progress && typeof data.challenge_progress === "object") {
           console.log("✅ Progresso carregado do Supabase");
