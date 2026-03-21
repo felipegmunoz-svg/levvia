@@ -210,11 +210,6 @@ const Today = () => {
     return <Day2Flow onComplete={() => setDay2Done(true)} />;
   }
 
-  // Show PWA install gate before everything else
-  if (showInstallGate) {
-    return <InstallPWAPrompt onDismiss={handleDismissInstall} />;
-  }
-
   if (selectedExercise) {
     return (
       <ExerciseDetail

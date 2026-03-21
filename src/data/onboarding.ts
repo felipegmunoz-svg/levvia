@@ -18,6 +18,13 @@ export const onboardingSteps: OnboardingQuestion[] = [
     icon: "heart",
   },
   {
+    id: 99,
+    type: "install_pwa",
+    title: "Instale o Levvia",
+    subtitle: "Para a melhor experiência, adicione à sua tela inicial.",
+    icon: "smartphone",
+  },
+  {
     id: 1,
     type: "disclaimer",
     title: "Aviso Importante",
