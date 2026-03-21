@@ -604,6 +604,18 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       });
     }
 
+    // Filter out incomplete recipes (missing ingredients or instructions)
+    if (candidates) {
+      const beforeCount = candidates.length;
+      candidates = candidates.filter(r =>
+        (r as any).ingredients?.length > 0 && (r as any).instructions?.length > 0
+      );
+      const filtered = beforeCount - candidates.length;
+      if (filtered > 0) {
+        console.warn(`⚠️ Motor — ${filtered}/${beforeCount} receitas removidas (ingredients/instructions vazios)`);
+      }
+    }
+
     // Fallback to maintenance recipes
     if (!candidates || candidates.length === 0) {
       const { data: fallback } = await supabase
@@ -619,6 +631,35 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
           const free = (recipe as any).allergen_free || [];
           return allergens.every(a => free.includes(a));
         });
+      }
+
+      // Also filter incomplete in fallback
+      if (candidates.length > 0) {
+        const beforeFallback = candidates.length;
+        candidates = candidates.filter(r =>
+          (r as any).ingredients?.length > 0 && (r as any).instructions?.length > 0
+        );
+        const filteredFallback = beforeFallback - candidates.length;
+        if (filteredFallback > 0) {
+          console.warn(`⚠️ Motor fallback — ${filteredFallback}/${beforeFallback} receitas removidas (vazias)`);
+        }
+      }
+    }
+
+    // Emergency fallback: if ALL candidates were filtered, pick ANY complete recipe
+    if (!candidates || candidates.length === 0) {
+      console.warn('🚨 Motor — TODAS as receitas candidatas estavam vazias! Buscando qualquer receita completa...');
+      const { data: emergency } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('is_active', true)
+        .not('ingredients', 'eq', '{}')
+        .not('instructions', 'eq', '{}')
+        .limit(10);
+
+      candidates = emergency || [];
+      if (candidates.length > 0) {
+        console.log(`🆘 Motor — Fallback de emergência: ${candidates.length} receitas encontradas`);
       }
     }
 
