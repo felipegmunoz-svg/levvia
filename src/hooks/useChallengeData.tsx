@@ -16,6 +16,9 @@ import {
 } from "@/lib/profileEngine";
 import { supabase } from "@/integrations/supabase/client";
 
+let dataCache: { exercises: DbExercise[]; recipes: DbRecipe[]; habits: DbHabit[]; ts: number } | null = null;
+const DATA_CACHE_TTL = 5 * 60_000; // 5 minutes
+
 export type MealSlot = "Café da Manhã" | "Lanche da Manhã" | "Almoço" | "Lanche da Tarde" | "Jantar";
 
 export const mealSlots: MealSlot[] = [
