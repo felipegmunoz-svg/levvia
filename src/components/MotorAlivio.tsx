@@ -557,7 +557,17 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
                         <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
                       </div>
                     ) : exercises.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-8">Nenhum exercício encontrado para esses critérios.</p>
+                      <div className="text-center py-8 space-y-3">
+                        <p className="text-2xl">😔</p>
+                        <p className="text-sm text-foreground/80">Não encontramos exercícios para esses critérios.</p>
+                        <p className="text-xs text-muted-foreground">Vamos tentar com filtros diferentes?</p>
+                        <button
+                          onClick={handleNewCheckIn}
+                          className="mt-2 px-4 py-2 rounded-xl bg-secondary/20 text-secondary text-sm font-medium hover:bg-secondary/30 transition-colors"
+                        >
+                          Tentar novamente
+                        </button>
+                      </div>
                     ) : (
                       exercises.map((ex, i) => (
                         <motion.button
