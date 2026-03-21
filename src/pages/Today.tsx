@@ -297,7 +297,7 @@ const Today = () => {
 
       {/* Pain relief mode */}
       <div className="mx-5 mt-4">
-        <PainReliefMode
+        <MotorAlivio
           onSelectExercise={(ex) => setSelectedExercise({ exercise: ex, activityId: `relief-${ex.id}` })}
         />
       </div>
