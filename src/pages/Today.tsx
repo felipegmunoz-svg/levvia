@@ -208,6 +208,19 @@ const Today = () => {
   }
 
   if (day2Done === false && currentDay >= 2) {
+    // Check 24h gate (bypass in dev mode)
+    if (!isDev && day1CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day1CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        return (
+          <WaitingScreen
+            completedAt={day1CompletedAt}
+            nextDay={2}
+            onReady={() => setDay1CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
     return <Day2Flow onComplete={() => setDay2Done(true)} />;
   }
 
