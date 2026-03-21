@@ -211,32 +211,36 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
 
     setViewState("loading");
 
-    const [todayRes, yesterdayRes] = await Promise.all([
-      supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", hoje).maybeSingle(),
-      supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", ontem).maybeSingle(),
-    ]);
+    try {
+      const [todayRes, yesterdayRes] = await Promise.all([
+        supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", hoje).maybeSingle(),
+        supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", ontem).maybeSingle(),
+      ]);
 
-    const todayData = todayRes.data as CheckIn | null;
-    const yesterdayData = yesterdayRes.data as CheckIn | null;
+      const todayData = todayRes.data as CheckIn | null;
+      const yesterdayData = yesterdayRes.data as CheckIn | null;
 
-    setTodayCheckIn(todayData);
-    setYesterdayCheckIn(yesterdayData);
+      setTodayCheckIn(todayData);
+      setYesterdayCheckIn(yesterdayData);
 
-    if (todayData) {
-      // Load exercises from today's check-in
-      await loadExercisesFromCheckIn(todayData);
-      setRespostas({ intensidade: todayData.intensidade, regiao: todayData.regiao, ambiente: todayData.ambiente });
-      setViewState("results");
-    } else if (yesterdayData) {
-      setViewState("initial");
-    } else {
+      if (todayData) {
+        await loadExercisesFromCheckIn(todayData);
+        setRespostas({ intensidade: todayData.intensidade, regiao: todayData.regiao, ambiente: todayData.ambiente });
+        setViewState("results");
+      } else if (yesterdayData) {
+        setViewState("initial");
+      } else {
+        setViewState("questions");
+        setEtapa(0);
+      }
+
+      const alert = await verificarCriseProlongada(user.id);
+      setCriseAlert(alert);
+    } catch (error) {
+      console.error('❌ [Motor Alívio] Erro em loadInitialState:', error);
       setViewState("questions");
       setEtapa(0);
     }
-
-    // Check crisis
-    const alert = await verificarCriseProlongada(user.id);
-    setCriseAlert(alert);
   }, [user?.id, hoje, ontem]);
 
   const loadExercisesFromCheckIn = async (checkIn: CheckIn) => {
