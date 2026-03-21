@@ -16,19 +16,27 @@ export async function saveWithRetry({
   retries = 3,
   onRetry,
 }: SaveWithRetryOptions): Promise<boolean> {
+  console.log(`💾 saveWithRetry — table: ${table}, userId: ${userId}, payload:`, JSON.stringify(data));
+
   for (let i = 0; i < retries; i++) {
     try {
-      const { error } = await (supabase
+      const { data: returned, error } = await (supabase
         .from(table as any)
         .update(data as any) as any)
-        .eq("id", userId);
+        .eq("id", userId)
+        .select()
+        .maybeSingle();
 
-      if (!error) {
-        console.log("✅ Progresso salvo com sucesso");
+      if (!error && returned) {
+        console.log("✅ Dados salvos e verificados:", JSON.stringify(returned));
         return true;
       }
 
-      console.warn(`⚠️ Tentativa ${i + 1}/${retries} falhou:`, error.message);
+      if (!error && !returned) {
+        console.warn(`⚠️ Tentativa ${i + 1}/${retries}: update sem erro mas 0 rows afetadas`);
+      } else if (error) {
+        console.warn(`⚠️ Tentativa ${i + 1}/${retries} falhou:`, error.message);
+      }
     } catch (err) {
       console.error(`❌ Erro na tentativa ${i + 1}:`, err);
     }

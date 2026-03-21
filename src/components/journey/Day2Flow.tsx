@@ -61,16 +61,23 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
   };
 
   const handleMapComplete = async (data: any) => {
+    console.log("🗺️ handleMapComplete — dados recebidos:", JSON.stringify(data));
+    
+    if (!data || (!data.markedAreas?.length && !Object.keys(data.notes || {}).length)) {
+      console.warn("⚠️ handleMapComplete — dados vazios, pulando save");
+      goTo("meal");
+      return;
+    }
+
     setMapData(data);
-    // Persist to localStorage as backup
     localStorage.setItem("levvia_day2_map_data", JSON.stringify(data));
     
-    // Immediately save to Supabase
     if (user?.id) {
-      await saveWithRetry({
+      const success = await saveWithRetry({
         userId: user.id,
         data: { day2_inflammation_map: data },
       });
+      console.log(`🗺️ handleMapComplete — save result: ${success ? "✅" : "❌"}`);
     }
     
     goTo("meal");
