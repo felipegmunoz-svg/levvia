@@ -18,9 +18,9 @@ export async function saveWithRetry({
 }: SaveWithRetryOptions): Promise<boolean> {
   for (let i = 0; i < retries; i++) {
     try {
-      const { error } = await supabase
-        .from(table)
-        .update(data as any)
+      const { error } = await (supabase
+        .from(table as any)
+        .update(data as any) as any)
         .eq("id", userId);
 
       if (!error) {
