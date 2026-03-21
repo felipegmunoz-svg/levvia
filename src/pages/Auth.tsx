@@ -85,7 +85,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        await syncProfileData(snapshot, data.user?.id, data.user?.email);
+        await syncProfileData(data.user?.id, data.user?.email);
         showSuccessAndNavigate("/today", true);
       }
     } catch (error: any) {
