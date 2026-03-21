@@ -81,8 +81,11 @@ const Today = () => {
 
   const [day1Done, setDay1Done] = useState<boolean | null>(null);
   const [day2Done, setDay2Done] = useState<boolean | null>(null);
+  const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
 
-  // Check day1_completed and day2_completed from profile on mount
+  const isDev = import.meta.env.MODE === 'development';
+
+  // Check day1_completed, day2_completed and timestamps from profile on mount
   useEffect(() => {
     if (!user?.id) {
       setDay1Done(true);
@@ -91,12 +94,13 @@ const Today = () => {
     }
     supabase
       .from("profiles")
-      .select("day1_completed, day2_completed")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         setDay1Done((data as any)?.day1_completed === true);
         setDay2Done((data as any)?.day2_completed === true);
+        setDay1CompletedAt((data as any)?.day1_completed_at || null);
       });
   }, [user?.id]);
 
