@@ -10,6 +10,7 @@ interface Day1MealSuggestionProps {
 
 function getMealLabel(): string {
   const hour = new Date().getHours();
+  if (hour < 5) return "Jantar";
   if (hour < 10) return "Café da Manhã";
   if (hour < 12) return "Lanche da Manhã";
   if (hour < 15) return "Almoço";
