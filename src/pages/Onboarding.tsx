@@ -141,6 +141,7 @@ const Onboarding = () => {
 
   const canProceed = () => {
     if (current.type === "welcome") return true;
+    if (current.type === "install_pwa") return true;
     if (current.type === "disclaimer") return disclaimerChecked;
     if (current.type === "name") return nameInput.trim().length >= 2;
     if (current.type === "number") {
