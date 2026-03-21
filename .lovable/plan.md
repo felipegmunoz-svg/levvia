@@ -1,31 +1,63 @@
 
 
-# Correções do Onboarding — Plano
+# Motor de Alívio Dinâmico
 
-## 1. Bug do Step Counter (Investigação)
+## Overview
 
-Após análise do código atual, `handleMultiSelect` **não** altera `step`. O counter `{step + 1} de {total}` só muda via `setStep`, que só é chamado em `handleSingleSelect` e `handleNext`. O bug pode ser de uma versão anterior em cache. Contudo, vou adicionar uma proteção extra: converter `handleSingleSelect` para usar functional updater (como já feito no `handleMultiSelect`) para consistência e segurança.
+Replace the current static `PainReliefMode` component with a dynamic 3-question check-in flow that queries exercises from the database based on the user's current state, saves history, and supports repeating yesterday's exercises.
 
-## 2. Adicionar opções faltantes (`src/data/onboarding.ts`)
+## Database Changes
 
-**Step 9 — Áreas afetadas:** Adicionar "Pernas", "Pés", "Abdômen/Barriga", "Glúteos" na ordem solicitada.
+**New table: `daily_check_ins`**
+- `id` UUID PK
+- `user_id` UUID NOT NULL
+- `data_checkin` DATE NOT NULL DEFAULT CURRENT_DATE
+- `intensidade` TEXT NOT NULL
+- `regiao` TEXT NOT NULL
+- `ambiente` TEXT NOT NULL
+- `exercicios_ids` UUID[]
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- Unique index on `(user_id, data_checkin)`
+- RLS: users can insert/select/update own rows, admins can manage all
 
-**Step 7 — Condições de saúde:** Adicionar "SOP (Síndrome do Ovário Policístico)", "Doença de Hashimoto", "Insuficiência venosa crônica" após "Linfedema".
+## File Changes
 
-## 3. Corrigir gênero gramatical (`src/data/onboarding.ts`)
+### 1. New: `src/components/MotorAlivio.tsx`
 
-**Step 6 — Atividade física:**
-- "Moderado" → "Moderada"
-- "Ativo" → "Ativa"
+Main component with 3 states:
+- **Initial check**: queries `daily_check_ins` for today/yesterday. If today exists → show results. If yesterday exists → offer "Repeat" or "New check-in". Otherwise → start questions.
+- **3-question flow**: animated step-by-step cards (intensidade → regiao → ambiente) with a 3-segment progress bar.
+- **Results**: list of 3-5 filtered exercises with fallback logic (relax environment first, then region, never pain). Includes crisis alert if 3+ consecutive days of "crise".
 
-## 4. Fix `handleSingleSelect` (`src/pages/Onboarding.tsx`)
-
-Converter para functional updater para consistência com `handleMultiSelect`:
-```typescript
-setAnswers((a) => ({ ...a, [current.id]: option }));
+Query logic:
+```text
+pain_suitability filtered by intensidade map
+body_part filtered by regiao map (overlaps)
+environment filtered by ambiente map (overlaps)
+Fallback: drop environment → drop region → never drop pain
 ```
 
-## Arquivos alterados
-- `src/data/onboarding.ts` — opções dos steps 6, 7, 9
-- `src/pages/Onboarding.tsx` — `handleSingleSelect` functional updater
+Saves check-in to `daily_check_ins` after fetching results.
+
+### 2. Modified: `src/pages/Today.tsx`
+
+- Replace `<PainReliefMode>` with `<MotorAlivio>` in the same location (~line 299-303)
+- Wire `onSelectExercise` the same way for exercise detail view
+
+### 3. Modified: `src/lib/profileEngine.ts`
+
+- Add `pain_suitability`, `body_part`, `environment`, `movement_type` fields to `DbExercise` interface (they exist in DB but not in the TS type)
+
+## Design
+
+Follows existing app patterns:
+- `glass-card` styling, `motion` animations from framer-motion
+- Full-screen overlay like current `PainReliefMode`
+- Color-coded option cards: red for crisis, yellow for tired, green for energy
+- Crisis alert: soft card with warning icon if 3+ consecutive crisis days
+
+## No changes needed
+- No edge functions
+- No auth changes
+- Existing exercises table schema already has all needed columns
 
