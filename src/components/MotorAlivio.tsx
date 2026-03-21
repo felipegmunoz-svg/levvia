@@ -87,30 +87,21 @@ const reliefTips = [
 // ─── Fetch helpers ───
 
 async function buscarExercicios(respostas: Respostas): Promise<DbExercise[]> {
-  const { pain_min, pain_max } = intensidadeMap[respostas.intensidade];
+  const mapping = intensidadeMap[respostas.intensidade];
+  if (!mapping) {
+    console.error('❌ [Motor Alívio] Intensidade não mapeada:', respostas.intensidade);
+    return [];
+  }
+
+  const { pain_min, pain_max } = mapping;
   const bodyParts = regiaoMap[respostas.regiao];
   const environments = ambienteMap[respostas.ambiente];
 
-  // Primary query
-  let query = supabase
-    .from("exercises")
-    .select("*")
-    .eq("is_active", true)
-    .gte("pain_suitability", pain_min)
-    .lte("pain_suitability", pain_max);
+  console.log('🔍 [Motor Alívio] Buscando:', { intensidade: respostas.intensidade, painRange: `${pain_min}-${pain_max}`, bodyParts, environments });
 
-  if (bodyParts) {
-    query = query.overlaps("body_part", bodyParts);
-  }
-
-  query = query.overlaps("environment", environments).order("pain_suitability", { ascending: false }).limit(5);
-
-  const { data } = await query;
-  let results = (data as DbExercise[]) || [];
-
-  // Fallback 1: relax environment
-  if (results.length < 3) {
-    let q2 = supabase
+  try {
+    // Primary query
+    let query = supabase
       .from("exercises")
       .select("*")
       .eq("is_active", true)
@@ -118,28 +109,59 @@ async function buscarExercicios(respostas: Respostas): Promise<DbExercise[]> {
       .lte("pain_suitability", pain_max);
 
     if (bodyParts) {
-      q2 = q2.overlaps("body_part", bodyParts);
+      query = query.overlaps("body_part", bodyParts);
     }
 
-    q2 = q2.order("pain_suitability", { ascending: false }).limit(5);
-    const { data: d2 } = await q2;
-    results = (d2 as DbExercise[]) || [];
-  }
+    query = query.overlaps("environment", environments).order("pain_suitability", { ascending: false }).limit(5);
 
-  // Fallback 2: relax region too (never relax pain)
-  if (results.length < 3) {
-    const { data: d3 } = await supabase
-      .from("exercises")
-      .select("*")
-      .eq("is_active", true)
-      .gte("pain_suitability", pain_min)
-      .lte("pain_suitability", pain_max)
-      .order("pain_suitability", { ascending: false })
-      .limit(5);
-    results = (d3 as DbExercise[]) || [];
-  }
+    const { data, error } = await query;
+    if (error) console.warn('⚠️ [Motor Alívio] Erro query primária:', error.message);
+    let results = (data as DbExercise[]) || [];
+    console.log(`📊 [Motor Alívio] Query primária: ${results.length} resultados`);
 
-  return results;
+    // Fallback 1: relax environment
+    if (results.length < 3) {
+      console.log('🔄 [Motor Alívio] Fallback 1: relaxando ambiente...');
+      let q2 = supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_active", true)
+        .gte("pain_suitability", pain_min)
+        .lte("pain_suitability", pain_max);
+
+      if (bodyParts) {
+        q2 = q2.overlaps("body_part", bodyParts);
+      }
+
+      q2 = q2.order("pain_suitability", { ascending: false }).limit(5);
+      const { data: d2, error: e2 } = await q2;
+      if (e2) console.warn('⚠️ [Motor Alívio] Erro fallback 1:', e2.message);
+      results = (d2 as DbExercise[]) || [];
+      console.log(`📊 [Motor Alívio] Fallback 1: ${results.length} resultados`);
+    }
+
+    // Fallback 2: relax region too (never relax pain)
+    if (results.length < 3) {
+      console.log('🔄 [Motor Alívio] Fallback 2: relaxando região...');
+      const { data: d3, error: e3 } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_active", true)
+        .gte("pain_suitability", pain_min)
+        .lte("pain_suitability", pain_max)
+        .order("pain_suitability", { ascending: false })
+        .limit(5);
+      if (e3) console.warn('⚠️ [Motor Alívio] Erro fallback 2:', e3.message);
+      results = (d3 as DbExercise[]) || [];
+      console.log(`📊 [Motor Alívio] Fallback 2: ${results.length} resultados`);
+    }
+
+    console.log(`✅ [Motor Alívio] ${results.length} exercícios retornados`);
+    return results;
+  } catch (error) {
+    console.error('❌ [Motor Alívio] Erro inesperado em buscarExercicios:', error);
+    return [];
+  }
 }
 
 async function verificarCriseProlongada(userId: string): Promise<{ mostrar: boolean; mensagem: string }> {
@@ -189,45 +211,55 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
 
     setViewState("loading");
 
-    const [todayRes, yesterdayRes] = await Promise.all([
-      supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", hoje).maybeSingle(),
-      supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", ontem).maybeSingle(),
-    ]);
+    try {
+      const [todayRes, yesterdayRes] = await Promise.all([
+        supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", hoje).maybeSingle(),
+        supabase.from("daily_check_ins").select("*").eq("user_id", user.id).eq("data_checkin", ontem).maybeSingle(),
+      ]);
 
-    const todayData = todayRes.data as CheckIn | null;
-    const yesterdayData = yesterdayRes.data as CheckIn | null;
+      const todayData = todayRes.data as CheckIn | null;
+      const yesterdayData = yesterdayRes.data as CheckIn | null;
 
-    setTodayCheckIn(todayData);
-    setYesterdayCheckIn(yesterdayData);
+      setTodayCheckIn(todayData);
+      setYesterdayCheckIn(yesterdayData);
 
-    if (todayData) {
-      // Load exercises from today's check-in
-      await loadExercisesFromCheckIn(todayData);
-      setRespostas({ intensidade: todayData.intensidade, regiao: todayData.regiao, ambiente: todayData.ambiente });
-      setViewState("results");
-    } else if (yesterdayData) {
-      setViewState("initial");
-    } else {
+      if (todayData) {
+        await loadExercisesFromCheckIn(todayData);
+        setRespostas({ intensidade: todayData.intensidade, regiao: todayData.regiao, ambiente: todayData.ambiente });
+        setViewState("results");
+      } else if (yesterdayData) {
+        setViewState("initial");
+      } else {
+        setViewState("questions");
+        setEtapa(0);
+      }
+
+      const alert = await verificarCriseProlongada(user.id);
+      setCriseAlert(alert);
+    } catch (error) {
+      console.error('❌ [Motor Alívio] Erro em loadInitialState:', error);
       setViewState("questions");
       setEtapa(0);
     }
-
-    // Check crisis
-    const alert = await verificarCriseProlongada(user.id);
-    setCriseAlert(alert);
   }, [user?.id, hoje, ontem]);
 
   const loadExercisesFromCheckIn = async (checkIn: CheckIn) => {
-    if (checkIn.exercicios_ids && checkIn.exercicios_ids.length > 0) {
-      const { data } = await supabase
-        .from("exercises")
-        .select("*")
-        .in("id", checkIn.exercicios_ids);
-      setExercises((data as DbExercise[]) || []);
-    } else {
-      const r: Respostas = { intensidade: checkIn.intensidade, regiao: checkIn.regiao, ambiente: checkIn.ambiente };
-      const exs = await buscarExercicios(r);
-      setExercises(exs);
+    try {
+      if (checkIn.exercicios_ids && checkIn.exercicios_ids.length > 0) {
+        const { data, error } = await supabase
+          .from("exercises")
+          .select("*")
+          .in("id", checkIn.exercicios_ids);
+        if (error) console.warn('⚠️ [Motor Alívio] Erro ao carregar exercícios do check-in:', error.message);
+        setExercises((data as DbExercise[]) || []);
+      } else {
+        const r: Respostas = { intensidade: checkIn.intensidade, regiao: checkIn.regiao, ambiente: checkIn.ambiente };
+        const exs = await buscarExercicios(r);
+        setExercises(exs);
+      }
+    } catch (error) {
+      console.error('❌ [Motor Alívio] Erro em loadExercisesFromCheckIn:', error);
+      setExercises([]);
     }
   };
 
@@ -245,26 +277,31 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
       // All answered — fetch exercises
       setLoadingExercises(true);
       setViewState("results");
-      const exs = await buscarExercicios(updated);
-      setExercises(exs);
-      setLoadingExercises(false);
+      try {
+        const exs = await buscarExercicios(updated);
+        setExercises(exs);
 
-      // Save check-in
-      if (user?.id) {
-        await supabase.from("daily_check_ins").upsert(
-          {
-            user_id: user.id,
-            data_checkin: hoje,
-            intensidade: updated.intensidade,
-            regiao: updated.regiao,
-            ambiente: updated.ambiente,
-            exercicios_ids: exs.map((e) => e.id),
-          },
-          { onConflict: "user_id,data_checkin" }
-        );
+        // Save check-in
+        if (user?.id) {
+          await supabase.from("daily_check_ins").upsert(
+            {
+              user_id: user.id,
+              data_checkin: hoje,
+              intensidade: updated.intensidade,
+              regiao: updated.regiao,
+              ambiente: updated.ambiente,
+              exercicios_ids: exs.map((e) => e.id),
+            },
+            { onConflict: "user_id,data_checkin" }
+          );
 
-        const alert = await verificarCriseProlongada(user.id);
-        setCriseAlert(alert);
+          const alert = await verificarCriseProlongada(user.id);
+          setCriseAlert(alert);
+        }
+      } catch (error) {
+        console.error('❌ [Motor Alívio] Erro em handleAnswer:', error);
+      } finally {
+        setLoadingExercises(false);
       }
     }
   };
@@ -275,21 +312,26 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
     setRespostas(r);
     setLoadingExercises(true);
     setViewState("results");
-    await loadExercisesFromCheckIn(yesterdayCheckIn);
-    setLoadingExercises(false);
+    try {
+      await loadExercisesFromCheckIn(yesterdayCheckIn);
 
-    if (user?.id) {
-      await supabase.from("daily_check_ins").upsert(
-        {
-          user_id: user.id,
-          data_checkin: hoje,
-          intensidade: r.intensidade,
-          regiao: r.regiao,
-          ambiente: r.ambiente,
-          exercicios_ids: yesterdayCheckIn.exercicios_ids,
-        },
-        { onConflict: "user_id,data_checkin" }
-      );
+      if (user?.id) {
+        await supabase.from("daily_check_ins").upsert(
+          {
+            user_id: user.id,
+            data_checkin: hoje,
+            intensidade: r.intensidade,
+            regiao: r.regiao,
+            ambiente: r.ambiente,
+            exercicios_ids: yesterdayCheckIn.exercicios_ids,
+          },
+          { onConflict: "user_id,data_checkin" }
+        );
+      }
+    } catch (error) {
+      console.error('❌ [Motor Alívio] Erro em handleRepeatYesterday:', error);
+    } finally {
+      setLoadingExercises(false);
     }
   };
 
@@ -515,7 +557,17 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
                         <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
                       </div>
                     ) : exercises.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-8">Nenhum exercício encontrado para esses critérios.</p>
+                      <div className="text-center py-8 space-y-3">
+                        <p className="text-2xl">😔</p>
+                        <p className="text-sm text-foreground/80">Não encontramos exercícios para esses critérios.</p>
+                        <p className="text-xs text-muted-foreground">Vamos tentar com filtros diferentes?</p>
+                        <button
+                          onClick={handleNewCheckIn}
+                          className="mt-2 px-4 py-2 rounded-xl bg-secondary/20 text-secondary text-sm font-medium hover:bg-secondary/30 transition-colors"
+                        >
+                          Tentar novamente
+                        </button>
+                      </div>
                     ) : (
                       exercises.map((ex, i) => (
                         <motion.button
