@@ -277,26 +277,31 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
       // All answered — fetch exercises
       setLoadingExercises(true);
       setViewState("results");
-      const exs = await buscarExercicios(updated);
-      setExercises(exs);
-      setLoadingExercises(false);
+      try {
+        const exs = await buscarExercicios(updated);
+        setExercises(exs);
 
-      // Save check-in
-      if (user?.id) {
-        await supabase.from("daily_check_ins").upsert(
-          {
-            user_id: user.id,
-            data_checkin: hoje,
-            intensidade: updated.intensidade,
-            regiao: updated.regiao,
-            ambiente: updated.ambiente,
-            exercicios_ids: exs.map((e) => e.id),
-          },
-          { onConflict: "user_id,data_checkin" }
-        );
+        // Save check-in
+        if (user?.id) {
+          await supabase.from("daily_check_ins").upsert(
+            {
+              user_id: user.id,
+              data_checkin: hoje,
+              intensidade: updated.intensidade,
+              regiao: updated.regiao,
+              ambiente: updated.ambiente,
+              exercicios_ids: exs.map((e) => e.id),
+            },
+            { onConflict: "user_id,data_checkin" }
+          );
 
-        const alert = await verificarCriseProlongada(user.id);
-        setCriseAlert(alert);
+          const alert = await verificarCriseProlongada(user.id);
+          setCriseAlert(alert);
+        }
+      } catch (error) {
+        console.error('❌ [Motor Alívio] Erro em handleAnswer:', error);
+      } finally {
+        setLoadingExercises(false);
       }
     }
   };
