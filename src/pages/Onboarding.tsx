@@ -290,6 +290,34 @@ const Onboarding = () => {
   };
 
   const renderContent = () => {
+    if (current.type === "install_pwa") {
+      // Auto-skip on desktop or already installed
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (navigator as any).standalone === true;
+      const dismissed = localStorage.getItem("levvia_install_dismissed") === "true";
+
+      if (!isMobile || isStandalone || dismissed) {
+        // Auto-advance past this step
+        setTimeout(() => {
+          setDirection(1);
+          setStep((s) => s + 1);
+        }, 0);
+        return null;
+      }
+
+      return (
+        <InstallPWAPrompt
+          onDismiss={() => {
+            localStorage.setItem("levvia_install_dismissed", "true");
+            setDirection(1);
+            setStep((s) => s + 1);
+          }}
+        />
+      );
+    }
+
     if (current.type === "welcome") {
       return (
         <div className="flex-1 flex flex-col justify-center px-6 py-8">
