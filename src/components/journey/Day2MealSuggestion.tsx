@@ -24,45 +24,56 @@ function getMealLabel(): string {
 const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
   const [recipe, setRecipe] = useState<DbRecipe | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [showRecipe, setShowRecipe] = useState(false);
   const hasExecuted = useRef(false);
   const label = useMemo(() => getMealLabel(), []);
 
-  useEffect(() => {
-    if (hasExecuted.current) return;
-    hasExecuted.current = true;
+  const loadRecipe = async () => {
+    setLoading(true);
+    setFetchError(false);
 
-    const load = async () => {
-      setLoading(true);
-
-      // Try specific recipe first
-      const { data: specific, error } = await supabase
-        .from("recipes")
-        .select("*")
-        .eq("id", SPECIFIC_RECIPE_ID)
-        .eq("is_active", true)
-        .single();
-
-      if (!error && specific && specific.ingredients?.length && specific.instructions?.length) {
-        console.log("✅ Receita Dia 2 (específica):", specific.title);
-        setRecipe(specific as unknown as DbRecipe);
-        setLoading(false);
-        return;
-      }
-
-      // Fallback to decision engine
-      console.log("⚠️ Receita específica não encontrada, usando motor de decisão");
+    for (let attempt = 0; attempt < 3; attempt++) {
       try {
+        // Try specific recipe first
+        const { data: specific, error } = await supabase
+          .from("recipes")
+          .select("*")
+          .eq("id", SPECIFIC_RECIPE_ID)
+          .eq("is_active", true)
+          .maybeSingle();
+
+        if (!error && specific && specific.ingredients?.length && specific.instructions?.length) {
+          console.log("✅ Receita Dia 2 (específica):", specific.title);
+          setRecipe(specific as unknown as DbRecipe);
+          setLoading(false);
+          return;
+        }
+
+        // Fallback to decision engine
+        console.log("⚠️ Receita específica não encontrada, usando motor de decisão");
         const fallback = await selectDay1Recipe(profile);
         console.log("🍽️ Receita Dia 2 (fallback):", fallback?.title || "NENHUMA");
         setRecipe(fallback);
-      } catch (err) {
-        console.error("Erro ao carregar receita:", err);
-      } finally {
         setLoading(false);
+        return;
+      } catch (err) {
+        console.error(`❌ Tentativa ${attempt + 1}/3 falhou:`, err);
+        if (attempt < 2) {
+          await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+        }
       }
-    };
-    load();
+    }
+
+    // All retries failed
+    setFetchError(true);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (hasExecuted.current) return;
+    hasExecuted.current = true;
+    loadRecipe();
   }, [profile]);
 
   if (loading) {
@@ -129,7 +140,24 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
         seu corpo de dentro para fora.
       </motion.p>
 
-      {recipe && (
+      {fetchError && (
+        <div className="glass-card p-5 w-full max-w-sm mb-6 text-center">
+          <p className="text-foreground/60 text-sm mb-3">
+            Não conseguimos carregar a receita. Verifique sua conexão.
+          </p>
+          <button
+            onClick={() => {
+              hasExecuted.current = false;
+              loadRecipe();
+            }}
+            className="py-2 px-6 rounded-2xl border border-secondary/30 text-secondary text-sm font-medium hover:bg-secondary/10 transition-colors"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {!fetchError && recipe && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,7 +190,7 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
         </motion.div>
       )}
 
-      {!recipe && (
+      {!fetchError && !recipe && (
         <div className="glass-card p-5 w-full max-w-sm mb-6">
           <p className="text-foreground/60 text-center text-sm">
             Não encontramos uma receita perfeita para hoje. Que tal explorar nossas opções no cardápio?

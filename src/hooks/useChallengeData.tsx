@@ -144,19 +144,18 @@ export function useChallengeData() {
   const [dataLoading, setDataLoading] = useState(true);
   const [challengeProgress, setChallengeProgress] = useState<Record<string, Record<string, boolean>>>({});
 
-  // Load challenge start from Supabase or localStorage
+  const [challengeStart, setChallengeStart] = useState<string | null>(null);
+
+  // Compute currentDay from Supabase challenge_start (cross-device)
   const currentDay = useMemo(() => {
-    let start = localStorage.getItem("levvia_challenge_start");
-    if (!start) {
-      start = new Date().toISOString();
-      localStorage.setItem("levvia_challenge_start", start);
-    }
+    const start = challengeStart || localStorage.getItem("levvia_challenge_start");
+    if (!start) return 1;
     const diff = Date.now() - new Date(start).getTime();
     const day = Math.floor(diff / 86400000) + 1;
     return Math.min(Math.max(day, 1), 14);
-  }, []);
+  }, [challengeStart]);
 
-  // Load progress from Supabase
+  // Load progress and challenge_start from Supabase
   useEffect(() => {
     const loadProgress = async () => {
       console.log("📂 Carregando progresso...");
@@ -168,6 +167,12 @@ export function useChallengeData() {
           .single();
         if (error) {
           console.error("❌ Erro ao carregar progresso:", error);
+        }
+        // Sync challenge_start from Supabase (cross-device)
+        if (data?.challenge_start) {
+          console.log("✅ challenge_start carregado do Supabase:", data.challenge_start);
+          setChallengeStart(data.challenge_start);
+          localStorage.setItem("levvia_challenge_start", data.challenge_start);
         }
         if (data?.challenge_progress && typeof data.challenge_progress === "object") {
           console.log("✅ Progresso carregado do Supabase");
