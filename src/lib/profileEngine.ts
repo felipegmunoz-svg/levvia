@@ -42,6 +42,14 @@ export interface DbExercise {
   icon: string | null;
   sort_order: number | null;
   is_active: boolean | null;
+  pain_suitability: number | null;
+  body_part: string[] | null;
+  environment: string[] | null;
+  movement_type: string | null;
+  clinical_benefit: string | null;
+  duration_seconds: number | null;
+  image_urls?: string[];
+  video_url?: string | null;
 }
 
 export interface DbRecipe {

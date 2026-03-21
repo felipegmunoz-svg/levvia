@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_check_ins: {
+        Row: {
+          ambiente: string
+          created_at: string
+          data_checkin: string
+          exercicios_ids: string[] | null
+          id: string
+          intensidade: string
+          regiao: string
+          user_id: string
+        }
+        Insert: {
+          ambiente: string
+          created_at?: string
+          data_checkin?: string
+          exercicios_ids?: string[] | null
+          id?: string
+          intensidade: string
+          regiao: string
+          user_id: string
+        }
+        Update: {
+          ambiente?: string
+          created_at?: string
+          data_checkin?: string
+          exercicios_ids?: string[] | null
+          id?: string
+          intensidade?: string
+          regiao?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_diary: {
         Row: {
           created_at: string
@@ -50,16 +83,22 @@ export type Database = {
       exercises: {
         Row: {
           benefits: string | null
+          body_part: string[] | null
           category: string
+          clinical_benefit: string | null
           created_at: string
           description: string
           duration: string
+          duration_seconds: number | null
+          environment: string[] | null
           frequency: string | null
           icon: string | null
           id: string
           image_urls: string[]
           is_active: boolean | null
           level: string
+          movement_type: string | null
+          pain_suitability: number | null
           safety: string | null
           sort_order: number | null
           start_position: string | null
@@ -71,16 +110,22 @@ export type Database = {
         }
         Insert: {
           benefits?: string | null
+          body_part?: string[] | null
           category: string
+          clinical_benefit?: string | null
           created_at?: string
           description?: string
           duration?: string
+          duration_seconds?: number | null
+          environment?: string[] | null
           frequency?: string | null
           icon?: string | null
           id?: string
           image_urls?: string[]
           is_active?: boolean | null
           level?: string
+          movement_type?: string | null
+          pain_suitability?: number | null
           safety?: string | null
           sort_order?: number | null
           start_position?: string | null
@@ -92,16 +137,22 @@ export type Database = {
         }
         Update: {
           benefits?: string | null
+          body_part?: string[] | null
           category?: string
+          clinical_benefit?: string | null
           created_at?: string
           description?: string
           duration?: string
+          duration_seconds?: number | null
+          environment?: string[] | null
           frequency?: string | null
           icon?: string | null
           id?: string
           image_urls?: string[]
           is_active?: boolean | null
           level?: string
+          movement_type?: string | null
+          pain_suitability?: number | null
           safety?: string | null
           sort_order?: number | null
           start_position?: string | null
