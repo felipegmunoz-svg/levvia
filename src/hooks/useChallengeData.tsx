@@ -159,20 +159,26 @@ export function useChallengeData() {
   // Load progress from Supabase
   useEffect(() => {
     const loadProgress = async () => {
+      console.log("📂 Carregando progresso...");
       if (user?.id) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("profiles")
           .select("challenge_progress, challenge_start")
           .eq("id", user.id)
           .single();
+        if (error) {
+          console.error("❌ Erro ao carregar progresso:", error);
+        }
         if (data?.challenge_progress && typeof data.challenge_progress === "object") {
+          console.log("✅ Progresso carregado do Supabase");
           setChallengeProgress(data.challenge_progress as Record<string, Record<string, boolean>>);
         } else {
-          // Fallback to localStorage
+          console.log("⚠️ Sem progresso no Supabase, usando localStorage");
           const saved = localStorage.getItem("levvia_challenge_progress");
           if (saved) setChallengeProgress(JSON.parse(saved));
         }
       } else {
+        console.log("⚠️ Sem usuário, usando localStorage");
         const saved = localStorage.getItem("levvia_challenge_progress");
         if (saved) setChallengeProgress(JSON.parse(saved));
       }
