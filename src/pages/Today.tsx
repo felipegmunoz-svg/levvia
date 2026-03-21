@@ -14,6 +14,7 @@ import HeatMapCard from "@/components/HeatMapCard";
 import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
 import Day1Flow from "@/components/journey/Day1Flow";
 import Day2Flow from "@/components/journey/Day2Flow";
+import WaitingScreen from "@/components/journey/WaitingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
