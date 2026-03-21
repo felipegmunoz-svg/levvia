@@ -165,13 +165,16 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
           guilt_after: diary.guilt_after,
           notes: diary.notes || "",
         });
+        const now = new Date().toISOString();
         await supabase
           .from("profiles")
           .update({
             day1_completed: true,
-            day1_completed_at: new Date().toISOString(),
+            day1_completed_at: now,
+            challenge_start: now,
           } as any)
           .eq("id", user.id);
+        localStorage.setItem("levvia_challenge_start", now);
       } catch (e) {
         console.error("Error syncing day1 diary:", e);
       }

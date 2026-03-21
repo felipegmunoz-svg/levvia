@@ -39,14 +39,17 @@ const Day1Closing = ({ userId, onComplete }: Day1ClosingProps) => {
       notes,
     } as any);
 
-    // Mark day 1 as completed
+    // Mark day 1 as completed + set challenge_start for cross-device
+    const now = new Date().toISOString();
     await supabase
       .from("profiles")
       .update({
         day1_completed: true,
-        day1_completed_at: new Date().toISOString(),
+        day1_completed_at: now,
+        challenge_start: now,
       } as any)
       .eq("id", userId);
+    localStorage.setItem("levvia_challenge_start", now);
 
     setSaving(false);
     setSaved(true);
