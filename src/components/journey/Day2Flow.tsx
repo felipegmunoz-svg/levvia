@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day2Welcome from "./Day2Welcome";
 import Day2DrainageGuide from "./Day2DrainageGuide";
 import Day2InflammationMap from "./Day2InflammationMap";
@@ -22,6 +23,17 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
   const { profile } = useProfile();
   const [step, setStep] = useState<Day2Step>("loading");
   const [mapData, setMapData] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+
+  // Restore mapData from localStorage on mount
+  useEffect(() => {
+    const savedMap = localStorage.getItem("levvia_day2_map_data");
+    if (savedMap) {
+      try {
+        setMapData(JSON.parse(savedMap));
+      } catch {}
+    }
+  }, []);
 
   // Determine starting step from localStorage
   useEffect(() => {
@@ -48,28 +60,57 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
     setStep(nextStep);
   };
 
+  const handleMapComplete = async (data: any) => {
+    setMapData(data);
+    // Persist to localStorage as backup
+    localStorage.setItem("levvia_day2_map_data", JSON.stringify(data));
+    
+    // Immediately save to Supabase
+    if (user?.id) {
+      await saveWithRetry({
+        userId: user.id,
+        data: { day2_inflammation_map: data },
+      });
+    }
+    
+    goTo("meal");
+  };
+
   const handleDay2Complete = async () => {
     if (!user?.id) return;
+    setSaving(true);
 
     console.log("💾 Day2Flow — Salvando conclusão do Dia 2...");
+    
+    // Read mapData from localStorage as fallback
+    let finalMapData = mapData;
+    if (!finalMapData) {
+      const savedMap = localStorage.getItem("levvia_day2_map_data");
+      if (savedMap) {
+        try { finalMapData = JSON.parse(savedMap); } catch {}
+      }
+    }
+
     const updatePayload: any = {
       day2_completed: true,
       day2_completed_at: new Date().toISOString(),
     };
-    if (mapData) {
-      updatePayload.day2_inflammation_map = mapData;
+    if (finalMapData) {
+      updatePayload.day2_inflammation_map = finalMapData;
     }
 
-    const { error } = await supabase
-      .from("profiles")
-      .update(updatePayload)
-      .eq("id", user.id);
+    const success = await saveWithRetry({
+      userId: user.id,
+      data: updatePayload,
+      onRetry: () => handleDay2Complete(),
+    });
 
-    if (error) {
-      console.error("❌ Erro ao salvar Dia 2:", error);
-    } else {
+    setSaving(false);
+
+    if (success) {
       console.log("✅ Dia 2 concluído com sucesso");
       localStorage.removeItem("levvia_day2_progress");
+      localStorage.removeItem("levvia_day2_map_data");
       onComplete();
     }
   };
@@ -85,14 +126,7 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
   if (step === "welcome") return <Day2Welcome onNext={() => goTo("drainage")} />;
   if (step === "drainage") return <Day2DrainageGuide onNext={() => goTo("map")} />;
   if (step === "map") {
-    return (
-      <Day2InflammationMap
-        onComplete={(data) => {
-          setMapData(data);
-          goTo("meal");
-        }}
-      />
-    );
+    return <Day2InflammationMap onComplete={handleMapComplete} />;
   }
   if (step === "meal") return <Day2MealSuggestion profile={profile} onNext={() => goTo("night")} />;
   if (step === "night") return <Day2NightRitual onNext={() => goTo("closing")} />;

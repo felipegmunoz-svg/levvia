@@ -85,7 +85,7 @@ const Today = () => {
 
   const isDev = import.meta.env.MODE === 'development';
 
-  // Check day1_completed, day2_completed and timestamps from profile on mount
+  // Check day completion and timestamps from Supabase (cross-device)
   useEffect(() => {
     if (!user?.id) {
       setDay1Done(true);
@@ -94,13 +94,17 @@ const Today = () => {
     }
     supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, challenge_start")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         setDay1Done((data as any)?.day1_completed === true);
         setDay2Done((data as any)?.day2_completed === true);
         setDay1CompletedAt((data as any)?.day1_completed_at || null);
+        // Sync challenge_start to localStorage for cross-device
+        if ((data as any)?.challenge_start) {
+          localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
+        }
       });
   }, [user?.id]);
 
