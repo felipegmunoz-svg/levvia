@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
 import Day1Welcome from "./Day1Welcome";
 import HeatMapInteractive from "./HeatMapInteractive";
 import Day1MealSuggestion from "./Day1MealSuggestion";
