@@ -244,16 +244,22 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
   }, [user?.id, hoje, ontem]);
 
   const loadExercisesFromCheckIn = async (checkIn: CheckIn) => {
-    if (checkIn.exercicios_ids && checkIn.exercicios_ids.length > 0) {
-      const { data } = await supabase
-        .from("exercises")
-        .select("*")
-        .in("id", checkIn.exercicios_ids);
-      setExercises((data as DbExercise[]) || []);
-    } else {
-      const r: Respostas = { intensidade: checkIn.intensidade, regiao: checkIn.regiao, ambiente: checkIn.ambiente };
-      const exs = await buscarExercicios(r);
-      setExercises(exs);
+    try {
+      if (checkIn.exercicios_ids && checkIn.exercicios_ids.length > 0) {
+        const { data, error } = await supabase
+          .from("exercises")
+          .select("*")
+          .in("id", checkIn.exercicios_ids);
+        if (error) console.warn('⚠️ [Motor Alívio] Erro ao carregar exercícios do check-in:', error.message);
+        setExercises((data as DbExercise[]) || []);
+      } else {
+        const r: Respostas = { intensidade: checkIn.intensidade, regiao: checkIn.regiao, ambiente: checkIn.ambiente };
+        const exs = await buscarExercicios(r);
+        setExercises(exs);
+      }
+    } catch (error) {
+      console.error('❌ [Motor Alívio] Erro em loadExercisesFromCheckIn:', error);
+      setExercises([]);
     }
   };
 
