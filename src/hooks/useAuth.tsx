@@ -30,7 +30,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       const nextUser = nextSession?.user ?? null;
-      setRoleLoading(!!nextUser);
+      if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') {
+        setRoleLoading(!!nextUser);
+      }
       setSession(nextSession);
       setUser(nextUser);
       setAuthLoading(false);
