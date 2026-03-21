@@ -14,6 +14,7 @@ import HeatMapCard from "@/components/HeatMapCard";
 import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
 import Day1Flow from "@/components/journey/Day1Flow";
 import Day2Flow from "@/components/journey/Day2Flow";
+import WaitingScreen from "@/components/journey/WaitingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
@@ -80,8 +81,11 @@ const Today = () => {
 
   const [day1Done, setDay1Done] = useState<boolean | null>(null);
   const [day2Done, setDay2Done] = useState<boolean | null>(null);
+  const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
 
-  // Check day1_completed and day2_completed from profile on mount
+  const isDev = import.meta.env.MODE === 'development';
+
+  // Check day1_completed, day2_completed and timestamps from profile on mount
   useEffect(() => {
     if (!user?.id) {
       setDay1Done(true);
@@ -90,12 +94,13 @@ const Today = () => {
     }
     supabase
       .from("profiles")
-      .select("day1_completed, day2_completed")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         setDay1Done((data as any)?.day1_completed === true);
         setDay2Done((data as any)?.day2_completed === true);
+        setDay1CompletedAt((data as any)?.day1_completed_at || null);
       });
   }, [user?.id]);
 
@@ -203,6 +208,19 @@ const Today = () => {
   }
 
   if (day2Done === false && currentDay >= 2) {
+    // Check 24h gate (bypass in dev mode)
+    if (!isDev && day1CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day1CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        return (
+          <WaitingScreen
+            completedAt={day1CompletedAt}
+            nextDay={2}
+            onReady={() => setDay1CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
     return <Day2Flow onComplete={() => setDay2Done(true)} />;
   }
 
