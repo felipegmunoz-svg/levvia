@@ -495,6 +495,19 @@ const Onboarding = () => {
               <span className="text-sm text-muted-foreground font-medium">{cfg.unit}</span>
             )}
           </motion.div>
+          {numberInput.trim() !== "" && (() => {
+            const val = parseInt(numberInput);
+            const min = cfg?.min ?? 0;
+            const max = cfg?.max ?? 999;
+            if (isNaN(val) || val < min || val > max) {
+              return (
+                <p className="text-destructive text-sm text-center mt-3">
+                  Idade deve estar entre {min} e {max} anos
+                </p>
+              );
+            }
+            return null;
+          })()}
         </div>
       );
     }

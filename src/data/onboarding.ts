@@ -45,7 +45,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     title: "Qual a sua idade?",
     subtitle: "Precisamos saber para adaptar as recomendações ao seu perfil.",
     icon: "calendar",
-    numberConfig: { min: 12, max: 120, unit: "anos", placeholder: "Ex: 35" },
+    numberConfig: { min: 18, max: 120, unit: "anos", placeholder: "Ex: 35" },
   },
   {
     id: 4,
