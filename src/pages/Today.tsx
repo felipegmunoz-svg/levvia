@@ -8,7 +8,7 @@ import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 import SymptomDiary from "@/components/SymptomDiary";
-import PainReliefMode from "@/components/PainReliefMode";
+import MotorAlivio from "@/components/MotorAlivio";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import HeatMapCard from "@/components/HeatMapCard";
 import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
