@@ -88,14 +88,23 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
 
         <section>
           <h2 className="text-base font-medium text-foreground mb-3">Ingredientes</h2>
-          <div className="space-y-2">
-            {recipe.ingredients.map((ingredient, i) => (
-              <div key={i} className="flex items-center gap-3 glass-card p-3">
-                <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary" />
-                <span className="text-sm text-foreground">{ingredient}</span>
-              </div>
-            ))}
-          </div>
+          {recipe.ingredients && recipe.ingredients.length > 0 ? (
+            <div className="space-y-2">
+              {recipe.ingredients.map((ingredient, i) => (
+                <div key={i} className="flex items-center gap-3 glass-card p-3">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary" />
+                  <span className="text-sm text-foreground">{ingredient}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="glass-card p-5 text-center">
+              <span className="text-2xl mb-2 block">🛒</span>
+              <p className="text-sm text-muted-foreground">
+                Ingredientes não disponíveis para esta receita.
+              </p>
+            </div>
+          )}
         </section>
 
         <section>
@@ -103,16 +112,25 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
             <ChefHat size={18} strokeWidth={1.5} className="text-secondary" />
             Modo de Fazer
           </h2>
-          <div className="space-y-3">
-            {recipe.instructions.map((instruction, i) => (
-              <div key={i} className="flex items-start gap-3 glass-card p-3">
-                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
-                  <span className="text-xs font-medium text-accent">{i + 1}</span>
+          {recipe.instructions && recipe.instructions.length > 0 ? (
+            <div className="space-y-3">
+              {recipe.instructions.map((instruction, i) => (
+                <div key={i} className="flex items-start gap-3 glass-card p-3">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
+                    <span className="text-xs font-medium text-accent">{i + 1}</span>
+                  </div>
+                  <p className="text-sm text-foreground leading-relaxed pt-0.5">{instruction}</p>
                 </div>
-                <p className="text-sm text-foreground leading-relaxed pt-0.5">{instruction}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="glass-card p-5 text-center">
+              <span className="text-2xl mb-2 block">👩‍🍳</span>
+              <p className="text-sm text-muted-foreground">
+                Modo de preparo não disponível para esta receita.
+              </p>
+            </div>
+          )}
         </section>
 
         <section className="flex flex-wrap gap-2">
