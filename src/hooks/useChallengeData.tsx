@@ -144,17 +144,16 @@ export function useChallengeData() {
   const [dataLoading, setDataLoading] = useState(true);
   const [challengeProgress, setChallengeProgress] = useState<Record<string, Record<string, boolean>>>({});
 
-  // Load challenge start from Supabase or localStorage
+  const [challengeStart, setChallengeStart] = useState<string | null>(null);
+
+  // Compute currentDay from Supabase challenge_start (cross-device)
   const currentDay = useMemo(() => {
-    let start = localStorage.getItem("levvia_challenge_start");
-    if (!start) {
-      start = new Date().toISOString();
-      localStorage.setItem("levvia_challenge_start", start);
-    }
+    const start = challengeStart || localStorage.getItem("levvia_challenge_start");
+    if (!start) return 1;
     const diff = Date.now() - new Date(start).getTime();
     const day = Math.floor(diff / 86400000) + 1;
     return Math.min(Math.max(day, 1), 14);
-  }, []);
+  }, [challengeStart]);
 
   // Load progress from Supabase
   useEffect(() => {
