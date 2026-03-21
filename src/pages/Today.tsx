@@ -13,6 +13,7 @@ import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import HeatMapCard from "@/components/HeatMapCard";
 import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
 import Day1Flow from "@/components/journey/Day1Flow";
+import Day2Flow from "@/components/journey/Day2Flow";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useChallengeData, type ChallengeActivity } from "@/hooks/useChallengeData";
@@ -78,20 +79,23 @@ const Today = () => {
   } = useChallengeData();
 
   const [day1Done, setDay1Done] = useState<boolean | null>(null);
+  const [day2Done, setDay2Done] = useState<boolean | null>(null);
 
-  // Check day1_completed from profile on mount
+  // Check day1_completed and day2_completed from profile on mount
   useEffect(() => {
     if (!user?.id) {
       setDay1Done(true);
+      setDay2Done(true);
       return;
     }
     supabase
       .from("profiles")
-      .select("day1_completed")
+      .select("day1_completed, day2_completed")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         setDay1Done((data as any)?.day1_completed === true);
+        setDay2Done((data as any)?.day2_completed === true);
       });
   }, [user?.id]);
 
@@ -186,7 +190,7 @@ const Today = () => {
   };
 
   // Day 1 journey flow
-  if (day1Done === null) {
+  if (day1Done === null || day2Done === null) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
@@ -196,6 +200,10 @@ const Today = () => {
 
   if (day1Done === false) {
     return <Day1Flow onComplete={() => setDay1Done(true)} />;
+  }
+
+  if (day2Done === false && currentDay >= 2) {
+    return <Day2Flow onComplete={() => setDay2Done(true)} />;
   }
 
   // Show PWA install gate before everything else
