@@ -195,6 +195,14 @@ export function useChallengeData() {
   // Fetch data from Supabase
   useEffect(() => {
     const load = async () => {
+      if (dataCache && Date.now() - dataCache.ts < DATA_CACHE_TTL) {
+        console.log("✅ [Cache] Dados carregados do cache");
+        setExercises(dataCache.exercises);
+        setRecipes(dataCache.recipes);
+        setHabits(dataCache.habits);
+        setDataLoading(false);
+        return;
+      }
       setDataLoading(true);
       const [exData, recData, habData] = await Promise.all([
         fetchExercises(),
@@ -204,6 +212,7 @@ export function useChallengeData() {
       setExercises(exData);
       setRecipes(recData);
       setHabits(habData);
+      dataCache = { exercises: exData, recipes: recData, habits: habData, ts: Date.now() };
       setDataLoading(false);
     };
     load();
