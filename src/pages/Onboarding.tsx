@@ -216,15 +216,31 @@ const Onboarding = () => {
   };
 
   const handleNext = async () => {
+    console.log(`🔍 [handleNext] step=${step}, id=${current.id}, type="${current.type}"`);
     // Save current step's input
     if (current.type === "name") {
-      setAnswers((a) => ({ ...a, [current.id]: nameInput.trim() }));
+      console.log(`🔍 [handleNext] name: "${nameInput.trim()}"`);
+      setAnswers((a) => {
+        const r = { ...a, [current.id]: nameInput.trim() };
+        console.log(`✅ [handleNext/name] answers keys:`, Object.keys(r));
+        return r;
+      });
     }
     if (current.type === "number") {
-      setAnswers((a) => ({ ...a, [current.id]: numberInput.trim() }));
+      console.log(`🔍 [handleNext] number: "${numberInput.trim()}"`);
+      setAnswers((a) => {
+        const r = { ...a, [current.id]: numberInput.trim() };
+        console.log(`✅ [handleNext/number] answers keys:`, Object.keys(r));
+        return r;
+      });
     }
     if (current.type === "body_metrics") {
-      setAnswers((a) => ({ ...a, [current.id]: [weightInput.trim(), heightInput.trim()] }));
+      console.log(`🔍 [handleNext] body_metrics: w="${weightInput.trim()}", h="${heightInput.trim()}"`);
+      setAnswers((a) => {
+        const r = { ...a, [current.id]: [weightInput.trim(), heightInput.trim()] };
+        console.log(`✅ [handleNext/body_metrics] answers keys:`, Object.keys(r));
+        return r;
+      });
     }
 
     // Pantry: merge checkboxes + free text
