@@ -80,7 +80,8 @@ const Auth = () => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         await syncProfileData(data.user?.id, data.user?.email);
-        showSuccessAndNavigate("/today", false);
+        const onboarded = localStorage.getItem("levvia_onboarded") === "true";
+        showSuccessAndNavigate(onboarded ? "/today" : "/onboarding", false);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -91,7 +92,8 @@ const Auth = () => {
         });
         if (error) throw error;
         await syncProfileData(data.user?.id, data.user?.email);
-        showSuccessAndNavigate("/today", true);
+        const onboarded = localStorage.getItem("levvia_onboarded") === "true";
+        showSuccessAndNavigate(onboarded ? "/today" : "/onboarding", true);
       }
     } catch (error: any) {
       toast({
