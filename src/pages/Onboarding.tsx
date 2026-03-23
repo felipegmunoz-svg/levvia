@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
+import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import logoFull from "@/assets/logo_livvia_branco.png";
