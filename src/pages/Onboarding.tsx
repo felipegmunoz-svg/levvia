@@ -278,12 +278,22 @@ const Onboarding = () => {
       setStep(step + 1);
     } else {
       // Final save
+      console.log("🔍 [Complete] Estado ANTES de save final:", {
+        answersLength: Object.keys(answers).length,
+        answersKeys: Object.keys(answers),
+        localStorage: localStorage.getItem("levvia_onboarding") ? `${localStorage.getItem("levvia_onboarding")!.length} chars` : "NULL",
+      });
+
+      if (Object.keys(answers).length === 0) {
+        console.error("❌ [Complete] ERRO CRÍTICO: answers está vazio! Dados do onboarding serão perdidos.");
+      }
+
       const finalAnswers = { ...answers };
       if (current.type === "name") finalAnswers[current.id] = nameInput.trim();
       if (current.type === "number") finalAnswers[current.id] = numberInput.trim();
       if (current.type === "body_metrics") finalAnswers[current.id] = [weightInput.trim(), heightInput.trim()];
 
-      // Pantry fallback: if answers[15] lost due to state race, recover from localStorage backup
+      // Pantry fallback
       if (!finalAnswers[15] || (Array.isArray(finalAnswers[15]) && (finalAnswers[15] as string[]).length === 0)) {
         const pantryBackup = localStorage.getItem("levvia_pantry_items");
         if (pantryBackup) {
@@ -307,17 +317,23 @@ const Onboarding = () => {
         }
       }
 
-      console.log('🔍 Final save — answers[15] (pantry):', finalAnswers[15]);
-      console.log('🔍 Final save — answers[16] (objectives):', finalAnswers[16]);
-      console.log('🔍 Final save — answers[13] (restrictions):', finalAnswers[13]);
+      console.log('🔍 [Complete] finalAnswers completo:', JSON.stringify(finalAnswers));
+      console.log('🔍 [Complete] Campos críticos:', {
+        name: finalAnswers[2],
+        age: finalAnswers[3],
+        pantry: Array.isArray(finalAnswers[15]) ? (finalAnswers[15] as string[]).length + ' items' : finalAnswers[15],
+        objectives: finalAnswers[16],
+        restrictions: finalAnswers[13],
+      });
 
-      // Save to localStorage only — Supabase sync happens after auth
       localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
       localStorage.setItem("levvia_onboarded", "true");
 
-      // Clear cached meal plan so it regenerates with new profile
-      localStorage.removeItem("levvia_meal_plan");
+      // Verify final save
+      const finalVerify = localStorage.getItem("levvia_onboarding");
+      console.log("✅ [Complete] Verificação final localStorage:", finalVerify ? `${finalVerify.length} chars` : "FALHOU!");
 
+      localStorage.removeItem("levvia_meal_plan");
       navigate("/diagnosis");
     }
   };
