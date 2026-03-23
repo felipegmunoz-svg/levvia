@@ -104,14 +104,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: ["Sem dor", "Dor leve", "Dor moderada", "Dor intensa", "Dor muito intensa"],
     icon: "thermometer",
   },
-  {
-    id: 9,
-    type: "multi",
-    title: "Quais áreas do corpo são mais afetadas?",
-    subtitle: "Selecione todas que se aplicam.",
-    options: ["Coxas", "Pernas", "Quadris", "Panturrilhas", "Pés", "Braços", "Tornozelos", "Joelhos", "Abdômen/Barriga", "Glúteos"],
-    icon: "body",
-  },
+  // id 9 (areas afetadas) removed — replaced by heat_map step above
   {
     id: 10,
     type: "result",
