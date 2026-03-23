@@ -4,6 +4,8 @@ import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/dat
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
+import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
+import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import logoFull from "@/assets/logo_livvia_branco.png";
@@ -330,12 +332,27 @@ const Onboarding = () => {
 
       localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
       localStorage.setItem("levvia_onboarded", "true");
+      console.log("🎯 Flag levvia_onboarded setada como true");
 
       // Verify final save
       const finalVerify = localStorage.getItem("levvia_onboarding");
       console.log("✅ [Complete] Verificação final localStorage:", finalVerify ? `${finalVerify.length} chars` : "FALHOU!");
 
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        const snapshot = readOnboardingSnapshot();
+        const syncSuccess = await syncOnboardingToSupabase(snapshot, session.user.id, {
+          email: session.user.email,
+        });
+
+        if (!syncSuccess) {
+          console.error("❌ Sync falhou, não navegando");
+          return;
+        }
+      }
+
       localStorage.removeItem("levvia_meal_plan");
+      console.log("🚀 Redirecionando para /diagnosis");
       navigate("/diagnosis");
     }
   };

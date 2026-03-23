@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
+import { useProfile } from "@/hooks/useProfile";
 import { fireResults } from "@/data/onboarding";
+import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { motion } from "framer-motion";
 import {
   Flame, Heart, Activity, Target, ShieldAlert, MapPin,
@@ -9,27 +11,47 @@ import logoFull from "@/assets/logo_livvia_branco.png";
 
 const Diagnosis = () => {
   const navigate = useNavigate();
+  const { profile } = useProfile();
 
-  const raw = localStorage.getItem("levvia_onboarding");
-  const answers = raw ? JSON.parse(raw) : {};
-
-  const userName = (answers[2] as string) || "Você";
-  const age = answers[3] as string;
-  const sex = (answers[4] as string) || "";
-  const bodyMetrics = (answers[5] as string[]) || [];
-  const weightKg = parseFloat(bodyMetrics[0]) || 0;
-  const heightCm = parseFloat(bodyMetrics[1]) || 0;
-  const activityLevel = (answers[6] as string) || "";
-  const healthConditions = (answers[7] as string[]) || [];
-  const painLevel = (answers[8] as string) || "";
-  const affectedAreas = (answers[9] as string[]) || [];
-  const enemies = (answers[11] as string[]) || [];
-  const allies = (answers[12] as string[]) || [];
-  // New IDs: 13=restrictions, 16=objectives
-  const objectives = (answers[16] as string[]) || [];
-  const restrictions = (answers[13] as string[]) || [];
+  const userName = profile.name || "Você";
+  const age = profile.age ? String(profile.age) : "";
+  const sex = profile.sex || "";
+  const weightKg = profile.weightKg || 0;
+  const heightCm = profile.heightCm || 0;
+  const activityLevel = profile.activityLevel || "";
+  const healthConditions = profile.healthConditions || [];
+  const painLevel = profile.painLevel || "";
+  const affectedAreas = profile.affectedAreas || [];
+  const enemies = profile.inflammatoryEnemies || [];
+  const allies = profile.antiInflammatoryAllies || [];
+  const objectives = profile.objectives || [];
+  const restrictions = profile.dietaryRestrictions || [];
+  const heatMapDay1 = profile.heatMapDay1 || {};
 
   const fireResult = painLevel ? fireResults[painLevel] : null;
+
+  const heatMapAreaLabels: Record<string, string> = {
+    panturrilha_esq: "Panturrilha Esquerda",
+    panturrilha_dir: "Panturrilha Direita",
+    coxa_esq: "Coxa Esquerda",
+    coxa_dir: "Coxa Direita",
+    quadril_esq: "Quadril Esquerdo",
+    quadril_dir: "Quadril Direito",
+    abdomen: "Abdômen/Barriga",
+    braco_esq: "Braço Esquerdo",
+    braco_dir: "Braço Direito",
+  };
+
+  const heatMapEntries = Object.entries(heatMapDay1)
+    .filter(([key, value]) => key !== "created_at" && typeof value === "number" && value > 0)
+    .map(([key, value]) => ({
+      key,
+      area: heatMapAreaLabels[key] || key,
+      intensity: value,
+      emoji: value >= 3 ? "🔥🔥🔥" : value >= 2 ? "🔥🔥" : "🔥",
+      description: value >= 3 ? "Alta intensidade" : value >= 2 ? "Intensidade moderada" : "Intensidade leve",
+    }))
+    .sort((a, b) => b.intensity - a.intensity);
 
 
   const persuasiveText = () => {
@@ -103,9 +125,43 @@ const Diagnosis = () => {
           </motion.div>
         )}
 
+        {heatMapEntries.length > 0 && (
+          <motion.div
+            custom={2}
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            className="glass-card rounded-2xl p-5"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <MapPin size={18} className="text-accent" />
+              <h2 className="text-base font-medium text-foreground">Seu Perfil de Inflamação</h2>
+            </div>
+
+            <div className="rounded-2xl bg-white/[0.04] border border-white/10 mb-4">
+              <HeatMapInteractive initialData={heatMapDay1} readOnly size="small" />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Áreas mais afetadas</p>
+              {heatMapEntries.map((item) => (
+                <div key={item.key} className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-3">
+                  <span className="text-sm font-medium min-w-14">{item.emoji}</span>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{item.area}</p>
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-sm text-foreground/70 mt-4">Vamos focar nesses pontos nos próximos 14 dias.</p>
+          </motion.div>
+        )}
+
         {/* Profile Card */}
         <motion.div
-          custom={2}
+          custom={3}
           variants={itemVariants}
           initial="hidden"
           animate="visible"
@@ -146,7 +202,7 @@ const Diagnosis = () => {
         {/* Activity Level */}
         {activityLevel && (
           <motion.div
-            custom={3}
+            custom={4}
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -163,7 +219,7 @@ const Diagnosis = () => {
         {/* Affected Areas & Health Conditions */}
         {(affectedAreas.length > 0 || healthConditions.length > 0) && (
           <motion.div
-            custom={4}
+            custom={5}
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -206,7 +262,7 @@ const Diagnosis = () => {
         {/* Objectives */}
         {objectives.length > 0 && (
           <motion.div
-            custom={5}
+            custom={6}
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -223,7 +279,7 @@ const Diagnosis = () => {
         {/* Dietary Info */}
         {(enemies.length > 0 || allies.length > 0 || restrictions.length > 0) && (
           <motion.div
-            custom={6}
+            custom={7}
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -274,7 +330,7 @@ const Diagnosis = () => {
 
         {/* Persuasive CTA Section */}
         <motion.div
-          custom={7}
+          custom={8}
           variants={itemVariants}
           initial="hidden"
           animate="visible"

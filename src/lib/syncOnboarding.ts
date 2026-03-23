@@ -30,7 +30,7 @@ export function readOnboardingSnapshot() {
     restrictions: restrictionsBackup ? `EXISTE (${restrictionsBackup.length} chars)` : 'VAZIO',
   });
 
-  let answers: Record<number, string | string[]> = {};
+  let answers: Record<number, string | string[] | Record<string, string | number>> = {};
   if (raw) {
     try { answers = JSON.parse(raw); } catch { /* ignore */ }
   }
@@ -196,6 +196,8 @@ export async function syncOnboardingToSupabase(
 
     // Only clean up AFTER confirmed successful sync
     if (syncSuccess) {
+      localStorage.setItem("levvia_onboarded", "true");
+      console.log('🎯 Flag levvia_onboarded setada como true');
       console.log('✅ Onboarding salvo com sucesso! Limpando localStorage...');
       localStorage.removeItem("levvia_onboarding");
       localStorage.removeItem("levvia_pantry_items");

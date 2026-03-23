@@ -104,6 +104,38 @@ export function parseOnboardingFromLocal(): UserProfile {
   try {
     const data = JSON.parse(saved);
     const bodyMetrics = (data[5] as string[]) || [];
+    const heatMapRaw = data[9];
+    const heatMapLabels: Record<string, string> = {
+      panturrilha_esq: "Panturrilhas",
+      panturrilha_dir: "Panturrilhas",
+      coxa_esq: "Coxas",
+      coxa_dir: "Coxas",
+      quadril_esq: "Quadris",
+      quadril_dir: "Quadris",
+      abdomen: "Abdômen/Barriga",
+      braco_esq: "Braços",
+      braco_dir: "Braços",
+    };
+
+    let heatMapDay1: Record<string, number> = {};
+    let affectedAreas: string[] = [];
+
+    if (heatMapRaw && typeof heatMapRaw === "object" && !Array.isArray(heatMapRaw)) {
+      heatMapDay1 = Object.fromEntries(
+        Object.entries(heatMapRaw).filter(([, value]) => typeof value === "number") as Array<[string, number]>
+      );
+      affectedAreas = Array.from(
+        new Set(
+          Object.entries(heatMapDay1)
+            .filter(([, value]) => value > 0)
+            .map(([key]) => heatMapLabels[key])
+            .filter(Boolean)
+        )
+      );
+    } else if (Array.isArray(heatMapRaw)) {
+      affectedAreas = heatMapRaw;
+    }
+
     return {
       name: (data[2] as string) || "",
       age: parseInt(data[3] as string) || null,
@@ -113,7 +145,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       activityLevel: (data[6] as string) || "",
       healthConditions: (data[7] as string[]) || [],
       painLevel: (data[8] as string) || "Sem dor",
-      affectedAreas: (data[9] as string[]) || [],
+      affectedAreas,
       // New IDs: 13=restrictions, 14=preferences, 15=pantry, 16=objectives
       objectives: (data[16] as string[]) || [],
       dietaryRestrictions: (data[13] as string[]) || [],
@@ -122,7 +154,7 @@ export function parseOnboardingFromLocal(): UserProfile {
       antiInflammatoryAllies: (data[12] as string[]) || [],
       pantryItems: (data[15] as string[]) || [],
       avatarUrl: null,
-      heatMapDay1: {},
+      heatMapDay1,
     };
   } catch {
     return defaultProfile();
