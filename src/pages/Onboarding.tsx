@@ -174,14 +174,17 @@ const Onboarding = () => {
   const handleMultiSelect = (option: string) => {
     const prev = (answers[current.id] as string[]) || [];
     const isDeselecting = prev.includes(option);
-    // Limit step 16 (objectives) to max 3 selections
     if (!isDeselecting && current.id === 16 && prev.length >= 3) return;
     const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
-    setAnswers((a) => ({ ...a, [current.id]: updated }));
+    console.log(`🔍 [handleMultiSelect] step=${step}, id=${current.id}, option="${option}", selected: ${prev.length} → ${updated.length}`);
+    setAnswers((a) => {
+      const result = { ...a, [current.id]: updated };
+      console.log(`✅ [handleMultiSelect] answers keys: ${Object.keys(a).length} → ${Object.keys(result).length}`, Object.keys(result));
+      return result;
+    });
 
-    // Immediate backup for critical steps
     if (current.id === 13) localStorage.setItem("levvia_restrictions", JSON.stringify(updated));
     if (current.id === 16) localStorage.setItem("levvia_objectives", JSON.stringify(updated));
   };
