@@ -112,6 +112,8 @@ export async function syncOnboardingToSupabase(
 
     console.log('💾 Sync — payload completo:', JSON.stringify(profileData));
 
+    let syncSuccess = false;
+
     // Try update first (trigger should have created the row)
     const { data: updated, error: updateError } = await supabase
       .from("profiles")
@@ -123,10 +125,13 @@ export async function syncOnboardingToSupabase(
       console.error("💾 Sync — update failed:", updateError.message);
     } else {
       console.log('💾 Sync — update result:', updated?.length, 'rows');
+      if (updated && updated.length > 0) {
+        syncSuccess = true;
+      }
     }
 
     // If no row was updated, insert as fallback
-    if (!updateError && (!updated || updated.length === 0)) {
+    if (!syncSuccess) {
       const { error: insertError } = await supabase.from("profiles").insert({
         id: userId,
         email: opts?.email || "",
@@ -136,11 +141,11 @@ export async function syncOnboardingToSupabase(
         console.error("💾 Sync — insert failed:", insertError.message);
       } else {
         console.log('💾 Sync — insert OK');
+        syncSuccess = true;
       }
     }
 
-    // Only clean up AFTER successful sync
-    const syncSuccess = !updateError || (updated && updated.length > 0);
+    // Only clean up AFTER confirmed successful sync
     if (syncSuccess) {
       console.log('✅ Onboarding salvo com sucesso! Limpando localStorage...');
       localStorage.removeItem("levvia_onboarding");
