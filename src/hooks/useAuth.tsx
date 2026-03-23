@@ -100,6 +100,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loading = authLoading || roleLoading;
 
   const signOut = async () => {
+    // Clear journey caches before sign-out
+    localStorage.removeItem("levvia_challenge_start");
+    localStorage.removeItem("levvia_challenge_progress");
+    localStorage.removeItem("levvia_day1_diary");
+    localStorage.removeItem("levvia_day1_local_completed");
+    localStorage.removeItem("levvia_day2_progress");
+    localStorage.removeItem("levvia_day2_map_data");
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
