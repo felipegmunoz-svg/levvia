@@ -32,6 +32,14 @@ const Auth = () => {
   /** Sync onboarding data to Supabase using shared helper */
   const syncProfileData = async (userId?: string, userEmail?: string) => {
     if (!userId) return;
+
+    // Check if we have an active session (needed for RLS)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.log('💾 Sync — sem sessão ativa, adiando sync para Day1Flow');
+      return;
+    }
+
     // Small delay to let trigger create the profile first
     await new Promise((r) => setTimeout(r, 500));
 
