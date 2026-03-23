@@ -26,12 +26,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [roleLoading, setRoleLoading] = useState(true);
 
   useEffect(() => {
+    const clearJourneyCaches = () => {
+      localStorage.removeItem("levvia_challenge_start");
+      localStorage.removeItem("levvia_challenge_progress");
+      localStorage.removeItem("levvia_day1_diary");
+      localStorage.removeItem("levvia_day1_local_completed");
+      localStorage.removeItem("levvia_day2_progress");
+      localStorage.removeItem("levvia_day2_map_data");
+    };
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       const nextUser = nextSession?.user ?? null;
       if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') {
         setRoleLoading(!!nextUser);
+        // Clear stale journey caches so backend is re-fetched
+        clearJourneyCaches();
+      }
+      if (_event === 'SIGNED_OUT') {
+        clearJourneyCaches();
       }
       setSession(nextSession);
       setUser(nextUser);
