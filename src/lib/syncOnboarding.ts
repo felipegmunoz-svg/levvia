@@ -196,8 +196,6 @@ export async function syncOnboardingToSupabase(
 
     // Only clean up AFTER confirmed successful sync
     if (syncSuccess) {
-      localStorage.setItem("levvia_onboarded", "true");
-      console.log('🎯 Flag levvia_onboarded setada como true');
       console.log('✅ Onboarding salvo com sucesso! Limpando localStorage...');
       localStorage.removeItem("levvia_onboarding");
       localStorage.removeItem("levvia_pantry_items");
