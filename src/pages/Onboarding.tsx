@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/data/onboarding";
 import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
+import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import logoFull from "@/assets/logo_livvia_branco.png";
@@ -192,6 +193,7 @@ const Onboarding = () => {
   const canProceed = () => {
     if (current.type === "welcome") return true;
     if (current.type === "install_pwa") return true;
+    if (current.type === "heat_map") return true; // has its own CTA
     if (current.type === "disclaimer") return disclaimerChecked;
     if (current.type === "name") return nameInput.trim().length >= 2;
     if (current.type === "number") {
@@ -395,6 +397,23 @@ const Onboarding = () => {
   }, [step]);
 
   const renderContent = () => {
+    if (current.type === "heat_map") {
+      return (
+        <HeatMapInteractive
+          onNext={(heatMap) => {
+            console.log("🔥 [HeatMap] Áreas selecionadas:", JSON.stringify(heatMap));
+            setAnswers((prev) => {
+              const updated = { ...prev, [current.id]: heatMap as any };
+              console.log("✅ [HeatMap] answers atualizado:", Object.keys(updated).length);
+              return updated;
+            });
+            setDirection(1);
+            setStep((s) => s + 1);
+          }}
+        />
+      );
+    }
+
     if (current.type === "install_pwa") {
       return (
         <InstallPWAPrompt
@@ -957,7 +976,7 @@ const Onboarding = () => {
             <ArrowLeft size={16} strokeWidth={1.5} />
             Voltar
           </motion.button>
-        ) : current.type !== "single" ? (
+        ) : current.type !== "single" && current.type !== "heat_map" ? (
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleNext}

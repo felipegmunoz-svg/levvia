@@ -1,6 +1,6 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry" | "install_pwa";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry" | "install_pwa" | "heat_map";
   title: string;
   subtitle?: string;
   options?: string[];
@@ -17,12 +17,13 @@ export const onboardingSteps: OnboardingQuestion[] = [
     subtitle: "Seu caminho para a leveza. Vamos conhecer você melhor para personalizar sua experiência.",
     icon: "heart",
   },
+  // Step 2 — Heat Map (visual body map)
   {
-    id: 99,
-    type: "install_pwa",
-    title: "Instale o Levvia",
-    subtitle: "Para a melhor experiência, adicione à sua tela inicial.",
-    icon: "smartphone",
+    id: 9,
+    type: "heat_map",
+    title: "Onde está o seu fogo interno?",
+    subtitle: "Toque nas áreas do corpo onde você sente desconforto, dor ou inchaço.",
+    icon: "body",
   },
   {
     id: 1,
@@ -61,6 +62,14 @@ export const onboardingSteps: OnboardingQuestion[] = [
     title: "Peso e Altura",
     subtitle: "Esses dados nos ajudam a entender melhor o seu corpo. Pode ser aproximado.",
     icon: "ruler",
+  },
+  // Step 8 — PWA (moved after body metrics)
+  {
+    id: 99,
+    type: "install_pwa",
+    title: "Instale o Levvia",
+    subtitle: "Para a melhor experiência, adicione à sua tela inicial.",
+    icon: "smartphone",
   },
   {
     id: 6,
@@ -104,14 +113,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: ["Sem dor", "Dor leve", "Dor moderada", "Dor intensa", "Dor muito intensa"],
     icon: "thermometer",
   },
-  {
-    id: 9,
-    type: "multi",
-    title: "Quais áreas do corpo são mais afetadas?",
-    subtitle: "Selecione todas que se aplicam.",
-    options: ["Coxas", "Pernas", "Quadris", "Panturrilhas", "Pés", "Braços", "Tornozelos", "Joelhos", "Abdômen/Barriga", "Glúteos"],
-    icon: "body",
-  },
+  // id 9 (areas afetadas) removed — replaced by heat_map step above
   {
     id: 10,
     type: "result",
