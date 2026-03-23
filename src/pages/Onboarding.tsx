@@ -289,24 +289,26 @@ const Onboarding = () => {
     localStorage.setItem("levvia_pantry_items", JSON.stringify(selected));
   };
 
+  // Auto-skip install_pwa step on desktop/standalone/dismissed (useEffect, not render)
+  useEffect(() => {
+    const currentStep = onboardingSteps[step];
+    if (currentStep?.type !== "install_pwa") return;
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as any).standalone === true;
+    const dismissed = localStorage.getItem("levvia_install_dismissed") === "true";
+
+    if (!isMobile || isStandalone || dismissed) {
+      console.log("⏭️ Auto-skip install_pwa step");
+      setDirection(1);
+      setStep((s) => s + 1);
+    }
+  }, [step]);
+
   const renderContent = () => {
     if (current.type === "install_pwa") {
-      // Auto-skip on desktop or already installed
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const isStandalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        (navigator as any).standalone === true;
-      const dismissed = localStorage.getItem("levvia_install_dismissed") === "true";
-
-      if (!isMobile || isStandalone || dismissed) {
-        // Auto-advance past this step
-        setTimeout(() => {
-          setDirection(1);
-          setStep((s) => s + 1);
-        }, 0);
-        return null;
-      }
-
       return (
         <InstallPWAPrompt
           onDismiss={() => {
