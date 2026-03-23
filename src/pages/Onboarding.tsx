@@ -155,7 +155,12 @@ const Onboarding = () => {
   const progress = ((step + 1) / total) * 100;
 
   const handleSingleSelect = (option: string) => {
-    setAnswers((a) => ({ ...a, [current.id]: option }));
+    console.log(`🔍 [handleSingleSelect] step=${step}, id=${current.id}, value="${option}"`);
+    setAnswers((prev) => {
+      const updated = { ...prev, [current.id]: option };
+      console.log(`✅ [handleSingleSelect] answers: ${Object.keys(prev).length} → ${Object.keys(updated).length}, keys:`, Object.keys(updated));
+      return updated;
+    });
     setSelectedSingle(option);
     setTimeout(() => {
       if (step < total - 1) {
