@@ -146,9 +146,10 @@ export function useChallengeData() {
 
   const [challengeStart, setChallengeStart] = useState<string | null>(null);
 
-  // Compute currentDay from Supabase challenge_start (cross-device)
+  // Compute currentDay — prioritize backend state, localStorage is only a temporary fallback
   const currentDay = useMemo(() => {
-    const start = challengeStart || localStorage.getItem("levvia_challenge_start");
+    // Prefer in-memory state (loaded from Supabase) over localStorage
+    const start = challengeStart ?? localStorage.getItem("levvia_challenge_start");
     if (!start) return 1;
     const diff = Date.now() - new Date(start).getTime();
     const day = Math.floor(diff / 86400000) + 1;
