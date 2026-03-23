@@ -146,9 +146,10 @@ export function useChallengeData() {
 
   const [challengeStart, setChallengeStart] = useState<string | null>(null);
 
-  // Compute currentDay from Supabase challenge_start (cross-device)
+  // Compute currentDay — prioritize backend state, localStorage is only a temporary fallback
   const currentDay = useMemo(() => {
-    const start = challengeStart || localStorage.getItem("levvia_challenge_start");
+    // Prefer in-memory state (loaded from Supabase) over localStorage
+    const start = challengeStart ?? localStorage.getItem("levvia_challenge_start");
     if (!start) return 1;
     const diff = Date.now() - new Date(start).getTime();
     const day = Math.floor(diff / 86400000) + 1;
@@ -195,15 +196,18 @@ export function useChallengeData() {
   }, [user?.id]);
 
   // Save progress to both localStorage and Supabase
+  // Uses in-memory challengeStart — never reads stale localStorage for challenge_start
   const saveProgress = async (newProgress: Record<string, Record<string, boolean>>) => {
     console.log("💾 Salvando progresso...", Object.keys(newProgress));
     setChallengeProgress(newProgress);
     localStorage.setItem("levvia_challenge_progress", JSON.stringify(newProgress));
     if (user?.id) {
-      const { error } = await supabase.from("profiles").update({
-        challenge_progress: newProgress as any,
-        challenge_start: localStorage.getItem("levvia_challenge_start"),
-      }).eq("id", user.id);
+      const payload: Record<string, any> = { challenge_progress: newProgress };
+      // Only send challenge_start if we have an in-memory value (from Supabase)
+      if (challengeStart) {
+        payload.challenge_start = challengeStart;
+      }
+      const { error } = await supabase.from("profiles").update(payload as any).eq("id", user.id);
       if (error) {
         console.error("❌ Erro ao salvar progresso:", error);
       } else {

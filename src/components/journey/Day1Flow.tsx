@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
+import { toast } from "sonner";
 import Day1Welcome from "./Day1Welcome";
 import HeatMapInteractive from "./HeatMapInteractive";
 import Day1MealSuggestion from "./Day1MealSuggestion";
@@ -13,10 +14,6 @@ interface Day1FlowProps {
   onComplete: () => void;
 }
 
-/**
- * Orchestrates the 5-moment Day 1 journey.
- * Steps: 1=Welcome, 2=HeatMap, 3=Onboarding(redirect), 4=MealSuggestion, 5=Closing
- */
 const Day1Flow = ({ onComplete }: Day1FlowProps) => {
   const { user } = useAuth();
   const { profile } = useProfile();
@@ -51,9 +48,6 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
           return;
         }
 
-        // NOTE: localStorage diary sync is deferred to handleHeatMapDone
-        // so that Welcome (M1) and HeatMap (M2) are never skipped.
-
         const { data, error } = await supabase
           .from("profiles")
           .select("day1_welcome_shown, heat_map_day1, day1_completed, onboarding_data")
@@ -71,7 +65,6 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
           return;
         }
 
-        // Already completed
         if ((data as any).day1_completed) {
           setLoading(false);
           onComplete();
@@ -87,7 +80,7 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
         } else if (!heatMapDone) {
           setStep(2);
         } else if (!onboardingDone) {
-          setStep(3);
+          setStep(3); // Will render <Navigate> to /onboarding
         } else {
           // Check if local diary was completed (public flow) — sync and finish
           const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
@@ -137,66 +130,83 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
   }, [user?.id, onComplete]);
 
   const handleWelcomeDone = async () => {
-    if (user?.id) {
-      await supabase
-        .from("profiles")
-        .update({ day1_welcome_shown: true } as any)
-        .eq("id", user.id);
+    try {
+      setLoading(true);
+      if (user?.id) {
+        await supabase
+          .from("profiles")
+          .update({ day1_welcome_shown: true } as any)
+          .eq("id", user.id);
+      }
+      setStep(2);
+    } catch (e) {
+      console.error("❌ Day1Flow — erro em handleWelcomeDone:", e);
+      toast.error("Erro ao salvar. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
-    setStep(2);
   };
 
   const handleHeatMapDone = async (heatMap: Record<string, number>) => {
-    if (user?.id) {
-      await supabase
-        .from("profiles")
-        .update({ heat_map_day1: heatMap } as any)
-        .eq("id", user.id);
-    }
+    try {
+      setLoading(true);
 
-    // PRIORITY: Check onboarding FIRST — never skip it
-    const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
-    if (!onboardingDone) {
-      navigate("/onboarding", { replace: true });
-      return;
-    }
-
-    // Onboarding done — now check if there's a pre-auth diary to sync
-    const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
-    const localDiary = localStorage.getItem("levvia_day1_diary");
-
-    if (localCompleted && localDiary && user?.id) {
-      try {
-        const diary = JSON.parse(localDiary);
-        await supabase.from("daily_diary").insert({
-          user_id: user.id,
-          day_number: 1,
-          leg_sensation: diary.leg_sensation,
-          guilt_before: diary.guilt_before,
-          guilt_after: diary.guilt_after,
-          notes: diary.notes || "",
-        });
-        const now = new Date().toISOString();
+      if (user?.id) {
         await supabase
           .from("profiles")
-          .update({
-            day1_completed: true,
-            day1_completed_at: now,
-            challenge_start: now,
-          } as any)
+          .update({ heat_map_day1: heatMap } as any)
           .eq("id", user.id);
-        localStorage.setItem("levvia_challenge_start", now);
-      } catch (e) {
-        console.error("Error syncing day1 diary:", e);
       }
-      localStorage.removeItem("levvia_day1_diary");
-      localStorage.removeItem("levvia_day1_local_completed");
-      onComplete();
-      return;
-    }
 
-    // Normal flow: proceed to meal suggestion
-    setStep(4);
+      // PRIORITY: Check onboarding FIRST — never skip it
+      const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
+      if (!onboardingDone) {
+        navigate("/onboarding", { replace: true });
+        return;
+      }
+
+      // Onboarding done — now check if there's a pre-auth diary to sync
+      const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
+      const localDiary = localStorage.getItem("levvia_day1_diary");
+
+      if (localCompleted && localDiary && user?.id) {
+        try {
+          const diary = JSON.parse(localDiary);
+          await supabase.from("daily_diary").insert({
+            user_id: user.id,
+            day_number: 1,
+            leg_sensation: diary.leg_sensation,
+            guilt_before: diary.guilt_before,
+            guilt_after: diary.guilt_after,
+            notes: diary.notes || "",
+          });
+          const now = new Date().toISOString();
+          await supabase
+            .from("profiles")
+            .update({
+              day1_completed: true,
+              day1_completed_at: now,
+              challenge_start: now,
+            } as any)
+            .eq("id", user.id);
+          localStorage.setItem("levvia_challenge_start", now);
+        } catch (e) {
+          console.error("Error syncing day1 diary:", e);
+        }
+        localStorage.removeItem("levvia_day1_diary");
+        localStorage.removeItem("levvia_day1_local_completed");
+        onComplete();
+        return;
+      }
+
+      // Normal flow: proceed to meal suggestion
+      setStep(4);
+    } catch (e) {
+      console.error("❌ Day1Flow — erro em handleHeatMapDone:", e);
+      toast.error("Erro ao salvar seus dados. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -209,11 +219,8 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
 
   if (step === 1) return <Day1Welcome onNext={handleWelcomeDone} />;
   if (step === 2) return <HeatMapInteractive onNext={handleHeatMapDone} />;
-  // Step 3 = onboarding not done; redirect immediately
-  if (step === 3) {
-    navigate("/onboarding", { replace: true });
-    return null;
-  }
+  // Step 3 = onboarding not done — use <Navigate> instead of imperative navigate in render
+  if (step === 3) return <Navigate to="/onboarding" replace />;
   if (step === 4) return <Day1MealSuggestion profile={profile} onNext={() => setStep(5)} />;
   if (step === 5 && user?.id) return <Day1Closing userId={user.id} onComplete={onComplete} />;
 
