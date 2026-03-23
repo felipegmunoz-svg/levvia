@@ -164,7 +164,7 @@ export function useChallengeData() {
           .from("profiles")
           .select("challenge_progress, challenge_start")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
         if (error) {
           console.error("❌ Erro ao carregar progresso:", error);
         }
@@ -173,6 +173,9 @@ export function useChallengeData() {
           console.log("✅ challenge_start carregado do Supabase:", data.challenge_start);
           setChallengeStart(data.challenge_start);
           localStorage.setItem("levvia_challenge_start", data.challenge_start);
+        } else {
+          console.warn("⚠️ challenge_start não encontrado no Supabase");
+          localStorage.removeItem("levvia_challenge_start");
         }
         if (data?.challenge_progress && typeof data.challenge_progress === "object") {
           console.log("✅ Progresso carregado do Supabase");

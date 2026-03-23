@@ -45,81 +45,92 @@ const Day1Flow = ({ onComplete }: Day1FlowProps) => {
   // Determine which step to show based on saved state
   useEffect(() => {
     const determineStep = async () => {
-      if (!user?.id) {
-        setLoading(false);
-        return;
-      }
+      try {
+        if (!user?.id) {
+          setStep(1);
+          return;
+        }
 
-      // NOTE: localStorage diary sync is deferred to handleHeatMapDone
-      // so that Welcome (M1) and HeatMap (M2) are never skipped.
+        // NOTE: localStorage diary sync is deferred to handleHeatMapDone
+        // so that Welcome (M1) and HeatMap (M2) are never skipped.
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("day1_welcome_shown, heat_map_day1, day1_completed, onboarding_data")
-        .eq("id", user.id)
-        .single();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("day1_welcome_shown, heat_map_day1, day1_completed, onboarding_data")
+          .eq("id", user.id)
+          .maybeSingle();
 
-      if (!data) {
-        setStep(1);
-        setLoading(false);
-        return;
-      }
+        if (error) {
+          console.error("❌ Day1Flow — erro ao buscar perfil:", error);
+          setStep(1);
+          return;
+        }
 
-      // Already completed
-      if ((data as any).day1_completed) {
-        onComplete();
-        return;
-      }
+        if (!data) {
+          setStep(1);
+          return;
+        }
 
-      const welcomeShown = (data as any).day1_welcome_shown === true;
-      const heatMapDone = (data as any).heat_map_day1 && Object.keys((data as any).heat_map_day1).length > 1;
-      const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
-
-      if (!welcomeShown) {
-        setStep(1);
-      } else if (!heatMapDone) {
-        setStep(2);
-      } else if (!onboardingDone) {
-        setStep(3);
-      } else {
-        // Check if local diary was completed (public flow) — sync and finish
-        const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
-        const localDiary = localStorage.getItem("levvia_day1_diary");
-
-        if (localCompleted && localDiary && user?.id) {
-          try {
-            const diary = JSON.parse(localDiary);
-            await supabase.from("daily_diary").insert({
-              user_id: user.id,
-              day_number: 1,
-              leg_sensation: diary.leg_sensation,
-              guilt_before: diary.guilt_before,
-              guilt_after: diary.guilt_after,
-              notes: diary.notes || "",
-            });
-            const now = new Date().toISOString();
-            await supabase
-              .from("profiles")
-              .update({
-                day1_completed: true,
-                day1_completed_at: now,
-                challenge_start: now,
-              } as any)
-              .eq("id", user.id);
-            localStorage.setItem("levvia_challenge_start", now);
-          } catch (e) {
-            console.error("Error syncing day1 diary:", e);
-          }
-          localStorage.removeItem("levvia_day1_diary");
-          localStorage.removeItem("levvia_day1_local_completed");
+        // Already completed
+        if ((data as any).day1_completed) {
+          setLoading(false);
           onComplete();
           return;
         }
 
-        setStep(4);
-      }
+        const welcomeShown = (data as any).day1_welcome_shown === true;
+        const heatMapDone = (data as any).heat_map_day1 && Object.keys((data as any).heat_map_day1).length > 1;
+        const onboardingDone = localStorage.getItem("levvia_onboarded") === "true";
 
-      setLoading(false);
+        if (!welcomeShown) {
+          setStep(1);
+        } else if (!heatMapDone) {
+          setStep(2);
+        } else if (!onboardingDone) {
+          setStep(3);
+        } else {
+          // Check if local diary was completed (public flow) — sync and finish
+          const localCompleted = localStorage.getItem("levvia_day1_local_completed") === "true";
+          const localDiary = localStorage.getItem("levvia_day1_diary");
+
+          if (localCompleted && localDiary && user?.id) {
+            try {
+              const diary = JSON.parse(localDiary);
+              await supabase.from("daily_diary").insert({
+                user_id: user.id,
+                day_number: 1,
+                leg_sensation: diary.leg_sensation,
+                guilt_before: diary.guilt_before,
+                guilt_after: diary.guilt_after,
+                notes: diary.notes || "",
+              });
+              const now = new Date().toISOString();
+              await supabase
+                .from("profiles")
+                .update({
+                  day1_completed: true,
+                  day1_completed_at: now,
+                  challenge_start: now,
+                } as any)
+                .eq("id", user.id);
+              localStorage.setItem("levvia_challenge_start", now);
+            } catch (e) {
+              console.error("Error syncing day1 diary:", e);
+            }
+            localStorage.removeItem("levvia_day1_diary");
+            localStorage.removeItem("levvia_day1_local_completed");
+            onComplete();
+            return;
+          }
+
+          setStep(4);
+        }
+      } catch (e) {
+        console.error("❌ Day1Flow — erro em determineStep:", e);
+        setStep(1);
+      } finally {
+        setLoading(false);
+      }
     };
 
     determineStep();
