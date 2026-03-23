@@ -92,7 +92,8 @@ const Auth = () => {
         });
         if (error) throw error;
         await syncProfileData(data.user?.id, data.user?.email);
-        showSuccessAndNavigate("/today", true);
+        const onboarded = localStorage.getItem("levvia_onboarded") === "true";
+        showSuccessAndNavigate(onboarded ? "/today" : "/onboarding", true);
       }
     } catch (error: any) {
       toast({
