@@ -101,34 +101,35 @@ const Onboarding = () => {
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string | string[]>>(() => {
     const saved = localStorage.getItem("levvia_onboarding");
+    console.log("📂 [MOUNT] localStorage levvia_onboarding:", saved ? `EXISTE (${saved.length} chars)` : "NULL");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        console.log("📂 [Onboarding] Restaurado do localStorage:", Object.keys(parsed).length, "respostas");
+        console.log("📂 [MOUNT] Restaurado:", Object.keys(parsed).length, "respostas, keys:", Object.keys(parsed));
         return parsed;
-      } catch { /* ignore */ }
+      } catch (e) { console.error("📂 [MOUNT] Parse error:", e); }
     }
     return {};
   });
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [nameInput, setNameInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { return (JSON.parse(saved)[2] as string) || ""; } catch {} }
+    if (saved) { try { const v = (JSON.parse(saved)[2] as string) || ""; console.log("📂 [MOUNT] nameInput:", v); return v; } catch {} }
     return "";
   });
   const [numberInput, setNumberInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { return (JSON.parse(saved)[3] as string) || ""; } catch {} }
+    if (saved) { try { const v = (JSON.parse(saved)[3] as string) || ""; console.log("📂 [MOUNT] numberInput:", v); return v; } catch {} }
     return "";
   });
   const [weightInput, setWeightInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { const m = JSON.parse(saved)[5]; return Array.isArray(m) ? m[0] || "" : ""; } catch {} }
+    if (saved) { try { const m = JSON.parse(saved)[5]; const v = Array.isArray(m) ? m[0] || "" : ""; console.log("📂 [MOUNT] weightInput:", v); return v; } catch {} }
     return "";
   });
   const [heightInput, setHeightInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { const m = JSON.parse(saved)[5]; return Array.isArray(m) ? m[1] || "" : ""; } catch {} }
+    if (saved) { try { const m = JSON.parse(saved)[5]; const v = Array.isArray(m) ? m[1] || "" : ""; console.log("📂 [MOUNT] heightInput:", v); return v; } catch {} }
     return "";
   });
   const [selectedSingle, setSelectedSingle] = useState<string | null>(null);
@@ -136,9 +137,16 @@ const Onboarding = () => {
 
   // Persist answers to localStorage on every change
   useEffect(() => {
+    console.log("🔍 [useEffect] answers mudou:", {
+      length: Object.keys(answers).length,
+      keys: Object.keys(answers),
+    });
     if (Object.keys(answers).length > 0) {
       localStorage.setItem("levvia_onboarding", JSON.stringify(answers));
-      console.log("💾 [Onboarding] Persistido:", Object.keys(answers).length, "respostas");
+      const verify = localStorage.getItem("levvia_onboarding");
+      console.log("💾 [useEffect] Persistido:", Object.keys(answers).length, "respostas. Verificação:", verify ? `${verify.length} chars` : "FALHOU");
+    } else {
+      console.warn("⚠️ [useEffect] answers está vazio, não persistiu");
     }
   }, [answers]);
 
