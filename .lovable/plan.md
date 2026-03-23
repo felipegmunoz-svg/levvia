@@ -1,98 +1,112 @@
 
-Objetivo: instrumentar o onboarding para descobrir exatamente onde o fluxo quebra entre interação da usuária, atualização de `answers`, persistência em `localStorage` e leitura no sync.
+Objetivo: corrigir os 2 bloqueadores críticos e blindar a persistência do desafio para funcionar entre dispositivos sem depender de cache local obsoleto.
 
-1. Instrumentar `src/pages/Onboarding.tsx` no `useEffect([answers])`
-- Adicionar log detalhado sempre que `answers` mudar:
-  - total de chaves
-  - chaves atuais
-  - payload completo
-- Adicionar branch explícita para estado vazio:
-  - `⚠️ [useEffect] answers está vazio, não persistiu`
-- Após `localStorage.setItem("levvia_onboarding", ...)`, reler a chave e logar a verificação:
-  - conteúdo salvo
-  - tamanho em chars
-- Isso confirma se:
-  - o effect dispara
-  - `answers` realmente mudou
-  - o browser aceitou a gravação
+1. Corrigir a rota do diagnóstico
+- Arquivo: `src/pages/Diagnosis.tsx`
+- Troca direta no CTA final:
+  - de `navigate("/day1-journey")`
+  - para `navigate("/today")`
+- Efeito esperado:
+  - a usuária sai do diagnóstico e entra no fluxo protegido real do Dia 1
+  - o `challenge_start` continua sendo definido apenas no fechamento correto do Dia 1
 
-2. Instrumentar todos os pontos que chamam `setAnswers`
-Mapear e adicionar logs antes e dentro do updater funcional nestes pontos já existentes:
-- `handleSingleSelect`
-- `handleMultiSelect`
-- `handleNext` para:
-  - `name`
-  - `number`
-  - `body_metrics`
-  - `pantry`
-- `handleSelectMostPantry`
+2. Eliminar o risco de loading infinito no Day1Flow
+- Arquivo: `src/components/journey/Day1Flow.tsx`
+- Problema atual:
+  - `handleHeatMapDone` faz update assíncrono no perfil, mas não controla `loading` localmente com `try/catch/finally`
+  - se houver erro ou estado intermediário inconsistente, o fluxo pode travar perceptivelmente
+- Implementação:
+  - envolver `handleHeatMapDone` em `try/catch/finally`
+  - ligar `setLoading(true)` no início da persistência
+  - garantir `setLoading(false)` no `finally`
+  - manter a ordem de negócio atual:
+    1. salvar `heat_map_day1`
+    2. se onboarding não concluído → `/onboarding`
+    3. se houver diário local concluído → sincronizar e finalizar dia 1
+    4. caso normal → avançar para `setStep(4)`
+- Blindagem adicional:
+  - aplicar o mesmo padrão em `handleWelcomeDone` para evitar estados pendurados em falhas de rede
+  - evitar navegação imperativa dentro do render (`if (step === 3) navigate(...)`), movendo esse redirect para `useEffect` ou retornando `<Navigate />`, para reduzir loops e estados instáveis
 
-Padrão dos logs:
-- antes do `setAnswers`: step atual, `current.id`, tipo, valor recebido
-- dentro do updater:
-  - quantidade antes/depois
-  - objeto final atualizado
-Isso vai mostrar em quais steps o estado entra corretamente e em quais não entra.
+3. Blindar a persistência cross-device do timer de 24h
+- Arquivo principal: `src/hooks/useChallengeData.tsx`
+- Problema atual:
+  - o cálculo de `currentDay` usa `challengeStart || localStorage.getItem("levvia_challenge_start")`
+  - isso é bom como fallback, mas ainda permite cache local influenciar o dia atual
+  - `saveProgress()` regrava `challenge_start` usando `localStorage`, o que pode reintroduzir valor stale no banco
+- Implementação:
+  - priorizar explicitamente o valor carregado do backend como fonte canônica
+  - usar localStorage apenas como fallback temporário quando ainda não houve resposta do backend
+  - alterar `saveProgress()` para:
+    - salvar `challenge_progress`
+    - enviar `challenge_start` a partir do estado `challengeStart` em memória, nunca lendo direto do localStorage
+    - idealmente não atualizar `challenge_start` dentro de `saveProgress` se ele já não mudou
+- Resultado:
+  - o dia atual passa a refletir o banco de forma consistente entre devices
+  - o cache deixa de “contaminar” o progresso
 
-3. Instrumentar finalização do onboarding antes da navegação
-No bloco final de `handleNext` (`else` quando termina o onboarding):
-- logar o snapshot completo antes do save final:
-  - `answersLength`
-  - `answersKeys`
-  - `answersData`
-  - `localStorage.getItem("levvia_onboarding")`
-- logar também `finalAnswers` imediatamente antes do `setItem`
-- adicionar erros explícitos se:
-  - `answers` estiver vazio
-  - `localStorage` estiver vazio
-Assim fica claro se o problema está no state, no save incremental, ou no save final.
+4. Invalidar caches de desafio no login/logout
+- Arquivo: `src/hooks/useAuth.tsx`
+- Problema atual:
+  - `signOut()` não limpa caches de jornada
+  - `onAuthStateChange` também não invalida progresso local ao trocar usuário/sessão
+- Implementação:
+  - limpar no logout:
+    - `levvia_challenge_start`
+    - `levvia_challenge_progress`
+    - caches locais do Dia 1/2 relacionados à jornada
+  - limpar/revalidar no `SIGNED_IN` e `INITIAL_SESSION` antes de recarregar dados, para forçar nova leitura do backend
+- Efeito esperado:
+  - ao entrar em outro dispositivo ou relogar, `/today` busca o estado real do banco
+  - desaparece a necessidade de “limpar cache manualmente”
 
-4. Instrumentar restauração inicial
-Nos lazy initializers de:
-- `answers`
-- `nameInput`
-- `numberInput`
-- `weightInput`
-- `heightInput`
-Adicionar logs curtos de restore:
-- chave encontrada ou não
-- quantidade de respostas restauradas
-Isso confirma se o componente está montando já vazio ou se está perdendo dados depois.
+5. Ajustar a leitura inicial de /today para respeitar backend primeiro
+- Arquivo: `src/pages/Today.tsx`
+- Estado atual:
+  - já busca `day1_completed`, `day1_completed_at`, `day2_completed`, `challenge_start` do backend
+  - isso está correto, mas deve ser alinhado com a blindagem do hook
+- Implementação:
+  - manter `day1_completed_at` vindo do backend como base da régua de 24h
+  - não depender de `levvia_challenge_start` para decidir liberação do Dia 2
+  - usar `day1_completed_at` como fonte do countdown / waiting gate
+- Observação:
+  - isso já está parcialmente correto hoje; a correção principal aqui é consistência com o hook e eliminação de stale cache
 
-5. Instrumentar o lado do sync para fechar o circuito
-Em `src/lib/syncOnboarding.ts`:
-- manter o log atual de snapshot
-- expandir com:
-  - chaves de `answers`
-  - tamanho do JSON bruto
-  - presença dos backups (`pantry/objectives/restrictions`)
-Isso permite comparar exatamente o que saiu do onboarding com o que chegou ao sync.
+6. Revisão de pontos que podem reintroduzir inconsistência
+- Arquivos a revisar:
+  - `src/pages/Auth.tsx`
+  - `src/pages/Onboarding.tsx`
+  - `src/lib/syncOnboarding.ts`
+- Objetivo:
+  - garantir que nenhum desses fluxos escreva `challenge_start` prematuramente
+  - garantir que `levvia_onboarded` continue sendo setada apenas no final do onboarding
+  - confirmar que o diagnóstico apenas navega para `/today`, sem inicializar desafio
 
-6. Resultado esperado da investigação
-Com esses logs será possível isolar qual cenário está acontecendo:
-- `setAnswers` nunca é chamado em certos steps
-- `setAnswers` é chamado, mas `answers` não muda
-- `answers` muda, mas `useEffect` não persiste
-- persiste, mas a chave é sobrescrita depois
-- persiste corretamente, mas chega vazia ao sync por limpeza/navegação posterior
+Critérios de aceite esperados após implementação
+1. Diagnóstico
+- Clique em “Continuar” leva para `/today`
+- `/today` renderiza `Day1Flow` quando `day1_completed = false`
 
-7. Próxima ação provável após os logs
-Dependendo do que aparecer, a correção mais provável será uma destas:
-- centralizar updates em um helper `updateAnswer(stepId, value)` para evitar pontos sem log e sem persistência
-- persistir imediatamente também nos steps de texto/número/body_metrics dentro dos handlers, não só via `useEffect`
-- salvar explicitamente passos informativos/welcome se o produto realmente espera um `raw` com todos os IDs
-- revisar se algum fluxo de navegação para `/diagnosis` ou `/auth` está recriando/limpando a chave
+2. Heat Map do Dia 1
+- Após clicar em avançar, o spinner sempre encerra
+- Em sucesso: segue para onboarding ou próxima etapa normal
+- Em erro: mostra feedback e não fica preso em loading infinito
 
-Arquivos envolvidos
-- `src/pages/Onboarding.tsx` — principal instrumentação
-- `src/lib/syncOnboarding.ts` — logs de leitura/snapshot
+3. Timer de 24h
+- Se `day1_completed_at` no banco tiver mais de 24h, o app libera Dia 2 automaticamente após login
+- Isso deve funcionar mesmo com `localStorage` antigo no navegador
 
-Critério de sucesso
-- conseguir ver, em ordem, logs de:
-  1. interação do step
-  2. `setAnswers` chamado
-  3. `answers` atualizado
-  4. `useEffect` disparado
-  5. `localStorage` verificado
-  6. snapshot completo antes do sync
-Se qualquer elo faltar, teremos identificado o ponto exato da quebra.
+Arquivos que devem entrar na implementação
+- `src/pages/Diagnosis.tsx`
+- `src/components/journey/Day1Flow.tsx`
+- `src/hooks/useChallengeData.tsx`
+- `src/hooks/useAuth.tsx`
+- `src/pages/Today.tsx`
+- revisão pontual em:
+  - `src/pages/Auth.tsx`
+  - `src/pages/Onboarding.tsx`
+  - `src/lib/syncOnboarding.ts`
+
+Sem mudanças de banco previstas
+- A correção é de fluxo e persistência no cliente
+- Não há necessidade de migration para esta tarefa
