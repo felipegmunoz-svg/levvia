@@ -976,7 +976,7 @@ const Onboarding = () => {
             <ArrowLeft size={16} strokeWidth={1.5} />
             Voltar
           </motion.button>
-        ) : current.type !== "single" ? (
+        ) : current.type !== "single" && current.type !== "heat_map" ? (
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleNext}

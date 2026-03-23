@@ -146,6 +146,7 @@ export async function syncOnboardingToSupabase(
         health_conditions: healthConditions,
         pain_level: painLevel,
         affected_areas: affectedAreas,
+        heat_map_day1: heatMapDay1,
         objectives,
         pantry_items: pantryItems,
         onboarding_data: {
