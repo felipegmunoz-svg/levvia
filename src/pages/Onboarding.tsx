@@ -397,6 +397,23 @@ const Onboarding = () => {
   }, [step]);
 
   const renderContent = () => {
+    if (current.type === "heat_map") {
+      return (
+        <HeatMapInteractive
+          onNext={(heatMap) => {
+            console.log("🔥 [HeatMap] Áreas selecionadas:", JSON.stringify(heatMap));
+            setAnswers((prev) => {
+              const updated = { ...prev, [current.id]: heatMap as any };
+              console.log("✅ [HeatMap] answers atualizado:", Object.keys(updated).length);
+              return updated;
+            });
+            setDirection(1);
+            setStep((s) => s + 1);
+          }}
+        />
+      );
+    }
+
     if (current.type === "install_pwa") {
       return (
         <InstallPWAPrompt
