@@ -100,7 +100,37 @@ export async function syncOnboardingToSupabase(
       const activityLevel = (answers[6] as string) || "";
       const healthConditions = (answers[7] as string[]) || [];
       const painLevel = (answers[8] as string) || "";
-      const affectedAreas = (answers[9] as string[]) || [];
+
+      // Heat map (id 9) is now a Record<string, number> from HeatMapInteractive
+      const heatMapRaw = answers[9] as any;
+      let heatMapDay1: Record<string, unknown> = {};
+      let affectedAreas: string[] = [];
+
+      const heatMapLabels: Record<string, string> = {
+        panturrilha_esq: "Panturrilhas",
+        panturrilha_dir: "Panturrilhas",
+        coxa_esq: "Coxas",
+        coxa_dir: "Coxas",
+        quadril_esq: "Quadris",
+        quadril_dir: "Quadris",
+        abdomen: "Abdômen/Barriga",
+        braco_esq: "Braços",
+        braco_dir: "Braços",
+      };
+
+      if (heatMapRaw && typeof heatMapRaw === "object" && !Array.isArray(heatMapRaw)) {
+        heatMapDay1 = heatMapRaw;
+        const labelsSet = new Set<string>();
+        for (const [key, val] of Object.entries(heatMapRaw)) {
+          if (typeof val === "number" && val > 0 && heatMapLabels[key]) {
+            labelsSet.add(heatMapLabels[key]);
+          }
+        }
+        affectedAreas = Array.from(labelsSet);
+      } else if (Array.isArray(heatMapRaw)) {
+        // Legacy fallback: old text-based multi-select
+        affectedAreas = heatMapRaw;
+      }
 
       console.log('💾 Sync — objectives FINAL a salvar:', JSON.stringify(objectives));
       console.log('💾 Sync — pantry_items FINAL a salvar:', JSON.stringify(pantryItems));
