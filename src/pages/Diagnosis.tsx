@@ -378,7 +378,7 @@ const Diagnosis = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.2 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => navigate("/day1-journey")}
+          onClick={() => navigate("/today")}
           className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base gradient-primary text-foreground hover:opacity-90 transition-all"
         >
           Continuar
