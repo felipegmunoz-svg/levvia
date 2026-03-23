@@ -99,14 +99,48 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
+  const [answers, setAnswers] = useState<Record<number, string | string[]>>(() => {
+    const saved = localStorage.getItem("levvia_onboarding");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        console.log("📂 [Onboarding] Restaurado do localStorage:", Object.keys(parsed).length, "respostas");
+        return parsed;
+      } catch { /* ignore */ }
+    }
+    return {};
+  });
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
-  const [nameInput, setNameInput] = useState("");
-  const [numberInput, setNumberInput] = useState("");
-  const [weightInput, setWeightInput] = useState("");
-  const [heightInput, setHeightInput] = useState("");
+  const [nameInput, setNameInput] = useState(() => {
+    const saved = localStorage.getItem("levvia_onboarding");
+    if (saved) { try { return (JSON.parse(saved)[2] as string) || ""; } catch {} }
+    return "";
+  });
+  const [numberInput, setNumberInput] = useState(() => {
+    const saved = localStorage.getItem("levvia_onboarding");
+    if (saved) { try { return (JSON.parse(saved)[3] as string) || ""; } catch {} }
+    return "";
+  });
+  const [weightInput, setWeightInput] = useState(() => {
+    const saved = localStorage.getItem("levvia_onboarding");
+    if (saved) { try { const m = JSON.parse(saved)[5]; return Array.isArray(m) ? m[0] || "" : ""; } catch {} }
+    return "";
+  });
+  const [heightInput, setHeightInput] = useState(() => {
+    const saved = localStorage.getItem("levvia_onboarding");
+    if (saved) { try { const m = JSON.parse(saved)[5]; return Array.isArray(m) ? m[1] || "" : ""; } catch {} }
+    return "";
+  });
   const [selectedSingle, setSelectedSingle] = useState<string | null>(null);
   const [customPantryInput, setCustomPantryInput] = useState("");
+
+  // Persist answers to localStorage on every change
+  useEffect(() => {
+    if (Object.keys(answers).length > 0) {
+      localStorage.setItem("levvia_onboarding", JSON.stringify(answers));
+      console.log("💾 [Onboarding] Persistido:", Object.keys(answers).length, "respostas");
+    }
+  }, [answers]);
 
   const current = onboardingSteps[step];
   const total = onboardingSteps.length;
