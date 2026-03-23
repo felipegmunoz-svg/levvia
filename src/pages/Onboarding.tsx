@@ -367,7 +367,12 @@ const Onboarding = () => {
   const handleSelectMostPantry = () => {
     const count = Math.ceil(allFilteredPantryItems.length * 0.75);
     const selected = allFilteredPantryItems.slice(0, count);
-    setAnswers((a) => ({ ...a, [current.id]: selected }));
+    console.log(`🔍 [handleSelectMostPantry] id=${current.id}, selecting ${selected.length} of ${allFilteredPantryItems.length} items`);
+    setAnswers((a) => {
+      const r = { ...a, [current.id]: selected };
+      console.log(`✅ [handleSelectMostPantry] answers keys:`, Object.keys(r));
+      return r;
+    });
     localStorage.setItem("levvia_pantry_items", JSON.stringify(selected));
   };
 
