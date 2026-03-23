@@ -17,12 +17,13 @@ export const onboardingSteps: OnboardingQuestion[] = [
     subtitle: "Seu caminho para a leveza. Vamos conhecer você melhor para personalizar sua experiência.",
     icon: "heart",
   },
+  // Step 2 — Heat Map (visual body map)
   {
-    id: 99,
-    type: "install_pwa",
-    title: "Instale o Levvia",
-    subtitle: "Para a melhor experiência, adicione à sua tela inicial.",
-    icon: "smartphone",
+    id: 9,
+    type: "heat_map",
+    title: "Onde está o seu fogo interno?",
+    subtitle: "Toque nas áreas do corpo onde você sente desconforto, dor ou inchaço.",
+    icon: "body",
   },
   {
     id: 1,
@@ -61,6 +62,14 @@ export const onboardingSteps: OnboardingQuestion[] = [
     title: "Peso e Altura",
     subtitle: "Esses dados nos ajudam a entender melhor o seu corpo. Pode ser aproximado.",
     icon: "ruler",
+  },
+  // Step 8 — PWA (moved after body metrics)
+  {
+    id: 99,
+    type: "install_pwa",
+    title: "Instale o Levvia",
+    subtitle: "Para a melhor experiência, adicione à sua tela inicial.",
+    icon: "smartphone",
   },
   {
     id: 6,
