@@ -10,7 +10,25 @@ export function readOnboardingSnapshot() {
   const objectivesBackup = localStorage.getItem("levvia_objectives");
   const restrictionsBackup = localStorage.getItem("levvia_restrictions");
 
-  console.log('📸 Snapshot — raw localStorage:', raw ? 'EXISTE (' + raw.length + ' chars)' : 'VAZIO');
+  console.log('📸 Snapshot — raw localStorage:', raw ? `EXISTE (${raw.length} chars)` : 'VAZIO');
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      console.log('📸 Snapshot — keys:', Object.keys(parsed));
+      console.log('📸 Snapshot — campos críticos:', {
+        name: parsed[2] || 'AUSENTE',
+        age: parsed[3] || 'AUSENTE',
+        pantry: Array.isArray(parsed[15]) ? `${parsed[15].length} items` : 'AUSENTE',
+        objectives: parsed[16] || 'AUSENTE',
+        restrictions: parsed[13] || 'AUSENTE',
+      });
+    } catch { /* ignore */ }
+  }
+  console.log('📸 Snapshot — backups:', {
+    pantry: pantryBackup ? `EXISTE (${pantryBackup.length} chars)` : 'VAZIO',
+    objectives: objectivesBackup ? `EXISTE (${objectivesBackup.length} chars)` : 'VAZIO',
+    restrictions: restrictionsBackup ? `EXISTE (${restrictionsBackup.length} chars)` : 'VAZIO',
+  });
 
   let answers: Record<number, string | string[]> = {};
   if (raw) {

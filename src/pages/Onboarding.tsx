@@ -101,34 +101,35 @@ const Onboarding = () => {
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string | string[]>>(() => {
     const saved = localStorage.getItem("levvia_onboarding");
+    console.log("📂 [MOUNT] localStorage levvia_onboarding:", saved ? `EXISTE (${saved.length} chars)` : "NULL");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        console.log("📂 [Onboarding] Restaurado do localStorage:", Object.keys(parsed).length, "respostas");
+        console.log("📂 [MOUNT] Restaurado:", Object.keys(parsed).length, "respostas, keys:", Object.keys(parsed));
         return parsed;
-      } catch { /* ignore */ }
+      } catch (e) { console.error("📂 [MOUNT] Parse error:", e); }
     }
     return {};
   });
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [nameInput, setNameInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { return (JSON.parse(saved)[2] as string) || ""; } catch {} }
+    if (saved) { try { const v = (JSON.parse(saved)[2] as string) || ""; console.log("📂 [MOUNT] nameInput:", v); return v; } catch {} }
     return "";
   });
   const [numberInput, setNumberInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { return (JSON.parse(saved)[3] as string) || ""; } catch {} }
+    if (saved) { try { const v = (JSON.parse(saved)[3] as string) || ""; console.log("📂 [MOUNT] numberInput:", v); return v; } catch {} }
     return "";
   });
   const [weightInput, setWeightInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { const m = JSON.parse(saved)[5]; return Array.isArray(m) ? m[0] || "" : ""; } catch {} }
+    if (saved) { try { const m = JSON.parse(saved)[5]; const v = Array.isArray(m) ? m[0] || "" : ""; console.log("📂 [MOUNT] weightInput:", v); return v; } catch {} }
     return "";
   });
   const [heightInput, setHeightInput] = useState(() => {
     const saved = localStorage.getItem("levvia_onboarding");
-    if (saved) { try { const m = JSON.parse(saved)[5]; return Array.isArray(m) ? m[1] || "" : ""; } catch {} }
+    if (saved) { try { const m = JSON.parse(saved)[5]; const v = Array.isArray(m) ? m[1] || "" : ""; console.log("📂 [MOUNT] heightInput:", v); return v; } catch {} }
     return "";
   });
   const [selectedSingle, setSelectedSingle] = useState<string | null>(null);
@@ -136,9 +137,16 @@ const Onboarding = () => {
 
   // Persist answers to localStorage on every change
   useEffect(() => {
+    console.log("🔍 [useEffect] answers mudou:", {
+      length: Object.keys(answers).length,
+      keys: Object.keys(answers),
+    });
     if (Object.keys(answers).length > 0) {
       localStorage.setItem("levvia_onboarding", JSON.stringify(answers));
-      console.log("💾 [Onboarding] Persistido:", Object.keys(answers).length, "respostas");
+      const verify = localStorage.getItem("levvia_onboarding");
+      console.log("💾 [useEffect] Persistido:", Object.keys(answers).length, "respostas. Verificação:", verify ? `${verify.length} chars` : "FALHOU");
+    } else {
+      console.warn("⚠️ [useEffect] answers está vazio, não persistiu");
     }
   }, [answers]);
 
@@ -147,7 +155,12 @@ const Onboarding = () => {
   const progress = ((step + 1) / total) * 100;
 
   const handleSingleSelect = (option: string) => {
-    setAnswers((a) => ({ ...a, [current.id]: option }));
+    console.log(`🔍 [handleSingleSelect] step=${step}, id=${current.id}, value="${option}"`);
+    setAnswers((prev) => {
+      const updated = { ...prev, [current.id]: option };
+      console.log(`✅ [handleSingleSelect] answers: ${Object.keys(prev).length} → ${Object.keys(updated).length}, keys:`, Object.keys(updated));
+      return updated;
+    });
     setSelectedSingle(option);
     setTimeout(() => {
       if (step < total - 1) {
@@ -161,14 +174,17 @@ const Onboarding = () => {
   const handleMultiSelect = (option: string) => {
     const prev = (answers[current.id] as string[]) || [];
     const isDeselecting = prev.includes(option);
-    // Limit step 16 (objectives) to max 3 selections
     if (!isDeselecting && current.id === 16 && prev.length >= 3) return;
     const updated = isDeselecting
       ? prev.filter((o) => o !== option)
       : [...prev, option];
-    setAnswers((a) => ({ ...a, [current.id]: updated }));
+    console.log(`🔍 [handleMultiSelect] step=${step}, id=${current.id}, option="${option}", selected: ${prev.length} → ${updated.length}`);
+    setAnswers((a) => {
+      const result = { ...a, [current.id]: updated };
+      console.log(`✅ [handleMultiSelect] answers keys: ${Object.keys(a).length} → ${Object.keys(result).length}`, Object.keys(result));
+      return result;
+    });
 
-    // Immediate backup for critical steps
     if (current.id === 13) localStorage.setItem("levvia_restrictions", JSON.stringify(updated));
     if (current.id === 16) localStorage.setItem("levvia_objectives", JSON.stringify(updated));
   };
@@ -200,15 +216,31 @@ const Onboarding = () => {
   };
 
   const handleNext = async () => {
+    console.log(`🔍 [handleNext] step=${step}, id=${current.id}, type="${current.type}"`);
     // Save current step's input
     if (current.type === "name") {
-      setAnswers((a) => ({ ...a, [current.id]: nameInput.trim() }));
+      console.log(`🔍 [handleNext] name: "${nameInput.trim()}"`);
+      setAnswers((a) => {
+        const r = { ...a, [current.id]: nameInput.trim() };
+        console.log(`✅ [handleNext/name] answers keys:`, Object.keys(r));
+        return r;
+      });
     }
     if (current.type === "number") {
-      setAnswers((a) => ({ ...a, [current.id]: numberInput.trim() }));
+      console.log(`🔍 [handleNext] number: "${numberInput.trim()}"`);
+      setAnswers((a) => {
+        const r = { ...a, [current.id]: numberInput.trim() };
+        console.log(`✅ [handleNext/number] answers keys:`, Object.keys(r));
+        return r;
+      });
     }
     if (current.type === "body_metrics") {
-      setAnswers((a) => ({ ...a, [current.id]: [weightInput.trim(), heightInput.trim()] }));
+      console.log(`🔍 [handleNext] body_metrics: w="${weightInput.trim()}", h="${heightInput.trim()}"`);
+      setAnswers((a) => {
+        const r = { ...a, [current.id]: [weightInput.trim(), heightInput.trim()] };
+        console.log(`✅ [handleNext/body_metrics] answers keys:`, Object.keys(r));
+        return r;
+      });
     }
 
     // Pantry: merge checkboxes + free text
@@ -246,12 +278,22 @@ const Onboarding = () => {
       setStep(step + 1);
     } else {
       // Final save
+      console.log("🔍 [Complete] Estado ANTES de save final:", {
+        answersLength: Object.keys(answers).length,
+        answersKeys: Object.keys(answers),
+        localStorage: localStorage.getItem("levvia_onboarding") ? `${localStorage.getItem("levvia_onboarding")!.length} chars` : "NULL",
+      });
+
+      if (Object.keys(answers).length === 0) {
+        console.error("❌ [Complete] ERRO CRÍTICO: answers está vazio! Dados do onboarding serão perdidos.");
+      }
+
       const finalAnswers = { ...answers };
       if (current.type === "name") finalAnswers[current.id] = nameInput.trim();
       if (current.type === "number") finalAnswers[current.id] = numberInput.trim();
       if (current.type === "body_metrics") finalAnswers[current.id] = [weightInput.trim(), heightInput.trim()];
 
-      // Pantry fallback: if answers[15] lost due to state race, recover from localStorage backup
+      // Pantry fallback
       if (!finalAnswers[15] || (Array.isArray(finalAnswers[15]) && (finalAnswers[15] as string[]).length === 0)) {
         const pantryBackup = localStorage.getItem("levvia_pantry_items");
         if (pantryBackup) {
@@ -275,17 +317,23 @@ const Onboarding = () => {
         }
       }
 
-      console.log('🔍 Final save — answers[15] (pantry):', finalAnswers[15]);
-      console.log('🔍 Final save — answers[16] (objectives):', finalAnswers[16]);
-      console.log('🔍 Final save — answers[13] (restrictions):', finalAnswers[13]);
+      console.log('🔍 [Complete] finalAnswers completo:', JSON.stringify(finalAnswers));
+      console.log('🔍 [Complete] Campos críticos:', {
+        name: finalAnswers[2],
+        age: finalAnswers[3],
+        pantry: Array.isArray(finalAnswers[15]) ? (finalAnswers[15] as string[]).length + ' items' : finalAnswers[15],
+        objectives: finalAnswers[16],
+        restrictions: finalAnswers[13],
+      });
 
-      // Save to localStorage only — Supabase sync happens after auth
       localStorage.setItem("levvia_onboarding", JSON.stringify(finalAnswers));
       localStorage.setItem("levvia_onboarded", "true");
 
-      // Clear cached meal plan so it regenerates with new profile
-      localStorage.removeItem("levvia_meal_plan");
+      // Verify final save
+      const finalVerify = localStorage.getItem("levvia_onboarding");
+      console.log("✅ [Complete] Verificação final localStorage:", finalVerify ? `${finalVerify.length} chars` : "FALHOU!");
 
+      localStorage.removeItem("levvia_meal_plan");
       navigate("/diagnosis");
     }
   };
@@ -319,7 +367,12 @@ const Onboarding = () => {
   const handleSelectMostPantry = () => {
     const count = Math.ceil(allFilteredPantryItems.length * 0.75);
     const selected = allFilteredPantryItems.slice(0, count);
-    setAnswers((a) => ({ ...a, [current.id]: selected }));
+    console.log(`🔍 [handleSelectMostPantry] id=${current.id}, selecting ${selected.length} of ${allFilteredPantryItems.length} items`);
+    setAnswers((a) => {
+      const r = { ...a, [current.id]: selected };
+      console.log(`✅ [handleSelectMostPantry] answers keys:`, Object.keys(r));
+      return r;
+    });
     localStorage.setItem("levvia_pantry_items", JSON.stringify(selected));
   };
 
