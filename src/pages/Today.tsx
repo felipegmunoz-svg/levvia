@@ -266,13 +266,25 @@ const Today = () => {
 
   // Premium gate: Day 4+ requires premium
   if (day3Done === true && currentDay >= 4 && !hasPremium) {
-    if (showPaywall) {
-      return <PaywallModal onClose={() => setShowPaywall(false)} />;
+    return <PaywallModal onClose={() => setShowPaywall(false)} />;
+  }
+
+  // Day 4 gate
+  if (day4Done === false && currentDay >= 4 && hasPremium) {
+    if (!isDev && day3CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day3CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        return (
+          <WaitingScreen
+            completedAt={day3CompletedAt}
+            nextDay={4}
+            onReady={() => setDay3CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
     }
-    // Show paywall on first visit
-    if (!showPaywall) {
-      return <PaywallModal onClose={() => setShowPaywall(false)} />;
-    }
+    return <Day4Flow onComplete={() => setDay4Done(true)} />;
+  }
   }
 
   if (selectedExercise) {
