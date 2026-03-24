@@ -1,54 +1,61 @@
+## Dia 3: Semáforo da Inflamação + Paywall — IMPLEMENTADO ✅
 
+### Migration
+- `day3_completed` (boolean), `day3_completed_at` (timestamptz), `has_premium` (boolean) adicionados à tabela `profiles`
 
-## Dia 5: Movimento Sem Dor — Plano de Implementação
+### Componentes criados
+- `Day3Flow.tsx` — Orchestrator (welcome → semáforo → cardápio → closing)
+- `Day3Welcome.tsx` — Tela de boas-vindas Dia 3
+- `FoodTrafficLight.tsx` — Semáforo Alimentar (Verde/Amarelo/Vermelho)
+- `Day3CardapioPersonalizado.tsx` — 5 refeições com accordion inline
+- `Day3Closing.tsx` — Encerramento + resumo conquistas
+- `PaywallModal.tsx` — Paywall fullscreen com preview Dias 4-14
+- `usePremium.tsx` — Hook verificação premium
 
-### 1. Migration SQL
-Adicionar 3 colunas à tabela `profiles`:
-- `day5_completed` (boolean, default false)
-- `day5_completed_at` (timestamptz)
-- `day5_movement_data` (jsonb)
+### Arquivos modificados
+- `Today.tsx` — Gate Dia 3 + gate premium Dia 4+
+- `Day2Closing.tsx` — Copy de transição atualizado
 
-### 2. Componentes novos (6 arquivos em `src/components/journey/`)
+### Checkout
+- Via `VITE_CHECKOUT_URL` (variável de ambiente configurável)
 
-**`Day5Flow.tsx`** — Orchestrator com 5 steps (welcome → movement → snack → journal → closing). AnimatePresence mode="wait", localStorage backup, saveWithRetry. Mesmo padrão Day4Flow.
+---
 
-**`Day5Welcome.tsx`** — Emoji 🏃‍♀️, título "Dia 5 — Movimento Sem Dor", afirmação sobre sistema linfático, CTA "Ativar Minha Bomba Linfática →". Sticky footer.
+## Dia 4: O Sono que Cura — IMPLEMENTADO ✅
 
-**`Day5MovementGuide.tsx`** — 3 exercícios em step-by-step com progress dots. Cada exercício mostra:
-- Header com emoji + título
-- **Ilustração SVG inline minimalista** mostrando a postura/movimento correto (silhueta simplificada com setas de direção) — não apenas emojis
-- Instruções textuais + reps
-- Botão "Completei Este Exercício" → feedback verde
-- Botão "Próximo" desabilitado até marcar completo
+### Migration
+- `day4_completed` (boolean), `day4_completed_at` (timestamptz), `day4_sleep_data` (jsonb)
 
-**`Day5Snack.tsx`** — Smoothie Verde Detox com ingredientes e preparo inline. Benefício da bromelina em destaque.
+### Componentes criados
+- `Day4Flow.tsx` — Orchestrator com AnimatePresence (welcome → hygiene → breathing → cardápio → closing)
+- `Day4Welcome.tsx` — Boas-vindas + afirmação
+- `Day4SleepHygiene.tsx` — Checklist interativo higiene do sono
+- `BreathingCircle.tsx` — Círculo de respiração 4-7-8 animado (clicável)
+- `Day4CardapioNoturno.tsx` — Cardápio com 3 opções por refeição (múltipla escolha)
+- `Day4Closing.tsx` — Encerramento + teaser Dia 5
 
-**`Day5Journal.tsx`** — Grid 2x2 para sensação nas pernas (4 opções com emoji) + grid 2x2 para energia (4 opções). Textarea opcional para notas. **canvas-confetti** dispara ao selecionar "Muito Mais Leves" (particleCount: 50, cores Levvia #2EC4B6/#1B3F6B/#2E86AB) + mensagem celebratória motion.div. Botão desabilitado até selecionar ambos os campos.
+### Sticky footer em todos os componentes
 
-**`Day5Closing.tsx`** — Lista conquistas Dia 1-5, teaser Dia 6 "O Poder das Especiarias". Sticky footer.
+---
 
-### 3. Today.tsx — Modificações
-- Adicionar state `day5Done` e `day4CompletedAt` (linhas ~90)
-- Na query existente (linha 110), adicionar `day5_completed, day4_completed_at` ao select
-- Nos setters (linhas 116-122), adicionar `setDay5Done` e `setDay4CompletedAt`
-- No catch (linha 129), adicionar `setDay5Done(false)`
-- Após o bloco Day 4 gate (linha 287), adicionar gate Day 5:
-  - Premium check → PaywallModal
-  - 24h gate (day4CompletedAt) → WaitingScreen
-  - `!day5Done` → Day5Flow
-- Import Day5Flow
+## Dia 5: Movimento Sem Dor — IMPLEMENTADO ✅
 
-### 4. Dependência nova
-- `canvas-confetti` — ~4kb gzipped, para celebração no Journal
+### Migration
+- `day5_completed` (boolean), `day5_completed_at` (timestamptz), `day5_movement_data` (jsonb)
 
-### 5. Decisões técnicas
-- **Ilustrações**: SVG inline dentro do componente (3 silhuetas minimalistas com setas de movimento — sem assets externos)
-- **Confetti**: canvas-confetti real, não substituto motion.div
-- **saveWithRetry** reutilizado
-- **Textarea** do shadcn/ui para notas
+### Componentes criados
+- `Day5Flow.tsx` — Orchestrator (welcome → movement → snack → journal → closing)
+- `Day5Welcome.tsx` — Boas-vindas sobre sistema linfático
+- `Day5MovementGuide.tsx` — 3 exercícios step-by-step com SVG inline (postura correta)
+- `Day5Snack.tsx` — Smoothie Verde Detox com bromelina
+- `Day5Journal.tsx` — Diário de sensação + energia com confetti celebration
+- `Day5Closing.tsx` — Conquistas Dia 1-5, teaser Dia 6
 
-### Arquivos
-- **Novos**: 6 componentes + 1 dependência (canvas-confetti)
-- **Modificado**: `src/pages/Today.tsx`
-- **Migration**: 3 colunas em profiles
+### Diferenciais
+- Ilustrações SVG inline mostrando postura correta para cada exercício
+- canvas-confetti ao selecionar "Muito Mais Leves"
+- Progress dots para navegação entre exercícios
+- AnimatePresence com fade+slide 300ms
 
+### Arquivos modificados
+- `Today.tsx` — Gate Day 5 (premium + 24h) + state day5Done/day4CompletedAt

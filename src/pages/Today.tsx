@@ -16,6 +16,7 @@ import Day1Flow from "@/components/journey/Day1Flow";
 import Day2Flow from "@/components/journey/Day2Flow";
 import Day3Flow from "@/components/journey/Day3Flow";
 import Day4Flow from "@/components/journey/Day4Flow";
+import Day5Flow from "@/components/journey/Day5Flow";
 import PaywallModal from "@/components/journey/PaywallModal";
 import WaitingScreen from "@/components/journey/WaitingScreen";
 import { useAuth } from "@/hooks/useAuth";
@@ -88,9 +89,11 @@ const Today = () => {
   const [day2Done, setDay2Done] = useState<boolean | null>(null);
   const [day3Done, setDay3Done] = useState<boolean | null>(null);
   const [day4Done, setDay4Done] = useState<boolean | null>(null);
+  const [day5Done, setDay5Done] = useState<boolean | null>(null);
   const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
   const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
   const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
+  const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   const isDev = import.meta.env.MODE === 'development';
@@ -107,7 +110,7 @@ const Today = () => {
     );
     const query = supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, challenge_start")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, challenge_start")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -117,9 +120,11 @@ const Today = () => {
         setDay2Done((data as any)?.day2_completed === true);
         setDay3Done((data as any)?.day3_completed === true);
         setDay4Done((data as any)?.day4_completed === true);
+        setDay5Done((data as any)?.day5_completed === true);
         setDay1CompletedAt((data as any)?.day1_completed_at || null);
         setDay2CompletedAt((data as any)?.day2_completed_at || null);
         setDay3CompletedAt((data as any)?.day3_completed_at || null);
+        setDay4CompletedAt((data as any)?.day4_completed_at || null);
         if ((data as any)?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
         }
@@ -130,6 +135,7 @@ const Today = () => {
         setDay2Done(false);
         setDay3Done(false);
         setDay4Done(false);
+        setDay5Done(false);
       });
   }, [user?.id]);
 
@@ -218,7 +224,7 @@ const Today = () => {
   };
 
   // Day 1 journey flow
-  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null) {
+  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
@@ -284,6 +290,23 @@ const Today = () => {
       }
     }
     return <Day4Flow onComplete={() => setDay4Done(true)} />;
+  }
+
+  // Day 5 gate
+  if (day5Done === false && currentDay >= 5 && hasPremium) {
+    if (!isDev && day4CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day4CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        return (
+          <WaitingScreen
+            completedAt={day4CompletedAt}
+            nextDay={5}
+            onReady={() => setDay4CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
+    return <Day5Flow onComplete={() => setDay5Done(true)} />;
   }
 
   if (selectedExercise) {
