@@ -104,7 +104,7 @@ const Today = () => {
     );
     const query = supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, challenge_start")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, challenge_start")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -112,7 +112,9 @@ const Today = () => {
       .then(({ data }) => {
         setDay1Done((data as any)?.day1_completed === true);
         setDay2Done((data as any)?.day2_completed === true);
+        setDay3Done((data as any)?.day3_completed === true);
         setDay1CompletedAt((data as any)?.day1_completed_at || null);
+        setDay2CompletedAt((data as any)?.day2_completed_at || null);
         if ((data as any)?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
         }
@@ -121,6 +123,7 @@ const Today = () => {
         console.warn("⚠️ Timeout/erro ao buscar day completion, usando fallback seguro", err);
         setDay1Done(false);
         setDay2Done(false);
+        setDay3Done(false);
       });
   }, [user?.id]);
 
