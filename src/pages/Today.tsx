@@ -97,7 +97,8 @@ const Today = () => {
   const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const isDev = import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true';
+  const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com'];
+  const isDev = (import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true') && !!user?.email && DEBUG_EMAILS.includes(user.email);
   const [replayDay, setReplayDay] = useState<number | null>(null);
 
   const handleResetLocal = () => {
