@@ -94,6 +94,7 @@ const Today = () => {
   const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
   const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
   const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
+  const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   const isDev = import.meta.env.MODE === 'development';
