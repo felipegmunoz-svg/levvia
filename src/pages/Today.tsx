@@ -234,9 +234,24 @@ const Today = () => {
   // Day 1 journey flow
   if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
-      </div>
+      <>
+        {isDev && (
+          <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
+            <span className="font-semibold text-yellow-800">🐛 Debug:</span>
+            {[1,2,3,4,5].map(d => (
+              <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded">
+                Dia {d}
+              </button>
+            ))}
+            <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded ml-auto">
+              Resetar Local
+            </button>
+          </div>
+        )}
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+        </div>
+      </>
     );
   }
 
