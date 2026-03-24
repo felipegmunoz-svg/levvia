@@ -98,6 +98,12 @@ const Today = () => {
   const [showPaywall, setShowPaywall] = useState(false);
 
   const isDev = import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true';
+  const [replayDay, setReplayDay] = useState<number | null>(null);
+
+  const handleResetLocal = () => {
+    ['levvia_day1_progress', 'levvia_day2_progress', 'levvia_day3_progress', 'levvia_day4_progress', 'levvia_day5_progress', 'levvia_challenge_progress'].forEach(k => localStorage.removeItem(k));
+    window.location.reload();
+  };
 
   // Check day completion and timestamps from Supabase (with timeout fallback)
   useEffect(() => {
