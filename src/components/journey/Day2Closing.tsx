@@ -61,9 +61,9 @@ const Day2Closing = ({ onComplete }: Day2ClosingProps) => {
           className="text-foreground/60 leading-relaxed"
           style={{ fontWeight: 300, fontSize: "0.9rem", lineHeight: 1.7 }}
         >
-          Vamos desvendar os segredos da alimentação que realmente silencia a
-          inflamação e focar em estratégias de drenagem ainda mais direcionadas.
-          Prepare-se para a clareza que você merece.
+          Amanhã é o nosso dia mais importante. Vamos consolidar sua clareza
+          nutricional para você decidir como quer seguir sua jornada de 14 dias.
+          Vamos juntas?
         </p>
       </motion.div>
 
