@@ -72,7 +72,7 @@ function getIncentiveMessage(progress: number): string {
 }
 
 const Today = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const {
     profile,
     currentDay,
