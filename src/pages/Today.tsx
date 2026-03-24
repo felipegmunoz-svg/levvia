@@ -256,7 +256,7 @@ const Today = () => {
   }
 
   // Day 3 gate
-  if (day3Done === false && currentDay >= 3) {
+  if (day3Done === false && day2Done === true) {
     if (!isDev && day2CompletedAt) {
       const hoursSince = (Date.now() - new Date(day2CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
