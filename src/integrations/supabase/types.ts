@@ -379,6 +379,9 @@ export type Database = {
           day4_completed: boolean
           day4_completed_at: string | null
           day4_sleep_data: Json | null
+          day5_completed: boolean
+          day5_completed_at: string | null
+          day5_movement_data: Json | null
           email: string
           has_premium: boolean
           health_conditions: string[] | null
@@ -415,6 +418,9 @@ export type Database = {
           day4_completed?: boolean
           day4_completed_at?: string | null
           day4_sleep_data?: Json | null
+          day5_completed?: boolean
+          day5_completed_at?: string | null
+          day5_movement_data?: Json | null
           email?: string
           has_premium?: boolean
           health_conditions?: string[] | null
@@ -451,6 +457,9 @@ export type Database = {
           day4_completed?: boolean
           day4_completed_at?: string | null
           day4_sleep_data?: Json | null
+          day5_completed?: boolean
+          day5_completed_at?: string | null
+          day5_movement_data?: Json | null
           email?: string
           has_premium?: boolean
           health_conditions?: string[] | null
