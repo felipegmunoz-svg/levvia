@@ -110,7 +110,7 @@ const Today = () => {
     );
     const query = supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, challenge_start")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, challenge_start")
       .eq("id", user.id)
       .maybeSingle();
 
