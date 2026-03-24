@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day4Welcome from "./Day4Welcome";
