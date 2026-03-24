@@ -285,7 +285,6 @@ const Today = () => {
     }
     return <Day4Flow onComplete={() => setDay4Done(true)} />;
   }
-  }
 
   if (selectedExercise) {
     return (
