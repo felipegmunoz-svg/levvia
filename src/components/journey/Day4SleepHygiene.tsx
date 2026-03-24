@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 
 interface Day4SleepHygieneProps {
@@ -27,7 +27,7 @@ const Day4SleepHygiene = ({ onContinue }: Day4SleepHygieneProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background px-6 py-12">
+    <div className="min-h-screen bg-background px-6 py-12 pb-28">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -86,29 +86,35 @@ const Day4SleepHygiene = ({ onContinue }: Day4SleepHygieneProps) => {
           ))}
         </div>
 
-        {allChecked && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass-card p-4 mb-6 text-center"
-          >
-            <p className="text-success text-sm font-medium">
-              ✨ Perfeito! Você criou um ambiente ideal para descanso restaurador.
-            </p>
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {allChecked && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="glass-card p-4 mb-6 text-center"
+            >
+              <p className="text-success text-sm font-medium">
+                ✨ Perfeito! Você criou um ambiente ideal para descanso restaurador.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <p className="text-xs text-foreground/40 text-center mb-4">
           {checkedCount}/{ITEMS.length} preparados
         </p>
+      </motion.div>
 
+      {/* Sticky bottom */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={() => onContinue(checklist)}
-          className="w-full py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+          className="w-full max-w-xs mx-auto py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm block"
         >
           Continuar para Respiração Guiada →
         </button>
-      </motion.div>
+      </div>
     </div>
   );
 };

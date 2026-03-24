@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BreathingCircleProps {
   onContinue: () => void;
@@ -66,8 +66,10 @@ const BreathingCircle = ({ onContinue }: BreathingCircleProps) => {
 
   const canFinish = cycles >= 3;
 
+  const toggleActive = () => setIsActive(!isActive);
+
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12 pb-28">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -90,8 +92,13 @@ const BreathingCircle = ({ onContinue }: BreathingCircleProps) => {
           Faça ao menos 3 ciclos completos.
         </p>
 
-        {/* Circle */}
-        <div className="relative w-56 h-56 mx-auto mb-10">
+        {/* Circle — clickable to start/pause */}
+        <div
+          className="relative w-56 h-56 mx-auto mb-10 cursor-pointer"
+          onClick={toggleActive}
+          role="button"
+          aria-label={isActive ? "Pausar respiração" : "Iniciar respiração"}
+        >
           {/* Outer glow */}
           <motion.div
             className="absolute inset-0 rounded-full"
@@ -132,52 +139,62 @@ const BreathingCircle = ({ onContinue }: BreathingCircleProps) => {
                   </p>
                   <p className="text-secondary text-3xl font-light">{countdown}s</p>
                   <p className="text-foreground/40 text-xs mt-1">Ciclo {cycles + 1}</p>
+                  <p className="text-foreground/30 text-[10px] mt-2">Toque para pausar</p>
                 </>
               ) : (
                 <p className="text-foreground/50 text-sm" style={{ fontWeight: 300 }}>
-                  {cycles > 0 ? "Pausado" : "Toque para iniciar"}
+                  {cycles > 0 ? "Toque para retomar" : "Toque para iniciar"}
                 </p>
               )}
             </div>
           </div>
         </div>
 
-        {/* Controls */}
-        {!isActive ? (
-          <button
-            onClick={() => setIsActive(true)}
-            className="w-full max-w-xs mx-auto py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm mb-4 block"
-          >
-            {cycles > 0 ? "Retomar" : "Começar Respiração Guiada"}
-          </button>
-        ) : (
-          <button
-            onClick={() => setIsActive(false)}
-            className="w-full max-w-xs mx-auto py-4 rounded-3xl border border-white/10 text-foreground/70 font-medium text-sm mb-4 block"
-          >
-            Pausar
-          </button>
-        )}
-
         <p className="text-xs text-foreground/40 mb-6">
           {cycles}/3 ciclos completos
         </p>
-
-        {canFinish && (
-          <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => {
-              setIsActive(false);
-              onContinue();
-            }}
-            className="w-full max-w-xs mx-auto py-4 rounded-3xl bg-success/20 text-success font-medium text-sm block"
-          >
-            ✓ Continuar para Cardápio Noturno →
-          </motion.button>
-        )}
       </motion.div>
+
+      {/* Sticky bottom */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+        <div className="max-w-xs mx-auto space-y-3">
+          {!isActive && !canFinish && (
+            <button
+              onClick={toggleActive}
+              className="w-full py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+            >
+              {cycles > 0 ? "Retomar" : "Começar Respiração Guiada"}
+            </button>
+          )}
+
+          {isActive && (
+            <button
+              onClick={toggleActive}
+              className="w-full py-4 rounded-3xl border border-white/10 text-foreground/70 font-medium text-sm"
+            >
+              Pausar
+            </button>
+          )}
+
+          <AnimatePresence>
+            {canFinish && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  setIsActive(false);
+                  onContinue();
+                }}
+                className="w-full py-4 rounded-3xl bg-success/20 text-success font-medium text-sm"
+              >
+                ✓ Continuar para Cardápio Noturno →
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 };
