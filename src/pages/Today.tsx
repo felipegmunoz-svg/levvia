@@ -240,6 +240,13 @@ const Today = () => {
     );
   }
 
+  // Debug replay: bypass all gates
+  if (replayDay === 1) return <Day1Flow onComplete={() => setReplayDay(null)} />;
+  if (replayDay === 2) return <Day2Flow onComplete={() => setReplayDay(null)} />;
+  if (replayDay === 3) return <Day3Flow onComplete={() => setReplayDay(null)} />;
+  if (replayDay === 4) return <Day4Flow onComplete={() => setReplayDay(null)} />;
+  if (replayDay === 5) return <Day5Flow onComplete={() => setReplayDay(null)} />;
+
   if (day1Done === false) {
     return <Day1Flow onComplete={() => setDay1Done(true)} />;
   }
