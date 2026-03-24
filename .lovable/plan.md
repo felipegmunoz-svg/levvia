@@ -1,48 +1,68 @@
 
+Objetivo: garantir que o `Day5Flow` tenha prioridade real de renderização em `/today` quando `day4_completed = true`, `day5_completed = false` e a usuária for premium.
 
-## Diagnose: Why Day 5 Doesn't Show After Completing Day 4
+1. Confirmar os pontos já verificados no código atual
+- `day4Done` está sendo populado do banco em `Today.tsx` via `select(... day4_completed ...)` e `setDay4Done((data as any)?.day4_completed === true)`.
+- A condição do Dia 5 já está antes do retorno da dashboard padrão:
+  - gate Day 5 aparece antes de `if ((loading && !forceReady) || !todayData)` e antes do `return` principal da dashboard.
+- Não há `useEffect` em `Today.tsx` resetando progresso após carregar, exceto o fallback do `catch`, que força `day1Done..day5Done = false` em erro/timeout.
 
-### Root Cause
+2. Corrigir a causa mais provável
+Hoje o componente usa `const { hasPremium } = usePremium();`, mas não espera `usePremium().loading`.
+Isso cria uma janela em que:
+- `day4Done === true`
+- `day5Done === false`
+- `hasPremium` ainda está no valor inicial `false`
+Resultado: o gate do Dia 5 não entra e o componente cai na dashboard padrão.
 
-The `currentDay` value in `useChallengeData.tsx` is **time-based**, not completion-based:
+Implementação:
+- Ler também `loading` de `usePremium`.
+- Bloquear a avaliação dos gates enquanto o status premium não estiver resolvido.
+- Exemplo de ajuste:
+  - `const { hasPremium, loading: premiumLoading } = usePremium();`
+  - incluir `premiumLoading` no spinner inicial dos gates.
 
-```text
-currentDay = Math.floor((Date.now() - challenge_start) / 86400000) + 1
-```
+3. Reforçar a prioridade de renderização do Dia 5
+Reorganizar a sequência de guards em `Today.tsx` para ficar explicitamente hierárquica:
+- loading dos estados do dia
+- loading do premium
+- Day1
+- Day2
+- Day3
+- Paywall Day4+
+- Day4
+- Day5
+- só então dashboard padrão
 
-This means if `challenge_start` was set 3.5 days ago, `currentDay = 4` — regardless of how many days you've completed. Day 5 gate checks `currentDay >= 5`, which won't be true until a full calendar day passes.
+Assim o `Day5Flow` fica impossível de ser “atropelado” por qualquer retorno genérico.
 
-So even after clicking "Salvar Progresso" on Day 4, the code falls through all gates (day1Done=true, day2Done=true, ... day4Done=true, day5Done=false but `currentDay < 5`) and renders the regular dashboard instead of Day5Flow.
+4. Eliminar inconsistência entre queries separadas
+Hoje `Today.tsx` busca progresso em uma query e `usePremium` faz outra query separada.
+Plano:
+- opção preferida: usar o mesmo fetch inicial de `profiles` em `Today.tsx` para também preencher um estado local `isPremiumUser`.
+- alternativa mínima: manter `usePremium`, mas travar a renderização até `premiumLoading === false`.
 
-### Secondary Issue
+5. Blindar contra fallback indevido
+No `catch` do fetch de progresso, hoje todos os dias viram `false`.
+Ajuste planejado:
+- não inferir progresso negativo agressivamente em erro transitório;
+- manter estado “indefinido” até retry/loading finalizar, ou usar fallback local apenas se existir dado confiável.
+Isso evita regressões onde a UI volta para fluxo antigo por timeout.
 
-The query on line 113 fetches `day4_completed_at` but **doesn't fetch `day5_completed_at`** — not a blocker now but will be needed for Day 6.
+6. Verificação específica do Day 4 → Day 5
+Ao revisar `Today.tsx`, validar também:
+- `day4_completed_at` está sendo carregado corretamente.
+- o gate de 24h só bloqueia quando houver timestamp válido e menos de 24h.
+- se `day4Done === true` e `day4CompletedAt === null`, o app deve priorizar `Day5Flow` em vez da dashboard, não silenciar o fluxo.
 
-### Fix Plan
+7. Resultado esperado após ajuste
+Cenário alvo:
+- `day4_completed = true`
+- `day5_completed = false`
+- `has_premium = true`
+- `day4_completed_at` com ou sem 24h já tratadas
+Então `/today` deve renderizar `Day5Flow` antes de qualquer dashboard.
 
-**File: `src/pages/Today.tsx`**
-
-Change the Day 5 gate condition from time-based to completion-based. Instead of requiring `currentDay >= 5`, check that Day 4 is done (which it is). The 24h gate already handles timing:
-
-```
-// Current (broken):
-if (day5Done === false && currentDay >= 5 && hasPremium)
-
-// Fixed:
-if (day5Done === false && day4Done === true && hasPremium)
-```
-
-Apply the same fix to all day gates for consistency:
-- Day 2: `day2Done === false && day1Done === true` (instead of `currentDay >= 2`)
-- Day 3: `day3Done === false && day2Done === true` (instead of `currentDay >= 3`)
-- Day 4: `day4Done === false && day3Done === true && hasPremium` (instead of `currentDay >= 4`)
-- Day 5: `day5Done === false && day4Done === true && hasPremium` (instead of `currentDay >= 5`)
-- Premium gate: `day3Done === true && day4Done === false && !hasPremium` (instead of `currentDay >= 4`)
-
-This way, completing Day 4 immediately unlocks Day 5 (subject to 24h gate), without waiting for the calendar to tick over.
-
-Also add `day5_completed_at` to the select query (line 113) and store it for future Day 6 gate.
-
-### Files Modified: 1
-- `src/pages/Today.tsx` — Fix gate conditions from time-based to completion-based, add `day5_completed_at` to query
-
+Arquivos a ajustar
+- `src/pages/Today.tsx` — prioridade dos guards, espera do premium loading, possível unificação do estado premium.
+- opcionalmente `src/hooks/usePremium.tsx` — apenas se for necessário melhorar a sincronização, mas o essencial resolve em `Today.tsx`.
