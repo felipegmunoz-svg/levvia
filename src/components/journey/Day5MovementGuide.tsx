@@ -51,31 +51,43 @@ const CalfRaiseSVG = () => (
 );
 
 const PlantarFlexionSVG = () => (
-  <svg viewBox="0 0 200 240" className="w-48 h-48 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 220 240" className="w-48 h-48 mx-auto" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bodyGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#2EC4B6" />
+        <stop offset="100%" stopColor="#3DD9C8" />
+      </linearGradient>
+    </defs>
     {/* Chair */}
-    <rect x="50" y="80" width="100" height="8" rx="2" fill="hsl(var(--muted-foreground) / 0.3)" stroke="hsl(var(--muted-foreground))" strokeWidth="1" />
-    <line x1="55" y1="88" x2="55" y2="220" stroke="hsl(var(--muted-foreground))" strokeWidth="2" />
-    <line x1="145" y1="88" x2="145" y2="220" stroke="hsl(var(--muted-foreground))" strokeWidth="2" />
-    {/* Back */}
-    <line x1="50" y1="20" x2="50" y2="80" stroke="hsl(var(--muted-foreground))" strokeWidth="2" />
-    {/* Torso sitting */}
-    <line x1="85" y1="30" x2="85" y2="85" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
+    <rect x="30" y="90" width="90" height="6" rx="3" fill="#D1D5DB" />
+    <rect x="28" y="20" width="6" height="76" rx="3" fill="#D1D5DB" />
+    <rect x="34" y="96" width="6" height="80" rx="3" fill="#D1D5DB" />
+    <rect x="110" y="96" width="6" height="80" rx="3" fill="#D1D5DB" />
     {/* Head */}
-    <circle cx="85" cy="18" r="12" stroke="hsl(var(--primary))" strokeWidth="2.5" fill="hsl(var(--primary) / 0.1)" />
-    {/* Thigh */}
-    <line x1="85" y1="85" x2="120" y2="88" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
+    <ellipse cx="75" cy="32" rx="14" ry="17" fill="url(#bodyGrad2)" />
+    {/* Neck */}
+    <rect x="70" y="48" width="10" height="8" rx="5" fill="url(#bodyGrad2)" />
+    {/* Torso sitting */}
+    <path d="M62 56 Q58 72 60 90 L90 90 Q92 72 88 56 Z" fill="url(#bodyGrad2)" />
+    {/* Left arm resting */}
+    <path d="M62 62 Q50 78 55 92" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
+    {/* Right arm resting */}
+    <path d="M88 62 Q96 78 92 92" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
+    {/* Thighs on chair */}
+    <path d="M65 92 Q80 96 100 94 Q110 93 118 96" stroke="#2EC4B6" strokeWidth="12" strokeLinecap="round" fill="none" />
     {/* Lower leg */}
-    <line x1="120" y1="88" x2="122" y2="160" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    {/* Foot pointing up */}
-    <line x1="122" y1="160" x2="110" y2="155" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    {/* Foot pointing down (ghost) */}
-    <line x1="122" y1="160" x2="135" y2="175" stroke="hsl(var(--primary) / 0.3)" strokeWidth="2" strokeLinecap="round" strokeDasharray="4 4" />
-    {/* Arrows */}
-    <path d="M105 145 L100 135 M105 145 L112 138" stroke="hsl(var(--secondary))" strokeWidth="2" strokeLinecap="round" />
-    <path d="M140 170 L145 180 M140 170 L133 177" stroke="hsl(var(--secondary))" strokeWidth="2" strokeLinecap="round" />
+    <path d="M118 96 Q120 130 119 162" stroke="#2EC4B6" strokeWidth="10" strokeLinecap="round" fill="none" />
+    {/* Foot position A - toes up (lighter) */}
+    <path d="M119 162 L105 155" stroke="#3DD9C8" strokeWidth="7" strokeLinecap="round" fill="none" />
+    {/* Foot position B - toes down (original) */}
+    <path d="M119 162 L133 172" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.5" strokeDasharray="4 3" />
+    {/* Arrow up (toe) */}
+    <path d="M98 160 L94 148 M90 153 L94 148 L98 153" stroke="#1B3F6B" strokeWidth="2" strokeLinecap="round" fill="none" />
+    {/* Arrow down (heel) */}
+    <path d="M140 166 L144 178 M140 173 L144 178 L148 173" stroke="#1B3F6B" strokeWidth="2" strokeLinecap="round" fill="none" />
     {/* Labels */}
-    <text x="85" y="135" fontSize="9" fill="hsl(var(--secondary))" fontWeight="600">PONTA</text>
-    <text x="130" y="195" fontSize="9" fill="hsl(var(--secondary))" fontWeight="600">CALCANHAR</text>
+    <text x="82" y="146" fontSize="9" fill="#1B3F6B" fontWeight="600" opacity="0.7">PONTA</text>
+    <text x="146" y="182" fontSize="9" fill="#1B3F6B" fontWeight="600" opacity="0.7">CALCANHAR</text>
   </svg>
 );
 
