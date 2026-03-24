@@ -94,6 +94,7 @@ const Today = () => {
   const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
   const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
   const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
+  const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   const isDev = import.meta.env.MODE === 'development';
@@ -110,7 +111,7 @@ const Today = () => {
     );
     const query = supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, challenge_start")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, challenge_start")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -125,6 +126,7 @@ const Today = () => {
         setDay2CompletedAt((data as any)?.day2_completed_at || null);
         setDay3CompletedAt((data as any)?.day3_completed_at || null);
         setDay4CompletedAt((data as any)?.day4_completed_at || null);
+        setDay5CompletedAt((data as any)?.day5_completed_at || null);
         if ((data as any)?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
         }
@@ -236,7 +238,7 @@ const Today = () => {
     return <Day1Flow onComplete={() => setDay1Done(true)} />;
   }
 
-  if (day2Done === false && currentDay >= 2) {
+  if (day2Done === false && day1Done === true) {
     // Check 24h gate (bypass in dev mode)
     if (!isDev && day1CompletedAt) {
       const hoursSince = (Date.now() - new Date(day1CompletedAt).getTime()) / 3600000;
@@ -254,7 +256,7 @@ const Today = () => {
   }
 
   // Day 3 gate
-  if (day3Done === false && currentDay >= 3) {
+  if (day3Done === false && day2Done === true) {
     if (!isDev && day2CompletedAt) {
       const hoursSince = (Date.now() - new Date(day2CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
@@ -271,12 +273,12 @@ const Today = () => {
   }
 
   // Premium gate: Day 4+ requires premium
-  if (day3Done === true && currentDay >= 4 && !hasPremium) {
+  if (day3Done === true && day4Done === false && !hasPremium) {
     return <PaywallModal onClose={() => setShowPaywall(false)} />;
   }
 
   // Day 4 gate
-  if (day4Done === false && currentDay >= 4 && hasPremium) {
+  if (day4Done === false && day3Done === true && hasPremium) {
     if (!isDev && day3CompletedAt) {
       const hoursSince = (Date.now() - new Date(day3CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
@@ -293,7 +295,7 @@ const Today = () => {
   }
 
   // Day 5 gate
-  if (day5Done === false && currentDay >= 5 && hasPremium) {
+  if (day5Done === false && day4Done === true && hasPremium) {
     if (!isDev && day4CompletedAt) {
       const hoursSince = (Date.now() - new Date(day4CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
