@@ -1,61 +1,48 @@
-## Dia 3: Semáforo da Inflamação + Paywall — IMPLEMENTADO ✅
 
-### Migration
-- `day3_completed` (boolean), `day3_completed_at` (timestamptz), `has_premium` (boolean) adicionados à tabela `profiles`
 
-### Componentes criados
-- `Day3Flow.tsx` — Orchestrator (welcome → semáforo → cardápio → closing)
-- `Day3Welcome.tsx` — Tela de boas-vindas Dia 3
-- `FoodTrafficLight.tsx` — Semáforo Alimentar (Verde/Amarelo/Vermelho)
-- `Day3CardapioPersonalizado.tsx` — 5 refeições com accordion inline
-- `Day3Closing.tsx` — Encerramento + resumo conquistas
-- `PaywallModal.tsx` — Paywall fullscreen com preview Dias 4-14
-- `usePremium.tsx` — Hook verificação premium
+## Diagnose: Why Day 5 Doesn't Show After Completing Day 4
 
-### Arquivos modificados
-- `Today.tsx` — Gate Dia 3 + gate premium Dia 4+
-- `Day2Closing.tsx` — Copy de transição atualizado
+### Root Cause
 
-### Checkout
-- Via `VITE_CHECKOUT_URL` (variável de ambiente configurável)
+The `currentDay` value in `useChallengeData.tsx` is **time-based**, not completion-based:
 
----
+```text
+currentDay = Math.floor((Date.now() - challenge_start) / 86400000) + 1
+```
 
-## Dia 4: O Sono que Cura — IMPLEMENTADO ✅
+This means if `challenge_start` was set 3.5 days ago, `currentDay = 4` — regardless of how many days you've completed. Day 5 gate checks `currentDay >= 5`, which won't be true until a full calendar day passes.
 
-### Migration
-- `day4_completed` (boolean), `day4_completed_at` (timestamptz), `day4_sleep_data` (jsonb)
+So even after clicking "Salvar Progresso" on Day 4, the code falls through all gates (day1Done=true, day2Done=true, ... day4Done=true, day5Done=false but `currentDay < 5`) and renders the regular dashboard instead of Day5Flow.
 
-### Componentes criados
-- `Day4Flow.tsx` — Orchestrator com AnimatePresence (welcome → hygiene → breathing → cardápio → closing)
-- `Day4Welcome.tsx` — Boas-vindas + afirmação
-- `Day4SleepHygiene.tsx` — Checklist interativo higiene do sono
-- `BreathingCircle.tsx` — Círculo de respiração 4-7-8 animado (clicável)
-- `Day4CardapioNoturno.tsx` — Cardápio com 3 opções por refeição (múltipla escolha)
-- `Day4Closing.tsx` — Encerramento + teaser Dia 5
+### Secondary Issue
 
-### Sticky footer em todos os componentes
+The query on line 113 fetches `day4_completed_at` but **doesn't fetch `day5_completed_at`** — not a blocker now but will be needed for Day 6.
 
----
+### Fix Plan
 
-## Dia 5: Movimento Sem Dor — IMPLEMENTADO ✅
+**File: `src/pages/Today.tsx`**
 
-### Migration
-- `day5_completed` (boolean), `day5_completed_at` (timestamptz), `day5_movement_data` (jsonb)
+Change the Day 5 gate condition from time-based to completion-based. Instead of requiring `currentDay >= 5`, check that Day 4 is done (which it is). The 24h gate already handles timing:
 
-### Componentes criados
-- `Day5Flow.tsx` — Orchestrator (welcome → movement → snack → journal → closing)
-- `Day5Welcome.tsx` — Boas-vindas sobre sistema linfático
-- `Day5MovementGuide.tsx` — 3 exercícios step-by-step com SVG inline (postura correta)
-- `Day5Snack.tsx` — Smoothie Verde Detox com bromelina
-- `Day5Journal.tsx` — Diário de sensação + energia com confetti celebration
-- `Day5Closing.tsx` — Conquistas Dia 1-5, teaser Dia 6
+```
+// Current (broken):
+if (day5Done === false && currentDay >= 5 && hasPremium)
 
-### Diferenciais
-- Ilustrações SVG inline mostrando postura correta para cada exercício
-- canvas-confetti ao selecionar "Muito Mais Leves"
-- Progress dots para navegação entre exercícios
-- AnimatePresence com fade+slide 300ms
+// Fixed:
+if (day5Done === false && day4Done === true && hasPremium)
+```
 
-### Arquivos modificados
-- `Today.tsx` — Gate Day 5 (premium + 24h) + state day5Done/day4CompletedAt
+Apply the same fix to all day gates for consistency:
+- Day 2: `day2Done === false && day1Done === true` (instead of `currentDay >= 2`)
+- Day 3: `day3Done === false && day2Done === true` (instead of `currentDay >= 3`)
+- Day 4: `day4Done === false && day3Done === true && hasPremium` (instead of `currentDay >= 4`)
+- Day 5: `day5Done === false && day4Done === true && hasPremium` (instead of `currentDay >= 5`)
+- Premium gate: `day3Done === true && day4Done === false && !hasPremium` (instead of `currentDay >= 4`)
+
+This way, completing Day 4 immediately unlocks Day 5 (subject to 24h gate), without waiting for the calendar to tick over.
+
+Also add `day5_completed_at` to the select query (line 113) and store it for future Day 6 gate.
+
+### Files Modified: 1
+- `src/pages/Today.tsx` — Fix gate conditions from time-based to completion-based, add `day5_completed_at` to query
+
