@@ -251,7 +251,7 @@ const Today = () => {
     );
   }
 
-  if (loading || !todayData) {
+  if ((loading && !forceReady) || !todayData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
