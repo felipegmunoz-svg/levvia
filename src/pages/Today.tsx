@@ -238,7 +238,7 @@ const Today = () => {
     return <Day1Flow onComplete={() => setDay1Done(true)} />;
   }
 
-  if (day2Done === false && currentDay >= 2) {
+  if (day2Done === false && day1Done === true) {
     // Check 24h gate (bypass in dev mode)
     if (!isDev && day1CompletedAt) {
       const hoursSince = (Date.now() - new Date(day1CompletedAt).getTime()) / 3600000;
