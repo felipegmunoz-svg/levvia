@@ -156,33 +156,48 @@ export function useChallengeData() {
     return Math.min(Math.max(day, 1), 14);
   }, [challengeStart]);
 
-  // Load progress and challenge_start from Supabase
+  // Load progress and challenge_start from Supabase (with timeout fallback)
   useEffect(() => {
     const loadProgress = async () => {
       console.log("📂 Carregando progresso...");
       if (user?.id) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("challenge_progress, challenge_start")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (error) {
-          console.error("❌ Erro ao carregar progresso:", error);
-        }
-        // Sync challenge_start from Supabase (cross-device)
-        if (data?.challenge_start) {
-          console.log("✅ challenge_start carregado do Supabase:", data.challenge_start);
-          setChallengeStart(data.challenge_start);
-          localStorage.setItem("levvia_challenge_start", data.challenge_start);
-        } else {
-          console.warn("⚠️ challenge_start não encontrado no Supabase");
-          localStorage.removeItem("levvia_challenge_start");
-        }
-        if (data?.challenge_progress && typeof data.challenge_progress === "object") {
-          console.log("✅ Progresso carregado do Supabase");
-          setChallengeProgress(data.challenge_progress as Record<string, Record<string, boolean>>);
-        } else {
-          console.log("⚠️ Sem progresso no Supabase, usando localStorage");
+        try {
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("timeout")), 5000)
+          );
+          const query = supabase
+            .from("profiles")
+            .select("challenge_progress, challenge_start")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          const { data, error } = await Promise.race([query, timeout]);
+
+          if (error) {
+            console.error("❌ Erro ao carregar progresso:", error);
+            throw error;
+          }
+          // Sync challenge_start from Supabase (cross-device)
+          if (data?.challenge_start) {
+            console.log("✅ challenge_start carregado do Supabase:", data.challenge_start);
+            setChallengeStart(data.challenge_start);
+            localStorage.setItem("levvia_challenge_start", data.challenge_start);
+          } else {
+            console.warn("⚠️ challenge_start não encontrado no Supabase");
+            localStorage.removeItem("levvia_challenge_start");
+          }
+          if (data?.challenge_progress && typeof data.challenge_progress === "object") {
+            console.log("✅ Progresso carregado do Supabase");
+            setChallengeProgress(data.challenge_progress as Record<string, Record<string, boolean>>);
+          } else {
+            console.log("⚠️ Sem progresso no Supabase, usando localStorage");
+            const saved = localStorage.getItem("levvia_challenge_progress");
+            if (saved) setChallengeProgress(JSON.parse(saved));
+          }
+        } catch (err) {
+          console.warn("⚠️ Supabase timeout/erro, usando fallback localStorage", err);
+          const savedStart = localStorage.getItem("levvia_challenge_start");
+          if (savedStart) setChallengeStart(savedStart);
           const saved = localStorage.getItem("levvia_challenge_progress");
           if (saved) setChallengeProgress(JSON.parse(saved));
         }
