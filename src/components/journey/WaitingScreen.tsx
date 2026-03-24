@@ -25,18 +25,20 @@ function getTimeRemaining(completedAt: string) {
 
 const WaitingScreen = ({ completedAt, nextDay, onReady }: WaitingScreenProps) => {
   const [remaining, setRemaining] = useState(() => getTimeRemaining(completedAt));
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   useEffect(() => {
     const interval = setInterval(() => {
       const r = getTimeRemaining(completedAt);
       if (!r) {
         clearInterval(interval);
-        onReady();
+        onReadyRef.current();
       }
       setRemaining(r);
     }, 1000);
     return () => clearInterval(interval);
-  }, [completedAt, onReady]);
+  }, [completedAt]);
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
