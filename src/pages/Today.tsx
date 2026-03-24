@@ -84,7 +84,7 @@ const Today = () => {
     saveProgress,
   } = useChallengeData();
 
-  const { hasPremium } = usePremium();
+  const { hasPremium, loading: premiumLoading } = usePremium();
   const [day1Done, setDay1Done] = useState<boolean | null>(null);
   const [day2Done, setDay2Done] = useState<boolean | null>(null);
   const [day3Done, setDay3Done] = useState<boolean | null>(null);
@@ -226,7 +226,7 @@ const Today = () => {
   };
 
   // Day 1 journey flow
-  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null) {
+  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
