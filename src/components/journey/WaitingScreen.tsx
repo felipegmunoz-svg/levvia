@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Clock, Sparkles, ArrowDown } from "lucide-react";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import BottomNav from "@/components/BottomNav";

@@ -47,8 +47,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (_event === 'SIGNED_OUT') {
         clearJourneyCaches();
       }
-      setSession(nextSession);
-      setUser(nextUser);
+      setSession(prev => prev?.access_token === nextSession?.access_token ? prev : nextSession);
+      setUser(prev => prev?.id === nextUser?.id ? prev : nextUser);
       setAuthLoading(false);
     });
 
