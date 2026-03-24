@@ -241,6 +241,34 @@ const Today = () => {
     return <Day2Flow onComplete={() => setDay2Done(true)} />;
   }
 
+  // Day 3 gate
+  if (day3Done === false && currentDay >= 3) {
+    if (!isDev && day2CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day2CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        return (
+          <WaitingScreen
+            completedAt={day2CompletedAt}
+            nextDay={3}
+            onReady={() => setDay2CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
+    return <Day3Flow onComplete={() => setDay3Done(true)} />;
+  }
+
+  // Premium gate: Day 4+ requires premium
+  if (day3Done === true && currentDay >= 4 && !hasPremium) {
+    if (showPaywall) {
+      return <PaywallModal onClose={() => setShowPaywall(false)} />;
+    }
+    // Show paywall on first visit
+    if (!showPaywall) {
+      return <PaywallModal onClose={() => setShowPaywall(false)} />;
+    }
+  }
+
   if (selectedExercise) {
     return (
       <ExerciseDetail
