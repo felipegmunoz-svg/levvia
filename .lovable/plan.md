@@ -1,60 +1,67 @@
 
 
-## Debug Replay — Plano
+## Fix: Debug Bar Visibility
 
-### Mudança
-**Arquivo: `src/pages/Today.tsx`**
+### Problem
+The debug bar with replay buttons is inside the dashboard `return` block (line 361). It only appears when ALL day gates have passed and the main dashboard renders. If the user is in a day flow, waiting screen, or paywall, the debug bar is invisible — making it useless for QA.
 
-1. **Replay em debug mode**: Quando `isDev === true`, ignorar o estado `dayXDone` para o dia mais recente completado, forçando o re-render do DayXFlow. Lógica: antes de cada gate, se `isDev` e o dia já está completo, tratar como não completo para replay.
+### Solution
+Move the debug bar to render **before** any gates, wrapping it around whichever content the gates produce. This way QA always sees the replay buttons regardless of current state.
 
-2. **Botão "Resetar Progresso Local"**: Visível apenas quando `isDev === true`, posicionado no topo da página (acima do header). Botão discreto que limpa todas as chaves localStorage dos dias (`levvia_day1_progress`, `levvia_day2_progress`, ..., `levvia_day5_progress`, `levvia_challenge_progress`) e recarrega a página.
+### Implementation
 
-### Implementação
+**File: `src/pages/Today.tsx`**
 
-**Gate override (linhas 237-312)**: Adicionar variável `debugReplay` que, quando `isDev`, força o último dia completado a ser re-exibido. Exemplo: se `day5Done === true` e `isDev`, tratar `day5Done` como `false` localmente para que o Day5Flow renderize.
+1. **Remove** the debug bar from inside the dashboard return (lines 361-373).
 
-Lógica concreta — criar variáveis override logo após a linha 229:
-```ts
-// Debug replay: force last completed day to replay
-const d1 = isDev ? false : day1Done;
-const d2 = isDev ? false : day2Done;
-// ... etc for each day
-```
+2. **Wrap the entire component output** in a fragment that always shows the debug bar first:
+   - After the loading spinner (line 235-241), all subsequent returns (gates, dashboard, etc.) should be wrapped.
+   - Simplest approach: extract the gate logic into a variable, then return a single JSX block:
 
-Isso é muito agressivo — resetaria TODOS os dias. Melhor abordagem: um state `replayDay` que o botão de debug define, e apenas esse dia específico é forçado a replay.
-
-**Abordagem final**:
-- Adicionar `const [replayDay, setReplayDay] = useState<number | null>(null);`
-- Quando `replayDay === 5`, ignorar `day5Done` e renderizar `Day5Flow`
-- Botão debug no topo mostra opções de replay (Day 1-5)
-- Botão "Resetar localStorage" limpa progress keys e recarrega
-
-**Botão debug (antes do header, linha 346)**:
 ```tsx
-{isDev && (
-  <div className="bg-yellow-100 p-2 flex gap-2 items-center text-xs">
-    <span>🐛 Debug:</span>
-    {[1,2,3,4,5].map(d => (
-      <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 rounded">
-        Replay Dia {d}
-      </button>
-    ))}
-    <button onClick={() => { /* clear localStorage keys, reload */ }}>
-      Resetar Local
-    </button>
-  </div>
-)}
+// After the premiumLoading spinner (line 241), instead of multiple early returns:
+
+// Compute which content to show
+let content: React.ReactNode = null;
+
+if (replayDay === 1) content = <Day1Flow onComplete={() => setReplayDay(null)} />;
+else if (replayDay === 2) content = <Day2Flow onComplete={() => setReplayDay(null)} />;
+// ... etc for days 3-5
+else if (day1Done === false) content = <Day1Flow ... />;
+else if (day2Done === false && day1Done === true) content = <Day2Flow ... /> (with 24h gate);
+// ... all existing gates
+else content = <dashboard JSX>;
+
+return (
+  <>
+    {isDev && (
+      <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
+        <span className="font-semibold text-yellow-800">🐛 Debug:</span>
+        {[1,2,3,4,5].map(d => (
+          <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded">
+            Dia {d}
+          </button>
+        ))}
+        <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded ml-auto">
+          Resetar Local
+        </button>
+      </div>
+    )}
+    {content}
+  </>
+);
 ```
 
-**Nos gates**: Adicionar antes da linha 237:
-```ts
-if (replayDay === 1) return <Day1Flow onComplete={() => setReplayDay(null)} />;
-if (replayDay === 2) return <Day2Flow onComplete={() => setReplayDay(null)} />;
-// ... etc
-```
+This refactors the multiple `if (...) return` pattern into a single content variable, then wraps it with the debug bar. The debug bar gets `sticky top-0 z-50` so it stays visible even during scrolling within day flows.
 
-Isso bypassa completamente todos os gates quando um replay está ativo.
+3. **Remove** the duplicate debug bar from the dashboard section (old lines 361-373).
 
-### Arquivos modificados: 1
-- `src/pages/Today.tsx` — adicionar `replayDay` state, barra debug com botões replay + reset localStorage
+### Result
+- Debug bar visible on **every** screen (day flows, waiting screens, paywall, dashboard)
+- QA can click "Dia 5" to replay at any time, from any state
+- "Resetar Local" always accessible
+- No functional changes to gates or flows
+
+### Files modified: 1
+- `src/pages/Today.tsx` — refactor returns into content variable, move debug bar to top-level wrapper
 
