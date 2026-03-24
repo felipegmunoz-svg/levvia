@@ -292,6 +292,23 @@ const Today = () => {
     return <Day4Flow onComplete={() => setDay4Done(true)} />;
   }
 
+  // Day 5 gate
+  if (day5Done === false && currentDay >= 5 && hasPremium) {
+    if (!isDev && day4CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day4CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        return (
+          <WaitingScreen
+            completedAt={day4CompletedAt}
+            nextDay={5}
+            onReady={() => setDay4CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
+    return <Day5Flow onComplete={() => setDay5Done(true)} />;
+  }
+
   if (selectedExercise) {
     return (
       <ExerciseDetail
