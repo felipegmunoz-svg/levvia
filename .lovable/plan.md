@@ -1,22 +1,31 @@
 
 
-## Dia 5 — Substituir SVGs por Imagens 3D Premium
+## Fix: Debug Bar Not Appearing for Authorized Email
 
-### Mudanças
+### Problem
+Two issues on line 101 of `src/pages/Today.tsx`:
+1. Email comparison is case-sensitive — if the user's email has any uppercase letters, it won't match
+2. `useAuth()` loading state isn't considered — `user` may still be `null` when `isDev` is evaluated
 
-1. **Copiar 3 imagens para `public/illustrations/`**
-   - `user-uploads://calf-raise-3d.png` → `public/illustrations/calf-raise-3d.png`
-   - `user-uploads://plantar-flexion-3d.png` → `public/illustrations/plantar-flexion-3d.png`
-   - `user-uploads://ankle-rotation-3d.png` → `public/illustrations/ankle-rotation-3d.png`
+### Solution
 
-2. **Modificar `src/components/journey/Day5MovementGuide.tsx`**
-   - Remover os 3 componentes SVG inline (`CalfRaiseSVG`, `PlantarFlexionSVG`, `AnkleRotationSVG`) — ~150 linhas de SVG eliminadas
-   - Substituir a propriedade `Illustration` por `illustrationUrl` no array `exercises`
-   - No render, trocar `<ExIllustration />` por `<img src={illustrationUrl} alt={title} className="w-64 h-64 object-contain rounded-lg mx-auto" loading="lazy" />`
+**File: `src/pages/Today.tsx`**
 
-### Arquivos modificados: 4
-- `public/illustrations/calf-raise-3d.png` (novo)
-- `public/illustrations/plantar-flexion-3d.png` (novo)
-- `public/illustrations/ankle-rotation-3d.png` (novo)
-- `src/components/journey/Day5MovementGuide.tsx` (modificado)
+1. **Line 75**: Destructure `loading` from `useAuth()`:
+   ```ts
+   const { user, loading: authLoading } = useAuth();
+   ```
+
+2. **Lines 100-101**: Add `.toLowerCase()`, console.log, and use `isAuthorized`:
+   ```ts
+   const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com'];
+   const isAuthorized = !!user?.email && DEBUG_EMAILS.includes(user.email.toLowerCase());
+   const isDev = (import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true') && isAuthorized;
+   console.log("Debug Check:", { email: user?.email, isAuthorized, isDev, authLoading });
+   ```
+
+No other changes needed. The debug bar rendering already uses `isDev`, so fixing the condition propagates everywhere.
+
+### Files modified: 1
+- `src/pages/Today.tsx` — 2 edits (line 75, lines 100-101)
 
