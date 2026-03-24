@@ -240,23 +240,25 @@ const Today = () => {
     );
   }
 
-  // Debug replay: bypass all gates
-  if (replayDay === 1) return <Day1Flow onComplete={() => setReplayDay(null)} />;
-  if (replayDay === 2) return <Day2Flow onComplete={() => setReplayDay(null)} />;
-  if (replayDay === 3) return <Day3Flow onComplete={() => setReplayDay(null)} />;
-  if (replayDay === 4) return <Day4Flow onComplete={() => setReplayDay(null)} />;
-  if (replayDay === 5) return <Day5Flow onComplete={() => setReplayDay(null)} />;
+  // --- Compute content to show ---
+  let content: React.ReactNode = null;
 
-  if (day1Done === false) {
-    return <Day1Flow onComplete={() => setDay1Done(true)} />;
+  // Debug replay: bypass all gates
+  if (replayDay === 1) content = <Day1Flow onComplete={() => setReplayDay(null)} />;
+  else if (replayDay === 2) content = <Day2Flow onComplete={() => setReplayDay(null)} />;
+  else if (replayDay === 3) content = <Day3Flow onComplete={() => setReplayDay(null)} />;
+  else if (replayDay === 4) content = <Day4Flow onComplete={() => setReplayDay(null)} />;
+  else if (replayDay === 5) content = <Day5Flow onComplete={() => setReplayDay(null)} />;
+
+  else if (day1Done === false) {
+    content = <Day1Flow onComplete={() => setDay1Done(true)} />;
   }
 
-  if (day2Done === false && day1Done === true) {
-    // Check 24h gate (bypass in dev mode)
+  else if (day2Done === false && day1Done === true) {
     if (!isDev && day1CompletedAt) {
       const hoursSince = (Date.now() - new Date(day1CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
-        return (
+        content = (
           <WaitingScreen
             completedAt={day1CompletedAt}
             nextDay={2}
@@ -265,15 +267,14 @@ const Today = () => {
         );
       }
     }
-    return <Day2Flow onComplete={() => setDay2Done(true)} />;
+    if (!content) content = <Day2Flow onComplete={() => setDay2Done(true)} />;
   }
 
-  // Day 3 gate
-  if (day3Done === false && day2Done === true) {
+  else if (day3Done === false && day2Done === true) {
     if (!isDev && day2CompletedAt) {
       const hoursSince = (Date.now() - new Date(day2CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
-        return (
+        content = (
           <WaitingScreen
             completedAt={day2CompletedAt}
             nextDay={3}
@@ -282,20 +283,18 @@ const Today = () => {
         );
       }
     }
-    return <Day3Flow onComplete={() => setDay3Done(true)} />;
+    if (!content) content = <Day3Flow onComplete={() => setDay3Done(true)} />;
   }
 
-  // Premium gate: Day 4+ requires premium
-  if (day3Done === true && day4Done === false && !hasPremium) {
-    return <PaywallModal onClose={() => setShowPaywall(false)} />;
+  else if (day3Done === true && day4Done === false && !hasPremium) {
+    content = <PaywallModal onClose={() => setShowPaywall(false)} />;
   }
 
-  // Day 4 gate
-  if (day4Done === false && day3Done === true && hasPremium) {
+  else if (day4Done === false && day3Done === true && hasPremium) {
     if (!isDev && day3CompletedAt) {
       const hoursSince = (Date.now() - new Date(day3CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
-        return (
+        content = (
           <WaitingScreen
             completedAt={day3CompletedAt}
             nextDay={4}
@@ -304,15 +303,14 @@ const Today = () => {
         );
       }
     }
-    return <Day4Flow onComplete={() => setDay4Done(true)} />;
+    if (!content) content = <Day4Flow onComplete={() => setDay4Done(true)} />;
   }
 
-  // Day 5 gate
-  if (day5Done === false && day4Done === true && hasPremium) {
+  else if (day5Done === false && day4Done === true && hasPremium) {
     if (!isDev && day4CompletedAt) {
       const hoursSince = (Date.now() - new Date(day4CompletedAt).getTime()) / 3600000;
       if (hoursSince < 24) {
-        return (
+        content = (
           <WaitingScreen
             completedAt={day4CompletedAt}
             nextDay={5}
@@ -321,11 +319,11 @@ const Today = () => {
         );
       }
     }
-    return <Day5Flow onComplete={() => setDay5Done(true)} />;
+    if (!content) content = <Day5Flow onComplete={() => setDay5Done(true)} />;
   }
 
-  if (selectedExercise) {
-    return (
+  else if (selectedExercise) {
+    content = (
       <ExerciseDetail
         exercise={toExerciseView(selectedExercise.exercise)}
         onBack={() => setSelectedExercise(null)}
@@ -334,8 +332,8 @@ const Today = () => {
     );
   }
 
-  if (selectedRecipe) {
-    return (
+  else if (selectedRecipe) {
+    content = (
       <RecipeDetail
         recipe={toRecipeView(selectedRecipe.recipe)}
         onBack={() => setSelectedRecipe(null)}
@@ -344,8 +342,8 @@ const Today = () => {
     );
   }
 
-  if ((loading && !forceReady) || !todayData) {
-    return (
+  else if ((loading && !forceReady) || !todayData) {
+    content = (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -355,22 +353,10 @@ const Today = () => {
     );
   }
 
-  return (
+  // If no gate matched, render the dashboard
+  if (!content) {
+    content = (
     <div className="min-h-screen bg-background pb-24">
-      {/* Debug bar */}
-      {isDev && (
-        <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs">
-          <span className="font-semibold text-yellow-800">🐛 Debug:</span>
-          {[1, 2, 3, 4, 5].map(d => (
-            <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
-              Dia {d}
-            </button>
-          ))}
-          <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded hover:bg-red-400 transition-colors ml-auto">
-            Resetar Local
-          </button>
-        </div>
-      )}
       {/* Header */}
       <header className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
         <div className="flex items-center gap-3 mb-1">
