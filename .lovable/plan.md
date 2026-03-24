@@ -1,53 +1,41 @@
 
 
-## Unificação Visual: Mapa de Inflamação Dia 2 com SVG
+## Blindagem contra Loading Infinito
 
 ### Objetivo
-Substituir o grid de botões do `Day2InflammationMap.tsx` pela silhueta SVG do `HeatMapInteractive.tsx`, mantendo as 4 categorias de inflamação e a tela de notas.
+Adicionar timeout + fallback em dois pontos críticos para que o app nunca trave em spinner.
 
-### Abordagem
-Reescrever `Day2InflammationMap.tsx` para usar o mesmo SVG do Dia 1, com um seletor de ferramentas (Dor/Inchaço/Peso/Sensibilidade) acima do mapa. Cada área pode receber múltiplos tipos. A tela de notas permanece como está.
+### 1. `src/hooks/useChallengeData.tsx` — Timeout no loadProgress
 
-Nao modificar `HeatMapInteractive.tsx` (manter Dia 1 intacto). Toda a lógica do Dia 2 fica encapsulada em `Day2InflammationMap.tsx`.
+No `useEffect` que carrega progresso (linha 160), envolver a query Supabase em `Promise.race` com timeout de 5 segundos. No `catch`, usar localStorage como fallback. Sem fallback disponível, manter estado inicial (vazio). Não mudar a assinatura do hook nem outros efeitos.
 
-### Arquivo: `src/components/journey/Day2InflammationMap.tsx`
+```
+Antes:
+  const { data, error } = await supabase.from("profiles").select(...)
 
-Mudanças:
+Depois:
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 5000));
+  const { data, error } = await Promise.race([supabase.from(...), timeout]);
+```
 
-1. **Substituir grid por SVG** — copiar a estrutura SVG do `HeatMapInteractive` (silhueta completa com cabeça, pescoço, mãos, pés decorativos + 9 áreas clicáveis)
+Adicionar `try/catch/finally` garantindo que mesmo com erro, o hook para de carregar.
 
-2. **Cor das áreas** — em vez de intensidade (0-3), cada área mostra a cor do último tipo marcado. Se tem múltiplos tipos, usa a cor do tipo mais recente (comportamento atual do `getAreaColor` já faz isso)
+### 2. `src/pages/Today.tsx` — Timeout de segurança no useEffect de day completion
 
-3. **Emojis sobre as áreas** — adicionar `<text>` SVG sobre cada área mostrando os emojis dos tipos marcados (ex: "🔴🟡" se tem Dor + Inchaço)
+No `useEffect` da linha 89 que busca `day1_completed/day2_completed`, adicionar:
+- Timeout de 5 segundos via `Promise.race`
+- No catch/timeout: setar `day1Done = false` e `day2Done = false` (estado seguro — renderiza Day1Flow)
+- Garantir que o spinner da linha 184-190 (`day1Done === null`) nunca fica infinito
 
-4. **Seletor de ferramentas** — manter o seletor existente (4 botões pill), posicionado acima do SVG
+### 3. Fallback visual em `Today.tsx` linha 233
 
-5. **Legenda** — substituir a legenda de intensidade por legenda dos 4 tipos com suas cores
-
-6. **Tela de notas** — manter exatamente como está (funciona bem)
-
-7. **Narrativa** — título muda de "Onde a inflamação se manifesta?" para "Ontem você mapeou onde. Hoje vamos entender como." com subtítulo contextual
-
-### Detalhes técnicos
-
-**SVG paths** — extraídos diretamente do `HeatMapInteractive.tsx` (linhas 117-131), incluindo paths decorativos (cabeça, pescoço, mãos, pés) e 9 áreas interativas
-
-**Coordenadas centrais para emojis** (aproximadas a partir dos paths):
-- braco_esq: (44, 150), braco_dir: (176, 150)
-- abdomen: (110, 130)
-- quadril_esq: (82, 198), quadril_dir: (138, 198)
-- coxa_esq: (82, 267), coxa_dir: (138, 267)
-- panturrilha_esq: (80, 354), panturrilha_dir: (140, 354)
-
-**Estado** — sem mudanças no estado (`markedAreas`, `notes`, `currentTool`, `showNotes`). A lógica de toggle e getAreaColor já está correta.
-
-**onComplete** — interface e dados retornados permanecem idênticos, sem mudança no `Day2Flow.tsx`
+O spinner "Personalizando seu plano..." (quando `loading || !todayData`) já existe. Adicionar um `useEffect` com `setTimeout(8000)` que força `loading = false` caso o hook `useChallengeData` nunca resolva. Isso é um último recurso — se ativado, o dashboard renderiza vazio mas navegável.
 
 ### Arquivos modificados
-- `src/components/journey/Day2InflammationMap.tsx` — reescrever render principal (substituir grid por SVG)
+- `src/hooks/useChallengeData.tsx` — timeout no loadProgress
+- `src/pages/Today.tsx` — timeout nos dois spinners
 
 ### Arquivos NÃO modificados
-- `HeatMapInteractive.tsx` — intacto
-- `Day2Flow.tsx` — intacto (já chama `Day2InflammationMap` corretamente)
-- Supabase — sem migration (campo `day2_inflammation_map` JSONB já existe)
+- Day1Flow, Day2Flow, HeatMapInteractive, Day2InflammationMap — intactos
+- Nenhuma migration necessária
 
