@@ -126,6 +126,7 @@ const Today = () => {
         setDay2CompletedAt((data as any)?.day2_completed_at || null);
         setDay3CompletedAt((data as any)?.day3_completed_at || null);
         setDay4CompletedAt((data as any)?.day4_completed_at || null);
+        setDay5CompletedAt((data as any)?.day5_completed_at || null);
         if ((data as any)?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
         }
