@@ -1,27 +1,22 @@
 
 
-## Restringir Debug Bar por Email — Plano
+## Dia 5 — Substituir SVGs por Imagens 3D Premium
 
-### Mudança
+### Mudanças
 
-**Arquivo: `src/pages/Today.tsx` (linha 100)**
+1. **Copiar 3 imagens para `public/illustrations/`**
+   - `user-uploads://calf-raise-3d.png` → `public/illustrations/calf-raise-3d.png`
+   - `user-uploads://plantar-flexion-3d.png` → `public/illustrations/plantar-flexion-3d.png`
+   - `user-uploads://ankle-rotation-3d.png` → `public/illustrations/ankle-rotation-3d.png`
 
-Alterar de:
-```ts
-const isDev = import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true';
-```
+2. **Modificar `src/components/journey/Day5MovementGuide.tsx`**
+   - Remover os 3 componentes SVG inline (`CalfRaiseSVG`, `PlantarFlexionSVG`, `AnkleRotationSVG`) — ~150 linhas de SVG eliminadas
+   - Substituir a propriedade `Illustration` por `illustrationUrl` no array `exercises`
+   - No render, trocar `<ExIllustration />` por `<img src={illustrationUrl} alt={title} className="w-64 h-64 object-contain rounded-lg mx-auto" loading="lazy" />`
 
-Para:
-```ts
-const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com'];
-const isDev = (import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true') && !!user?.email && DEBUG_EMAILS.includes(user.email);
-```
-
-`user` já está disponível via `useAuth()` na linha 75. Isso garante que:
-- Mesmo com `levvia_debug` no localStorage, a barra só aparece para os 2 emails autorizados
-- O gate de 24h permanece ativo para todos os outros usuários
-- Nenhum outro arquivo precisa ser alterado
-
-### Arquivos modificados: 1
-- `src/pages/Today.tsx` — 1 linha alterada (linha 100)
+### Arquivos modificados: 4
+- `public/illustrations/calf-raise-3d.png` (novo)
+- `public/illustrations/plantar-flexion-3d.png` (novo)
+- `public/illustrations/ankle-rotation-3d.png` (novo)
+- `src/components/journey/Day5MovementGuide.tsx` (modificado)
 
