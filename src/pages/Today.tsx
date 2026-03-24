@@ -100,7 +100,15 @@ const Today = () => {
   const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com'];
   const isAuthorized = !!user?.email && DEBUG_EMAILS.includes(user.email.toLowerCase());
   const isDev = (import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true') && isAuthorized;
-  console.log("Debug Check:", { email: user?.email, isAuthorized, isDev });
+  console.log("Debug Check:", { email: user?.email, isAuthorized, isDev, authLoading });
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (localStorage.getItem('levvia_debug') === 'true') {
+      alert('User Email: ' + user?.email);
+    }
+  }, [user?.email, authLoading]);
+
   const [replayDay, setReplayDay] = useState<number | null>(null);
 
   const handleResetLocal = () => {
