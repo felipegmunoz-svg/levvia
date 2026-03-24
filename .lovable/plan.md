@@ -1,112 +1,53 @@
 
-Objetivo: corrigir os 2 bloqueadores críticos e blindar a persistência do desafio para funcionar entre dispositivos sem depender de cache local obsoleto.
 
-1. Corrigir a rota do diagnóstico
-- Arquivo: `src/pages/Diagnosis.tsx`
-- Troca direta no CTA final:
-  - de `navigate("/day1-journey")`
-  - para `navigate("/today")`
-- Efeito esperado:
-  - a usuária sai do diagnóstico e entra no fluxo protegido real do Dia 1
-  - o `challenge_start` continua sendo definido apenas no fechamento correto do Dia 1
+## Unificação Visual: Mapa de Inflamação Dia 2 com SVG
 
-2. Eliminar o risco de loading infinito no Day1Flow
-- Arquivo: `src/components/journey/Day1Flow.tsx`
-- Problema atual:
-  - `handleHeatMapDone` faz update assíncrono no perfil, mas não controla `loading` localmente com `try/catch/finally`
-  - se houver erro ou estado intermediário inconsistente, o fluxo pode travar perceptivelmente
-- Implementação:
-  - envolver `handleHeatMapDone` em `try/catch/finally`
-  - ligar `setLoading(true)` no início da persistência
-  - garantir `setLoading(false)` no `finally`
-  - manter a ordem de negócio atual:
-    1. salvar `heat_map_day1`
-    2. se onboarding não concluído → `/onboarding`
-    3. se houver diário local concluído → sincronizar e finalizar dia 1
-    4. caso normal → avançar para `setStep(4)`
-- Blindagem adicional:
-  - aplicar o mesmo padrão em `handleWelcomeDone` para evitar estados pendurados em falhas de rede
-  - evitar navegação imperativa dentro do render (`if (step === 3) navigate(...)`), movendo esse redirect para `useEffect` ou retornando `<Navigate />`, para reduzir loops e estados instáveis
+### Objetivo
+Substituir o grid de botões do `Day2InflammationMap.tsx` pela silhueta SVG do `HeatMapInteractive.tsx`, mantendo as 4 categorias de inflamação e a tela de notas.
 
-3. Blindar a persistência cross-device do timer de 24h
-- Arquivo principal: `src/hooks/useChallengeData.tsx`
-- Problema atual:
-  - o cálculo de `currentDay` usa `challengeStart || localStorage.getItem("levvia_challenge_start")`
-  - isso é bom como fallback, mas ainda permite cache local influenciar o dia atual
-  - `saveProgress()` regrava `challenge_start` usando `localStorage`, o que pode reintroduzir valor stale no banco
-- Implementação:
-  - priorizar explicitamente o valor carregado do backend como fonte canônica
-  - usar localStorage apenas como fallback temporário quando ainda não houve resposta do backend
-  - alterar `saveProgress()` para:
-    - salvar `challenge_progress`
-    - enviar `challenge_start` a partir do estado `challengeStart` em memória, nunca lendo direto do localStorage
-    - idealmente não atualizar `challenge_start` dentro de `saveProgress` se ele já não mudou
-- Resultado:
-  - o dia atual passa a refletir o banco de forma consistente entre devices
-  - o cache deixa de “contaminar” o progresso
+### Abordagem
+Reescrever `Day2InflammationMap.tsx` para usar o mesmo SVG do Dia 1, com um seletor de ferramentas (Dor/Inchaço/Peso/Sensibilidade) acima do mapa. Cada área pode receber múltiplos tipos. A tela de notas permanece como está.
 
-4. Invalidar caches de desafio no login/logout
-- Arquivo: `src/hooks/useAuth.tsx`
-- Problema atual:
-  - `signOut()` não limpa caches de jornada
-  - `onAuthStateChange` também não invalida progresso local ao trocar usuário/sessão
-- Implementação:
-  - limpar no logout:
-    - `levvia_challenge_start`
-    - `levvia_challenge_progress`
-    - caches locais do Dia 1/2 relacionados à jornada
-  - limpar/revalidar no `SIGNED_IN` e `INITIAL_SESSION` antes de recarregar dados, para forçar nova leitura do backend
-- Efeito esperado:
-  - ao entrar em outro dispositivo ou relogar, `/today` busca o estado real do banco
-  - desaparece a necessidade de “limpar cache manualmente”
+Nao modificar `HeatMapInteractive.tsx` (manter Dia 1 intacto). Toda a lógica do Dia 2 fica encapsulada em `Day2InflammationMap.tsx`.
 
-5. Ajustar a leitura inicial de /today para respeitar backend primeiro
-- Arquivo: `src/pages/Today.tsx`
-- Estado atual:
-  - já busca `day1_completed`, `day1_completed_at`, `day2_completed`, `challenge_start` do backend
-  - isso está correto, mas deve ser alinhado com a blindagem do hook
-- Implementação:
-  - manter `day1_completed_at` vindo do backend como base da régua de 24h
-  - não depender de `levvia_challenge_start` para decidir liberação do Dia 2
-  - usar `day1_completed_at` como fonte do countdown / waiting gate
-- Observação:
-  - isso já está parcialmente correto hoje; a correção principal aqui é consistência com o hook e eliminação de stale cache
+### Arquivo: `src/components/journey/Day2InflammationMap.tsx`
 
-6. Revisão de pontos que podem reintroduzir inconsistência
-- Arquivos a revisar:
-  - `src/pages/Auth.tsx`
-  - `src/pages/Onboarding.tsx`
-  - `src/lib/syncOnboarding.ts`
-- Objetivo:
-  - garantir que nenhum desses fluxos escreva `challenge_start` prematuramente
-  - garantir que `levvia_onboarded` continue sendo setada apenas no final do onboarding
-  - confirmar que o diagnóstico apenas navega para `/today`, sem inicializar desafio
+Mudanças:
 
-Critérios de aceite esperados após implementação
-1. Diagnóstico
-- Clique em “Continuar” leva para `/today`
-- `/today` renderiza `Day1Flow` quando `day1_completed = false`
+1. **Substituir grid por SVG** — copiar a estrutura SVG do `HeatMapInteractive` (silhueta completa com cabeça, pescoço, mãos, pés decorativos + 9 áreas clicáveis)
 
-2. Heat Map do Dia 1
-- Após clicar em avançar, o spinner sempre encerra
-- Em sucesso: segue para onboarding ou próxima etapa normal
-- Em erro: mostra feedback e não fica preso em loading infinito
+2. **Cor das áreas** — em vez de intensidade (0-3), cada área mostra a cor do último tipo marcado. Se tem múltiplos tipos, usa a cor do tipo mais recente (comportamento atual do `getAreaColor` já faz isso)
 
-3. Timer de 24h
-- Se `day1_completed_at` no banco tiver mais de 24h, o app libera Dia 2 automaticamente após login
-- Isso deve funcionar mesmo com `localStorage` antigo no navegador
+3. **Emojis sobre as áreas** — adicionar `<text>` SVG sobre cada área mostrando os emojis dos tipos marcados (ex: "🔴🟡" se tem Dor + Inchaço)
 
-Arquivos que devem entrar na implementação
-- `src/pages/Diagnosis.tsx`
-- `src/components/journey/Day1Flow.tsx`
-- `src/hooks/useChallengeData.tsx`
-- `src/hooks/useAuth.tsx`
-- `src/pages/Today.tsx`
-- revisão pontual em:
-  - `src/pages/Auth.tsx`
-  - `src/pages/Onboarding.tsx`
-  - `src/lib/syncOnboarding.ts`
+4. **Seletor de ferramentas** — manter o seletor existente (4 botões pill), posicionado acima do SVG
 
-Sem mudanças de banco previstas
-- A correção é de fluxo e persistência no cliente
-- Não há necessidade de migration para esta tarefa
+5. **Legenda** — substituir a legenda de intensidade por legenda dos 4 tipos com suas cores
+
+6. **Tela de notas** — manter exatamente como está (funciona bem)
+
+7. **Narrativa** — título muda de "Onde a inflamação se manifesta?" para "Ontem você mapeou onde. Hoje vamos entender como." com subtítulo contextual
+
+### Detalhes técnicos
+
+**SVG paths** — extraídos diretamente do `HeatMapInteractive.tsx` (linhas 117-131), incluindo paths decorativos (cabeça, pescoço, mãos, pés) e 9 áreas interativas
+
+**Coordenadas centrais para emojis** (aproximadas a partir dos paths):
+- braco_esq: (44, 150), braco_dir: (176, 150)
+- abdomen: (110, 130)
+- quadril_esq: (82, 198), quadril_dir: (138, 198)
+- coxa_esq: (82, 267), coxa_dir: (138, 267)
+- panturrilha_esq: (80, 354), panturrilha_dir: (140, 354)
+
+**Estado** — sem mudanças no estado (`markedAreas`, `notes`, `currentTool`, `showNotes`). A lógica de toggle e getAreaColor já está correta.
+
+**onComplete** — interface e dados retornados permanecem idênticos, sem mudança no `Day2Flow.tsx`
+
+### Arquivos modificados
+- `src/components/journey/Day2InflammationMap.tsx` — reescrever render principal (substituir grid por SVG)
+
+### Arquivos NÃO modificados
+- `HeatMapInteractive.tsx` — intacto
+- `Day2Flow.tsx` — intacto (já chama `Day2InflammationMap` corretamente)
+- Supabase — sem migration (campo `day2_inflammation_map` JSONB já existe)
+
