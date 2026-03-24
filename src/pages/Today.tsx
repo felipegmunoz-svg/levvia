@@ -85,28 +85,49 @@ const Today = () => {
 
   const isDev = import.meta.env.MODE === 'development';
 
-  // Check day completion and timestamps from Supabase (cross-device)
+  // Check day completion and timestamps from Supabase (with timeout fallback)
   useEffect(() => {
     if (!user?.id) {
       setDay1Done(true);
       setDay2Done(true);
       return;
     }
-    supabase
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), 5000)
+    );
+    const query = supabase
       .from("profiles")
       .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, challenge_start")
       .eq("id", user.id)
-      .single()
+      .maybeSingle();
+
+    Promise.race([query, timeout])
       .then(({ data }) => {
         setDay1Done((data as any)?.day1_completed === true);
         setDay2Done((data as any)?.day2_completed === true);
         setDay1CompletedAt((data as any)?.day1_completed_at || null);
-        // Sync challenge_start to localStorage for cross-device
         if ((data as any)?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
         }
+      })
+      .catch((err) => {
+        console.warn("⚠️ Timeout/erro ao buscar day completion, usando fallback seguro", err);
+        setDay1Done(false);
+        setDay2Done(false);
       });
   }, [user?.id]);
+
+  // Safety timeout: force loading off if useChallengeData never resolves
+  const [forceReady, setForceReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        console.warn("⚠️ Safety timeout 8s atingido, forçando renderização");
+        setForceReady(true);
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const [selectedExercise, setSelectedExercise] = useState<{ exercise: DbExercise; activityId: string } | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<{ recipe: DbRecipe; activityId: string } | null>(null);
@@ -230,7 +251,7 @@ const Today = () => {
     );
   }
 
-  if (loading || !todayData) {
+  if ((loading && !forceReady) || !todayData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
