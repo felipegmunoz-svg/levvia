@@ -16,6 +16,7 @@ import Day1Flow from "@/components/journey/Day1Flow";
 import Day2Flow from "@/components/journey/Day2Flow";
 import Day3Flow from "@/components/journey/Day3Flow";
 import Day4Flow from "@/components/journey/Day4Flow";
+import Day5Flow from "@/components/journey/Day5Flow";
 import PaywallModal from "@/components/journey/PaywallModal";
 import WaitingScreen from "@/components/journey/WaitingScreen";
 import { useAuth } from "@/hooks/useAuth";
