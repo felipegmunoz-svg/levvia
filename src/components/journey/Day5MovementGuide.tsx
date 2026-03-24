@@ -7,36 +7,46 @@ interface Day5MovementGuideProps {
 }
 
 const CalfRaiseSVG = () => (
-  <svg viewBox="0 0 200 280" className="w-48 h-48 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Ground line */}
-    <line x1="40" y1="260" x2="160" y2="260" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" strokeDasharray="4 4" />
-    {/* Left leg */}
-    <line x1="85" y1="120" x2="80" y2="200" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    <line x1="80" y1="200" x2="82" y2="240" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    {/* Left foot (on toes) */}
-    <line x1="82" y1="240" x2="75" y2="252" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="75" cy="252" r="3" fill="hsl(var(--primary))" />
-    {/* Right leg */}
-    <line x1="115" y1="120" x2="120" y2="200" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    <line x1="120" y1="200" x2="118" y2="240" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    {/* Right foot (on toes) */}
-    <line x1="118" y1="240" x2="125" y2="252" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="125" cy="252" r="3" fill="hsl(var(--primary))" />
-    {/* Torso */}
-    <line x1="100" y1="60" x2="100" y2="120" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
+  <svg viewBox="0 0 200 300" className="w-48 h-48 mx-auto" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bodyGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#2EC4B6" />
+        <stop offset="100%" stopColor="#3DD9C8" />
+      </linearGradient>
+    </defs>
     {/* Head */}
-    <circle cx="100" cy="45" r="15" stroke="hsl(var(--primary))" strokeWidth="2.5" fill="hsl(var(--primary) / 0.1)" />
-    {/* Arms */}
-    <line x1="100" y1="75" x2="70" y2="100" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round" />
-    <line x1="100" y1="75" x2="130" y2="100" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round" />
+    <ellipse cx="100" cy="38" rx="16" ry="20" fill="url(#bodyGrad1)" />
+    {/* Neck */}
+    <rect x="94" y="56" width="12" height="12" rx="6" fill="url(#bodyGrad1)" />
+    {/* Torso */}
+    <path d="M82 68 Q78 90 80 120 Q82 140 88 145 L112 145 Q118 140 120 120 Q122 90 118 68 Z" fill="url(#bodyGrad1)" />
+    {/* Left arm */}
+    <path d="M82 72 Q68 95 72 120" stroke="#2EC4B6" strokeWidth="8" strokeLinecap="round" fill="none" />
+    {/* Right arm */}
+    <path d="M118 72 Q132 95 128 120" stroke="#2EC4B6" strokeWidth="8" strokeLinecap="round" fill="none" />
     {/* Hips */}
-    <line x1="85" y1="120" x2="115" y2="120" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
+    <ellipse cx="100" cy="150" rx="22" ry="14" fill="url(#bodyGrad1)" />
+    {/* Left thigh */}
+    <path d="M86 158 Q82 185 84 210" stroke="#2EC4B6" strokeWidth="14" strokeLinecap="round" fill="none" />
+    {/* Right thigh */}
+    <path d="M114 158 Q118 185 116 210" stroke="#2EC4B6" strokeWidth="14" strokeLinecap="round" fill="none" />
+    {/* Left calf - highlighted */}
+    <path d="M84 210 Q80 235 82 258" stroke="#2EC4B6" strokeWidth="11" strokeLinecap="round" fill="none" />
+    <path d="M84 210 Q80 235 82 258" stroke="#1B3F6B" strokeWidth="13" strokeLinecap="round" fill="none" opacity="0.15" />
+    {/* Right calf - highlighted */}
+    <path d="M116 210 Q120 235 118 258" stroke="#2EC4B6" strokeWidth="11" strokeLinecap="round" fill="none" />
+    <path d="M116 210 Q120 235 118 258" stroke="#1B3F6B" strokeWidth="13" strokeLinecap="round" fill="none" opacity="0.15" />
+    {/* Left foot on toes */}
+    <ellipse cx="80" cy="264" rx="10" ry="5" fill="#2EC4B6" />
+    {/* Right foot on toes */}
+    <ellipse cx="120" cy="264" rx="10" ry="5" fill="#2EC4B6" />
+    {/* Ground dots */}
+    <line x1="55" y1="272" x2="145" y2="272" stroke="#1B3F6B" strokeWidth="1" strokeDasharray="3 5" opacity="0.3" />
     {/* Up arrows */}
-    <path d="M150 220 L150 180 L142 192 M150 180 L158 192" stroke="hsl(var(--secondary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <text x="155" y="210" fontSize="10" fill="hsl(var(--secondary))" fontWeight="600">SUBA</text>
-    {/* Calf highlight */}
-    <ellipse cx="80" cy="215" rx="8" ry="18" fill="hsl(var(--secondary) / 0.15)" stroke="hsl(var(--secondary))" strokeWidth="1" strokeDasharray="3 3" />
-    <ellipse cx="120" cy="215" rx="8" ry="18" fill="hsl(var(--secondary) / 0.15)" stroke="hsl(var(--secondary))" strokeWidth="1" strokeDasharray="3 3" />
+    <path d="M148 250 L148 220 M142 230 L148 220 L154 230" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    <path d="M52 250 L52 220 M46 230 L52 220 L58 230" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    {/* Label */}
+    <text x="100" y="292" fontSize="11" fill="#1B3F6B" fontWeight="600" textAnchor="middle" opacity="0.7">ELEVAR</text>
   </svg>
 );
 
