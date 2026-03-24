@@ -87,8 +87,10 @@ const Today = () => {
   const [day1Done, setDay1Done] = useState<boolean | null>(null);
   const [day2Done, setDay2Done] = useState<boolean | null>(null);
   const [day3Done, setDay3Done] = useState<boolean | null>(null);
+  const [day4Done, setDay4Done] = useState<boolean | null>(null);
   const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
   const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
+  const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   const isDev = import.meta.env.MODE === 'development';
