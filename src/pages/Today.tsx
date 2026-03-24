@@ -273,7 +273,7 @@ const Today = () => {
   }
 
   // Premium gate: Day 4+ requires premium
-  if (day3Done === true && currentDay >= 4 && !hasPremium) {
+  if (day3Done === true && day4Done === false && !hasPremium) {
     return <PaywallModal onClose={() => setShowPaywall(false)} />;
   }
 
