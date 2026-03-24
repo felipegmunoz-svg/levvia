@@ -6,141 +6,13 @@ interface Day5MovementGuideProps {
   onContinue: (data: Record<string, boolean>) => void;
 }
 
-const CalfRaiseSVG = () => (
-  <svg viewBox="0 0 200 300" className="w-48 h-48 mx-auto" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bodyGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#2EC4B6" />
-        <stop offset="100%" stopColor="#3DD9C8" />
-      </linearGradient>
-    </defs>
-    {/* Head */}
-    <ellipse cx="100" cy="38" rx="16" ry="20" fill="url(#bodyGrad1)" />
-    {/* Neck */}
-    <rect x="94" y="56" width="12" height="12" rx="6" fill="url(#bodyGrad1)" />
-    {/* Torso */}
-    <path d="M82 68 Q78 90 80 120 Q82 140 88 145 L112 145 Q118 140 120 120 Q122 90 118 68 Z" fill="url(#bodyGrad1)" />
-    {/* Left arm */}
-    <path d="M82 72 Q68 95 72 120" stroke="#2EC4B6" strokeWidth="8" strokeLinecap="round" fill="none" />
-    {/* Right arm */}
-    <path d="M118 72 Q132 95 128 120" stroke="#2EC4B6" strokeWidth="8" strokeLinecap="round" fill="none" />
-    {/* Hips */}
-    <ellipse cx="100" cy="150" rx="22" ry="14" fill="url(#bodyGrad1)" />
-    {/* Left thigh */}
-    <path d="M86 158 Q82 185 84 210" stroke="#2EC4B6" strokeWidth="14" strokeLinecap="round" fill="none" />
-    {/* Right thigh */}
-    <path d="M114 158 Q118 185 116 210" stroke="#2EC4B6" strokeWidth="14" strokeLinecap="round" fill="none" />
-    {/* Left calf - highlighted */}
-    <path d="M84 210 Q80 235 82 258" stroke="#2EC4B6" strokeWidth="11" strokeLinecap="round" fill="none" />
-    <path d="M84 210 Q80 235 82 258" stroke="#1B3F6B" strokeWidth="13" strokeLinecap="round" fill="none" opacity="0.15" />
-    {/* Right calf - highlighted */}
-    <path d="M116 210 Q120 235 118 258" stroke="#2EC4B6" strokeWidth="11" strokeLinecap="round" fill="none" />
-    <path d="M116 210 Q120 235 118 258" stroke="#1B3F6B" strokeWidth="13" strokeLinecap="round" fill="none" opacity="0.15" />
-    {/* Left foot on toes */}
-    <ellipse cx="80" cy="264" rx="10" ry="5" fill="#2EC4B6" />
-    {/* Right foot on toes */}
-    <ellipse cx="120" cy="264" rx="10" ry="5" fill="#2EC4B6" />
-    {/* Ground dots */}
-    <line x1="55" y1="272" x2="145" y2="272" stroke="#1B3F6B" strokeWidth="1" strokeDasharray="3 5" opacity="0.3" />
-    {/* Up arrows */}
-    <path d="M148 250 L148 220 M142 230 L148 220 L154 230" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    <path d="M52 250 L52 220 M46 230 L52 220 L58 230" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    {/* Label */}
-    <text x="100" y="292" fontSize="11" fill="#1B3F6B" fontWeight="600" textAnchor="middle" opacity="0.7">ELEVAR</text>
-  </svg>
-);
-
-const PlantarFlexionSVG = () => (
-  <svg viewBox="0 0 220 240" className="w-48 h-48 mx-auto" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bodyGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#2EC4B6" />
-        <stop offset="100%" stopColor="#3DD9C8" />
-      </linearGradient>
-    </defs>
-    {/* Chair */}
-    <rect x="30" y="90" width="90" height="6" rx="3" fill="#D1D5DB" />
-    <rect x="28" y="20" width="6" height="76" rx="3" fill="#D1D5DB" />
-    <rect x="34" y="96" width="6" height="80" rx="3" fill="#D1D5DB" />
-    <rect x="110" y="96" width="6" height="80" rx="3" fill="#D1D5DB" />
-    {/* Head */}
-    <ellipse cx="75" cy="32" rx="14" ry="17" fill="url(#bodyGrad2)" />
-    {/* Neck */}
-    <rect x="70" y="48" width="10" height="8" rx="5" fill="url(#bodyGrad2)" />
-    {/* Torso sitting */}
-    <path d="M62 56 Q58 72 60 90 L90 90 Q92 72 88 56 Z" fill="url(#bodyGrad2)" />
-    {/* Left arm resting */}
-    <path d="M62 62 Q50 78 55 92" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
-    {/* Right arm resting */}
-    <path d="M88 62 Q96 78 92 92" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
-    {/* Thighs on chair */}
-    <path d="M65 92 Q80 96 100 94 Q110 93 118 96" stroke="#2EC4B6" strokeWidth="12" strokeLinecap="round" fill="none" />
-    {/* Lower leg */}
-    <path d="M118 96 Q120 130 119 162" stroke="#2EC4B6" strokeWidth="10" strokeLinecap="round" fill="none" />
-    {/* Foot position A - toes up (lighter) */}
-    <path d="M119 162 L105 155" stroke="#3DD9C8" strokeWidth="7" strokeLinecap="round" fill="none" />
-    {/* Foot position B - toes down (original) */}
-    <path d="M119 162 L133 172" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.5" strokeDasharray="4 3" />
-    {/* Arrow up (toe) */}
-    <path d="M98 160 L94 148 M90 153 L94 148 L98 153" stroke="#1B3F6B" strokeWidth="2" strokeLinecap="round" fill="none" />
-    {/* Arrow down (heel) */}
-    <path d="M140 166 L144 178 M140 173 L144 178 L148 173" stroke="#1B3F6B" strokeWidth="2" strokeLinecap="round" fill="none" />
-    {/* Labels */}
-    <text x="82" y="146" fontSize="9" fill="#1B3F6B" fontWeight="600" opacity="0.7">PONTA</text>
-    <text x="146" y="182" fontSize="9" fill="#1B3F6B" fontWeight="600" opacity="0.7">CALCANHAR</text>
-  </svg>
-);
-
-const AnkleRotationSVG = () => (
-  <svg viewBox="0 0 220 200" className="w-48 h-48 mx-auto" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bodyGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#2EC4B6" />
-        <stop offset="100%" stopColor="#3DD9C8" />
-      </linearGradient>
-    </defs>
-    {/* Support surface / cushion */}
-    <rect x="10" y="100" width="70" height="12" rx="6" fill="#D1D5DB" opacity="0.5" />
-    {/* Torso reclined */}
-    <path d="M35 50 Q30 70 32 100 L52 100 Q54 70 50 50 Z" fill="url(#bodyGrad3)" />
-    {/* Head */}
-    <ellipse cx="42" cy="36" rx="14" ry="16" fill="url(#bodyGrad3)" />
-    {/* Left arm */}
-    <path d="M35 58 Q20 75 25 95" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
-    {/* Right arm supporting */}
-    <path d="M52 58 Q62 75 58 95" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
-    {/* Hips */}
-    <ellipse cx="42" cy="108" rx="18" ry="10" fill="url(#bodyGrad3)" />
-    {/* Left leg resting */}
-    <path d="M32 114 Q28 140 30 170" stroke="#2EC4B6" strokeWidth="10" strokeLinecap="round" fill="none" />
-    <ellipse cx="30" cy="176" rx="10" ry="5" fill="#2EC4B6" />
-    {/* Right leg elevated */}
-    <path d="M54 114 Q80 105 120 95 Q145 88 158 85" stroke="#2EC4B6" strokeWidth="10" strokeLinecap="round" fill="none" />
-    {/* Ankle joint glow */}
-    <circle cx="158" cy="85" r="8" fill="#1B3F6B" opacity="0.15" />
-    <circle cx="158" cy="85" r="4" fill="#1B3F6B" opacity="0.3" />
-    {/* Foot */}
-    <path d="M158 85 Q170 80 180 83" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
-    {/* Rotation circle */}
-    <circle cx="158" cy="85" r="26" stroke="#1B3F6B" strokeWidth="1.5" strokeDasharray="4 4" fill="none" opacity="0.4" />
-    {/* Rotation arrow CW */}
-    <path d="M184 85 Q186 68 178 58" stroke="#1B3F6B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-    <path d="M178 58 L182 66 M178 58 L172 62" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-    {/* Rotation arrow CCW */}
-    <path d="M132 85 Q130 102 138 112" stroke="#1B3F6B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-    <path d="M138 112 L134 104 M138 112 L144 108" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-    {/* Label */}
-    <text x="158" y="128" fontSize="11" fill="#1B3F6B" fontWeight="600" textAnchor="middle" opacity="0.7">GIRAR</text>
-  </svg>
-);
-
 const exercises = [
   {
     id: "elevacaoCalcanhares",
     title: "Elevação de Calcanhares",
     subtitle: "Em Pé",
     icon: "👣",
-    Illustration: CalfRaiseSVG,
+    illustrationUrl: "/illustrations/calf-raise-3d.png",
     instructions:
       "Em pé, com os pés paralelos e o corpo ereto, eleve os calcanhares do chão, ficando na ponta dos pés. Sinta a contração nas panturrilhas. Desça lentamente. Repita 10 vezes.",
     reps: "10 repetições",
@@ -150,7 +22,7 @@ const exercises = [
     title: "Flexão Plantar e Dorsal",
     subtitle: "Sentada",
     icon: "🪑",
-    Illustration: PlantarFlexionSVG,
+    illustrationUrl: "/illustrations/plantar-flexion-3d.png",
     instructions:
       "Sentada, com os pés no chão, alterne entre levantar a ponta dos pés (mantendo os calcanhares no chão) e levantar os calcanhares (mantendo as pontas dos pés no chão). Faça 10 repetições de cada movimento.",
     reps: "10 repetições de cada",
@@ -160,7 +32,7 @@ const exercises = [
     title: "Rotação de Tornozelos",
     subtitle: "Deitada ou Sentada",
     icon: "🔄",
-    Illustration: AnkleRotationSVG,
+    illustrationUrl: "/illustrations/ankle-rotation-3d.png",
     instructions:
       "Deitada ou sentada, eleve uma perna e gire o tornozelo em círculos, 10 vezes para cada lado. Troque de perna. Isso ajuda a lubrificar as articulações e ativar a circulação local.",
     reps: "10 vezes cada lado, 2 pernas",
@@ -176,7 +48,6 @@ const Day5MovementGuide = ({ onContinue }: Day5MovementGuideProps) => {
   });
 
   const currentExercise = exercises[currentStep];
-  const ExIllustration = currentExercise.Illustration;
 
   const handleMarkComplete = () => {
     setCompleted({ ...completed, [currentExercise.id]: true });
@@ -232,8 +103,13 @@ const Day5MovementGuide = ({ onContinue }: Day5MovementGuideProps) => {
           </div>
         </div>
 
-        <div className="mb-4">
-          <ExIllustration />
+        <div className="mb-4 flex justify-center">
+          <img
+            src={currentExercise.illustrationUrl}
+            alt={currentExercise.title}
+            className="w-64 h-64 object-contain rounded-lg"
+            loading="lazy"
+          />
         </div>
 
         <p className="text-sm text-muted-foreground mb-4">{currentExercise.instructions}</p>
