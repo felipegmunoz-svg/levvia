@@ -167,14 +167,6 @@ const BreathingCircle = ({ onContinue }: BreathingCircleProps) => {
             </button>
           )}
 
-          {isActive && (
-            <button
-              onClick={toggleActive}
-              className="w-full py-4 rounded-3xl border border-white/10 text-foreground/70 font-medium text-sm"
-            >
-              Pausar
-            </button>
-          )}
 
           <AnimatePresence>
             {canFinish && (

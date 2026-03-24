@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day4Welcome from "./Day4Welcome";
@@ -86,13 +87,41 @@ const Day4Flow = ({ onComplete }: Day4FlowProps) => {
     );
   }
 
-  if (step === "welcome") return <Day4Welcome onContinue={() => goTo("hygiene")} />;
-  if (step === "hygiene") return <Day4SleepHygiene onContinue={(data) => goTo("breathing", { hygieneChecklist: data })} />;
-  if (step === "breathing") return <BreathingCircle onContinue={() => goTo("cardapio", { breathingCompleted: true })} />;
-  if (step === "cardapio") return <Day4CardapioNoturno onContinue={() => goTo("closing")} />;
-  if (step === "closing") return <Day4Closing onComplete={handleDay4Complete} />;
+  const stepVariants = {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 },
+  };
 
-  return null;
+  return (
+    <AnimatePresence mode="wait">
+      {step === "welcome" && (
+        <motion.div key="welcome" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day4Welcome onContinue={() => goTo("hygiene")} />
+        </motion.div>
+      )}
+      {step === "hygiene" && (
+        <motion.div key="hygiene" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day4SleepHygiene onContinue={(data) => goTo("breathing", { hygieneChecklist: data })} />
+        </motion.div>
+      )}
+      {step === "breathing" && (
+        <motion.div key="breathing" {...stepVariants} transition={{ duration: 0.3 }}>
+          <BreathingCircle onContinue={() => goTo("cardapio", { breathingCompleted: true })} />
+        </motion.div>
+      )}
+      {step === "cardapio" && (
+        <motion.div key="cardapio" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day4CardapioNoturno onContinue={() => goTo("closing")} />
+        </motion.div>
+      )}
+      {step === "closing" && (
+        <motion.div key="closing" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day4Closing onComplete={handleDay4Complete} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 export default Day4Flow;
