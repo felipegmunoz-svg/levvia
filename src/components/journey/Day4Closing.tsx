@@ -19,7 +19,7 @@ const Day4Closing = ({ onComplete }: Day4ClosingProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12 pb-28">
       <motion.img
         src={logoAzul}
         alt="Levvia"
@@ -89,17 +89,20 @@ const Day4Closing = ({ onComplete }: Day4ClosingProps) => {
         </p>
       </motion.div>
 
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={handleComplete}
-        disabled={saving}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
-      >
-        {saving ? "Salvando..." : "Salvar Progresso →"}
-      </motion.button>
+      {/* Sticky bottom */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={handleComplete}
+          disabled={saving}
+          className="w-full max-w-xs mx-auto py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm block"
+        >
+          {saving ? "Salvando..." : "Salvar Progresso →"}
+        </motion.button>
+      </div>
     </div>
   );
 };
