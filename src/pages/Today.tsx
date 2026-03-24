@@ -129,6 +129,7 @@ const Today = () => {
         setDay1Done(false);
         setDay2Done(false);
         setDay3Done(false);
+        setDay4Done(false);
       });
   }, [user?.id]);
 
