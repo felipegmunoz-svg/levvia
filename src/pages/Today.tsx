@@ -97,7 +97,7 @@ const Today = () => {
   const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const isDev = import.meta.env.MODE === 'development';
+  const isDev = import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true';
 
   // Check day completion and timestamps from Supabase (with timeout fallback)
   useEffect(() => {
