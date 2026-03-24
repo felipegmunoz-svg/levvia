@@ -561,6 +561,26 @@ const Today = () => {
 
       <BottomNav />
     </div>
+    );
+  }
+
+  return (
+    <>
+      {isDev && (
+        <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
+          <span className="font-semibold text-yellow-800">🐛 Debug:</span>
+          {[1, 2, 3, 4, 5].map(d => (
+            <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
+              Dia {d}
+            </button>
+          ))}
+          <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded hover:bg-red-400 transition-colors ml-auto">
+            Resetar Local
+          </button>
+        </div>
+      )}
+      {content}
+    </>
   );
 };
 
