@@ -92,26 +92,45 @@ const PlantarFlexionSVG = () => (
 );
 
 const AnkleRotationSVG = () => (
-  <svg viewBox="0 0 200 200" className="w-48 h-48 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Leg elevated */}
-    <line x1="40" y1="60" x2="100" y2="70" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    <line x1="100" y1="70" x2="140" y2="80" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    {/* Ankle joint */}
-    <circle cx="140" cy="80" r="5" fill="hsl(var(--secondary))" />
+  <svg viewBox="0 0 220 200" className="w-48 h-48 mx-auto" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bodyGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#2EC4B6" />
+        <stop offset="100%" stopColor="#3DD9C8" />
+      </linearGradient>
+    </defs>
+    {/* Support surface / cushion */}
+    <rect x="10" y="100" width="70" height="12" rx="6" fill="#D1D5DB" opacity="0.5" />
+    {/* Torso reclined */}
+    <path d="M35 50 Q30 70 32 100 L52 100 Q54 70 50 50 Z" fill="url(#bodyGrad3)" />
+    {/* Head */}
+    <ellipse cx="42" cy="36" rx="14" ry="16" fill="url(#bodyGrad3)" />
+    {/* Left arm */}
+    <path d="M35 58 Q20 75 25 95" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
+    {/* Right arm supporting */}
+    <path d="M52 58 Q62 75 58 95" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
+    {/* Hips */}
+    <ellipse cx="42" cy="108" rx="18" ry="10" fill="url(#bodyGrad3)" />
+    {/* Left leg resting */}
+    <path d="M32 114 Q28 140 30 170" stroke="#2EC4B6" strokeWidth="10" strokeLinecap="round" fill="none" />
+    <ellipse cx="30" cy="176" rx="10" ry="5" fill="#2EC4B6" />
+    {/* Right leg elevated */}
+    <path d="M54 114 Q80 105 120 95 Q145 88 158 85" stroke="#2EC4B6" strokeWidth="10" strokeLinecap="round" fill="none" />
+    {/* Ankle joint glow */}
+    <circle cx="158" cy="85" r="8" fill="#1B3F6B" opacity="0.15" />
+    <circle cx="158" cy="85" r="4" fill="#1B3F6B" opacity="0.3" />
     {/* Foot */}
-    <line x1="140" y1="80" x2="165" y2="90" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-    {/* Rotation circle around ankle */}
-    <circle cx="140" cy="80" r="30" stroke="hsl(var(--secondary))" strokeWidth="1.5" strokeDasharray="5 5" fill="none" />
-    {/* Rotation arrow */}
-    <path d="M170 80 Q175 65 165 55" stroke="hsl(var(--secondary))" strokeWidth="2" fill="none" strokeLinecap="round" />
-    <path d="M165 55 L170 62 M165 55 L158 58" stroke="hsl(var(--secondary))" strokeWidth="2" strokeLinecap="round" />
-    {/* Second rotation arrow */}
-    <path d="M110 80 Q105 95 115 105" stroke="hsl(var(--secondary))" strokeWidth="2" fill="none" strokeLinecap="round" />
-    <path d="M115 105 L110 98 M115 105 L122 102" stroke="hsl(var(--secondary))" strokeWidth="2" strokeLinecap="round" />
+    <path d="M158 85 Q170 80 180 83" stroke="#2EC4B6" strokeWidth="7" strokeLinecap="round" fill="none" />
+    {/* Rotation circle */}
+    <circle cx="158" cy="85" r="26" stroke="#1B3F6B" strokeWidth="1.5" strokeDasharray="4 4" fill="none" opacity="0.4" />
+    {/* Rotation arrow CW */}
+    <path d="M184 85 Q186 68 178 58" stroke="#1B3F6B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    <path d="M178 58 L182 66 M178 58 L172 62" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    {/* Rotation arrow CCW */}
+    <path d="M132 85 Q130 102 138 112" stroke="#1B3F6B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    <path d="M138 112 L134 104 M138 112 L144 108" stroke="#1B3F6B" strokeWidth="2.5" strokeLinecap="round" fill="none" />
     {/* Label */}
-    <text x="120" y="130" fontSize="10" fill="hsl(var(--secondary))" fontWeight="600" textAnchor="middle">GIRE</text>
-    {/* Support surface */}
-    <rect x="10" y="55" width="40" height="10" rx="3" fill="hsl(var(--muted-foreground) / 0.2)" stroke="hsl(var(--muted-foreground))" strokeWidth="1" />
+    <text x="158" y="128" fontSize="11" fill="#1B3F6B" fontWeight="600" textAnchor="middle" opacity="0.7">GIRAR</text>
   </svg>
 );
 
