@@ -162,7 +162,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 }
 
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
-  console.log('🔍 parseOnboardingFromSupabase — userId:', userId);
+  
 
   const { data, error } = await supabase
     .from("profiles")
