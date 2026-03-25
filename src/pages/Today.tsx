@@ -105,6 +105,24 @@ const Today = () => {
   const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
+  // Debug render instrumentation
+  const branch = day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading
+    ? "LOADING_GATES"
+    : day1Done === false ? "DAY1_FLOW"
+    : day2Done === false && day1Done === true ? "DAY2_FLOW"
+    : day3Done === false && day2Done === true ? "DAY3_FLOW"
+    : day3Done === true && day4Done === false && !hasPremium ? "PAYWALL"
+    : day4Done === false && day3Done === true && hasPremium ? "DAY4_FLOW"
+    : day5Done === false && day4Done === true && hasPremium ? "DAY5_FLOW"
+    : day5Done === true && hasPremium ? "DAY5_DONE"
+    : "DASHBOARD";
+  
+  debugRender("Today", {
+    renderNum: renderCount.current, branch, currentDay, authLoading, loading, premiumLoading,
+    day1Done, day2Done, day3Done, day4Done, day5Done, hasPremium,
+    hasTodayData: !!todayData, forceReady: false,
+  });
+
   const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com'];
   const isAuthorized = !!user?.email && DEBUG_EMAILS.includes(user.email.toLowerCase());
   const isDev = (import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true') && isAuthorized;
