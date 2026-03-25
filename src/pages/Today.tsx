@@ -340,6 +340,33 @@ const Today = () => {
     if (!content) content = <Day5Flow onComplete={() => setDay5Done(true)} />;
   }
 
+  else if (day5Done === true && hasPremium) {
+    if (day5CompletedAt) {
+      const hoursSince = (Date.now() - new Date(day5CompletedAt).getTime()) / 3600000;
+      if (hoursSince < 24) {
+        content = (
+          <WaitingScreen
+            completedAt={day5CompletedAt}
+            nextDay={6}
+            onReady={() => setDay5CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
+    if (!content) {
+      content = (
+        <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center text-center">
+          <span className="text-6xl mb-4">🚀</span>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Dia 6 em breve!</h2>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Estamos preparando o próximo passo da sua jornada.
+            Enquanto isso, continue praticando os aprendizados dos dias anteriores.
+          </p>
+        </div>
+      );
+    }
+  }
+
   else if (selectedExercise) {
     content = (
       <ExerciseDetail
