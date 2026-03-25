@@ -796,7 +796,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
     if (top3.length >= 3 && (top3[0].finalScore - top3[2].finalScore) <= 5) {
       const randomIndex = Math.floor(Math.random() * 3);
       selected = top3[randomIndex];
-      console.log('🎲 Randomização ativada — scores próximos, escolhendo index', randomIndex);
+      
     }
 
     // Meal-time preference within top 5 (if no randomization)
