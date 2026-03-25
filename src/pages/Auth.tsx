@@ -55,9 +55,11 @@ const Auth = () => {
     const message = isSignup ? "Conta criada com sucesso!" : "Bem-vinda de volta!";
     setLoading(false);
     setSuccess({ message, destination });
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       navigate(destination, { replace: true });
     }, 1800);
+    // Store timer ref for potential cleanup (component will unmount on navigate)
+    return () => clearTimeout(timer);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
