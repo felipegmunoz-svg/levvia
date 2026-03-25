@@ -788,24 +788,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
 
     withFinal.sort((a, b) => b.finalScore - a.finalScore);
 
-    console.log('🔍 Motor — Perfil recebido:', {
-      pantrySize,
-      commonWeight,
-      objectives: healthGoals,
-      restrictions: dietProfile,
-      activityLevel: profile.activityLevel,
-    });
-    console.log('🔍 Motor — Top 5 receitas:', withFinal.slice(0, 5).map(r => ({
-      title: r.title,
-      pantryScore: r.pantryScore.toFixed(1) + '%',
-      goalOverlap: r.goalOverlap,
-      inflammation: r.inflammationScore,
-      commonWeighted: r.commonWeighted.toFixed(1),
-      complexity: r.complexityBonus.toFixed(1),
-      diversity: r.diversityScore + ' (' + r.diversityCategories.join(', ') + ')',
-      activityBoost: r.activityBoost,
-      finalScore: r.finalScore.toFixed(1),
-    })));
+
 
     // Controlled randomization among top 3 if scores are close
     let selected: typeof withFinal[0] | undefined;
