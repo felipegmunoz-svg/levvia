@@ -160,6 +160,11 @@ export function useChallengeData() {
     return Math.min(Math.max(day, 1), 14);
   }, [challengeStart]);
 
+  debugRender("useChallengeData", { 
+    renderNum: renderCount.current, profileLoading, dataLoading, currentDay, 
+    userId: user?.id, hasChallengeStart: !!challengeStart 
+  });
+
   // Load progress and challenge_start from Supabase (with proper cleanup)
   useEffect(() => {
     if (!user?.id) {
