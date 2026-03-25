@@ -18,7 +18,7 @@ const STEPS = [
     detail: "Quanto mais perto, mais fácil elevar as pernas",
   },
   {
-    title: "Suba as pernas pela parede até ficar em "L"",
+    title: "Suba as pernas pela parede até ficar em 'L'",
     detail: "Quadril no chão, pernas retas apoiadas na parede",
   },
   {
