@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day5Welcome from "./Day5Welcome";
 import Day5MovementGuide from "./Day5MovementGuide";
