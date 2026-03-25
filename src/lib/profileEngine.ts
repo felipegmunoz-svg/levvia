@@ -180,10 +180,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
   }
 
   const onb = (data.onboarding_data as Record<string, unknown>) || {};
-  console.log('🔍 parseOnboardingFromSupabase — onboarding_data bruto:', JSON.stringify(onb));
-  console.log('🔍 parseOnboardingFromSupabase — objectives:', data.objectives);
-  console.log('🔍 parseOnboardingFromSupabase — pantry_items:', (data as any).pantry_items);
-  console.log('🔍 parseOnboardingFromSupabase — restrictions (de onb):', onb.restrictions);
+
 
   return {
     name: data.name || "",
