@@ -656,6 +656,15 @@ const Today = () => {
           </button>
         </div>
       )}
+      {/* Debug overlay — activated via localStorage.setItem('levvia_debug_render', '1') */}
+      {isDebugActive() && (
+        <div style={{ position: 'fixed', bottom: 70, right: 8, zIndex: 9999, background: 'rgba(0,0,0,0.85)', color: '#0f0', padding: '8px 12px', borderRadius: 8, fontSize: 10, fontFamily: 'monospace', maxWidth: 260, pointerEvents: 'none' }}>
+          <div>🔄 Today #{renderCount.current} | branch: {branch}</div>
+          <div>day: {currentDay} | d1:{String(day1Done)} d2:{String(day2Done)} d3:{String(day3Done)} d4:{String(day4Done)} d5:{String(day5Done)}</div>
+          <div>premium:{String(hasPremium)} pLoad:{String(premiumLoading)} cLoad:{String(loading)} auth:{String(authLoading)}</div>
+          <div>data:{todayData ? 'yes' : 'no'}</div>
+        </div>
+      )}
       {content}
     </>
   );
