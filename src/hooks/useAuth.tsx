@@ -23,13 +23,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const renderCount = useRef(0);
   renderCount.current++;
   debugRender("AuthProvider", { renderNum: renderCount.current });
+
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [roleLoading, setRoleLoading] = useState(true);
 
+  // Track the current user id to detect real identity changes
+  const currentUserIdRef = useRef<string | null>(null);
+  // Track whether initial auth resolution is done
+  const initializedRef = useRef(false);
+
   useEffect(() => {
+    debugMount("AuthProvider");
+
     const clearJourneyCaches = () => {
       localStorage.removeItem("levvia_challenge_start");
       localStorage.removeItem("levvia_challenge_progress");
@@ -42,33 +50,86 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      debugEvent("AuthProvider", `onAuthStateChange: ${_event}`, { userId: nextSession?.user?.id });
       const nextUser = nextSession?.user ?? null;
-      if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') {
-        setRoleLoading(!!nextUser);
+      const nextUserId = nextUser?.id ?? null;
+      const prevUserId = currentUserIdRef.current;
+
+      debugEvent("AuthProvider", `onAuthStateChange: ${_event}`, {
+        nextUserId,
+        prevUserId,
+        initialized: initializedRef.current,
+      });
+
+      // ─── SIGNED_OUT: always honor ───
+      if (_event === "SIGNED_OUT") {
         clearJourneyCaches();
+        currentUserIdRef.current = null;
+        setSession(null);
+        setUser(null);
+        setIsAdmin(false);
+        setAuthLoading(false);
+        setRoleLoading(false);
+        return;
       }
-      if (_event === 'SIGNED_OUT') {
-        clearJourneyCaches();
+
+      // ─── TOKEN_REFRESHED: update session ref silently, never touch loading ───
+      if (_event === "TOKEN_REFRESHED") {
+        debugEvent("AuthProvider", "TOKEN_REFRESHED — silent update, no loading reset");
+        setSession(nextSession);
+        // Don't touch user, loading, or role state
+        return;
       }
-      if (_event === 'TOKEN_REFRESHED') {
-        debugEvent("AuthProvider", "TOKEN_REFRESHED — session updated silently");
+
+      // ─── SIGNED_IN / INITIAL_SESSION ───
+      if (_event === "SIGNED_IN" || _event === "INITIAL_SESSION") {
+        const isRealIdentityChange = nextUserId !== prevUserId;
+
+        if (isRealIdentityChange) {
+          // Real login or first load: update everything
+          debugEvent("AuthProvider", `Real identity change: ${prevUserId} → ${nextUserId}`);
+          currentUserIdRef.current = nextUserId;
+          clearJourneyCaches();
+          setSession(nextSession);
+          setUser(nextUser);
+          setAuthLoading(false);
+          // roleLoading will be set to true by the role useEffect
+          setRoleLoading(!!nextUser);
+        } else {
+          // Same user — redundant SIGNED_IN (silent refresh). Ignore.
+          debugEvent("AuthProvider", `Redundant ${_event} for same user — IGNORED. No loading reset.`);
+          // Update session object silently (new token), but don't touch loading
+          setSession(nextSession);
+        }
+        return;
       }
+
+      // ─── Any other event: update session/user only if changed ───
+      debugEvent("AuthProvider", `Other event: ${_event}`);
       setSession(prev => prev?.access_token === nextSession?.access_token ? prev : nextSession);
       setUser(prev => prev?.id === nextUser?.id ? prev : nextUser);
-      setAuthLoading(false);
     });
 
+    // Initial session fetch
     void supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       const currentUser = currentSession?.user ?? null;
-      setRoleLoading(!!currentUser);
+      debugEvent("AuthProvider", "getSession resolved", { userId: currentUser?.id });
+
+      currentUserIdRef.current = currentUser?.id ?? null;
+      initializedRef.current = true;
       setSession(currentSession);
       setUser(currentUser);
       setAuthLoading(false);
+      setRoleLoading(!!currentUser);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      debugUnmount("AuthProvider");
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // ─── Role loading: only when user.id actually changes ───
+  const prevRoleUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,10 +139,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user?.id) {
       setIsAdmin(false);
       setRoleLoading(false);
+      prevRoleUserIdRef.current = null;
       return;
     }
 
+    // Skip if we already loaded roles for this exact user
+    if (user.id === prevRoleUserIdRef.current) {
+      debugEvent("AuthProvider", `Role check skipped — same user ${user.id}`);
+      return;
+    }
+
+    debugEvent("AuthProvider", `Loading admin role for user ${user.id}`);
     setRoleLoading(true);
+    prevRoleUserIdRef.current = user.id;
 
     const loadAdminState = async () => {
       const { data, error } = await supabase
@@ -107,7 +177,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loading = authLoading || roleLoading;
 
   const signOut = async () => {
-    // Clear journey caches before sign-out
     localStorage.removeItem("levvia_challenge_start");
     localStorage.removeItem("levvia_challenge_progress");
     localStorage.removeItem("levvia_day1_diary");
@@ -115,6 +184,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("levvia_day2_progress");
     localStorage.removeItem("levvia_day2_map_data");
     await supabase.auth.signOut();
+    currentUserIdRef.current = null;
+    prevRoleUserIdRef.current = null;
     setUser(null);
     setSession(null);
     setIsAdmin(false);
