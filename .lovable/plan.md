@@ -1,22 +1,38 @@
 
 
-## Diagnóstico: Código está correto, rebuild necessário
+## Limpar logs de diagnóstico + forçar novo fingerprint
 
-### Verificação do código fonte
+### Alterações
 
-Confirmei que ambos os arquivos estão corretos no repositório:
+**1. `src/lib/profileEngine.ts`** — Remover todos os `console.log` de diagnóstico
 
-- **`Day5Snack.tsx`**: Contém as 3 opções de smoothie (Verde, Tropical, Vermelho) com `useState`, `AnimatePresence`, radio visual — tudo implementado
-- **`Today.tsx`**: Linha 100-102 tem a lógica correta de `isDev` com `DEBUG_EMAILS` e `.toLowerCase()`. Sem `console.log` ou `alert` no render path
+Linhas a remover/comentar:
+- L165: `console.log('🔍 parseOnboardingFromSupabase — userId:' ...)`
+- L174: `console.log('🔍 parseOnboardingFromSupabase — ERRO:' ...)`
+- L178: `console.log('🔍 parseOnboardingFromSupabase — Sem dados...')`
+- L183-186: 4 logs de onboarding_data, objectives, pantry_items, restrictions
+- L694: `console.log('🆘 Motor — Fallback...')`
+- L794-810: 2 blocos de log do Motor (perfil + top 5)
+- L819: `console.log('🎲 Randomização...')`
+- L835-839: `console.log('🏆 Receita vencedora...')`
 
-### Problema
+Total: ~20 linhas de `console.log` removidas.
 
-O preview está servindo uma versão em cache do bundle anterior. O código-fonte está correto mas o Vite HMR pode não ter propagado todas as mudanças.
+**2. `src/main.tsx`** — Atualizar comentário de versão para forçar novo hash de build
 
-### Solução
+```ts
+// build v3 – clean logs + force deploy
+```
 
-Vou fazer uma mudança mínima (whitespace) em `src/main.tsx` para forçar o Vite a fazer um full rebuild do bundle, garantindo que todas as mudanças pendentes sejam compiladas e servidas.
+### Resultado
 
-### Arquivos modificados: 1
-- `src/main.tsx` — adicionar comentário de versão para forçar rebuild
+Após estas mudanças, você clica em **Publish → Update** e o novo bundle será gerado com:
+- Zero logs de diagnóstico no console
+- Novo hash de arquivo (não mais `index-Duey2WjR.js`)
+- 3 smoothies no Day5Snack (código já presente)
+- Debug bar corrigida (código já presente)
+
+### Arquivos modificados: 2
+- `src/lib/profileEngine.ts` — remover ~20 linhas de console.log
+- `src/main.tsx` — atualizar comentário de versão
 
