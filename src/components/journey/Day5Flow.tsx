@@ -4,20 +4,27 @@ import { useAuth } from "@/hooks/useAuth";
 import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day5Welcome from "./Day5Welcome";
 import Day5MovementGuide from "./Day5MovementGuide";
+import Day5Lunch from "./Day5Lunch";
 import Day5Snack from "./Day5Snack";
+import Day5MicroChallenge from "./Day5MicroChallenge";
+import Day5LegsElevation from "./Day5LegsElevation";
 import Day5Journal from "./Day5Journal";
 import Day5Closing from "./Day5Closing";
 
-type Day5Step = "loading" | "welcome" | "movement" | "snack" | "journal" | "closing";
+type Day5Step = "loading" | "welcome" | "movement" | "lunch" | "snack" | "microChallenge" | "legsElevation" | "journal" | "closing";
 
 interface Day5FlowProps {
   onComplete: () => void;
 }
 
-const STEPS_ORDER: Day5Step[] = ["welcome", "movement", "snack", "journal", "closing"];
+const STEPS_ORDER: Day5Step[] = ["welcome", "movement", "lunch", "snack", "microChallenge", "legsElevation", "journal", "closing"];
 
 interface MovementData {
   exercisesCompleted?: Record<string, boolean>;
+  lunchChoice?: string;
+  snackChoice?: string;
+  microChallengeCompleted?: boolean;
+  legsElevationDuration?: number;
   journalEntry?: {
     legsSensation: string;
     energyLevel: string;
@@ -101,12 +108,27 @@ const Day5Flow = ({ onComplete }: Day5FlowProps) => {
       )}
       {step === "movement" && (
         <motion.div key="movement" {...stepVariants} transition={{ duration: 0.3 }}>
-          <Day5MovementGuide onContinue={(data) => goTo("snack", { exercisesCompleted: data })} />
+          <Day5MovementGuide onContinue={(data) => goTo("lunch", { exercisesCompleted: data })} />
+        </motion.div>
+      )}
+      {step === "lunch" && (
+        <motion.div key="lunch" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day5Lunch onContinue={(choice) => goTo("snack", { lunchChoice: choice })} />
         </motion.div>
       )}
       {step === "snack" && (
         <motion.div key="snack" {...stepVariants} transition={{ duration: 0.3 }}>
-          <Day5Snack onContinue={() => goTo("journal")} />
+          <Day5Snack onContinue={() => goTo("microChallenge")} />
+        </motion.div>
+      )}
+      {step === "microChallenge" && (
+        <motion.div key="microChallenge" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day5MicroChallenge onContinue={() => goTo("legsElevation", { microChallengeCompleted: true })} />
+        </motion.div>
+      )}
+      {step === "legsElevation" && (
+        <motion.div key="legsElevation" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day5LegsElevation onContinue={(duration) => goTo("journal", { legsElevationDuration: duration })} />
         </motion.div>
       )}
       {step === "journal" && (
