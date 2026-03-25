@@ -10,9 +10,6 @@ export function usePremium() {
   const renderCount = useRef(0);
   renderCount.current++;
   debugRender("usePremium", { userId: user?.id, hasPremium, loading, renderNum: renderCount.current });
-  const { user } = useAuth();
-  const [hasPremium, setHasPremium] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user?.id) {
