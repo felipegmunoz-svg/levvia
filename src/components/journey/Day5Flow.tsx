@@ -146,7 +146,7 @@ const Day5Flow = ({ onComplete }: Day5FlowProps) => {
       )}
       {step === "dashboard" && (
         <motion.div key="dashboard" {...stepVariants} transition={{ duration: 0.3 }}>
-          <Day5Dashboard movementData={movementData} onContinue={handleDay5Complete} />
+          <Day5Dashboard movementData={movementData} heatMapDay1={profile.heatMapDay1} onContinue={handleDay5Complete} />
         </motion.div>
       )}
     </AnimatePresence>
