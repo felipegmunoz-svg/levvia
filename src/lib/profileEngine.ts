@@ -175,7 +175,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
   }
 
   if (!data) {
-    console.log('🔍 parseOnboardingFromSupabase — Sem dados no Supabase, fallback para localStorage');
+    
     return parseOnboardingFromLocal();
   }
 
