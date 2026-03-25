@@ -1,62 +1,39 @@
 
 
-# Dia 5 V2 — Expansão para 4 Touchpoints
+# Dia 5 V2 — Ajustes Finais (Padrão Ouro)
 
-## Resumo
+## 3 Arquivos
 
-Expandir o Dia 5 de 5 para 8 steps, adicionando 3 novos componentes (Day5Lunch, Day5MicroChallenge, Day5LegsElevation) e reorganizando o fluxo no Day5Flow.tsx. Os 5 componentes existentes permanecem inalterados.
+### 1. Modificar `src/components/journey/Day5MicroChallenge.tsx`
+- Emoji header: 🌀 → 🏃‍♀️
+- Emoji card: 🦶 → 🏃‍♀️
+- Título: "Gire os Tornozelos" → "Marcha Parada — Desperte o Fluxo"
+- Descrição: foco em linfonodos da virilha
+- 5 passos da marcha parada (em pé, joelho direito, esquerdo, alternar, 20 reps)
+- Adicionar bloco "Adaptações" (parede/cadeira, dor, sentada, cansaço) com tom acolhedor
+- Benefício: texto expandido sobre movimento cíclico + linfonodos virilha + terapia drenagem ativa
+- Dica Lavínia: "Querida, vamos dar um sacode no sistema?"
+- Celebração: manter texto atual
 
-## Arquivos a Criar
+### 2. Criar `src/components/journey/Day5Dashboard.tsx`
+- Checklist visual 4 atividades (manhã/almoço/tarde/noite) com ✓ verde
+- Helpers `getLunchName`/`getSnackName` para traduzir IDs
+- Insights personalizados para TODOS os 4 cenários de `legsSensation`:
+  - `muito_mais_leves`: celebração + causa-efeito
+  - `um_pouco_mais_leves`: validação + gradualidade
+  - `iguais`: normalização + consistência
+  - `mais_pesadas`: validação emocional + explicação hormonal/calor
+- Fogo Interno com explicação clara (alto = ruim, baixo = bom) + 3 faixas de feedback (≤50, 51-70, >70)
+- Mensagem Lavínia + teaser Dia 6
+- Sticky footer "Finalizar Dia 5 →"
+- Props: `movementData` + `onContinue`
 
-### 1. `src/components/journey/Day5Lunch.tsx`
-- Refeição almoço anti-inflamatória com 3 opções (Bowl Quinoa, Salmão, Frango)
-- Padrão idêntico ao Day5Snack: múltipla escolha com accordion expandível (ingredientes + preparo)
-- Props: `onContinue: (choice: string) => void`
-- Botão disabled até selecionar; texto dinâmico no footer sticky
+### 3. Modificar `src/components/journey/Day5Flow.tsx`
+- Adicionar `"dashboard"` ao type `Day5Step` e ao `STEPS_ORDER`
+- Import `Day5Dashboard`
+- `Day5Closing.onComplete` → navega para `"dashboard"` (não salva ainda)
+- Novo case `dashboard`: renderiza `Day5Dashboard` com `movementData` e `onContinue={handleDay5Complete}`
 
-### 2. `src/components/journey/Day5MicroChallenge.tsx`
-- Micro-desafio tarde: giro de tornozelos (30s)
-- Tela única com instruções numeradas, benefício, botão "Completei"
-- Confetti simples ao completar (cores marca: #2EC4B6, #1B3F6B, #2E86AB)
-- Props: `onContinue: () => void`
-- Botão footer disabled até completar
-
-### 3. `src/components/journey/Day5LegsElevation.tsx`
-- Ritual pernas na parede: guia 5 passos + seleção duração (5/7/10 min)
-- Fluxo: escolher duração → marcar completo → celebração
-- Props: `onContinue: (duration: number) => void`
-- Botão footer disabled até completar
-
-### 4. Ilustração `legs-elevation-wall.png`
-- Gerar via AI image generation (Nano banana pro)
-- Silhueta feminina posição "L" invertida, gradiente teal, fundo branco
-- Salvar em `/public/illustrations/legs-elevation-wall.png`
-
-## Arquivo a Modificar
-
-### 5. `src/components/journey/Day5Flow.tsx`
-- Expandir `Day5Step` type: adicionar `"lunch" | "microChallenge" | "legsElevation"`
-- `STEPS_ORDER`: `["welcome", "movement", "lunch", "snack", "microChallenge", "legsElevation", "journal", "closing"]`
-- Expandir `MovementData` com: `lunchChoice`, `microChallengeCompleted`, `legsElevationDuration`
-- Adicionar imports dos 3 novos componentes
-- Adicionar 3 novos cases no render com AnimatePresence (padrão existente)
-- Ajustar transições: movement→lunch, lunch→snack, snack→microChallenge, microChallenge→legsElevation, legsElevation→journal
-
-## Persistência
-- Sem mudanças no schema do banco — `day5_movement_data` já é JSONB e aceita campos adicionais
-- Novos campos salvos automaticamente via `movementData` spread no Day5Flow
-
-## Padrões Seguidos
-- Sticky footer mobile-first (fixed bottom-0, bg-background/80, backdrop-blur-lg, pb-28)
-- AnimatePresence mode="wait" com motion.div fade+slide (300ms)
-- Glass-card para opções, ring-2 ring-secondary/60 para selecionado
-- Tom Lavínia nos textos e dicas (💜)
-- Confetti canvas-confetti nas cores da marca
-
-## Ordem de Implementação
-1. Gerar ilustração legs-elevation-wall.png
-2. Criar Day5Lunch.tsx
-3. Criar Day5MicroChallenge.tsx
-4. Criar Day5LegsElevation.tsx
-5. Atualizar Day5Flow.tsx com 8 steps
+### Fluxo final: 9 steps
+welcome → movement → lunch → snack → microChallenge → legsElevation → journal → closing → dashboard
 
