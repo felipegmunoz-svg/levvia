@@ -27,7 +27,7 @@ const Day5MicroChallenge = ({ onContinue }: Day5MicroChallengeProps) => {
         className="max-w-md mx-auto"
       >
         <div className="text-center mb-6">
-          <span className="text-5xl mb-3 block">🌀</span>
+          <span className="text-5xl mb-3 block">🏃‍♀️</span>
           <h2
             className="text-foreground mb-2"
             style={{
@@ -47,16 +47,17 @@ const Day5MicroChallenge = ({ onContinue }: Day5MicroChallengeProps) => {
 
         <div className="glass-card p-5 mb-6">
           <h3 className="text-foreground text-lg font-bold mb-3 flex items-center gap-2">
-            <span className="text-2xl">🦶</span>
-            Gire os Tornozelos — Onde Você Estiver
+            <span className="text-2xl">🏃‍♀️</span>
+            Marcha Parada — Desperte o Fluxo
           </h3>
 
           <p
             className="text-foreground/60 text-sm mb-4"
             style={{ fontWeight: 300, lineHeight: 1.7 }}
           >
-            Seja na mesa do trabalho, no sofá ou na fila do mercado — este
-            micro-movimento ativa a circulação das pernas em segundos.
+            Seja na sala, no escritório ou na cozinha — este movimento simples
+            ativa não só as panturrilhas, mas também os linfonodos da virilha,
+            os grandes "ralos" de drenagem das pernas.
           </p>
 
           <div className="bg-secondary/10 rounded-lg p-4 mb-4">
@@ -64,12 +65,31 @@ const Day5MicroChallenge = ({ onContinue }: Day5MicroChallengeProps) => {
               Como fazer:
             </p>
             <ol className="text-foreground/60 text-sm space-y-2" style={{ fontWeight: 300 }}>
-              <li>1. Sente-se confortavelmente ou fique em pé</li>
-              <li>2. Levante um pé do chão (se sentada) ou aponte os dedos (se em pé)</li>
-              <li>3. Gire o tornozelo 10 vezes no sentido horário ↻</li>
-              <li>4. Gire 10 vezes no sentido anti-horário ↺</li>
-              <li>5. Troque de perna e repita</li>
+              <li>1. Fique em pé, com os pés paralelos na largura dos quadris</li>
+              <li>2. Levante o joelho direito em direção ao peito</li>
+              <li>3. Abaixe e levante o joelho esquerdo</li>
+              <li>4. Continue alternando em ritmo moderado</li>
+              <li>5. Complete 20 repetições no total (10 cada perna)</li>
             </ol>
+          </div>
+
+          <div className="bg-accent/30 rounded-lg p-4 mb-4">
+            <p className="text-foreground/80 text-sm font-semibold mb-2">
+              ⚠️ Adaptações se necessário:
+            </p>
+            <ul className="text-foreground/60 text-sm space-y-2" style={{ fontWeight: 300, lineHeight: 1.7 }}>
+              <li>• Se sentir desequilíbrio: Apoie-se em uma parede ou cadeira</li>
+              <li>• Se houver dor: Levante os joelhos apenas até onde for confortável (não precisa chegar ao peito)</li>
+              <li>• Se mobilidade limitada: Faça sentada (marche com os pés no ar)</li>
+              <li>• Se estiver cansada: Reduza para 10 repetições (5 cada perna)</li>
+            </ul>
+            <p
+              className="text-foreground/50 text-xs mt-3 italic"
+              style={{ fontWeight: 300, lineHeight: 1.7 }}
+            >
+              Movimento eficaz é movimento que você consegue fazer sem dor.
+              Respeite os limites do seu corpo hoje.
+            </p>
           </div>
 
           <div className="p-3 bg-green-500/10 rounded mb-4">
@@ -77,9 +97,12 @@ const Day5MicroChallenge = ({ onContinue }: Day5MicroChallengeProps) => {
               className="text-foreground/80 text-xs"
               style={{ fontWeight: 300, lineHeight: 1.7 }}
             >
-              <strong>💡 Por que funciona:</strong> A rotação do tornozelo
-              contrai e relaxa os músculos da panturrilha, ativando a "bomba
-              linfática" que drena o excesso de líquido das pernas.
+              <strong>💡 Por que funciona:</strong> A marcha é um movimento{" "}
+              <em>cíclico</em> — a repetição rítmica contrai e relaxa
+              os músculos da panturrilha e da coxa, ativando a "bomba linfática"
+              que drena o excesso de líquido. Ao elevar os joelhos, você também
+              mobiliza os linfonodos da virilha, os principais "ralos" de drenagem
+              das pernas. É terapia de drenagem ativa, não apenas exercício.
             </p>
           </div>
 
@@ -116,9 +139,10 @@ const Day5MicroChallenge = ({ onContinue }: Day5MicroChallengeProps) => {
             className="text-foreground/50 text-xs italic"
             style={{ fontWeight: 300, lineHeight: 1.7 }}
           >
-            💜 <strong>Dica da Lavínia:</strong> Configure um alarme no celular
-            para repetir este micro-movimento a cada 2-3 horas. Seus tornozelos
-            vão agradecer!
+            💜 <strong>Dica da Lavínia:</strong> Querida, vamos dar um "sacode"
+            no sistema? Levante os joelhos agora, como se estivesse marchando
+            no lugar. Sinta o sangue e a linfa subindo. Suas pernas vão
+            agradecer esse despertar!
           </p>
         </div>
       </motion.div>

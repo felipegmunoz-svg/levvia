@@ -10,14 +10,15 @@ import Day5MicroChallenge from "./Day5MicroChallenge";
 import Day5LegsElevation from "./Day5LegsElevation";
 import Day5Journal from "./Day5Journal";
 import Day5Closing from "./Day5Closing";
+import Day5Dashboard from "./Day5Dashboard";
 
-type Day5Step = "loading" | "welcome" | "movement" | "lunch" | "snack" | "microChallenge" | "legsElevation" | "journal" | "closing";
+type Day5Step = "loading" | "welcome" | "movement" | "lunch" | "snack" | "microChallenge" | "legsElevation" | "journal" | "closing" | "dashboard";
 
 interface Day5FlowProps {
   onComplete: () => void;
 }
 
-const STEPS_ORDER: Day5Step[] = ["welcome", "movement", "lunch", "snack", "microChallenge", "legsElevation", "journal", "closing"];
+const STEPS_ORDER: Day5Step[] = ["welcome", "movement", "lunch", "snack", "microChallenge", "legsElevation", "journal", "closing", "dashboard"];
 
 interface MovementData {
   exercisesCompleted?: Record<string, boolean>;
@@ -138,7 +139,12 @@ const Day5Flow = ({ onComplete }: Day5FlowProps) => {
       )}
       {step === "closing" && (
         <motion.div key="closing" {...stepVariants} transition={{ duration: 0.3 }}>
-          <Day5Closing onComplete={handleDay5Complete} />
+          <Day5Closing onComplete={() => goTo("dashboard")} />
+        </motion.div>
+      )}
+      {step === "dashboard" && (
+        <motion.div key="dashboard" {...stepVariants} transition={{ duration: 0.3 }}>
+          <Day5Dashboard movementData={movementData} onContinue={handleDay5Complete} />
         </motion.div>
       )}
     </AnimatePresence>
