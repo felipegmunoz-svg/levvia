@@ -1,38 +1,38 @@
 
 
-## Limpar logs de diagnóstico + forçar novo fingerprint
+## Diagnóstico: Gate está correto, problema é bundle desatualizado
 
-### Alterações
+### Evidências
 
-**1. `src/lib/profileEngine.ts`** — Remover todos os `console.log` de diagnóstico
+1. **Banco de dados** confirma: `day5_completed=true`, `has_premium=true`, `day5_completed_at` presente
+2. **Código fonte** confirma: gate `day5Done === true && hasPremium` existe na linha 343 do Today.tsx
+3. **Lógica está correta**: a cadeia de `else if` funciona — com day1-5 todos `true` e `hasPremium=true`, a linha 343 é alcançada e mostra "Dia 6 em breve"
 
-Linhas a remover/comentar:
-- L165: `console.log('🔍 parseOnboardingFromSupabase — userId:' ...)`
-- L174: `console.log('🔍 parseOnboardingFromSupabase — ERRO:' ...)`
-- L178: `console.log('🔍 parseOnboardingFromSupabase — Sem dados...')`
-- L183-186: 4 logs de onboarding_data, objectives, pantry_items, restrictions
-- L694: `console.log('🆘 Motor — Fallback...')`
-- L794-810: 2 blocos de log do Motor (perfil + top 5)
-- L819: `console.log('🎲 Randomização...')`
-- L835-839: `console.log('🏆 Receita vencedora...')`
+### Causa raiz
 
-Total: ~20 linhas de `console.log` removidas.
+O bundle servido (`index-Duey2WjR.js`) **não contém** o gate da linha 343 porque foi compilado ANTES dessa mudança ser adicionada. É o mesmo problema de stale bundle que já identificamos.
 
-**2. `src/main.tsx`** — Atualizar comentário de versão para forçar novo hash de build
+O fato de o app mostrar "Dia 4 de 14" confirma: sem o gate, o código cai no fallback do dashboard (que usa `currentDay` calculado por data — que dá 4 baseado no `challenge_start`).
 
-```ts
-// build v3 – clean logs + force deploy
-```
+### O que fazer
 
-### Resultado
+Não há bug no código. A solução é garantir que o bundle seja republicado:
 
-Após estas mudanças, você clica em **Publish → Update** e o novo bundle será gerado com:
-- Zero logs de diagnóstico no console
-- Novo hash de arquivo (não mais `index-Duey2WjR.js`)
-- 3 smoothies no Day5Snack (código já presente)
-- Debug bar corrigida (código já presente)
+1. **Clique em Publish → Update** no painel do Lovable
+2. **Aguarde o deploy completar** (verifique se o hash do JS muda no Network tab)
+3. **Teste em modo incógnito** para garantir cache zero
 
-### Arquivos modificados: 2
-- `src/lib/profileEngine.ts` — remover ~20 linhas de console.log
-- `src/main.tsx` — atualizar comentário de versão
+### Como validar que o novo bundle carregou
+
+No DevTools → Network → filtrar por `.js`:
+- Se o nome do arquivo JS principal mudou (não é mais `index-Duey2WjR.js`), o deploy funcionou
+- Se continua o mesmo nome, o deploy não propagou
+
+### Nota importante
+
+Se após Publish → Update o bundle continuar o mesmo, o problema é na pipeline de deploy/CDN do Lovable, e não no código. Nesse caso, a alternativa seria fazer uma mudança mais significativa em um arquivo core (como `App.tsx`) para forçar invalidação.
+
+### Arquivos a modificar: 0
+
+Nenhuma mudança de código necessária — o gate já está implementado corretamente.
 
