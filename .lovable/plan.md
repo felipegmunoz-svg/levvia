@@ -1,20 +1,22 @@
 
 
-## Dia 5 — Múltipla Escolha Smoothie
+## Diagnóstico: Código está correto, rebuild necessário
 
-### Mudança
+### Verificação do código fonte
 
-**Arquivo: `src/components/journey/Day5Snack.tsx`**
+Confirmei que ambos os arquivos estão corretos no repositório:
 
-Reescrever o componente seguindo o padrão do `Day4CardapioNoturno.tsx`:
+- **`Day5Snack.tsx`**: Contém as 3 opções de smoothie (Verde, Tropical, Vermelho) com `useState`, `AnimatePresence`, radio visual — tudo implementado
+- **`Today.tsx`**: Linha 100-102 tem a lógica correta de `isDev` com `DEBUG_EMAILS` e `.toLowerCase()`. Sem `console.log` ou `alert` no render path
 
-1. Adicionar `useState<string | null>(null)` para `selectedSnack`
-2. Criar array `snacks` com 3 opções (Verde Detox, Tropical, Vermelho Antioxidante) — cada uma com id, name, subtitle, emoji, benefit, ingredients, instructions
-3. Cards clicáveis com radio visual e `AnimatePresence` para auto-expansão dos detalhes (ingredientes + preparo) ao selecionar
-4. Botão desabilitado até selecionar, com texto dinâmico
-5. Manter sticky footer mobile e classes do design system (`glass-card`, `text-foreground`, `text-foreground/60`, etc.) consistentes com Day4
-6. Adicionar imports: `useState` do React, `motion`/`AnimatePresence` do framer-motion
+### Problema
+
+O preview está servindo uma versão em cache do bundle anterior. O código-fonte está correto mas o Vite HMR pode não ter propagado todas as mudanças.
+
+### Solução
+
+Vou fazer uma mudança mínima (whitespace) em `src/main.tsx` para forçar o Vite a fazer um full rebuild do bundle, garantindo que todas as mudanças pendentes sejam compiladas e servidas.
 
 ### Arquivos modificados: 1
-- `src/components/journey/Day5Snack.tsx` — reescrita completa
+- `src/main.tsx` — adicionar comentário de versão para forçar rebuild
 
