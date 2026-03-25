@@ -162,7 +162,7 @@ export function parseOnboardingFromLocal(): UserProfile {
 }
 
 export async function parseOnboardingFromSupabase(userId: string): Promise<UserProfile> {
-  console.log('🔍 parseOnboardingFromSupabase — userId:', userId);
+  
 
   const { data, error } = await supabase
     .from("profiles")
@@ -171,19 +171,16 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     .maybeSingle();
 
   if (error) {
-    console.log('🔍 parseOnboardingFromSupabase — ERRO:', error.message);
+    
   }
 
   if (!data) {
-    console.log('🔍 parseOnboardingFromSupabase — Sem dados no Supabase, fallback para localStorage');
+    
     return parseOnboardingFromLocal();
   }
 
   const onb = (data.onboarding_data as Record<string, unknown>) || {};
-  console.log('🔍 parseOnboardingFromSupabase — onboarding_data bruto:', JSON.stringify(onb));
-  console.log('🔍 parseOnboardingFromSupabase — objectives:', data.objectives);
-  console.log('🔍 parseOnboardingFromSupabase — pantry_items:', (data as any).pantry_items);
-  console.log('🔍 parseOnboardingFromSupabase — restrictions (de onb):', onb.restrictions);
+
 
   return {
     name: data.name || "",
@@ -691,7 +688,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
 
       candidates = emergency || [];
       if (candidates.length > 0) {
-        console.log(`🆘 Motor — Fallback de emergência: ${candidates.length} receitas encontradas`);
+        
       }
     }
 
@@ -791,24 +788,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
 
     withFinal.sort((a, b) => b.finalScore - a.finalScore);
 
-    console.log('🔍 Motor — Perfil recebido:', {
-      pantrySize,
-      commonWeight,
-      objectives: healthGoals,
-      restrictions: dietProfile,
-      activityLevel: profile.activityLevel,
-    });
-    console.log('🔍 Motor — Top 5 receitas:', withFinal.slice(0, 5).map(r => ({
-      title: r.title,
-      pantryScore: r.pantryScore.toFixed(1) + '%',
-      goalOverlap: r.goalOverlap,
-      inflammation: r.inflammationScore,
-      commonWeighted: r.commonWeighted.toFixed(1),
-      complexity: r.complexityBonus.toFixed(1),
-      diversity: r.diversityScore + ' (' + r.diversityCategories.join(', ') + ')',
-      activityBoost: r.activityBoost,
-      finalScore: r.finalScore.toFixed(1),
-    })));
+
 
     // Controlled randomization among top 3 if scores are close
     let selected: typeof withFinal[0] | undefined;
@@ -816,7 +796,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
     if (top3.length >= 3 && (top3[0].finalScore - top3[2].finalScore) <= 5) {
       const randomIndex = Math.floor(Math.random() * 3);
       selected = top3[randomIndex];
-      console.log('🎲 Randomização ativada — scores próximos, escolhendo index', randomIndex);
+      
     }
 
     // Meal-time preference within top 5 (if no randomization)
@@ -832,11 +812,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       selected = top5.find(r => r.tipo_refeicao?.includes(mealType)) || withFinal[0];
     }
 
-    console.log('🏆 Receita vencedora:', selected.title, '| finalScore:', selected.finalScore.toFixed(1),
-      '| breakdown: pantry', selected.pantryScore.toFixed(1), '× 2 + goals', selected.goalOverlap,
-      '× 10 + inflam', selected.inflammationScore, '× 5 + common', selected.commonWeighted.toFixed(1), '× 3',
-      '+ complexity', selected.complexityBonus.toFixed(1), '+ diversity', selected.diversityScore,
-      '(' + selected.diversityCategories.join(', ') + ') + activityBoost', selected.activityBoost);
+
 
     return selected;
   } catch (err) {
