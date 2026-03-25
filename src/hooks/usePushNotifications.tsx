@@ -24,11 +24,15 @@ export function usePushNotifications() {
   // Check if already subscribed
   useEffect(() => {
     if (!supported || !user) return;
+    let cancelled = false;
 
     navigator.serviceWorker.ready.then(async (reg) => {
+      if (cancelled) return;
       const sub = await reg.pushManager.getSubscription();
-      setIsSubscribed(!!sub);
+      if (!cancelled) setIsSubscribed(!!sub);
     });
+
+    return () => { cancelled = true; };
   }, [supported, user]);
 
   const subscribe = useCallback(async () => {
