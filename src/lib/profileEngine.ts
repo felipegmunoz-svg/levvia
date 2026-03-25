@@ -171,7 +171,7 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     .maybeSingle();
 
   if (error) {
-    console.log('🔍 parseOnboardingFromSupabase — ERRO:', error.message);
+    
   }
 
   if (!data) {
