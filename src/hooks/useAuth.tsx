@@ -20,6 +20,9 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const renderCount = useRef(0);
+  renderCount.current++;
+  debugRender("AuthProvider", { renderNum: renderCount.current });
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -39,14 +42,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      debugEvent("AuthProvider", `onAuthStateChange: ${_event}`, { userId: nextSession?.user?.id });
       const nextUser = nextSession?.user ?? null;
       if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') {
         setRoleLoading(!!nextUser);
-        // Clear stale journey caches so backend is re-fetched
         clearJourneyCaches();
       }
       if (_event === 'SIGNED_OUT') {
         clearJourneyCaches();
+      }
+      if (_event === 'TOKEN_REFRESHED') {
+        debugEvent("AuthProvider", "TOKEN_REFRESHED — session updated silently");
       }
       setSession(prev => prev?.access_token === nextSession?.access_token ? prev : nextSession);
       setUser(prev => prev?.id === nextUser?.id ? prev : nextUser);

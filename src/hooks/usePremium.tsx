@@ -1,8 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { debugRender } from "@/lib/renderDebug";
 
 export function usePremium() {
+  const { user } = useAuth();
+  const [hasPremium, setHasPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const renderCount = useRef(0);
+  renderCount.current++;
+  debugRender("usePremium", { userId: user?.id, hasPremium, loading, renderNum: renderCount.current });
   const { user } = useAuth();
   const [hasPremium, setHasPremium] = useState(false);
   const [loading, setLoading] = useState(true);
