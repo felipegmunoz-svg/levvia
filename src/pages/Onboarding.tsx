@@ -38,6 +38,7 @@ const ResultScreen = ({ fireResult, painAnswer }: { fireResult: import("@/data/o
     const colors = fireConfettiColors[painAnswer] || ["#2dd4a8", "#34d399"];
     
     const end = Date.now() + 1500;
+    let rafId: number;
     const frame = () => {
       confetti({
         particleCount: 3,
@@ -57,9 +58,10 @@ const ResultScreen = ({ fireResult, painAnswer }: { fireResult: import("@/data/o
         gravity: 0.8,
         scalar: 0.9,
       });
-      if (Date.now() < end) requestAnimationFrame(frame);
+      if (Date.now() < end) rafId = requestAnimationFrame(frame);
     };
     frame();
+    return () => { if (rafId) cancelAnimationFrame(rafId); };
   }, [fireResult]);
 
   return (

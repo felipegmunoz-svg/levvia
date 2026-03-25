@@ -108,46 +108,52 @@ const Today = () => {
     window.location.reload();
   };
 
-  // Check day completion and timestamps from Supabase (with timeout fallback)
+  // Check day completion and timestamps from Supabase (with proper cleanup)
   useEffect(() => {
     if (!user?.id) {
       setDay1Done(true);
       setDay2Done(true);
       return;
     }
-    const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("timeout")), 5000)
-    );
-    const query = supabase
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      if (!cancelled) {
+        console.warn("⚠️ Timeout 5s ao buscar day completion — preservando estado atual");
+        // Don't reset to false! Preserve current state (null means still loading)
+      }
+    }, 5000);
+
+    supabase
       .from("profiles")
       .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, challenge_start")
       .eq("id", user.id)
-      .maybeSingle();
-
-    Promise.race([query, timeout])
-      .then(({ data }) => {
-        setDay1Done((data as any)?.day1_completed === true);
-        setDay2Done((data as any)?.day2_completed === true);
-        setDay3Done((data as any)?.day3_completed === true);
-        setDay4Done((data as any)?.day4_completed === true);
-        setDay5Done((data as any)?.day5_completed === true);
-        setDay1CompletedAt((data as any)?.day1_completed_at || null);
-        setDay2CompletedAt((data as any)?.day2_completed_at || null);
-        setDay3CompletedAt((data as any)?.day3_completed_at || null);
-        setDay4CompletedAt((data as any)?.day4_completed_at || null);
-        setDay5CompletedAt((data as any)?.day5_completed_at || null);
-        if ((data as any)?.challenge_start) {
-          localStorage.setItem("levvia_challenge_start", (data as any).challenge_start);
+      .maybeSingle()
+      .then(({ data, error }) => {
+        clearTimeout(timer);
+        if (cancelled) return;
+        if (error) {
+          console.warn("⚠️ Erro ao buscar day completion, preservando estado", error);
+          return;
         }
-      })
-      .catch((err) => {
-        console.warn("⚠️ Timeout/erro ao buscar day completion, usando fallback seguro", err);
-        setDay1Done(false);
-        setDay2Done(false);
-        setDay3Done(false);
-        setDay4Done(false);
-        setDay5Done(false);
+        setDay1Done(data?.day1_completed === true);
+        setDay2Done(data?.day2_completed === true);
+        setDay3Done(data?.day3_completed === true);
+        setDay4Done(data?.day4_completed === true);
+        setDay5Done(data?.day5_completed === true);
+        setDay1CompletedAt(data?.day1_completed_at || null);
+        setDay2CompletedAt(data?.day2_completed_at || null);
+        setDay3CompletedAt(data?.day3_completed_at || null);
+        setDay4CompletedAt(data?.day4_completed_at || null);
+        setDay5CompletedAt(data?.day5_completed_at || null);
+        if (data?.challenge_start) {
+          localStorage.setItem("levvia_challenge_start", data.challenge_start);
+        }
       });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [user?.id]);
 
   // Safety timeout: force loading off if useChallengeData never resolves

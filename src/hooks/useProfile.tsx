@@ -32,14 +32,16 @@ export function useProfile() {
     return getCachedProfile(user?.id) === null;
   });
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (signal?: { cancelled: boolean }) => {
     setLoading(true);
     if (user?.id) {
       const p = await parseOnboardingFromSupabase(user.id);
+      if (signal?.cancelled) return;
       setProfile(p);
       profileCache = { userId: user.id, profile: p, timestamp: Date.now() };
     } else {
       const p = parseOnboardingFromLocal();
+      if (signal?.cancelled) return;
       setProfile(p);
       profileCache = { userId: "", profile: p, timestamp: Date.now() };
     }
@@ -52,7 +54,9 @@ export function useProfile() {
       setLoading(false);
       return;
     }
-    refresh();
+    const signal = { cancelled: false };
+    refresh(signal);
+    return () => { signal.cancelled = true; };
   }, [refresh, user?.id]);
 
   return { profile, loading, refresh };
