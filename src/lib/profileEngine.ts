@@ -812,11 +812,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       selected = top5.find(r => r.tipo_refeicao?.includes(mealType)) || withFinal[0];
     }
 
-    console.log('🏆 Receita vencedora:', selected.title, '| finalScore:', selected.finalScore.toFixed(1),
-      '| breakdown: pantry', selected.pantryScore.toFixed(1), '× 2 + goals', selected.goalOverlap,
-      '× 10 + inflam', selected.inflammationScore, '× 5 + common', selected.commonWeighted.toFixed(1), '× 3',
-      '+ complexity', selected.complexityBonus.toFixed(1), '+ diversity', selected.diversityScore,
-      '(' + selected.diversityCategories.join(', ') + ') + activityBoost', selected.activityBoost);
+
 
     return selected;
   } catch (err) {

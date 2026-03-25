@@ -1,4 +1,4 @@
-// build v2 – force full rebuild
+// build v3 – clean logs + force deploy
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
