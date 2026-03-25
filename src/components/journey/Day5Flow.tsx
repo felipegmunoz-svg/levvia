@@ -36,6 +36,7 @@ interface MovementData {
 
 const Day5Flow = ({ onComplete }: Day5FlowProps) => {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const [step, setStep] = useState<Day5Step>("loading");
   const [movementData, setMovementData] = useState<MovementData>({});
 
