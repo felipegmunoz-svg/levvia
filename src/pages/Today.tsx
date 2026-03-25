@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
 
@@ -72,6 +73,13 @@ function getIncentiveMessage(progress: number): string {
 }
 
 const Today = () => {
+  const renderCount = useRef(0);
+  renderCount.current++;
+
+  useEffect(() => {
+    debugMount("Today");
+    return () => debugUnmount("Today");
+  }, []);
   const { user, loading: authLoading } = useAuth();
   const {
     profile,
@@ -96,6 +104,24 @@ const Today = () => {
   const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
   const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+
+  // Debug render instrumentation
+  const branch = day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading
+    ? "LOADING_GATES"
+    : day1Done === false ? "DAY1_FLOW"
+    : day2Done === false && day1Done === true ? "DAY2_FLOW"
+    : day3Done === false && day2Done === true ? "DAY3_FLOW"
+    : day3Done === true && day4Done === false && !hasPremium ? "PAYWALL"
+    : day4Done === false && day3Done === true && hasPremium ? "DAY4_FLOW"
+    : day5Done === false && day4Done === true && hasPremium ? "DAY5_FLOW"
+    : day5Done === true && hasPremium ? "DAY5_DONE"
+    : "DASHBOARD";
+  
+  debugRender("Today", {
+    renderNum: renderCount.current, branch, currentDay, authLoading, loading, premiumLoading,
+    day1Done, day2Done, day3Done, day4Done, day5Done, hasPremium,
+    hasTodayData: !!todayData, forceReady: false,
+  });
 
   const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com'];
   const isAuthorized = !!user?.email && DEBUG_EMAILS.includes(user.email.toLowerCase());
@@ -628,6 +654,15 @@ const Today = () => {
           <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded hover:bg-red-400 transition-colors ml-auto">
             Resetar Local
           </button>
+        </div>
+      )}
+      {/* Debug overlay — activated via localStorage.setItem('levvia_debug_render', '1') */}
+      {isDebugActive() && (
+        <div style={{ position: 'fixed', bottom: 70, right: 8, zIndex: 9999, background: 'rgba(0,0,0,0.85)', color: '#0f0', padding: '8px 12px', borderRadius: 8, fontSize: 10, fontFamily: 'monospace', maxWidth: 260, pointerEvents: 'none' }}>
+          <div>🔄 Today #{renderCount.current} | branch: {branch}</div>
+          <div>day: {currentDay} | d1:{String(day1Done)} d2:{String(day2Done)} d3:{String(day3Done)} d4:{String(day4Done)} d5:{String(day5Done)}</div>
+          <div>premium:{String(hasPremium)} pLoad:{String(premiumLoading)} cLoad:{String(loading)} auth:{String(authLoading)}</div>
+          <div>data:{todayData ? 'yes' : 'no'}</div>
         </div>
       )}
       {content}

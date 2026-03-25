@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { debugRender, debugMount, debugUnmount } from "@/lib/renderDebug";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,6 +10,14 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
   const { user, isAdmin, loading } = useAuth();
+
+  useEffect(() => {
+    debugMount("ProtectedRoute");
+    return () => debugUnmount("ProtectedRoute");
+  }, []);
+
+  const decision = loading ? "SPINNER" : !user ? "REDIRECT_AUTH" : (requireAdmin && !isAdmin) ? "REDIRECT_TODAY" : "RENDER_CHILDREN";
+  debugRender("ProtectedRoute", { loading, hasUser: !!user, isAdmin, requireAdmin, decision });
 
   if (loading) {
     return (

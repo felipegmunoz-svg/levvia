@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "./useAuth";
+import { debugRender, debugMount, debugUnmount } from "@/lib/renderDebug";
 import {
   parseOnboardingFromLocal,
   parseOnboardingFromSupabase,
@@ -23,6 +24,10 @@ function getCachedProfile(userId: string | undefined): UserProfile | null {
 
 export function useProfile() {
   const { user } = useAuth();
+
+  const renderCount = useRef(0);
+  renderCount.current++;
+  debugRender("useProfile", { userId: user?.id, renderNum: renderCount.current });
 
   const [profile, setProfile] = useState<UserProfile>(() => {
     return getCachedProfile(user?.id) ?? parseOnboardingFromLocal();

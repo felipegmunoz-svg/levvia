@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useProfile } from "./useProfile";
 import { useAuth } from "./useAuth";
+import { debugRender } from "@/lib/renderDebug";
 import {
   fetchExercises,
   fetchRecipes,
@@ -138,6 +139,9 @@ function generateMealsForDay(
 export function useChallengeData() {
   const { profile, loading: profileLoading } = useProfile();
   const { user } = useAuth();
+  const renderCount = useRef(0);
+  renderCount.current++;
+  
   const [exercises, setExercises] = useState<DbExercise[]>([]);
   const [recipes, setRecipes] = useState<DbRecipe[]>([]);
   const [habits, setHabits] = useState<DbHabit[]>([]);
@@ -155,6 +159,11 @@ export function useChallengeData() {
     const day = Math.floor(diff / 86400000) + 1;
     return Math.min(Math.max(day, 1), 14);
   }, [challengeStart]);
+
+  debugRender("useChallengeData", { 
+    renderNum: renderCount.current, profileLoading, dataLoading, currentDay, 
+    userId: user?.id, hasChallengeStart: !!challengeStart 
+  });
 
   // Load progress and challenge_start from Supabase (with proper cleanup)
   useEffect(() => {
