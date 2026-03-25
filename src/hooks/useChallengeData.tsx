@@ -139,6 +139,9 @@ function generateMealsForDay(
 export function useChallengeData() {
   const { profile, loading: profileLoading } = useProfile();
   const { user } = useAuth();
+  const renderCount = useRef(0);
+  renderCount.current++;
+  
   const [exercises, setExercises] = useState<DbExercise[]>([]);
   const [recipes, setRecipes] = useState<DbRecipe[]>([]);
   const [habits, setHabits] = useState<DbHabit[]>([]);
