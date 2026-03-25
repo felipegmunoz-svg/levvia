@@ -688,7 +688,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
 
       candidates = emergency || [];
       if (candidates.length > 0) {
-        console.log(`🆘 Motor — Fallback de emergência: ${candidates.length} receitas encontradas`);
+        
       }
     }
 
