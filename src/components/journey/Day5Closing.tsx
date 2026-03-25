@@ -49,7 +49,7 @@ const Day5Closing = ({ onComplete }: Day5ClosingProps) => {
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border/30 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <Button onClick={onComplete} className="w-full">
-          Salvar Progresso
+          Ver Resumo do Dia →
         </Button>
       </div>
     </div>

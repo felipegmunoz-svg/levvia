@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import HeatMapInteractive from "./HeatMapInteractive";
 
 interface Day5DashboardProps {
   movementData: {
@@ -11,6 +12,7 @@ interface Day5DashboardProps {
       notes?: string;
     };
   };
+  heatMapDay1?: Record<string, number> | null;
   onContinue: () => void;
 }
 
@@ -32,9 +34,36 @@ const getSnackName = (choice: string) => {
   return names[choice] || choice;
 };
 
+const calculateImprovedMap = (
+  originalMap: Record<string, number>,
+  legsSensation?: string
+): Record<string, number> => {
+  const improvement =
+    legsSensation === "muito_mais_leves" ? 2 :
+    legsSensation === "um_pouco_mais_leves" ? 1 : 0;
+
+  if (improvement === 0) return { ...originalMap };
+
+  const improved = { ...originalMap };
+  ["panturrilha_dir", "panturrilha_esq", "coxa_dir", "coxa_esq"].forEach((area) => {
+    if (improved[area] && improved[area] > 0) {
+      improved[area] = Math.max(0, improved[area] - improvement);
+    }
+  });
+  return improved;
+};
+
 const fogoInternoScore = 65;
 
-const Day5Dashboard = ({ movementData, onContinue }: Day5DashboardProps) => {
+const journeyDays = [
+  { day: 1, title: "Consciência Corporal", sub: "Mapeou seu Fogo Interno" },
+  { day: 2, title: "Hidratação Inteligente", sub: "Sentiu alívio com drenagem linfática" },
+  { day: 3, title: "Alimentação Anti-Inflamatória", sub: "Ganhou clareza nutricional" },
+  { day: 4, title: "Força Suave e Estabilidade", sub: "Preparou ritual do sono restaurador" },
+  { day: 5, title: "Movimento Sem Dor", sub: "Desbloqueou o fluxo linfático com movimento gentil" },
+];
+
+const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardProps) => {
   const sensation = movementData.journalEntry?.legsSensation;
   const duration = movementData.legsElevationDuration ?? 5;
 
@@ -44,6 +73,10 @@ const Day5Dashboard = ({ movementData, onContinue }: Day5DashboardProps) => {
     { emoji: "🥤", title: `Tarde: ${getSnackName(movementData.snackChoice || "")}`, sub: "Detox + Micro-desafio marcha" },
     { emoji: "🧘‍♀️", title: `Noite: Elevação de Pernas (${duration} min)`, sub: "Drenagem gravitacional" },
   ];
+
+  const improvedMap = heatMapDay1
+    ? calculateImprovedMap(heatMapDay1, sensation)
+    : null;
 
   return (
     <div className="min-h-screen bg-background px-6 py-12 pb-28">
@@ -80,6 +113,91 @@ const Day5Dashboard = ({ movementData, onContinue }: Day5DashboardProps) => {
                 <span className="text-green-500 font-bold text-sm shrink-0">✓</span>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Mapa de Calor Comparação */}
+        {heatMapDay1 && (
+          <div className="glass-card p-5 mb-6">
+            <h3 className="text-foreground text-sm font-bold mb-1">Veja Sua Evolução:</h3>
+            <p className="text-foreground/50 text-xs mb-4" style={{ fontWeight: 300, lineHeight: 1.7 }}>
+              Compare como suas pernas estavam no Dia 1 vs Hoje (Dia 5)
+            </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="text-center">
+                <p className="text-xs font-semibold text-foreground/80 mb-2">Dia 1 (Início)</p>
+                <HeatMapInteractive initialData={heatMapDay1} readOnly size="small" />
+              </div>
+              <div className="text-center">
+                <p className="text-xs font-semibold text-foreground/80 mb-2">Hoje (Dia 5)</p>
+                {improvedMap ? (
+                  <HeatMapInteractive initialData={improvedMap} readOnly size="small" />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-xs text-muted-foreground">Sem dados</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {sensation === "muito_mais_leves" && (
+              <div className="mt-4 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                <p className="text-xs text-foreground" style={{ fontWeight: 300, lineHeight: 1.7 }}>
+                  🎉 <strong>Suas pernas estão "esfriando"!</strong> O movimento que você cultivou
+                  nos últimos 5 dias está reduzindo a inflamação.
+                </p>
+              </div>
+            )}
+            {sensation === "um_pouco_mais_leves" && (
+              <div className="mt-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <p className="text-xs text-foreground" style={{ fontWeight: 300, lineHeight: 1.7 }}>
+                  💙 <strong>Progresso visível!</strong> A redução de calor no mapa reflete
+                  a melhora gradual que você está sentindo.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Timeline Progresso */}
+        <div className="glass-card p-5 mb-6">
+          <h3 className="text-foreground text-sm font-bold mb-4">Sua Jornada até Aqui:</h3>
+          <div className="space-y-3">
+            {journeyDays.map((d) => (
+              <div key={d.day} className="flex items-center gap-3">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                    d.day < 5
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-secondary/20 text-secondary"
+                  }`}
+                >
+                  {d.day < 5 ? "✓" : d.day}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground text-sm font-medium truncate">
+                    Dia {d.day}: {d.title}
+                  </p>
+                  <p className="text-foreground/50 text-xs" style={{ fontWeight: 300 }}>{d.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4">
+            <div className="flex justify-between text-xs text-foreground/50 mb-2">
+              <span>Progresso da Jornada</span>
+              <span>5/14 dias (36%)</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-secondary to-primary"
+                initial={{ width: 0 }}
+                animate={{ width: "36%" }}
+                transition={{ duration: 1, delay: 0.5 }}
+              />
+            </div>
           </div>
         </div>
 
@@ -180,7 +298,7 @@ const Day5Dashboard = ({ movementData, onContinue }: Day5DashboardProps) => {
         </div>
       </motion.div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border/30 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={onContinue}
           className="w-full max-w-xs mx-auto py-4 rounded-3xl font-medium text-sm block gradient-primary text-foreground transition-all"

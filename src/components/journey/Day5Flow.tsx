@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day5Welcome from "./Day5Welcome";
 import Day5MovementGuide from "./Day5MovementGuide";
@@ -35,6 +36,7 @@ interface MovementData {
 
 const Day5Flow = ({ onComplete }: Day5FlowProps) => {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const [step, setStep] = useState<Day5Step>("loading");
   const [movementData, setMovementData] = useState<MovementData>({});
 
@@ -144,7 +146,7 @@ const Day5Flow = ({ onComplete }: Day5FlowProps) => {
       )}
       {step === "dashboard" && (
         <motion.div key="dashboard" {...stepVariants} transition={{ duration: 0.3 }}>
-          <Day5Dashboard movementData={movementData} onContinue={handleDay5Complete} />
+          <Day5Dashboard movementData={movementData} heatMapDay1={profile.heatMapDay1} onContinue={handleDay5Complete} />
         </motion.div>
       )}
     </AnimatePresence>
