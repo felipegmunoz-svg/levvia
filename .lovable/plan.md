@@ -1,38 +1,62 @@
 
 
-## Diagnóstico: Gate está correto, problema é bundle desatualizado
+# Dia 5 V2 — Expansão para 4 Touchpoints
 
-### Evidências
+## Resumo
 
-1. **Banco de dados** confirma: `day5_completed=true`, `has_premium=true`, `day5_completed_at` presente
-2. **Código fonte** confirma: gate `day5Done === true && hasPremium` existe na linha 343 do Today.tsx
-3. **Lógica está correta**: a cadeia de `else if` funciona — com day1-5 todos `true` e `hasPremium=true`, a linha 343 é alcançada e mostra "Dia 6 em breve"
+Expandir o Dia 5 de 5 para 8 steps, adicionando 3 novos componentes (Day5Lunch, Day5MicroChallenge, Day5LegsElevation) e reorganizando o fluxo no Day5Flow.tsx. Os 5 componentes existentes permanecem inalterados.
 
-### Causa raiz
+## Arquivos a Criar
 
-O bundle servido (`index-Duey2WjR.js`) **não contém** o gate da linha 343 porque foi compilado ANTES dessa mudança ser adicionada. É o mesmo problema de stale bundle que já identificamos.
+### 1. `src/components/journey/Day5Lunch.tsx`
+- Refeição almoço anti-inflamatória com 3 opções (Bowl Quinoa, Salmão, Frango)
+- Padrão idêntico ao Day5Snack: múltipla escolha com accordion expandível (ingredientes + preparo)
+- Props: `onContinue: (choice: string) => void`
+- Botão disabled até selecionar; texto dinâmico no footer sticky
 
-O fato de o app mostrar "Dia 4 de 14" confirma: sem o gate, o código cai no fallback do dashboard (que usa `currentDay` calculado por data — que dá 4 baseado no `challenge_start`).
+### 2. `src/components/journey/Day5MicroChallenge.tsx`
+- Micro-desafio tarde: giro de tornozelos (30s)
+- Tela única com instruções numeradas, benefício, botão "Completei"
+- Confetti simples ao completar (cores marca: #2EC4B6, #1B3F6B, #2E86AB)
+- Props: `onContinue: () => void`
+- Botão footer disabled até completar
 
-### O que fazer
+### 3. `src/components/journey/Day5LegsElevation.tsx`
+- Ritual pernas na parede: guia 5 passos + seleção duração (5/7/10 min)
+- Fluxo: escolher duração → marcar completo → celebração
+- Props: `onContinue: (duration: number) => void`
+- Botão footer disabled até completar
 
-Não há bug no código. A solução é garantir que o bundle seja republicado:
+### 4. Ilustração `legs-elevation-wall.png`
+- Gerar via AI image generation (Nano banana pro)
+- Silhueta feminina posição "L" invertida, gradiente teal, fundo branco
+- Salvar em `/public/illustrations/legs-elevation-wall.png`
 
-1. **Clique em Publish → Update** no painel do Lovable
-2. **Aguarde o deploy completar** (verifique se o hash do JS muda no Network tab)
-3. **Teste em modo incógnito** para garantir cache zero
+## Arquivo a Modificar
 
-### Como validar que o novo bundle carregou
+### 5. `src/components/journey/Day5Flow.tsx`
+- Expandir `Day5Step` type: adicionar `"lunch" | "microChallenge" | "legsElevation"`
+- `STEPS_ORDER`: `["welcome", "movement", "lunch", "snack", "microChallenge", "legsElevation", "journal", "closing"]`
+- Expandir `MovementData` com: `lunchChoice`, `microChallengeCompleted`, `legsElevationDuration`
+- Adicionar imports dos 3 novos componentes
+- Adicionar 3 novos cases no render com AnimatePresence (padrão existente)
+- Ajustar transições: movement→lunch, lunch→snack, snack→microChallenge, microChallenge→legsElevation, legsElevation→journal
 
-No DevTools → Network → filtrar por `.js`:
-- Se o nome do arquivo JS principal mudou (não é mais `index-Duey2WjR.js`), o deploy funcionou
-- Se continua o mesmo nome, o deploy não propagou
+## Persistência
+- Sem mudanças no schema do banco — `day5_movement_data` já é JSONB e aceita campos adicionais
+- Novos campos salvos automaticamente via `movementData` spread no Day5Flow
 
-### Nota importante
+## Padrões Seguidos
+- Sticky footer mobile-first (fixed bottom-0, bg-background/80, backdrop-blur-lg, pb-28)
+- AnimatePresence mode="wait" com motion.div fade+slide (300ms)
+- Glass-card para opções, ring-2 ring-secondary/60 para selecionado
+- Tom Lavínia nos textos e dicas (💜)
+- Confetti canvas-confetti nas cores da marca
 
-Se após Publish → Update o bundle continuar o mesmo, o problema é na pipeline de deploy/CDN do Lovable, e não no código. Nesse caso, a alternativa seria fazer uma mudança mais significativa em um arquivo core (como `App.tsx`) para forçar invalidação.
-
-### Arquivos a modificar: 0
-
-Nenhuma mudança de código necessária — o gate já está implementado corretamente.
+## Ordem de Implementação
+1. Gerar ilustração legs-elevation-wall.png
+2. Criar Day5Lunch.tsx
+3. Criar Day5MicroChallenge.tsx
+4. Criar Day5LegsElevation.tsx
+5. Atualizar Day5Flow.tsx com 8 steps
 
