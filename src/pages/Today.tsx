@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
 
@@ -72,6 +73,13 @@ function getIncentiveMessage(progress: number): string {
 }
 
 const Today = () => {
+  const renderCount = useRef(0);
+  renderCount.current++;
+
+  useEffect(() => {
+    debugMount("Today");
+    return () => debugUnmount("Today");
+  }, []);
   const { user, loading: authLoading } = useAuth();
   const {
     profile,

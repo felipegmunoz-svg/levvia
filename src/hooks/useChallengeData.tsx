@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useProfile } from "./useProfile";
 import { useAuth } from "./useAuth";
+import { debugRender } from "@/lib/renderDebug";
 import {
   fetchExercises,
   fetchRecipes,
