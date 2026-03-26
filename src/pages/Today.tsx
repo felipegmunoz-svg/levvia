@@ -110,7 +110,7 @@ const Today = () => {
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Debug render instrumentation
-  const branch = day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading
+  const branch = day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || day6Done === null || premiumLoading
     ? "LOADING_GATES"
     : day1Done === false ? "DAY1_FLOW"
     : day2Done === false && day1Done === true ? "DAY2_FLOW"
@@ -118,7 +118,8 @@ const Today = () => {
     : day3Done === true && day4Done === false && !hasPremium ? "PAYWALL"
     : day4Done === false && day3Done === true && hasPremium ? "DAY4_FLOW"
     : day5Done === false && day4Done === true && hasPremium ? "DAY5_FLOW"
-    : day5Done === true && hasPremium ? "DAY5_DONE"
+    : day6Done === false && day5Done === true && hasPremium ? "DAY6_FLOW"
+    : day6Done === true && hasPremium ? "DAY6_DONE"
     : "DASHBOARD";
   
   debugRender("Today", {
@@ -155,7 +156,7 @@ const Today = () => {
 
     supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, challenge_start")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, day6_completed, day6_completed_at, challenge_start")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data, error }) => {
@@ -170,11 +171,13 @@ const Today = () => {
         setDay3Done(data?.day3_completed === true);
         setDay4Done(data?.day4_completed === true);
         setDay5Done(data?.day5_completed === true);
+        setDay6Done(data?.day6_completed === true);
         setDay1CompletedAt(data?.day1_completed_at || null);
         setDay2CompletedAt(data?.day2_completed_at || null);
         setDay3CompletedAt(data?.day3_completed_at || null);
         setDay4CompletedAt(data?.day4_completed_at || null);
         setDay5CompletedAt(data?.day5_completed_at || null);
+        setDay6CompletedAt(data?.day6_completed_at || null);
         if (data?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", data.challenge_start);
         }
