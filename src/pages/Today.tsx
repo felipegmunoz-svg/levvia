@@ -274,13 +274,13 @@ const Today = () => {
   };
 
   // Day 1 journey flow
-  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading) {
+  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || day6Done === null || premiumLoading) {
     return (
       <>
         {isDev && (
           <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
             <span className="font-semibold text-yellow-800">🐛 Debug:</span>
-            {[1,2,3,4,5].map(d => (
+            {[1,2,3,4,5,6].map(d => (
               <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded">
                 Dia {d}
               </button>
