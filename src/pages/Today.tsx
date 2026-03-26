@@ -312,6 +312,17 @@ const Today = () => {
   else if (replayDay === 5) content = <Day5Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 6) content = <Day6Flow onComplete={() => setReplayDay(null)} />;
 
+  // Review mode: revisit completed days (read-only, navigates back to /journey)
+  else if (reviewDay) {
+    const goBack = () => navTo("/journey");
+    if (reviewDay === 1) content = <Day1Flow onComplete={goBack} />;
+    else if (reviewDay === 2) content = <Day2Flow onComplete={goBack} />;
+    else if (reviewDay === 3) content = <Day3Flow onComplete={goBack} />;
+    else if (reviewDay === 4) content = <Day4Flow onComplete={goBack} />;
+    else if (reviewDay === 5) content = <Day5Flow onComplete={goBack} />;
+    else if (reviewDay === 6) content = <Day6Flow onComplete={goBack} />;
+  }
+
   else if (day1Done === false) {
     content = <Day1Flow onComplete={() => setDay1Done(true)} />;
   }
