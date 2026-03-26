@@ -306,6 +306,7 @@ const Today = () => {
   else if (replayDay === 3) content = <Day3Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 4) content = <Day4Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 5) content = <Day5Flow onComplete={() => setReplayDay(null)} />;
+  else if (replayDay === 6) content = <Day6Flow onComplete={() => setReplayDay(null)} />;
 
   else if (day1Done === false) {
     content = <Day1Flow onComplete={() => setDay1Done(true)} />;
