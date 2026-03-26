@@ -14,7 +14,7 @@ import Day5Journal from "./Day5Journal";
 import Day5Closing from "./Day5Closing";
 import Day5Dashboard from "./Day5Dashboard";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 type Day5Step = "loading" | "welcome" | "movement" | "lunch" | "snack" | "microChallenge" | "legsElevation" | "journal" | "closing" | "dashboard";
 
@@ -99,7 +99,9 @@ const Day5Flow = ({ onComplete, isReviewMode = false }: Day5FlowProps) => {
     return (
       <div className="levvia-page min-h-screen pb-24">
         <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
-          <img src={logoIcon} alt="Levvia" className="h-7" />
+          <div className="flex justify-center">
+            <img src={logoFull} alt="Levvia" className="h-10" />
+          </div>
         </div>
 
         <div className="p-5 space-y-6">

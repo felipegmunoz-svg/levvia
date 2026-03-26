@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 import BottomNav from "@/components/BottomNav";
 import DiaryReflection, { type DiaryData } from "./DiaryReflection";
 import DayDashboard from "./DayDashboard";
@@ -83,7 +83,9 @@ const DayTemplate = ({
     <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
       <header className="px-6 pt-8 pb-2">
-        <img src={logoIcon} alt="Levvia" className="h-7" />
+        <div className="flex justify-center">
+          <img src={logoFull} alt="Levvia" className="h-10" />
+        </div>
       </header>
 
       <AnimatePresence mode="wait">

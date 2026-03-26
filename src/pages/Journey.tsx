@@ -77,7 +77,7 @@ const Journey = () => {
       {/* Header */}
       <header className="px-6 pt-10 pb-6">
         <div className="flex justify-center mb-4">
-          <img src={logoFull} alt="Levvia" className="h-8" />
+          <img src={logoFull} alt="Levvia" className="h-10" />
         </div>
         <h1 className="text-[26px] font-heading font-semibold text-levvia-fg tracking-tight text-center">
           Sua Jornada
