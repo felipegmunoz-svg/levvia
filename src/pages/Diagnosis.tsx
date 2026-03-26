@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
 import { fireResults } from "@/data/onboarding";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { motion } from "framer-motion";
@@ -11,6 +12,7 @@ import logoFull from "@/assets/logo_livvia_branco.png";
 
 const Diagnosis = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { profile } = useProfile();
 
   const userName = profile.name || "Você";
@@ -378,7 +380,7 @@ const Diagnosis = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.2 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => navigate("/today")}
+          onClick={() => navigate(user ? "/today" : "/auth")}
           className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base gradient-primary text-foreground hover:opacity-90 transition-all"
         >
           Continuar
