@@ -382,6 +382,9 @@ export type Database = {
           day5_completed: boolean
           day5_completed_at: string | null
           day5_movement_data: Json | null
+          day6_completed: boolean
+          day6_completed_at: string | null
+          day6_spice_data: Json | null
           email: string
           has_premium: boolean
           health_conditions: string[] | null
@@ -421,6 +424,9 @@ export type Database = {
           day5_completed?: boolean
           day5_completed_at?: string | null
           day5_movement_data?: Json | null
+          day6_completed?: boolean
+          day6_completed_at?: string | null
+          day6_spice_data?: Json | null
           email?: string
           has_premium?: boolean
           health_conditions?: string[] | null
@@ -460,6 +466,9 @@ export type Database = {
           day5_completed?: boolean
           day5_completed_at?: string | null
           day5_movement_data?: Json | null
+          day6_completed?: boolean
+          day6_completed_at?: string | null
+          day6_spice_data?: Json | null
           email?: string
           has_premium?: boolean
           health_conditions?: string[] | null
