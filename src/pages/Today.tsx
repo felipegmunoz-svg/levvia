@@ -278,17 +278,9 @@ const Today = () => {
     }
   };
 
-  // Review mode: render immediately, skip loading gates
+  // Review mode: standalone component, no dependency on Day flows
   if (reviewDay) {
-    const goBack = () => navTo("/journey");
-    let reviewContent: React.ReactNode = null;
-    if (reviewDay === 1) reviewContent = <Day1Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 2) reviewContent = <Day2Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 3) reviewContent = <Day3Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 4) reviewContent = <Day4Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 5) reviewContent = <Day5Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 6) reviewContent = <Day6Flow onComplete={goBack} isReviewMode={true} />;
-    return <>{reviewContent}</>;
+    return <DayReview />;
   }
 
   // Day 1 journey flow
