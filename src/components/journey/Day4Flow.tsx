@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { saveWithRetry } from "@/lib/saveWithRetry";
@@ -7,11 +8,14 @@ import Day4SleepHygiene from "./Day4SleepHygiene";
 import BreathingCircle from "./BreathingCircle";
 import Day4CardapioNoturno from "./Day4CardapioNoturno";
 import Day4Closing from "./Day4Closing";
+import BottomNav from "@/components/BottomNav";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 
 type Day4Step = "loading" | "welcome" | "hygiene" | "breathing" | "cardapio" | "closing";
 
 interface Day4FlowProps {
   onComplete: () => void;
+  isReviewMode?: boolean;
 }
 
 const STEPS_ORDER: Day4Step[] = ["welcome", "hygiene", "breathing", "cardapio", "closing"];
@@ -21,12 +25,14 @@ interface SleepData {
   breathingCompleted?: boolean;
 }
 
-const Day4Flow = ({ onComplete }: Day4FlowProps) => {
+const Day4Flow = ({ onComplete, isReviewMode = false }: Day4FlowProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Day4Step>("loading");
   const [sleepData, setSleepData] = useState<SleepData>({});
 
   useEffect(() => {
+    if (isReviewMode) return;
     const saved = localStorage.getItem("levvia_day4_progress");
     if (saved) {
       try {
@@ -40,7 +46,7 @@ const Day4Flow = ({ onComplete }: Day4FlowProps) => {
       } catch {}
     }
     setStep("welcome");
-  }, []);
+  }, [isReviewMode]);
 
   const goTo = (nextStep: Day4Step, newSleepData?: Partial<SleepData>) => {
     console.log(`🔄 Day4Flow — ${step} → ${nextStep}`);
@@ -79,6 +85,54 @@ const Day4Flow = ({ onComplete }: Day4FlowProps) => {
     }
   };
 
+  // ===== REVIEW MODE =====
+  if (isReviewMode) {
+    return (
+      <div className="levvia-page min-h-screen pb-24">
+        <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
+          <img src={logoIcon} alt="Levvia" className="h-7" />
+        </div>
+
+        <div className="p-5 space-y-6">
+          <div className="text-center space-y-2">
+            <span className="text-3xl">😴</span>
+            <h1 className="text-xl font-heading font-bold text-levvia-fg">
+              Dia 4: Sono & Recuperação
+            </h1>
+            <p className="text-sm text-levvia-muted font-body">
+              Revisão do seu quarto dia de jornada
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🛏️ Higiene do Sono</h2>
+            <Day4SleepHygiene onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🫁 Respiração Guiada</h2>
+            <BreathingCircle onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🍽️ Cardápio Noturno</h2>
+            <Day4CardapioNoturno onContinue={() => {}} />
+          </div>
+
+          <button
+            onClick={() => navigate('/journey')}
+            className="w-full py-3 bg-levvia-primary text-white rounded-xl font-medium font-body"
+          >
+            ← Voltar para Jornada
+          </button>
+        </div>
+
+        <BottomNav />
+      </div>
+    );
+  }
+
+  // ===== NORMAL MODE =====
   if (step === "loading") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

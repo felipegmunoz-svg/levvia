@@ -1,25 +1,31 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { saveWithRetry } from "@/lib/saveWithRetry";
 import Day3Welcome from "./Day3Welcome";
 import FoodTrafficLight from "./FoodTrafficLight";
 import Day3CardapioPersonalizado from "./Day3CardapioPersonalizado";
 import Day3Closing from "./Day3Closing";
+import BottomNav from "@/components/BottomNav";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 
 type Day3Step = "loading" | "welcome" | "semaforo" | "cardapio" | "closing";
 
 interface Day3FlowProps {
   onComplete: () => void;
+  isReviewMode?: boolean;
 }
 
 const STEPS_ORDER: Day3Step[] = ["welcome", "semaforo", "cardapio", "closing"];
 
-const Day3Flow = ({ onComplete }: Day3FlowProps) => {
+const Day3Flow = ({ onComplete, isReviewMode = false }: Day3FlowProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Day3Step>("loading");
 
   // Restore step from localStorage
   useEffect(() => {
+    if (isReviewMode) return;
     const saved = localStorage.getItem("levvia_day3_progress");
     if (saved) {
       try {
@@ -32,7 +38,7 @@ const Day3Flow = ({ onComplete }: Day3FlowProps) => {
       } catch {}
     }
     setStep("welcome");
-  }, []);
+  }, [isReviewMode]);
 
   const goTo = (nextStep: Day3Step) => {
     console.log(`🔄 Day3Flow — ${step} → ${nextStep}`);
@@ -68,6 +74,49 @@ const Day3Flow = ({ onComplete }: Day3FlowProps) => {
     }
   };
 
+  // ===== REVIEW MODE =====
+  if (isReviewMode) {
+    return (
+      <div className="levvia-page min-h-screen pb-24">
+        <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
+          <img src={logoIcon} alt="Levvia" className="h-7" />
+        </div>
+
+        <div className="p-5 space-y-6">
+          <div className="text-center space-y-2">
+            <span className="text-3xl">🚦</span>
+            <h1 className="text-xl font-heading font-bold text-levvia-fg">
+              Dia 3: Semáforo Alimentar
+            </h1>
+            <p className="text-sm text-levvia-muted font-body">
+              Revisão do seu terceiro dia de jornada
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🚦 Semáforo dos Alimentos</h2>
+            <FoodTrafficLight onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🍽️ Cardápio Personalizado</h2>
+            <Day3CardapioPersonalizado onContinue={() => {}} />
+          </div>
+
+          <button
+            onClick={() => navigate('/journey')}
+            className="w-full py-3 bg-levvia-primary text-white rounded-xl font-medium font-body"
+          >
+            ← Voltar para Jornada
+          </button>
+        </div>
+
+        <BottomNav />
+      </div>
+    );
+  }
+
+  // ===== NORMAL MODE =====
   if (step === "loading") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

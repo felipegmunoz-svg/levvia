@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -9,34 +10,40 @@ import Day2InflammationMap from "./Day2InflammationMap";
 import Day2MealSuggestion from "./Day2MealSuggestion";
 import Day2NightRitual from "./Day2NightRitual";
 import Day2Closing from "./Day2Closing";
+import BottomNav from "@/components/BottomNav";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 
 type Day2Step = "loading" | "welcome" | "drainage" | "map" | "meal" | "night" | "closing";
 
 interface Day2FlowProps {
   onComplete: () => void;
+  isReviewMode?: boolean;
 }
 
 const STEPS_ORDER: Day2Step[] = ["welcome", "drainage", "map", "meal", "night", "closing"];
 
-const Day2Flow = ({ onComplete }: Day2FlowProps) => {
+const Day2Flow = ({ onComplete, isReviewMode = false }: Day2FlowProps) => {
   const { user } = useAuth();
   const { profile } = useProfile();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Day2Step>("loading");
   const [mapData, setMapData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
 
   // Restore mapData from localStorage on mount
   useEffect(() => {
+    if (isReviewMode) return;
     const savedMap = localStorage.getItem("levvia_day2_map_data");
     if (savedMap) {
       try {
         setMapData(JSON.parse(savedMap));
       } catch {}
     }
-  }, []);
+  }, [isReviewMode]);
 
   // Determine starting step from localStorage
   useEffect(() => {
+    if (isReviewMode) return;
     const saved = localStorage.getItem("levvia_day2_progress");
     if (saved) {
       try {
@@ -49,7 +56,7 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
       } catch {}
     }
     setStep("welcome");
-  }, []);
+  }, [isReviewMode]);
 
   const goTo = (nextStep: Day2Step) => {
     console.log(`🔄 Day2Flow — ${step} → ${nextStep}`);
@@ -89,7 +96,6 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
 
     console.log("💾 Day2Flow — Salvando conclusão do Dia 2...");
     
-    // Read mapData from localStorage as fallback
     let finalMapData = mapData;
     if (!finalMapData) {
       const savedMap = localStorage.getItem("levvia_day2_map_data");
@@ -122,6 +128,54 @@ const Day2Flow = ({ onComplete }: Day2FlowProps) => {
     }
   };
 
+  // ===== REVIEW MODE =====
+  if (isReviewMode) {
+    return (
+      <div className="levvia-page min-h-screen pb-24">
+        <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
+          <img src={logoIcon} alt="Levvia" className="h-7" />
+        </div>
+
+        <div className="p-5 space-y-6">
+          <div className="text-center space-y-2">
+            <span className="text-3xl">💧</span>
+            <h1 className="text-xl font-heading font-bold text-levvia-fg">
+              Dia 2: Hidratação Inteligente
+            </h1>
+            <p className="text-sm text-levvia-muted font-body">
+              Revisão do seu segundo dia de jornada
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🤲 Guia de Drenagem</h2>
+            <Day2DrainageGuide onNext={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🍽️ Refeição Sugerida</h2>
+            <Day2MealSuggestion profile={profile} onNext={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🌙 Ritual Noturno</h2>
+            <Day2NightRitual onNext={() => {}} />
+          </div>
+
+          <button
+            onClick={() => navigate('/journey')}
+            className="w-full py-3 bg-levvia-primary text-white rounded-xl font-medium font-body"
+          >
+            ← Voltar para Jornada
+          </button>
+        </div>
+
+        <BottomNav />
+      </div>
+    );
+  }
+
+  // ===== NORMAL MODE =====
   if (step === "loading") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
