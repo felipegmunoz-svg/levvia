@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import DayReview from "@/components/journey/DayReview";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { startOfDay, addDays } from "date-fns";
+// date-fns temporal imports removed for linear test mode
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
@@ -23,7 +23,7 @@ import Day4Flow from "@/components/journey/Day4Flow";
 import Day5Flow from "@/components/journey/Day5Flow";
 import Day6Flow from "@/components/journey/Day6Flow";
 import PaywallModal from "@/components/journey/PaywallModal";
-import WaitingScreen from "@/components/journey/WaitingScreen";
+// WaitingScreen removed for linear test mode
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,12 +107,7 @@ const Today = () => {
   const [day4Done, setDay4Done] = useState<boolean | null>(null);
   const [day5Done, setDay5Done] = useState<boolean | null>(null);
   const [day6Done, setDay6Done] = useState<boolean | null>(null);
-  const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
-  const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
-  const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
-  const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
-  const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
-  const [day6CompletedAt, setDay6CompletedAt] = useState<string | null>(null);
+  // completedAt states removed for linear test mode
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Debug render instrumentation
