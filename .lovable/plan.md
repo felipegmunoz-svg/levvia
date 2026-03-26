@@ -1,49 +1,73 @@
 
-# Debug Review Mode — Adicionar 4 Logs
+## Diagnóstico
 
-## Objetivo
-Inserir logs mínimos para confirmar:
-- se `?review=N` está chegando em `Today.tsx`
-- se o branch de review está sendo executado
-- se `Day1Flow` está recebendo `isReviewMode={true}`
-- se `Day1Flow` realmente entra no bloco de review
+O ajuste que você pediu em `Today.tsx` já está aplicado no código atual.
 
-## Arquivos a alterar
-
-### 1. `src/pages/Today.tsx`
-Adicionar 2 logs:
-
-**Após linha 82** (logo após `const reviewDay = ...`)
+### Evidência encontrada
+- `src/pages/Today.tsx` linhas 317–325:
 ```tsx
-console.log("DEBUG reviewDay:", reviewDay);
+else if (reviewDay) {
+  console.log("DEBUG REVIEW MODE ATIVADO, dia:", reviewDay);
+  const goBack = () => navTo("/journey");
+  if (reviewDay === 1) content = <Day1Flow onComplete={goBack} isReviewMode={true} />;
+  else if (reviewDay === 2) content = <Day2Flow onComplete={goBack} isReviewMode={true} />;
+  else if (reviewDay === 3) content = <Day3Flow onComplete={goBack} isReviewMode={true} />;
+  else if (reviewDay === 4) content = <Day4Flow onComplete={goBack} isReviewMode={true} />;
+  else if (reviewDay === 5) content = <Day5Flow onComplete={goBack} isReviewMode={true} />;
+  else if (reviewDay === 6) content = <Day6Flow onComplete={goBack} isReviewMode={true} />;
+}
 ```
 
-**Dentro do bloco `else if (reviewDay)`** (antes de `const goBack = ...`)
+- `src/components/journey/Day1Flow.tsx`:
+  - recebe `isReviewMode?: boolean`
+  - usa default `isReviewMode = false`
+  - tem bloco `if (isReviewMode)` com layout claro e read-only
+
+- `src/pages/Journey.tsx`:
 ```tsx
-console.log("DEBUG REVIEW MODE ATIVADO, dia:", reviewDay);
+navigate(`/today?review=${day}`);
 ```
 
-### 2. `src/components/journey/Day1Flow.tsx`
-Adicionar 2 logs:
+- `src/components/ProtectedRoute.tsx` não remove query params.
+- O app registra PWA/service worker:
+  - `src/main.tsx`: `registerSW({ immediate: true })`
+  - `vite.config.ts`: `VitePWA({ registerType: "autoUpdate", ... })`
 
-**No início do componente**, logo após a declaração:
-```tsx
-console.log("DEBUG Day1Flow isReviewMode:", isReviewMode);
-```
+## Causa raiz mais provável
 
-**No início do bloco `if (isReviewMode)`**, antes do `if (loading)`:
-```tsx
-console.log("DEBUG Day1Flow ENTRANDO REVIEW MODE");
-```
+O problema não é mais “faltou passar `isReviewMode`”. No código atual, essa prop já está sendo passada corretamente.
+
+A causa mais provável é cache de bundle/service worker: a usuária está vendo uma versão antiga do app, onde os flows ainda abriam no modo normal.
+
+## O que corrigir
+
+### 1. Forçar atualização real do frontend
+Aplicar uma correção de cache-busting para garantir que preview/publicado carreguem o bundle novo:
+- atualizar marcador de build em `src/main.tsx` e/ou `src/App.tsx`
+- revisar estratégia de registro do service worker para não atrapalhar preview
+- manter PWA, mas evitar que versão antiga continue servindo `/today`
+
+### 2. Remover logs temporários
+Depois da correção de cache:
+- remover os 2 logs de `Today.tsx`
+- remover os 2 logs de `Day1Flow.tsx`
+
+### 3. Validar review mode ponta a ponta
+Testar `/journey` → clicar “Rever” nos dias 1–6 e confirmar:
+- fundo claro
+- logo azul no topo
+- conteúdo em scroll vertical
+- sem step-by-step
+- sem salvar
+- botão “Voltar para Jornada”
+- Dia 6 via `DayTemplate` também em review
+
+## Arquivos a ajustar
+- `src/main.tsx`
+- `src/App.tsx`
+- possivelmente `vite.config.ts` se precisar endurecer invalidação de cache no PWA
+- `src/pages/Today.tsx` (limpar logs)
+- `src/components/journey/Day1Flow.tsx` (limpar logs)
 
 ## Resultado esperado
-Com esses 4 logs, ficará claro onde a falha está:
-- se o parâmetro `review` não está chegando
-- se `Today.tsx` não está entrando no branch de review
-- se `Day1Flow` recebe `false` em vez de `true`
-- ou se entra no componente mas não passa pelo bloco de review
-
-## Impacto
-- Mudança apenas de debug
-- Sem alterar fluxo, layout ou persistência
-- Apenas 2 arquivos
+Sem mexer na lógica dos dias, o review mode volta a funcionar porque a aplicação finalmente passa a servir a versão atual do código, que já contém `isReviewMode={true}` para os dias 1–6.
