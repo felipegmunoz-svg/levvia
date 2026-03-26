@@ -19,6 +19,7 @@ import Day2Flow from "@/components/journey/Day2Flow";
 import Day3Flow from "@/components/journey/Day3Flow";
 import Day4Flow from "@/components/journey/Day4Flow";
 import Day5Flow from "@/components/journey/Day5Flow";
+import Day6Flow from "@/components/journey/Day6Flow";
 import PaywallModal from "@/components/journey/PaywallModal";
 import WaitingScreen from "@/components/journey/WaitingScreen";
 import { useAuth } from "@/hooks/useAuth";
@@ -99,11 +100,13 @@ const Today = () => {
   const [day3Done, setDay3Done] = useState<boolean | null>(null);
   const [day4Done, setDay4Done] = useState<boolean | null>(null);
   const [day5Done, setDay5Done] = useState<boolean | null>(null);
+  const [day6Done, setDay6Done] = useState<boolean | null>(null);
   const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
   const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
   const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
   const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
   const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
+  const [day6CompletedAt, setDay6CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Debug render instrumentation
