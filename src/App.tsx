@@ -37,7 +37,7 @@ import LearnModules from "./pages/admin/LearnModules";
 import Day1Journey from "./pages/Day1Journey";
 import NotFound from "./pages/NotFound";
 
-// build v4 – force new bundle hash
+// build v6 – review mode + SW fix
 const queryClient = new QueryClient();
 
 const App = () => (
