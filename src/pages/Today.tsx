@@ -666,7 +666,7 @@ const Today = () => {
           <div>data:{todayData ? 'yes' : 'no'}</div>
         </div>
       )}
-      {content}
+      <div className="levvia-page">{content}</div>
     </>
   );
 };
