@@ -347,7 +347,7 @@ const Today = () => {
     }
   }
 
-  else if (selectedExercise) {
+  if (!content && selectedExercise) {
     content = (
       <ExerciseDetail
         exercise={toExerciseView(selectedExercise.exercise)}
@@ -357,7 +357,7 @@ const Today = () => {
     );
   }
 
-  else if (selectedRecipe) {
+  if (!content && selectedRecipe) {
     content = (
       <RecipeDetail
         recipe={toRecipeView(selectedRecipe.recipe)}
@@ -367,7 +367,7 @@ const Today = () => {
     );
   }
 
-  else if ((loading && !forceReady) || !todayData) {
+  if (!content && ((loading && !forceReady) || !todayData)) {
     content = (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
