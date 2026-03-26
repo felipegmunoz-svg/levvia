@@ -62,12 +62,12 @@ const Journey = () => {
   const nextDay = totalCompleted + 1;
 
   const handleDayClick = (day: number) => {
+    if (day > 6) return; // days 7-14 locked
     const isCompleted = completedDays.includes(day);
     if (isCompleted) {
-      // Navigate to Today with review mode
       navigate(`/today?review=${day}`);
-    } else if (day === nextDay && day <= 6) {
-      // Navigate to Today which will show the current day flow
+    } else {
+      // Linear mode: any uncompleted day navigates to /today (sequential flow handles it)
       navigate("/today");
     }
   };
