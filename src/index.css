@@ -68,6 +68,24 @@
 }
 
 @layer utilities {
+  .levvia-page {
+    background-color: #FAFBFC;
+    color: #1A2F3D;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .levvia-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 12px;
+    padding: 18px;
+  }
+
+  .levvia-card:hover {
+    border-color: rgba(46,196,182,0.15);
+    background: rgba(46,196,182,0.02);
+  }
+
   .gradient-primary {
     background: linear-gradient(135deg, hsl(196, 58%, 42%), hsl(212, 59%, 26%));
   }
