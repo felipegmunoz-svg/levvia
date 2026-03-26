@@ -381,7 +381,7 @@ const Today = () => {
   // If no gate matched, render the dashboard
   if (!content) {
     content = (
-    <div className="levvia-page min-h-screen pb-24">
+    <div className="theme-light levvia-page min-h-screen pb-24">
       {/* Header */}
       <header className="px-6 pt-10 pb-8">
         <div className="flex items-center gap-3 mb-1">
