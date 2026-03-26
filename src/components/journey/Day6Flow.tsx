@@ -7,9 +7,10 @@ import type { DiaryData } from "@/components/journey/DiaryReflection";
 
 interface Day6FlowProps {
   onComplete: () => void;
+  isReviewMode?: boolean;
 }
 
-const Day6Flow = ({ onComplete }: Day6FlowProps) => {
+const Day6Flow = ({ onComplete, isReviewMode = false }: Day6FlowProps) => {
   const { user } = useAuth();
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [diaryData, setDiaryData] = useState<DiaryData | null>(null);
@@ -180,6 +181,7 @@ const Day6Flow = ({ onComplete }: Day6FlowProps) => {
       }))}
       onComplete={handleComplete}
       onDiarySave={(data) => setDiaryData(data)}
+      isReviewMode={isReviewMode}
     />
   );
 };

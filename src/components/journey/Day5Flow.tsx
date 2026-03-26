@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -12,11 +13,14 @@ import Day5LegsElevation from "./Day5LegsElevation";
 import Day5Journal from "./Day5Journal";
 import Day5Closing from "./Day5Closing";
 import Day5Dashboard from "./Day5Dashboard";
+import BottomNav from "@/components/BottomNav";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 
 type Day5Step = "loading" | "welcome" | "movement" | "lunch" | "snack" | "microChallenge" | "legsElevation" | "journal" | "closing" | "dashboard";
 
 interface Day5FlowProps {
   onComplete: () => void;
+  isReviewMode?: boolean;
 }
 
 const STEPS_ORDER: Day5Step[] = ["welcome", "movement", "lunch", "snack", "microChallenge", "legsElevation", "journal", "closing", "dashboard"];
@@ -34,13 +38,15 @@ interface MovementData {
   };
 }
 
-const Day5Flow = ({ onComplete }: Day5FlowProps) => {
+const Day5Flow = ({ onComplete, isReviewMode = false }: Day5FlowProps) => {
   const { user } = useAuth();
   const { profile } = useProfile();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Day5Step>("loading");
   const [movementData, setMovementData] = useState<MovementData>({});
 
   useEffect(() => {
+    if (isReviewMode) return;
     const saved = localStorage.getItem("levvia_day5_progress");
     if (saved) {
       try {
@@ -53,7 +59,7 @@ const Day5Flow = ({ onComplete }: Day5FlowProps) => {
       } catch {}
     }
     setStep("welcome");
-  }, []);
+  }, [isReviewMode]);
 
   const goTo = (nextStep: Day5Step, newData?: Partial<MovementData>) => {
     const merged = newData ? { ...movementData, ...newData } : movementData;
@@ -88,6 +94,64 @@ const Day5Flow = ({ onComplete }: Day5FlowProps) => {
     }
   };
 
+  // ===== REVIEW MODE =====
+  if (isReviewMode) {
+    return (
+      <div className="levvia-page min-h-screen pb-24">
+        <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
+          <img src={logoIcon} alt="Levvia" className="h-7" />
+        </div>
+
+        <div className="p-5 space-y-6">
+          <div className="text-center space-y-2">
+            <span className="text-3xl">🏃‍♀️</span>
+            <h1 className="text-xl font-heading font-bold text-levvia-fg">
+              Dia 5: Movimento Sem Dor
+            </h1>
+            <p className="text-sm text-levvia-muted font-body">
+              Revisão do seu quinto dia de jornada
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🤸‍♀️ Guia de Movimento</h2>
+            <Day5MovementGuide onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🍽️ Almoço</h2>
+            <Day5Lunch onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🍎 Lanche</h2>
+            <Day5Snack onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🏃‍♀️ Micro-Desafio</h2>
+            <Day5MicroChallenge onContinue={() => {}} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-levvia-fg">🦵 Elevação de Pernas</h2>
+            <Day5LegsElevation onContinue={() => {}} />
+          </div>
+
+          <button
+            onClick={() => navigate('/journey')}
+            className="w-full py-3 bg-levvia-primary text-white rounded-xl font-medium font-body"
+          >
+            ← Voltar para Jornada
+          </button>
+        </div>
+
+        <BottomNav />
+      </div>
+    );
+  }
+
+  // ===== NORMAL MODE =====
   if (step === "loading") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
