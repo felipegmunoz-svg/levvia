@@ -181,6 +181,7 @@ const Day6Flow = ({ onComplete, isReviewMode = false }: Day6FlowProps) => {
       }))}
       onComplete={handleComplete}
       onDiarySave={(data) => setDiaryData(data)}
+      isReviewMode={isReviewMode}
     />
   );
 };
