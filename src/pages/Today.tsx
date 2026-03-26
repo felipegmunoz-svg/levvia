@@ -308,118 +308,42 @@ const Today = () => {
   else if (replayDay === 5) content = <Day5Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 6) content = <Day6Flow onComplete={() => setReplayDay(null)} />;
 
-  else if (day1Done === false) {
-    content = <Day1Flow onComplete={() => setDay1Done(true)} />;
-  }
+  // === LINEAR TEST MODE: sequential, no temporal gates ===
+  else {
+    const completedDays = [day1Done, day2Done, day3Done, day4Done, day5Done, day6Done].filter(Boolean).length;
+    const nextDay = completedDays + 1;
+    console.log("🎯 Modo linear — dias completos:", completedDays, "próximo:", nextDay);
 
-  else if (day2Done === false && day1Done === true) {
-    if (!isDev && day1CompletedAt) {
-      const nextMidnight = startOfDay(addDays(new Date(day1CompletedAt), 1));
-      if (Date.now() < nextMidnight.getTime()) {
-        content = (
-          <WaitingScreen
-            completedAt={day1CompletedAt}
-            nextDay={2}
-            onReady={() => setDay1CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
-          />
-        );
-      }
-    }
-    if (!content) content = <Day2Flow onComplete={() => setDay2Done(true)} />;
-  }
-
-  else if (day3Done === false && day2Done === true) {
-    if (!isDev && day2CompletedAt) {
-      const nextMidnight = startOfDay(addDays(new Date(day2CompletedAt), 1));
-      if (Date.now() < nextMidnight.getTime()) {
-        content = (
-          <WaitingScreen
-            completedAt={day2CompletedAt}
-            nextDay={3}
-            onReady={() => setDay2CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
-          />
-        );
-      }
-    }
-    if (!content) content = <Day3Flow onComplete={() => setDay3Done(true)} />;
-  }
-
-  else if (day3Done === true && day4Done === false && !hasPremium) {
-    content = <PaywallModal onClose={() => setShowPaywall(false)} />;
-  }
-
-  else if (day4Done === false && day3Done === true && hasPremium) {
-    if (!isDev && day3CompletedAt) {
-      const nextMidnight = startOfDay(addDays(new Date(day3CompletedAt), 1));
-      if (Date.now() < nextMidnight.getTime()) {
-        content = (
-          <WaitingScreen
-            completedAt={day3CompletedAt}
-            nextDay={4}
-            onReady={() => setDay3CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
-          />
-        );
-      }
-    }
-    if (!content) content = <Day4Flow onComplete={() => setDay4Done(true)} />;
-  }
-
-  else if (day5Done === false && day4Done === true && hasPremium) {
-    if (!isDev && day4CompletedAt) {
-      const nextMidnight = startOfDay(addDays(new Date(day4CompletedAt), 1));
-      if (Date.now() < nextMidnight.getTime()) {
-        content = (
-          <WaitingScreen
-            completedAt={day4CompletedAt}
-            nextDay={5}
-            onReady={() => setDay4CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
-          />
-        );
-      }
-    }
-    if (!content) content = <Day5Flow onComplete={() => setDay5Done(true)} />;
-  }
-
-  else if (day6Done === false && day5Done === true && hasPremium) {
-    if (!isDev && day5CompletedAt) {
-      const nextMidnight = startOfDay(addDays(new Date(day5CompletedAt), 1));
-      if (Date.now() < nextMidnight.getTime()) {
-        content = (
-          <WaitingScreen
-            completedAt={day5CompletedAt}
-            nextDay={6}
-            onReady={() => setDay5CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
-          />
-        );
-      }
-    }
-    if (!content) content = <Day6Flow onComplete={() => setDay6Done(true)} />;
-  }
-
-  else if (day6Done === true && hasPremium) {
-    if (day6CompletedAt) {
-      const nextMidnight = startOfDay(addDays(new Date(day6CompletedAt), 1));
-      if (Date.now() < nextMidnight.getTime()) {
-        content = (
-          <WaitingScreen
-            completedAt={day6CompletedAt}
-            nextDay={7}
-            onReady={() => setDay6CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
-          />
-        );
-      }
-    }
-    if (!content) {
+    if (completedDays >= 6) {
       content = (
         <div className="min-h-screen levvia-page p-6 flex flex-col items-center justify-center text-center">
-          <span className="text-6xl mb-4">🚀</span>
-          <h2 className="text-2xl font-heading font-bold text-levvia-fg mb-2">Dia 7 em breve!</h2>
-          <p className="text-sm text-levvia-muted font-body max-w-xs">
-            Estamos preparando o próximo passo da sua jornada.
-            Enquanto isso, continue praticando os aprendizados dos dias anteriores.
+          <span className="text-6xl mb-4">🎉</span>
+          <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Jornada Dias 1-6 Completa!</h2>
+          <p className="text-sm text-muted-foreground font-body max-w-xs mb-6">
+            Parabéns! Você completou os primeiros 6 dias da jornada.
           </p>
+          <button
+            onClick={() => navTo("/journey")}
+            className="px-6 py-3 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+          >
+            Ver Jornada Completa
+          </button>
         </div>
       );
+    } else if (nextDay === 1) {
+      content = <Day1Flow onComplete={() => setDay1Done(true)} />;
+    } else if (nextDay === 2) {
+      content = <Day2Flow onComplete={() => setDay2Done(true)} />;
+    } else if (nextDay === 3) {
+      content = <Day3Flow onComplete={() => setDay3Done(true)} />;
+    } else if (nextDay === 4 && !hasPremium) {
+      content = <PaywallModal onClose={() => setShowPaywall(false)} />;
+    } else if (nextDay === 4) {
+      content = <Day4Flow onComplete={() => setDay4Done(true)} />;
+    } else if (nextDay === 5) {
+      content = <Day5Flow onComplete={() => setDay5Done(true)} />;
+    } else if (nextDay === 6) {
+      content = <Day6Flow onComplete={() => setDay6Done(true)} />;
     }
   }
 
