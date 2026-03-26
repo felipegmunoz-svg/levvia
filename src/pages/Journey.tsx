@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Check, Lock, ChevronRight } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ProgressCircle from "@/components/ui/ProgressCircle";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
