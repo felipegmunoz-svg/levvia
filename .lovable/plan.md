@@ -1,73 +1,37 @@
 
-## Diagnóstico
 
-O ajuste que você pediu em `Today.tsx` já está aplicado no código atual.
+# New DayReview Component — Replace Broken Review Mode
 
-### Evidência encontrada
-- `src/pages/Today.tsx` linhas 317–325:
+## Problem
+The review mode using `isReviewMode` prop on Day1-6 Flow components doesn't work reliably. Multiple attempts to fix it have failed.
+
+## Solution
+Create a standalone `DayReview.tsx` component that renders review content independently, with no dependency on the Day1-6 Flow components. Replace the review block in `Today.tsx` to use this new component.
+
+## Changes
+
+### 1. Create `src/components/journey/DayReview.tsx`
+- Standalone component that reads `?review=N` from URL
+- Fetches profile data from database (heat_map_day1, day2_inflammation_map, day4_sleep_data, day5_movement_data, day6_spice_data)
+- Renders day-specific saved data in read-only cards
+- White background (`#FAFBFC`), blue logo centered, vertical scroll
+- "Voltar para Jornada" button at bottom
+- Day titles and icons for days 1-6
+- Loading state while fetching
+
+### 2. Modify `src/pages/Today.tsx`
+- Import `DayReview`
+- Replace lines 282-291 (the current review block that uses Day1-6 Flows with `isReviewMode`) with:
 ```tsx
-else if (reviewDay) {
-  console.log("DEBUG REVIEW MODE ATIVADO, dia:", reviewDay);
-  const goBack = () => navTo("/journey");
-  if (reviewDay === 1) content = <Day1Flow onComplete={goBack} isReviewMode={true} />;
-  else if (reviewDay === 2) content = <Day2Flow onComplete={goBack} isReviewMode={true} />;
-  else if (reviewDay === 3) content = <Day3Flow onComplete={goBack} isReviewMode={true} />;
-  else if (reviewDay === 4) content = <Day4Flow onComplete={goBack} isReviewMode={true} />;
-  else if (reviewDay === 5) content = <Day5Flow onComplete={goBack} isReviewMode={true} />;
-  else if (reviewDay === 6) content = <Day6Flow onComplete={goBack} isReviewMode={true} />;
+if (reviewDay) {
+  return <DayReview />;
 }
 ```
+- Remove unused Day flow imports if they're only used for review (they're still used for normal flow, so keep them)
 
-- `src/components/journey/Day1Flow.tsx`:
-  - recebe `isReviewMode?: boolean`
-  - usa default `isReviewMode = false`
-  - tem bloco `if (isReviewMode)` com layout claro e read-only
+## Why This Works
+- Zero dependency on Day1-6 Flow internal logic
+- No `isReviewMode` prop threading needed
+- Simple data fetch + read-only render
+- Guaranteed white background and read-only behavior
 
-- `src/pages/Journey.tsx`:
-```tsx
-navigate(`/today?review=${day}`);
-```
-
-- `src/components/ProtectedRoute.tsx` não remove query params.
-- O app registra PWA/service worker:
-  - `src/main.tsx`: `registerSW({ immediate: true })`
-  - `vite.config.ts`: `VitePWA({ registerType: "autoUpdate", ... })`
-
-## Causa raiz mais provável
-
-O problema não é mais “faltou passar `isReviewMode`”. No código atual, essa prop já está sendo passada corretamente.
-
-A causa mais provável é cache de bundle/service worker: a usuária está vendo uma versão antiga do app, onde os flows ainda abriam no modo normal.
-
-## O que corrigir
-
-### 1. Forçar atualização real do frontend
-Aplicar uma correção de cache-busting para garantir que preview/publicado carreguem o bundle novo:
-- atualizar marcador de build em `src/main.tsx` e/ou `src/App.tsx`
-- revisar estratégia de registro do service worker para não atrapalhar preview
-- manter PWA, mas evitar que versão antiga continue servindo `/today`
-
-### 2. Remover logs temporários
-Depois da correção de cache:
-- remover os 2 logs de `Today.tsx`
-- remover os 2 logs de `Day1Flow.tsx`
-
-### 3. Validar review mode ponta a ponta
-Testar `/journey` → clicar “Rever” nos dias 1–6 e confirmar:
-- fundo claro
-- logo azul no topo
-- conteúdo em scroll vertical
-- sem step-by-step
-- sem salvar
-- botão “Voltar para Jornada”
-- Dia 6 via `DayTemplate` também em review
-
-## Arquivos a ajustar
-- `src/main.tsx`
-- `src/App.tsx`
-- possivelmente `vite.config.ts` se precisar endurecer invalidação de cache no PWA
-- `src/pages/Today.tsx` (limpar logs)
-- `src/components/journey/Day1Flow.tsx` (limpar logs)
-
-## Resultado esperado
-Sem mexer na lógica dos dias, o review mode volta a funcionar porque a aplicação finalmente passa a servir a versão atual do código, que já contém `isReviewMode={true}` para os dias 1–6.
