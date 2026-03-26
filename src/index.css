@@ -54,6 +54,28 @@
     --glass-bg: 0 0% 100% / 0.06;
     --glass-border: 0 0% 100% / 0.10;
   }
+
+  .theme-light {
+    --background: 220 20% 98%;
+    --foreground: 200 30% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 30% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 30% 17%;
+    --primary: 174 63% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 196 58% 42%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 210 10% 55%;
+    --accent: 174 63% 47%;
+    --accent-foreground: 0 0% 100%;
+    --border: 0 0% 0% / 0.04;
+    --input: 0 0% 0% / 0.08;
+    --ring: 174 63% 47%;
+    --glass-bg: 0 0% 100% / 0.80;
+    --glass-border: 0 0% 0% / 0.04;
+  }
 }
 
 @layer base {

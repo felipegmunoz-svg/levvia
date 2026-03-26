@@ -73,7 +73,7 @@ const Journey = () => {
   };
 
   return (
-    <div className="levvia-page min-h-screen pb-24">
+    <div className="theme-light levvia-page min-h-screen pb-24">
       {/* Header */}
       <header className="px-6 pt-10 pb-6">
         <div className="flex justify-center mb-4">
