@@ -11,7 +11,7 @@ import RecipeDetail from "@/components/RecipeDetail";
 import BottomNav from "@/components/BottomNav";
 import SymptomDiary from "@/components/SymptomDiary";
 import MotorAlivio from "@/components/MotorAlivio";
-import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 import HeatMapCard from "@/components/HeatMapCard";
 import FoodTrafficLightCard from "@/components/FoodTrafficLightCard";
 import Day1Flow from "@/components/journey/Day1Flow";
@@ -434,9 +434,9 @@ const Today = () => {
   // If no gate matched, render the dashboard
   if (!content) {
     content = (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
-      <header className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
+      <header className="px-6 pt-10 pb-8">
         <div className="flex items-center gap-3 mb-1">
           <img src={logoIcon} alt="Levvia" className="w-8 h-auto" />
           <p className="text-muted-foreground text-sm font-medium">{getGreeting()}</p>
@@ -666,7 +666,7 @@ const Today = () => {
           <div>data:{todayData ? 'yes' : 'no'}</div>
         </div>
       )}
-      {content}
+      <div className="levvia-page">{content}</div>
     </>
   );
 };

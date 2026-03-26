@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -296,7 +296,7 @@ const Profile = () => {
   const maxBarHeight = 80;
 
   return (
-    <div className="min-h-screen bg-background gradient-page pb-24">
+    <div className="levvia-page min-h-screen pb-24">
       <header className="px-6 pt-10 pb-6">
         <div className="flex items-center gap-4">
           <AvatarUpload
