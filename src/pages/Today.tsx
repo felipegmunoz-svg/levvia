@@ -436,7 +436,7 @@ const Today = () => {
     content = (
     <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
-      <header className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
+      <header className="px-6 pt-10 pb-8">
         <div className="flex items-center gap-3 mb-1">
           <img src={logoIcon} alt="Levvia" className="w-8 h-auto" />
           <p className="text-muted-foreground text-sm font-medium">{getGreeting()}</p>
