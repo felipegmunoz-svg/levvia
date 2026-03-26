@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import DayReview from "@/components/journey/DayReview";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { startOfDay, addDays } from "date-fns";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
