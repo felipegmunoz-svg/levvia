@@ -1,37 +1,33 @@
 
 
-# New DayReview Component — Replace Broken Review Mode
+# Fix DayReview — Correct Data per Day + Visual Components
 
 ## Problem
-The review mode using `isReviewMode` prop on Day1-6 Flow components doesn't work reliably. Multiple attempts to fix it have failed.
-
-## Solution
-Create a standalone `DayReview.tsx` component that renders review content independently, with no dependency on the Day1-6 Flow components. Replace the review block in `Today.tsx` to use this new component.
+DayReview may be showing wrong data for some days due to a possible caching issue, and renders raw JSON for days 2/4/5/6 instead of visual components.
 
 ## Changes
 
-### 1. Create `src/components/journey/DayReview.tsx`
-- Standalone component that reads `?review=N` from URL
-- Fetches profile data from database (heat_map_day1, day2_inflammation_map, day4_sleep_data, day5_movement_data, day6_spice_data)
-- Renders day-specific saved data in read-only cards
-- White background (`#FAFBFC`), blue logo centered, vertical scroll
-- "Voltar para Jornada" button at bottom
-- Day titles and icons for days 1-6
-- Loading state while fetching
+### `src/components/journey/DayReview.tsx`
 
-### 2. Modify `src/pages/Today.tsx`
-- Import `DayReview`
-- Replace lines 282-291 (the current review block that uses Day1-6 Flows with `isReviewMode`) with:
-```tsx
-if (reviewDay) {
-  return <DayReview />;
-}
-```
-- Remove unused Day flow imports if they're only used for review (they're still used for normal flow, so keep them)
+1. **Import HeatMapInteractive** for Day 1 visual rendering in read-only mode
+2. **Fix `renderDayContent` switch/case** to ensure each day renders only its own data with proper visual components:
 
-## Why This Works
-- Zero dependency on Day1-6 Flow internal logic
-- No `isReviewMode` prop threading needed
-- Simple data fetch + read-only render
-- Guaranteed white background and read-only behavior
+| Day | Title | Data Column | Visual |
+|-----|-------|-------------|--------|
+| 1 | Mapa de Calor | `heat_map_day1` | `<HeatMapInteractive readOnly size="small" initialData={...} />` |
+| 2 | Mapa de Inflamação | `day2_inflammation_map` | Formatted cards showing area + type |
+| 3 | Semáforo Alimentar | (no saved data) | Static description text |
+| 4 | Higiene do Sono | `day4_sleep_data` | Formatted cards with sleep habits |
+| 5 | Movimento & Ritmo | `day5_movement_data` | Formatted cards with movement data |
+| 6 | Temperos & Especiarias | `day6_spice_data` | Formatted cards with spice selections |
+
+3. **For JSON data (days 2, 4, 5, 6)**: Instead of raw `JSON.stringify`, render human-readable cards showing key-value pairs with labels. Fallback to "Nenhum dado salvo" when empty.
+
+4. **Day 1 specifically**: Replace the dots grid with `<HeatMapInteractive initialData={data.heat_map_day1} readOnly={true} size="small" />` which already supports read-only mode and renders the interactive silhouette.
+
+### Technical details
+- Import: `import HeatMapInteractive from "./HeatMapInteractive";`
+- The `HeatMapInteractive` component already accepts `readOnly`, `size="small"`, and `initialData` props
+- For days 2/4/5/6: parse JSONB objects and render labeled cards instead of `<pre>` tags
+- No database changes needed
 
