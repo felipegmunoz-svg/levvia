@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { startOfDay, addDays } from "date-fns";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
