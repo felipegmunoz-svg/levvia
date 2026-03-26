@@ -1,36 +1,49 @@
 
+# Debug Review Mode — Adicionar 4 Logs
 
-# Correção Logo — Tamanho + Review Mode
+## Objetivo
+Inserir logs mínimos para confirmar:
+- se `?review=N` está chegando em `Today.tsx`
+- se o branch de review está sendo executado
+- se `Day1Flow` está recebendo `isReviewMode={true}`
+- se `Day1Flow` realmente entra no bloco de review
 
-## 7 Arquivos a Modificar
+## Arquivos a alterar
 
-### 1. `src/pages/Journey.tsx` (linha 80)
-- `h-8` → `h-10`
+### 1. `src/pages/Today.tsx`
+Adicionar 2 logs:
 
-### 2-5. `Day1Flow.tsx`, `Day2Flow.tsx`, `Day3Flow.tsx`, `Day4Flow.tsx`, `Day5Flow.tsx`
-Todos usam `import logoIcon from "@/assets/logo_livvia_azul_icone.png"` e `<img src={logoIcon} className="h-7" />` no review mode header.
-
-**Mudança em cada:**
-- Trocar import: `logoIcon` → `import logoFull from "@/assets/logo_livvia_azul.png"`
-- Review mode header: centralizar + `h-10`
+**Após linha 82** (logo após `const reviewDay = ...`)
 ```tsx
-<div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
-  <div className="flex justify-center">
-    <img src={logoFull} alt="Levvia" className="h-10" />
-  </div>
-</div>
+console.log("DEBUG reviewDay:", reviewDay);
 ```
 
-### 6. `src/components/journey/DayTemplate.tsx` (linha 4, 86)
-- Trocar import: `logoIcon` → `import logoFull from "@/assets/logo_livvia_azul.png"`
-- Linha 86: centralizar + `h-10`
+**Dentro do bloco `else if (reviewDay)`** (antes de `const goBack = ...`)
 ```tsx
-<header className="px-6 pt-8 pb-2">
-  <div className="flex justify-center">
-    <img src={logoFull} alt="Levvia" className="h-10" />
-  </div>
-</header>
+console.log("DEBUG REVIEW MODE ATIVADO, dia:", reviewDay);
 ```
 
-Isso cobre Day6Flow automaticamente (usa DayTemplate).
+### 2. `src/components/journey/Day1Flow.tsx`
+Adicionar 2 logs:
 
+**No início do componente**, logo após a declaração:
+```tsx
+console.log("DEBUG Day1Flow isReviewMode:", isReviewMode);
+```
+
+**No início do bloco `if (isReviewMode)`**, antes do `if (loading)`:
+```tsx
+console.log("DEBUG Day1Flow ENTRANDO REVIEW MODE");
+```
+
+## Resultado esperado
+Com esses 4 logs, ficará claro onde a falha está:
+- se o parâmetro `review` não está chegando
+- se `Today.tsx` não está entrando no branch de review
+- se `Day1Flow` recebe `false` em vez de `true`
+- ou se entra no componente mas não passa pelo bloco de review
+
+## Impacto
+- Mudança apenas de debug
+- Sem alterar fluxo, layout ou persistência
+- Apenas 2 arquivos
