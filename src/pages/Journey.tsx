@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Check, Lock } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ProgressCircle from "@/components/ui/ProgressCircle";
 import logoIcon from "@/assets/logo_livvia_azul_icone.png";
-import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const dayTitles: Record<number, string> = {
   1: "Consciência Corporal",
@@ -23,17 +24,27 @@ const dayTitles: Record<number, string> = {
 };
 
 const Journey = () => {
-  const { profile } = useProfile();
+  const { user } = useAuth();
+  const [completedDays, setCompletedDays] = useState<number[]>([]);
 
-  const completedDays = useMemo(() => {
-    const days: number[] = [];
-    if (profile.day1Completed) days.push(1);
-    if (profile.day2Completed) days.push(2);
-    if (profile.day3Completed) days.push(3);
-    if (profile.day4Completed) days.push(4);
-    if (profile.day5Completed) days.push(5);
-    return days;
-  }, [profile]);
+  useEffect(() => {
+    if (!user?.id) return;
+    supabase
+      .from("profiles")
+      .select("day1_completed, day2_completed, day3_completed, day4_completed, day5_completed")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+        const days: number[] = [];
+        if (data.day1_completed) days.push(1);
+        if (data.day2_completed) days.push(2);
+        if (data.day3_completed) days.push(3);
+        if (data.day4_completed) days.push(4);
+        if (data.day5_completed) days.push(5);
+        setCompletedDays(days);
+      });
+  }, [user?.id]);
 
   const totalCompleted = completedDays.length;
   const nextDay = totalCompleted + 1;

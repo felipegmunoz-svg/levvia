@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import Plans from "./pages/Plans";
 import Today from "./pages/Today";
+import Journey from "./pages/Journey";
+import Progress from "./pages/Progress";
 import Practices from "./pages/Practices";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
