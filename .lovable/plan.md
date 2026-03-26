@@ -1,45 +1,47 @@
 
 
-# Modo Linear de Teste — Plano
+# Reset Journey Progress — Migration
 
-## Resumo
-Converter o app de jornada temporal (bloqueios 24h) para modo sequencial imediato, permitindo testar todos os 6 dias em ~30 minutos.
+## What
+Run a single UPDATE to reset all journey progress for `felipegmunoz@gmail.com`, keeping profile data (name, age, email, etc.) intact.
 
-## Arquivos a modificar
+## Corrected SQL
 
-### 1. `src/pages/Today.tsx`
-**Remover** toda lógica temporal (WaitingScreen, startOfDay, addDays) entre linhas 322-435.
+```sql
+UPDATE profiles 
+SET 
+  day1_completed = false,
+  day1_completed_at = null,
+  day1_welcome_shown = false,
+  heat_map_day1 = '{}'::jsonb,
+  day2_completed = false,
+  day2_completed_at = null,
+  day2_inflammation_map = '{}'::jsonb,
+  day3_completed = false,
+  day3_completed_at = null,
+  day4_completed = false,
+  day4_completed_at = null,
+  day4_sleep_data = null,
+  day5_completed = false,
+  day5_completed_at = null,
+  day5_movement_data = null,
+  day6_completed = false,
+  day6_completed_at = null,
+  day6_spice_data = null,
+  challenge_start = NOW(),
+  challenge_progress = '{}'::jsonb
+WHERE email = 'felipegmunoz@gmail.com';
+```
 
-**Substituir** por lógica sequencial simples:
-- Calcular `completedCount` a partir dos estados `day1Done`...`day6Done`
-- Determinar `nextDay = completedCount + 1`
-- Se todos 6 completos → tela "Jornada Completa 🎉" com botão para `/journey`
-- Se `nextDay` entre 1-3 → renderizar DayXFlow direto (sem espera)
-- Se `nextDay` === 4 e sem premium → PaywallModal
-- Se `nextDay` entre 4-6 com premium → renderizar DayXFlow direto
-- Remover imports de `startOfDay`, `addDays`, `WaitingScreen`
-- Remover estados `dayXCompletedAt` (não mais necessários para gating)
-- Manter review mode e debug replay intactos
+## Column name fixes from your query
+| Your query | Actual column |
+|---|---|
+| `day1_done` | `day1_completed` |
+| `heat_map_day2` | `day2_inflammation_map` |
+| `day3_food_traffic_light` | (doesn't exist) |
 
-**onComplete** de cada flow: `() => setDayXDone(true)` (sem `window.location.reload`)
-
-### 2. `src/pages/Journey.tsx`
-**Tornar todos dias 1-6 clicáveis** (não apenas completados + próximo):
-- Remover lógica `isLocked` para dias 1-6
-- Dias 7-14 permanecem bloqueados ("Em breve")
-- Badge: "Rever" se completado, "Próximo" se é o próximo sequencial, círculo vazio se disponível
-- Click: se completado → `/today?review=N`; se não completado → `/today` (flow normal trata)
-
-### 3. Auth — **Não modificar**
-Manter autenticação atual. Auto-login é risco desnecessário e o login já funciona.
-
-## O que NÃO muda
-- Day1-6 Flow components (intactos)
-- HeatMapInteractive, UI components
-- Database schema
-- DayReview component
-- Design system, BottomNav
-
-## Resultado
-Completar Dia 1 → Dia 2 aparece imediatamente → ... → Dia 6 → "Jornada Completa!"
+## Method
+- Database migration tool (only way to run UPDATE)
+- Single migration, one statement
+- Profile data (name, email, age, phone, onboarding_data, etc.) untouched
 
