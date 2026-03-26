@@ -1,33 +1,45 @@
 
 
-# Fix DayReview — Correct Data per Day + Visual Components
+# Modo Linear de Teste — Plano
 
-## Problem
-DayReview may be showing wrong data for some days due to a possible caching issue, and renders raw JSON for days 2/4/5/6 instead of visual components.
+## Resumo
+Converter o app de jornada temporal (bloqueios 24h) para modo sequencial imediato, permitindo testar todos os 6 dias em ~30 minutos.
 
-## Changes
+## Arquivos a modificar
 
-### `src/components/journey/DayReview.tsx`
+### 1. `src/pages/Today.tsx`
+**Remover** toda lógica temporal (WaitingScreen, startOfDay, addDays) entre linhas 322-435.
 
-1. **Import HeatMapInteractive** for Day 1 visual rendering in read-only mode
-2. **Fix `renderDayContent` switch/case** to ensure each day renders only its own data with proper visual components:
+**Substituir** por lógica sequencial simples:
+- Calcular `completedCount` a partir dos estados `day1Done`...`day6Done`
+- Determinar `nextDay = completedCount + 1`
+- Se todos 6 completos → tela "Jornada Completa 🎉" com botão para `/journey`
+- Se `nextDay` entre 1-3 → renderizar DayXFlow direto (sem espera)
+- Se `nextDay` === 4 e sem premium → PaywallModal
+- Se `nextDay` entre 4-6 com premium → renderizar DayXFlow direto
+- Remover imports de `startOfDay`, `addDays`, `WaitingScreen`
+- Remover estados `dayXCompletedAt` (não mais necessários para gating)
+- Manter review mode e debug replay intactos
 
-| Day | Title | Data Column | Visual |
-|-----|-------|-------------|--------|
-| 1 | Mapa de Calor | `heat_map_day1` | `<HeatMapInteractive readOnly size="small" initialData={...} />` |
-| 2 | Mapa de Inflamação | `day2_inflammation_map` | Formatted cards showing area + type |
-| 3 | Semáforo Alimentar | (no saved data) | Static description text |
-| 4 | Higiene do Sono | `day4_sleep_data` | Formatted cards with sleep habits |
-| 5 | Movimento & Ritmo | `day5_movement_data` | Formatted cards with movement data |
-| 6 | Temperos & Especiarias | `day6_spice_data` | Formatted cards with spice selections |
+**onComplete** de cada flow: `() => setDayXDone(true)` (sem `window.location.reload`)
 
-3. **For JSON data (days 2, 4, 5, 6)**: Instead of raw `JSON.stringify`, render human-readable cards showing key-value pairs with labels. Fallback to "Nenhum dado salvo" when empty.
+### 2. `src/pages/Journey.tsx`
+**Tornar todos dias 1-6 clicáveis** (não apenas completados + próximo):
+- Remover lógica `isLocked` para dias 1-6
+- Dias 7-14 permanecem bloqueados ("Em breve")
+- Badge: "Rever" se completado, "Próximo" se é o próximo sequencial, círculo vazio se disponível
+- Click: se completado → `/today?review=N`; se não completado → `/today` (flow normal trata)
 
-4. **Day 1 specifically**: Replace the dots grid with `<HeatMapInteractive initialData={data.heat_map_day1} readOnly={true} size="small" />` which already supports read-only mode and renders the interactive silhouette.
+### 3. Auth — **Não modificar**
+Manter autenticação atual. Auto-login é risco desnecessário e o login já funciona.
 
-### Technical details
-- Import: `import HeatMapInteractive from "./HeatMapInteractive";`
-- The `HeatMapInteractive` component already accepts `readOnly`, `size="small"`, and `initialData` props
-- For days 2/4/5/6: parse JSONB objects and render labeled cards instead of `<pre>` tags
-- No database changes needed
+## O que NÃO muda
+- Day1-6 Flow components (intactos)
+- HeatMapInteractive, UI components
+- Database schema
+- DayReview component
+- Design system, BottomNav
+
+## Resultado
+Completar Dia 1 → Dia 2 aparece imediatamente → ... → Dia 6 → "Jornada Completa!"
 
