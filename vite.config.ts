@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: "autoUpdate",
       devOptions: { enabled: false },
-      registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "logo_app_livvia.png"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
