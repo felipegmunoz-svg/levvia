@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { startOfDay, addDays } from "date-fns";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { Dumbbell, UtensilsCrossed, Heart, X, Sparkles, BarChart3 } from "lucide-react";
@@ -306,8 +307,8 @@ const Today = () => {
 
   else if (day2Done === false && day1Done === true) {
     if (!isDev && day1CompletedAt) {
-      const hoursSince = (Date.now() - new Date(day1CompletedAt).getTime()) / 3600000;
-      if (hoursSince < 24) {
+      const nextMidnight = startOfDay(addDays(new Date(day1CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
         content = (
           <WaitingScreen
             completedAt={day1CompletedAt}
@@ -322,8 +323,8 @@ const Today = () => {
 
   else if (day3Done === false && day2Done === true) {
     if (!isDev && day2CompletedAt) {
-      const hoursSince = (Date.now() - new Date(day2CompletedAt).getTime()) / 3600000;
-      if (hoursSince < 24) {
+      const nextMidnight = startOfDay(addDays(new Date(day2CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
         content = (
           <WaitingScreen
             completedAt={day2CompletedAt}
@@ -342,8 +343,8 @@ const Today = () => {
 
   else if (day4Done === false && day3Done === true && hasPremium) {
     if (!isDev && day3CompletedAt) {
-      const hoursSince = (Date.now() - new Date(day3CompletedAt).getTime()) / 3600000;
-      if (hoursSince < 24) {
+      const nextMidnight = startOfDay(addDays(new Date(day3CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
         content = (
           <WaitingScreen
             completedAt={day3CompletedAt}
@@ -358,8 +359,8 @@ const Today = () => {
 
   else if (day5Done === false && day4Done === true && hasPremium) {
     if (!isDev && day4CompletedAt) {
-      const hoursSince = (Date.now() - new Date(day4CompletedAt).getTime()) / 3600000;
-      if (hoursSince < 24) {
+      const nextMidnight = startOfDay(addDays(new Date(day4CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
         content = (
           <WaitingScreen
             completedAt={day4CompletedAt}
@@ -374,8 +375,8 @@ const Today = () => {
 
   else if (day5Done === true && hasPremium) {
     if (day5CompletedAt) {
-      const hoursSince = (Date.now() - new Date(day5CompletedAt).getTime()) / 3600000;
-      if (hoursSince < 24) {
+      const nextMidnight = startOfDay(addDays(new Date(day5CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
         content = (
           <WaitingScreen
             completedAt={day5CompletedAt}

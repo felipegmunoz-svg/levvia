@@ -63,7 +63,7 @@ const WaitingScreen = ({ completedAt, nextDay, onReady }: WaitingScreenProps) =>
           </h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xs mx-auto">
             Seu corpo precisa de tempo para absorver os benefícios de hoje.
-            O Dia {nextDay} será liberado em breve.
+            O Dia {nextDay} será liberado à meia-noite.
           </p>
         </div>
 
