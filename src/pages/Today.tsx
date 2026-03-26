@@ -278,6 +278,19 @@ const Today = () => {
     }
   };
 
+  // Review mode: render immediately, skip loading gates
+  if (reviewDay) {
+    const goBack = () => navTo("/journey");
+    let reviewContent: React.ReactNode = null;
+    if (reviewDay === 1) reviewContent = <Day1Flow onComplete={goBack} isReviewMode={true} />;
+    else if (reviewDay === 2) reviewContent = <Day2Flow onComplete={goBack} isReviewMode={true} />;
+    else if (reviewDay === 3) reviewContent = <Day3Flow onComplete={goBack} isReviewMode={true} />;
+    else if (reviewDay === 4) reviewContent = <Day4Flow onComplete={goBack} isReviewMode={true} />;
+    else if (reviewDay === 5) reviewContent = <Day5Flow onComplete={goBack} isReviewMode={true} />;
+    else if (reviewDay === 6) reviewContent = <Day6Flow onComplete={goBack} isReviewMode={true} />;
+    return <>{reviewContent}</>;
+  }
+
   // Day 1 journey flow
   if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || day6Done === null || premiumLoading) {
     return (
@@ -312,18 +325,6 @@ const Today = () => {
   else if (replayDay === 4) content = <Day4Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 5) content = <Day5Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 6) content = <Day6Flow onComplete={() => setReplayDay(null)} />;
-
-  // Review mode: revisit completed days (read-only, navigates back to /journey)
-  else if (reviewDay) {
-    
-    const goBack = () => navTo("/journey");
-    if (reviewDay === 1) content = <Day1Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 2) content = <Day2Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 3) content = <Day3Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 4) content = <Day4Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 5) content = <Day5Flow onComplete={goBack} isReviewMode={true} />;
-    else if (reviewDay === 6) content = <Day6Flow onComplete={goBack} isReviewMode={true} />;
-  }
 
   else if (day1Done === false) {
     content = <Day1Flow onComplete={() => setDay1Done(true)} />;
