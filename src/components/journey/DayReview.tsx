@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import BottomNav from "@/components/BottomNav";
+import HeatMapInteractive from "./HeatMapInteractive";
 import logoFull from "@/assets/logo_livvia_azul.png";
 
 interface ProfileData {
@@ -29,12 +30,7 @@ const dayTitles: Record<number, string> = {
 };
 
 const dayIcons: Record<number, string> = {
-  1: "🔥",
-  2: "💧",
-  3: "🚦",
-  4: "🧘‍♀️",
-  5: "🌙",
-  6: "✨",
+  1: "🔥", 2: "💧", 3: "🚦", 4: "🧘‍♀️", 5: "🌙", 6: "✨",
 };
 
 const dayDescriptions: Record<number, string> = {
@@ -44,6 +40,27 @@ const dayDescriptions: Record<number, string> = {
   4: "Você explorou movimentos conscientes e higiene do sono.",
   5: "Você trabalhou ritmo circadiano, elevação de pernas e micro-desafios.",
   6: "Você integrou todos os aprendizados em uma rotina completa.",
+};
+
+const formatKey = (key: string) =>
+  key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+const renderJsonCards = (obj: Record<string, unknown> | null, emptyMsg: string) => {
+  if (!obj || typeof obj !== "object") return <p className="text-sm text-muted-foreground">{emptyMsg}</p>;
+  const entries = Object.entries(obj).filter(([, v]) => v !== null && v !== "" && v !== undefined);
+  if (entries.length === 0) return <p className="text-sm text-muted-foreground">{emptyMsg}</p>;
+  return (
+    <div className="grid gap-2">
+      {entries.map(([key, value]) => (
+        <div key={key} className="bg-background border border-border rounded-lg p-3 flex justify-between items-center">
+          <span className="text-sm font-medium text-foreground">{formatKey(key)}</span>
+          <span className="text-sm text-muted-foreground">
+            {typeof value === "object" ? JSON.stringify(value) : String(value)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const DayReview = () => {
@@ -56,10 +73,7 @@ const DayReview = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (!user?.id || !dayNum) {
-        setLoading(false);
-        return;
-      }
+      if (!user?.id || !dayNum) { setLoading(false); return; }
       const { data: profile } = await supabase
         .from("profiles")
         .select("heat_map_day1, day2_inflammation_map, day4_sleep_data, day5_movement_data, day6_spice_data, day1_completed_at, day2_completed_at, day3_completed_at, day4_completed_at, day5_completed_at, day6_completed_at")
@@ -71,10 +85,7 @@ const DayReview = () => {
     load();
   }, [user?.id, dayNum]);
 
-  if (!dayNum || dayNum < 1 || dayNum > 6) {
-    navigate("/journey");
-    return null;
-  }
+  if (!dayNum || dayNum < 1 || dayNum > 6) { navigate("/journey"); return null; }
 
   if (loading) {
     return (
@@ -86,65 +97,24 @@ const DayReview = () => {
 
   const completedAt = data?.[`day${dayNum}_completed_at` as keyof ProfileData] as string | null;
 
-  const renderHeatMap = () => {
-    const heatMap = data?.heat_map_day1;
-    if (!heatMap || typeof heatMap !== "object") return <p className="text-sm text-muted-foreground">Nenhum dado salvo.</p>;
-    const entries = Object.entries(heatMap).filter(([, v]) => (v as number) > 0);
-    if (entries.length === 0) return <p className="text-sm text-muted-foreground">Nenhuma área marcada.</p>;
-    return (
-      <div className="grid grid-cols-2 gap-2">
-        {entries.map(([area, level]) => (
-          <div key={area} className="bg-white border border-border rounded-lg p-3">
-            <span className="text-sm font-medium capitalize">{area.replace(/_/g, " ")}</span>
-            <div className="flex mt-1 gap-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className={`w-3 h-3 rounded-full ${i <= (level as number) ? "bg-red-400" : "bg-gray-200"}`} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const renderInflammationMap = () => {
-    const map = data?.day2_inflammation_map;
-    if (!map || typeof map !== "object") return <p className="text-sm text-muted-foreground">Nenhum dado salvo.</p>;
-    return <pre className="text-xs bg-white border border-border rounded-lg p-3 overflow-auto">{JSON.stringify(map, null, 2)}</pre>;
-  };
-
-  const renderSleepData = () => {
-    const sleep = data?.day4_sleep_data;
-    if (!sleep || typeof sleep !== "object") return <p className="text-sm text-muted-foreground">Nenhum dado salvo.</p>;
-    return <pre className="text-xs bg-white border border-border rounded-lg p-3 overflow-auto">{JSON.stringify(sleep, null, 2)}</pre>;
-  };
-
-  const renderMovementData = () => {
-    const movement = data?.day5_movement_data;
-    if (!movement || typeof movement !== "object") return <p className="text-sm text-muted-foreground">Nenhum dado salvo.</p>;
-    return <pre className="text-xs bg-white border border-border rounded-lg p-3 overflow-auto">{JSON.stringify(movement, null, 2)}</pre>;
-  };
-
-  const renderSpiceData = () => {
-    const spice = data?.day6_spice_data;
-    if (!spice || typeof spice !== "object") return <p className="text-sm text-muted-foreground">Nenhum dado salvo.</p>;
-    return <pre className="text-xs bg-white border border-border rounded-lg p-3 overflow-auto">{JSON.stringify(spice, null, 2)}</pre>;
-  };
-
   const renderDayContent = () => {
     switch (dayNum) {
       case 1:
         return (
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">🗺️ Seu Mapa de Calor</h3>
-            {renderHeatMap()}
+            {data?.heat_map_day1 && Object.values(data.heat_map_day1).some((v) => typeof v === "number" && v > 0) ? (
+              <HeatMapInteractive initialData={data.heat_map_day1 as Record<string, number>} readOnly size="small" />
+            ) : (
+              <p className="text-sm text-muted-foreground">Nenhuma área marcada.</p>
+            )}
           </div>
         );
       case 2:
         return (
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">🔥 Mapa de Inflamação</h3>
-            {renderInflammationMap()}
+            {renderJsonCards(data?.day2_inflammation_map ?? null, "Nenhum dado salvo.")}
           </div>
         );
       case 3:
@@ -158,21 +128,21 @@ const DayReview = () => {
         return (
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">😴 Dados de Sono</h3>
-            {renderSleepData()}
+            {renderJsonCards(data?.day4_sleep_data ?? null, "Nenhum dado salvo.")}
           </div>
         );
       case 5:
         return (
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">🏃 Dados de Movimento</h3>
-            {renderMovementData()}
+            {renderJsonCards(data?.day5_movement_data ?? null, "Nenhum dado salvo.")}
           </div>
         );
       case 6:
         return (
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">🌿 Temperos & Especiarias</h3>
-            {renderSpiceData()}
+            {renderJsonCards(data?.day6_spice_data ?? null, "Nenhum dado salvo.")}
           </div>
         );
       default:
@@ -182,17 +152,14 @@ const DayReview = () => {
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] pb-24">
-      {/* Header */}
       <header className="px-6 pt-8 pb-4">
         <div className="flex justify-center">
           <img src={logoFull} alt="Levvia" className="h-10" />
         </div>
       </header>
 
-      {/* Content */}
       <div className="px-6 space-y-6">
-        {/* Title card */}
-        <div className="bg-white rounded-xl border border-border p-6 text-center space-y-3">
+        <div className="bg-background rounded-xl border border-border p-6 text-center space-y-3">
           <span className="text-4xl">{dayIcons[dayNum]}</span>
           <h1 className="text-xl font-bold text-foreground">{dayTitles[dayNum]}</h1>
           <p className="text-sm text-muted-foreground">{dayDescriptions[dayNum]}</p>
@@ -203,12 +170,10 @@ const DayReview = () => {
           )}
         </div>
 
-        {/* Day-specific saved data */}
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-background rounded-xl border border-border p-6">
           {renderDayContent()}
         </div>
 
-        {/* Back button */}
         <button
           onClick={() => navigate("/journey")}
           className="w-full py-3 bg-[#2EC4B6] text-white rounded-xl font-medium text-base hover:bg-[#28b0a3] transition-colors"
