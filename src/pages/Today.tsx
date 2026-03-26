@@ -80,6 +80,7 @@ const Today = () => {
   renderCount.current++;
   const [searchParams] = useSearchParams();
   const reviewDay = searchParams.get("review") ? Number(searchParams.get("review")) : null;
+  console.log("DEBUG reviewDay:", reviewDay);
   const navTo = useNavigate();
 
   useEffect(() => {
@@ -314,6 +315,7 @@ const Today = () => {
 
   // Review mode: revisit completed days (read-only, navigates back to /journey)
   else if (reviewDay) {
+    console.log("DEBUG REVIEW MODE ATIVADO, dia:", reviewDay);
     const goBack = () => navTo("/journey");
     if (reviewDay === 1) content = <Day1Flow onComplete={goBack} isReviewMode={true} />;
     else if (reviewDay === 2) content = <Day2Flow onComplete={goBack} isReviewMode={true} />;
