@@ -1,47 +1,58 @@
 
 
-# Reset Journey Progress — Migration
+# Fix: Day Flow Components Missing theme-light
 
-## What
-Run a single UPDATE to reset all journey progress for `felipegmunoz@gmail.com`, keeping profile data (name, age, email, etc.) intact.
+## Problem
+`theme-light` is only applied to the **dashboard** view (line 384 of Today.tsx). When a Day flow renders (Day1Flow → Day1Welcome, Day1Closing, etc.), those components use `bg-background` and `text-foreground` which resolve to the **dark** `:root` variables because they're rendered **outside** the `theme-light` wrapper.
 
-## Corrected SQL
+The Day flow components (Day1Welcome, Day1Closing, HeatMapInteractive, Day2Welcome, etc.) all use:
+- `bg-background` → dark navy
+- `text-foreground` → light gray  
+- `gradient-primary` → dark gradient
 
-```sql
-UPDATE profiles 
-SET 
-  day1_completed = false,
-  day1_completed_at = null,
-  day1_welcome_shown = false,
-  heat_map_day1 = '{}'::jsonb,
-  day2_completed = false,
-  day2_completed_at = null,
-  day2_inflammation_map = '{}'::jsonb,
-  day3_completed = false,
-  day3_completed_at = null,
-  day4_completed = false,
-  day4_completed_at = null,
-  day4_sleep_data = null,
-  day5_completed = false,
-  day5_completed_at = null,
-  day5_movement_data = null,
-  day6_completed = false,
-  day6_completed_at = null,
-  day6_spice_data = null,
-  challenge_start = NOW(),
-  challenge_progress = '{}'::jsonb
-WHERE email = 'felipegmunoz@gmail.com';
+## Solution
+Wrap **each Day flow render** in Today.tsx with `theme-light`, and also add `theme-light` to the Day flow components' own root wrappers.
+
+### Changes
+
+**1. `src/pages/Today.tsx` — Wrap Day flow renders (lines ~320-348)**
+
+Each Day flow assignment needs wrapping:
+```tsx
+content = <div className="theme-light"><Day1Flow onComplete={...} /></div>;
+content = <div className="theme-light"><Day2Flow onComplete={...} /></div>;
+// ... same for Day3-6
 ```
 
-## Column name fixes from your query
-| Your query | Actual column |
-|---|---|
-| `day1_done` | `day1_completed` |
-| `heat_map_day2` | `day2_inflammation_map` |
-| `day3_food_traffic_light` | (doesn't exist) |
+**2. `src/components/journey/Day1Welcome.tsx`**
+Change line 10:
+```tsx
+<div className="theme-light min-h-screen bg-background ...">
+```
 
-## Method
-- Database migration tool (only way to run UPDATE)
-- Single migration, one statement
-- Profile data (name, email, age, phone, onboarding_data, etc.) untouched
+**3. `src/components/journey/Day1Closing.tsx`**
+Add `theme-light` to both render paths' root divs.
+
+**4. `src/components/journey/Day1Flow.tsx`**
+Add `theme-light` to loading spinner div (line 306).
+
+**5. Same pattern for Day2-6 Welcome/Closing/Flow components**
+Each component that renders `bg-background` or `text-foreground` at its root needs `theme-light` on its outermost div.
+
+### Simpler alternative (recommended)
+Instead of editing 15+ component files, wrap **once** in Today.tsx around the entire render:
+
+In Today.tsx, find the final `return` and wrap `content` in a theme-light div:
+```tsx
+return (
+  <div className="theme-light">
+    {content}
+  </div>
+);
+```
+
+This single wrapper ensures ALL content rendered by Today.tsx (Day flows, dashboard, exercise details, recipe details, loading spinner) inherits the light theme variables. One line change instead of 15+ files.
+
+### Files
+- `src/pages/Today.tsx` — wrap final return in `<div className="theme-light">{content}</div>`
 
