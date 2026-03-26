@@ -76,13 +76,13 @@ const Journey = () => {
     <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
       <header className="px-6 pt-10 pb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <img src={logoIcon} alt="Levvia" className="h-7" />
+        <div className="flex justify-center mb-4">
+          <img src={logoFull} alt="Levvia" className="h-8" />
         </div>
-        <h1 className="text-[26px] font-heading font-semibold text-levvia-fg tracking-tight">
+        <h1 className="text-[26px] font-heading font-semibold text-levvia-fg tracking-tight text-center">
           Sua Jornada
         </h1>
-        <p className="text-[13px] text-levvia-muted font-body mt-1">
+        <p className="text-[13px] text-levvia-muted font-body mt-1 text-center">
           Jornada de Consciência
         </p>
       </header>
