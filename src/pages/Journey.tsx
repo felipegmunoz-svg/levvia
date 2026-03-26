@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
-import { Check, Lock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Check, Lock, ChevronRight } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ProgressCircle from "@/components/ui/ProgressCircle";
 import logoIcon from "@/assets/logo_livvia_azul_icone.png";
@@ -12,7 +13,7 @@ const dayTitles: Record<number, string> = {
   3: "Semáforo Alimentar",
   4: "Sono & Recuperação",
   5: "Movimento Sem Dor",
-  6: "Em breve",
+  6: "O Poder das Especiarias",
   7: "Em breve",
   8: "Em breve",
   9: "Em breve",
@@ -23,15 +24,25 @@ const dayTitles: Record<number, string> = {
   14: "Em breve",
 };
 
+const daySubtitles: Record<number, string> = {
+  1: "Mapeou seu Fogo Interno",
+  2: "Sentiu alívio com drenagem",
+  3: "Escolhas anti-inflamatórias",
+  4: "Noite reparadora",
+  5: "Gentileza com o corpo",
+  6: "Especiarias medicinais",
+};
+
 const Journey = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [completedDays, setCompletedDays] = useState<number[]>([]);
 
   useEffect(() => {
     if (!user?.id) return;
     supabase
       .from("profiles")
-      .select("day1_completed, day2_completed, day3_completed, day4_completed, day5_completed")
+      .select("day1_completed, day2_completed, day3_completed, day4_completed, day5_completed, day6_completed")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
@@ -42,12 +53,24 @@ const Journey = () => {
         if (data.day3_completed) days.push(3);
         if (data.day4_completed) days.push(4);
         if (data.day5_completed) days.push(5);
+        if (data.day6_completed) days.push(6);
         setCompletedDays(days);
       });
   }, [user?.id]);
 
   const totalCompleted = completedDays.length;
   const nextDay = totalCompleted + 1;
+
+  const handleDayClick = (day: number) => {
+    const isCompleted = completedDays.includes(day);
+    if (isCompleted) {
+      // Navigate to Today with review mode
+      navigate(`/today?review=${day}`);
+    } else if (day === nextDay && day <= 6) {
+      // Navigate to Today which will show the current day flow
+      navigate("/today");
+    }
+  };
 
   return (
     <div className="levvia-page min-h-screen pb-24">
@@ -88,14 +111,21 @@ const Journey = () => {
         {Array.from({ length: 14 }, (_, i) => {
           const day = i + 1;
           const isCompleted = completedDays.includes(day);
-          const isNext = day === nextDay && day <= 5;
+          const isNext = day === nextDay && day <= 6;
           const isLocked = !isCompleted && !isNext;
+          const isClickable = isCompleted || isNext;
 
           return (
-            <div
+            <button
               key={day}
-              className={`levvia-card flex items-center gap-4 p-4 transition-all ${
-                isCompleted ? "border-levvia-success/20" : isNext ? "border-levvia-warning/30" : "opacity-60"
+              onClick={() => isClickable && handleDayClick(day)}
+              disabled={!isClickable}
+              className={`levvia-card flex items-center gap-4 p-4 w-full text-left transition-all ${
+                isCompleted
+                  ? "border-levvia-success/20 cursor-pointer hover:border-levvia-success/40"
+                  : isNext
+                  ? "border-levvia-warning/30 cursor-pointer hover:border-levvia-warning/50"
+                  : "opacity-60 cursor-default"
               }`}
             >
               {/* Status icon */}
@@ -118,26 +148,41 @@ const Journey = () => {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className={`text-[13px] font-medium font-body ${isCompleted ? "text-levvia-fg" : isNext ? "text-levvia-fg" : "text-levvia-muted"}`}>
+                <p
+                  className={`text-[13px] font-medium font-body ${
+                    isCompleted || isNext ? "text-levvia-fg" : "text-levvia-muted"
+                  }`}
+                >
                   Dia {day}
                 </p>
                 <p className="text-[11px] text-levvia-muted font-body truncate">
                   {dayTitles[day]}
                 </p>
+                {isCompleted && daySubtitles[day] && (
+                  <p className="text-[10px] text-levvia-success font-body mt-0.5">
+                    {daySubtitles[day]}
+                  </p>
+                )}
               </div>
 
-              {/* Badge */}
+              {/* Badge / Arrow */}
               {isCompleted && (
-                <span className="text-[10px] font-medium text-levvia-success bg-levvia-success/10 px-2 py-0.5 rounded-full font-body">
-                  Completo
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-medium text-levvia-success bg-levvia-success/10 px-2 py-0.5 rounded-full font-body">
+                    Rever
+                  </span>
+                  <ChevronRight size={14} className="text-levvia-muted" />
+                </div>
               )}
               {isNext && (
-                <span className="text-[10px] font-medium text-levvia-warning bg-levvia-warning/10 px-2 py-0.5 rounded-full font-body">
-                  Próximo
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-medium text-levvia-warning bg-levvia-warning/10 px-2 py-0.5 rounded-full font-body">
+                    Próximo
+                  </span>
+                  <ChevronRight size={14} className="text-levvia-warning" />
+                </div>
               )}
-            </div>
+            </button>
           );
         })}
       </main>

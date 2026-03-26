@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { startOfDay, addDays } from "date-fns";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
@@ -19,6 +20,7 @@ import Day2Flow from "@/components/journey/Day2Flow";
 import Day3Flow from "@/components/journey/Day3Flow";
 import Day4Flow from "@/components/journey/Day4Flow";
 import Day5Flow from "@/components/journey/Day5Flow";
+import Day6Flow from "@/components/journey/Day6Flow";
 import PaywallModal from "@/components/journey/PaywallModal";
 import WaitingScreen from "@/components/journey/WaitingScreen";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +78,9 @@ function getIncentiveMessage(progress: number): string {
 const Today = () => {
   const renderCount = useRef(0);
   renderCount.current++;
+  const [searchParams] = useSearchParams();
+  const reviewDay = searchParams.get("review") ? Number(searchParams.get("review")) : null;
+  const navTo = useNavigate();
 
   useEffect(() => {
     debugMount("Today");
@@ -99,15 +104,17 @@ const Today = () => {
   const [day3Done, setDay3Done] = useState<boolean | null>(null);
   const [day4Done, setDay4Done] = useState<boolean | null>(null);
   const [day5Done, setDay5Done] = useState<boolean | null>(null);
+  const [day6Done, setDay6Done] = useState<boolean | null>(null);
   const [day1CompletedAt, setDay1CompletedAt] = useState<string | null>(null);
   const [day2CompletedAt, setDay2CompletedAt] = useState<string | null>(null);
   const [day3CompletedAt, setDay3CompletedAt] = useState<string | null>(null);
   const [day4CompletedAt, setDay4CompletedAt] = useState<string | null>(null);
   const [day5CompletedAt, setDay5CompletedAt] = useState<string | null>(null);
+  const [day6CompletedAt, setDay6CompletedAt] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Debug render instrumentation
-  const branch = day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading
+  const branch = day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || day6Done === null || premiumLoading
     ? "LOADING_GATES"
     : day1Done === false ? "DAY1_FLOW"
     : day2Done === false && day1Done === true ? "DAY2_FLOW"
@@ -115,7 +122,8 @@ const Today = () => {
     : day3Done === true && day4Done === false && !hasPremium ? "PAYWALL"
     : day4Done === false && day3Done === true && hasPremium ? "DAY4_FLOW"
     : day5Done === false && day4Done === true && hasPremium ? "DAY5_FLOW"
-    : day5Done === true && hasPremium ? "DAY5_DONE"
+    : day6Done === false && day5Done === true && hasPremium ? "DAY6_FLOW"
+    : day6Done === true && hasPremium ? "DAY6_DONE"
     : "DASHBOARD";
   
   debugRender("Today", {
@@ -152,7 +160,7 @@ const Today = () => {
 
     supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, challenge_start")
+      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, day6_completed, day6_completed_at, challenge_start")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data, error }) => {
@@ -167,11 +175,13 @@ const Today = () => {
         setDay3Done(data?.day3_completed === true);
         setDay4Done(data?.day4_completed === true);
         setDay5Done(data?.day5_completed === true);
+        setDay6Done(data?.day6_completed === true);
         setDay1CompletedAt(data?.day1_completed_at || null);
         setDay2CompletedAt(data?.day2_completed_at || null);
         setDay3CompletedAt(data?.day3_completed_at || null);
         setDay4CompletedAt(data?.day4_completed_at || null);
         setDay5CompletedAt(data?.day5_completed_at || null);
+        setDay6CompletedAt(data?.day6_completed_at || null);
         if (data?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", data.challenge_start);
         }
@@ -268,13 +278,13 @@ const Today = () => {
   };
 
   // Day 1 journey flow
-  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || premiumLoading) {
+  if (day1Done === null || day2Done === null || day3Done === null || day4Done === null || day5Done === null || day6Done === null || premiumLoading) {
     return (
       <>
         {isDev && (
           <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
             <span className="font-semibold text-yellow-800">🐛 Debug:</span>
-            {[1,2,3,4,5].map(d => (
+            {[1,2,3,4,5,6].map(d => (
               <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded">
                 Dia {d}
               </button>
@@ -300,6 +310,18 @@ const Today = () => {
   else if (replayDay === 3) content = <Day3Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 4) content = <Day4Flow onComplete={() => setReplayDay(null)} />;
   else if (replayDay === 5) content = <Day5Flow onComplete={() => setReplayDay(null)} />;
+  else if (replayDay === 6) content = <Day6Flow onComplete={() => setReplayDay(null)} />;
+
+  // Review mode: revisit completed days (read-only, navigates back to /journey)
+  else if (reviewDay) {
+    const goBack = () => navTo("/journey");
+    if (reviewDay === 1) content = <Day1Flow onComplete={goBack} />;
+    else if (reviewDay === 2) content = <Day2Flow onComplete={goBack} />;
+    else if (reviewDay === 3) content = <Day3Flow onComplete={goBack} />;
+    else if (reviewDay === 4) content = <Day4Flow onComplete={goBack} />;
+    else if (reviewDay === 5) content = <Day5Flow onComplete={goBack} />;
+    else if (reviewDay === 6) content = <Day6Flow onComplete={goBack} />;
+  }
 
   else if (day1Done === false) {
     content = <Day1Flow onComplete={() => setDay1Done(true)} />;
@@ -373,8 +395,8 @@ const Today = () => {
     if (!content) content = <Day5Flow onComplete={() => setDay5Done(true)} />;
   }
 
-  else if (day5Done === true && hasPremium) {
-    if (day5CompletedAt) {
+  else if (day6Done === false && day5Done === true && hasPremium) {
+    if (!isDev && day5CompletedAt) {
       const nextMidnight = startOfDay(addDays(new Date(day5CompletedAt), 1));
       if (Date.now() < nextMidnight.getTime()) {
         content = (
@@ -386,12 +408,28 @@ const Today = () => {
         );
       }
     }
+    if (!content) content = <Day6Flow onComplete={() => setDay6Done(true)} />;
+  }
+
+  else if (day6Done === true && hasPremium) {
+    if (day6CompletedAt) {
+      const nextMidnight = startOfDay(addDays(new Date(day6CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
+        content = (
+          <WaitingScreen
+            completedAt={day6CompletedAt}
+            nextDay={7}
+            onReady={() => setDay6CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
     if (!content) {
       content = (
-        <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center text-center">
+        <div className="min-h-screen levvia-page p-6 flex flex-col items-center justify-center text-center">
           <span className="text-6xl mb-4">🚀</span>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Dia 6 em breve!</h2>
-          <p className="text-sm text-muted-foreground max-w-xs">
+          <h2 className="text-2xl font-heading font-bold text-levvia-fg mb-2">Dia 7 em breve!</h2>
+          <p className="text-sm text-levvia-muted font-body max-w-xs">
             Estamos preparando o próximo passo da sua jornada.
             Enquanto isso, continue praticando os aprendizados dos dias anteriores.
           </p>
@@ -647,7 +685,7 @@ const Today = () => {
       {isDev && (
         <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
           <span className="font-semibold text-yellow-800">🐛 Debug:</span>
-          {[1, 2, 3, 4, 5].map(d => (
+          {[1, 2, 3, 4, 5, 6].map(d => (
             <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
               Dia {d}
             </button>
@@ -661,7 +699,7 @@ const Today = () => {
       {isDebugActive() && (
         <div style={{ position: 'fixed', bottom: 70, right: 8, zIndex: 9999, background: 'rgba(0,0,0,0.85)', color: '#0f0', padding: '8px 12px', borderRadius: 8, fontSize: 10, fontFamily: 'monospace', maxWidth: 260, pointerEvents: 'none' }}>
           <div>🔄 Today #{renderCount.current} | branch: {branch}</div>
-          <div>day: {currentDay} | d1:{String(day1Done)} d2:{String(day2Done)} d3:{String(day3Done)} d4:{String(day4Done)} d5:{String(day5Done)}</div>
+          <div>day: {currentDay} | d1:{String(day1Done)} d2:{String(day2Done)} d3:{String(day3Done)} d4:{String(day4Done)} d5:{String(day5Done)} d6:{String(day6Done)}</div>
           <div>premium:{String(hasPremium)} pLoad:{String(premiumLoading)} cLoad:{String(loading)} auth:{String(authLoading)}</div>
           <div>data:{todayData ? 'yes' : 'no'}</div>
         </div>
