@@ -62,12 +62,12 @@ const Journey = () => {
   const nextDay = totalCompleted + 1;
 
   const handleDayClick = (day: number) => {
+    if (day > 6) return; // days 7-14 locked
     const isCompleted = completedDays.includes(day);
     if (isCompleted) {
-      // Navigate to Today with review mode
       navigate(`/today?review=${day}`);
-    } else if (day === nextDay && day <= 6) {
-      // Navigate to Today which will show the current day flow
+    } else {
+      // Linear mode: any uncompleted day navigates to /today (sequential flow handles it)
       navigate("/today");
     }
   };
@@ -111,9 +111,10 @@ const Journey = () => {
         {Array.from({ length: 14 }, (_, i) => {
           const day = i + 1;
           const isCompleted = completedDays.includes(day);
+          const isAvailable = day <= 6; // days 1-6 always available in linear mode
           const isNext = day === nextDay && day <= 6;
-          const isLocked = !isCompleted && !isNext;
-          const isClickable = isCompleted || isNext;
+          const isLocked = !isAvailable;
+          const isClickable = isAvailable;
 
           return (
             <button
@@ -123,7 +124,7 @@ const Journey = () => {
               className={`levvia-card flex items-center gap-4 p-4 w-full text-left transition-all ${
                 isCompleted
                   ? "border-levvia-success/20 cursor-pointer hover:border-levvia-success/40"
-                  : isNext
+                  : isAvailable
                   ? "border-levvia-warning/30 cursor-pointer hover:border-levvia-warning/50"
                   : "opacity-60 cursor-default"
               }`}
@@ -150,7 +151,7 @@ const Journey = () => {
               <div className="flex-1 min-w-0">
                 <p
                   className={`text-[13px] font-medium font-body ${
-                    isCompleted || isNext ? "text-levvia-fg" : "text-levvia-muted"
+                    isCompleted || isAvailable ? "text-levvia-fg" : "text-levvia-muted"
                   }`}
                 >
                   Dia {day}
@@ -174,12 +175,20 @@ const Journey = () => {
                   <ChevronRight size={14} className="text-levvia-muted" />
                 </div>
               )}
-              {isNext && (
+              {isNext && !isCompleted && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] font-medium text-levvia-warning bg-levvia-warning/10 px-2 py-0.5 rounded-full font-body">
                     Próximo
                   </span>
                   <ChevronRight size={14} className="text-levvia-warning" />
+                </div>
+              )}
+              {isAvailable && !isCompleted && !isNext && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-medium text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full font-body">
+                    Disponível
+                  </span>
+                  <ChevronRight size={14} className="text-muted-foreground" />
                 </div>
               )}
             </button>
