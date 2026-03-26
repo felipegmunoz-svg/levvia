@@ -111,9 +111,10 @@ const Journey = () => {
         {Array.from({ length: 14 }, (_, i) => {
           const day = i + 1;
           const isCompleted = completedDays.includes(day);
+          const isAvailable = day <= 6; // days 1-6 always available in linear mode
           const isNext = day === nextDay && day <= 6;
-          const isLocked = !isCompleted && !isNext;
-          const isClickable = isCompleted || isNext;
+          const isLocked = !isAvailable;
+          const isClickable = isAvailable;
 
           return (
             <button
