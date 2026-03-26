@@ -380,8 +380,8 @@ const Today = () => {
     if (!content) content = <Day5Flow onComplete={() => setDay5Done(true)} />;
   }
 
-  else if (day5Done === true && hasPremium) {
-    if (day5CompletedAt) {
+  else if (day6Done === false && day5Done === true && hasPremium) {
+    if (!isDev && day5CompletedAt) {
       const nextMidnight = startOfDay(addDays(new Date(day5CompletedAt), 1));
       if (Date.now() < nextMidnight.getTime()) {
         content = (
@@ -393,12 +393,28 @@ const Today = () => {
         );
       }
     }
+    if (!content) content = <Day6Flow onComplete={() => setDay6Done(true)} />;
+  }
+
+  else if (day6Done === true && hasPremium) {
+    if (day6CompletedAt) {
+      const nextMidnight = startOfDay(addDays(new Date(day6CompletedAt), 1));
+      if (Date.now() < nextMidnight.getTime()) {
+        content = (
+          <WaitingScreen
+            completedAt={day6CompletedAt}
+            nextDay={7}
+            onReady={() => setDay6CompletedAt(new Date(Date.now() - 25 * 3600000).toISOString())}
+          />
+        );
+      }
+    }
     if (!content) {
       content = (
-        <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center text-center">
+        <div className="min-h-screen levvia-page p-6 flex flex-col items-center justify-center text-center">
           <span className="text-6xl mb-4">🚀</span>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Dia 6 em breve!</h2>
-          <p className="text-sm text-muted-foreground max-w-xs">
+          <h2 className="text-2xl font-heading font-bold text-levvia-fg mb-2">Dia 7 em breve!</h2>
+          <p className="text-sm text-levvia-muted font-body max-w-xs">
             Estamos preparando o próximo passo da sua jornada.
             Enquanto isso, continue praticando os aprendizados dos dias anteriores.
           </p>
