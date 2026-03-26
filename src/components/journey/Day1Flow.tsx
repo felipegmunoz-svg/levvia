@@ -18,6 +18,7 @@ interface Day1FlowProps {
 }
 
 const Day1Flow = ({ onComplete, isReviewMode = false }: Day1FlowProps) => {
+  console.log("DEBUG Day1Flow isReviewMode:", isReviewMode);
   const { user } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
@@ -234,6 +235,7 @@ const Day1Flow = ({ onComplete, isReviewMode = false }: Day1FlowProps) => {
 
   // ===== REVIEW MODE =====
   if (isReviewMode) {
+    console.log("DEBUG Day1Flow ENTRANDO REVIEW MODE");
     if (loading) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center">
