@@ -7,7 +7,7 @@ import FoodTrafficLight from "./FoodTrafficLight";
 import Day3CardapioPersonalizado from "./Day3CardapioPersonalizado";
 import Day3Closing from "./Day3Closing";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 type Day3Step = "loading" | "welcome" | "semaforo" | "cardapio" | "closing";
 
@@ -79,7 +79,9 @@ const Day3Flow = ({ onComplete, isReviewMode = false }: Day3FlowProps) => {
     return (
       <div className="levvia-page min-h-screen pb-24">
         <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
-          <img src={logoIcon} alt="Levvia" className="h-7" />
+          <div className="flex justify-center">
+            <img src={logoFull} alt="Levvia" className="h-10" />
+          </div>
         </div>
 
         <div className="p-5 space-y-6">

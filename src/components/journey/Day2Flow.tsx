@@ -11,7 +11,7 @@ import Day2MealSuggestion from "./Day2MealSuggestion";
 import Day2NightRitual from "./Day2NightRitual";
 import Day2Closing from "./Day2Closing";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 type Day2Step = "loading" | "welcome" | "drainage" | "map" | "meal" | "night" | "closing";
 
@@ -133,7 +133,9 @@ const Day2Flow = ({ onComplete, isReviewMode = false }: Day2FlowProps) => {
     return (
       <div className="levvia-page min-h-screen pb-24">
         <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
-          <img src={logoIcon} alt="Levvia" className="h-7" />
+          <div className="flex justify-center">
+            <img src={logoFull} alt="Levvia" className="h-10" />
+          </div>
         </div>
 
         <div className="p-5 space-y-6">

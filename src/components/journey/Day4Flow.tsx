@@ -9,7 +9,7 @@ import BreathingCircle from "./BreathingCircle";
 import Day4CardapioNoturno from "./Day4CardapioNoturno";
 import Day4Closing from "./Day4Closing";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 type Day4Step = "loading" | "welcome" | "hygiene" | "breathing" | "cardapio" | "closing";
 
@@ -90,7 +90,9 @@ const Day4Flow = ({ onComplete, isReviewMode = false }: Day4FlowProps) => {
     return (
       <div className="levvia-page min-h-screen pb-24">
         <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
-          <img src={logoIcon} alt="Levvia" className="h-7" />
+          <div className="flex justify-center">
+            <img src={logoFull} alt="Levvia" className="h-10" />
+          </div>
         </div>
 
         <div className="p-5 space-y-6">

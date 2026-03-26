@@ -10,7 +10,7 @@ import HeatMapInteractive from "./HeatMapInteractive";
 import Day1MealSuggestion from "./Day1MealSuggestion";
 import Day1Closing from "./Day1Closing";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_azul_icone.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 interface Day1FlowProps {
   onComplete: () => void;
@@ -245,7 +245,9 @@ const Day1Flow = ({ onComplete, isReviewMode = false }: Day1FlowProps) => {
     return (
       <div className="levvia-page min-h-screen pb-24">
         <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
-          <img src={logoIcon} alt="Levvia" className="h-7" />
+          <div className="flex justify-center">
+            <img src={logoFull} alt="Levvia" className="h-10" />
+          </div>
         </div>
 
         <div className="p-5 space-y-6">
