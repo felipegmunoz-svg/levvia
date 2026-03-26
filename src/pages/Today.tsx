@@ -78,6 +78,9 @@ function getIncentiveMessage(progress: number): string {
 const Today = () => {
   const renderCount = useRef(0);
   renderCount.current++;
+  const [searchParams] = useSearchParams();
+  const reviewDay = searchParams.get("review") ? Number(searchParams.get("review")) : null;
+  const navTo = useNavigate();
 
   useEffect(() => {
     debugMount("Today");
