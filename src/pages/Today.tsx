@@ -670,7 +670,7 @@ const Today = () => {
       {isDev && (
         <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
           <span className="font-semibold text-yellow-800">🐛 Debug:</span>
-          {[1, 2, 3, 4, 5].map(d => (
+          {[1, 2, 3, 4, 5, 6].map(d => (
             <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
               Dia {d}
             </button>
@@ -684,7 +684,7 @@ const Today = () => {
       {isDebugActive() && (
         <div style={{ position: 'fixed', bottom: 70, right: 8, zIndex: 9999, background: 'rgba(0,0,0,0.85)', color: '#0f0', padding: '8px 12px', borderRadius: 8, fontSize: 10, fontFamily: 'monospace', maxWidth: 260, pointerEvents: 'none' }}>
           <div>🔄 Today #{renderCount.current} | branch: {branch}</div>
-          <div>day: {currentDay} | d1:{String(day1Done)} d2:{String(day2Done)} d3:{String(day3Done)} d4:{String(day4Done)} d5:{String(day5Done)}</div>
+          <div>day: {currentDay} | d1:{String(day1Done)} d2:{String(day2Done)} d3:{String(day3Done)} d4:{String(day4Done)} d5:{String(day5Done)} d6:{String(day6Done)}</div>
           <div>premium:{String(hasPremium)} pLoad:{String(premiumLoading)} cLoad:{String(loading)} auth:{String(authLoading)}</div>
           <div>data:{todayData ? 'yes' : 'no'}</div>
         </div>
