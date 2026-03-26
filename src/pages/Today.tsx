@@ -157,7 +157,7 @@ const Today = () => {
 
     supabase
       .from("profiles")
-      .select("day1_completed, day1_completed_at, day2_completed, day2_completed_at, day3_completed, day3_completed_at, day4_completed, day4_completed_at, day5_completed, day5_completed_at, day6_completed, day6_completed_at, challenge_start")
+      .select("day1_completed, day2_completed, day3_completed, day4_completed, day5_completed, day6_completed, challenge_start")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data, error }) => {
@@ -173,12 +173,6 @@ const Today = () => {
         setDay4Done(data?.day4_completed === true);
         setDay5Done(data?.day5_completed === true);
         setDay6Done(data?.day6_completed === true);
-        setDay1CompletedAt(data?.day1_completed_at || null);
-        setDay2CompletedAt(data?.day2_completed_at || null);
-        setDay3CompletedAt(data?.day3_completed_at || null);
-        setDay4CompletedAt(data?.day4_completed_at || null);
-        setDay5CompletedAt(data?.day5_completed_at || null);
-        setDay6CompletedAt(data?.day6_completed_at || null);
         if (data?.challenge_start) {
           localStorage.setItem("levvia_challenge_start", data.challenge_start);
         }
