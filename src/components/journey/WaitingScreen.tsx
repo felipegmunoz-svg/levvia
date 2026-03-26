@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Clock, Sparkles, ArrowDown } from "lucide-react";
+import { startOfDay, addDays } from "date-fns";
 import logoIcon from "@/assets/logo_livvia_branco_icone.png";
 import BottomNav from "@/components/BottomNav";
 
@@ -10,9 +11,8 @@ interface WaitingScreenProps {
 }
 
 function getTimeRemaining(completedAt: string) {
-  const unlockTime = new Date(completedAt).getTime() + 24 * 60 * 60 * 1000;
-  const now = Date.now();
-  const diff = unlockTime - now;
+  const nextMidnight = startOfDay(addDays(new Date(completedAt), 1));
+  const diff = nextMidnight.getTime() - Date.now();
 
   if (diff <= 0) return null;
 
@@ -63,7 +63,7 @@ const WaitingScreen = ({ completedAt, nextDay, onReady }: WaitingScreenProps) =>
           </h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xs mx-auto">
             Seu corpo precisa de tempo para absorver os benefícios de hoje.
-            O Dia {nextDay} será liberado em breve.
+            O Dia {nextDay} será liberado à meia-noite.
           </p>
         </div>
 
