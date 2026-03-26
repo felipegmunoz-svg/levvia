@@ -1,4 +1,4 @@
-// build v3 – clean logs + force deploy
+// build v5 – fix SW cache + review mode
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
@@ -7,7 +7,20 @@ import { migrateLegacyStorage } from "./lib/migrateLegacyStorage";
 
 migrateLegacyStorage();
 
-// Register service worker for PWA
-registerSW({ immediate: true });
+// Guard: never register SW inside iframes or preview hosts
+const isInIframe = (() => {
+  try { return window.self !== window.top; } catch { return true; }
+})();
+const isPreviewHost =
+  window.location.hostname.includes("id-preview--") ||
+  window.location.hostname.includes("lovableproject.com");
+
+if (isPreviewHost || isInIframe) {
+  navigator.serviceWorker?.getRegistrations().then((regs) => {
+    regs.forEach((r) => r.unregister());
+  });
+} else {
+  registerSW({ immediate: true });
+}
 
 createRoot(document.getElementById("root")!).render(<App />);
