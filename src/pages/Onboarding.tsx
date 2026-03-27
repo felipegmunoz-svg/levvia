@@ -724,8 +724,8 @@ const Onboarding = () => {
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
             className="flex justify-center mb-6"
           >
-            <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
-              <Heart size={28} strokeWidth={1.5} className="text-foreground" />
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
+              <Heart size={28} strokeWidth={1.5} className="text-primary-foreground" />
             </div>
           </motion.div>
           <motion.h1
@@ -759,8 +759,8 @@ const Onboarding = () => {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="flex justify-center mb-4"
           >
-            <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
-              <ShoppingBag size={28} strokeWidth={1.5} className="text-foreground" />
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
+              <ShoppingBag size={28} strokeWidth={1.5} className="text-primary-foreground" />
             </div>
           </motion.div>
           <motion.h1
@@ -815,7 +815,7 @@ const Onboarding = () => {
                       className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                         selected.includes(item)
                           ? "bg-secondary text-foreground border-secondary"
-                          : "bg-white/[0.06] text-muted-foreground border-white/10 hover:border-white/20"
+                          : "bg-muted text-muted-foreground border-border hover:border-primary/30"
                       }`}
                     >
                       {item}
@@ -831,7 +831,7 @@ const Onboarding = () => {
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.3 }}
-            className="max-w-sm mx-auto w-full mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-4"
+            className="max-w-sm mx-auto w-full mt-6 rounded-2xl border border-border bg-muted p-4"
           >
             <label className="text-xs font-medium text-muted-foreground block mb-2">
               ✍️ Não encontrou o que procura? Digite outros ingredientes:
@@ -841,7 +841,7 @@ const Onboarding = () => {
               onChange={(e) => setCustomPantryInput(e.target.value)}
               placeholder="Ex: feijão branco, coentro, hortelã, azeitona"
               rows={2}
-              className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/[0.04] text-foreground text-sm placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors resize-none"
+              className="w-full px-3 py-2.5 rounded-xl border border-border bg-muted text-foreground text-sm placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors resize-none"
             />
             <p className="text-[10px] text-muted-foreground/60 mt-1">Separe por vírgula</p>
           </motion.div>
@@ -869,8 +869,8 @@ const Onboarding = () => {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="flex justify-center mb-6"
         >
-          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
-            <Heart size={28} strokeWidth={1.5} className="text-foreground" />
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
+            <Heart size={28} strokeWidth={1.5} className="text-primary-foreground" />
           </div>
         </motion.div>
         <motion.h1
@@ -914,7 +914,7 @@ const Onboarding = () => {
                 className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-all duration-200 text-left ${
                   isSelected(option)
                     ? "border-secondary bg-secondary/10"
-                    : "border-white/10 bg-white/[0.06] hover:border-secondary/30"
+                    : "border-border bg-muted hover:border-secondary/30"
                 }`}
               >
                 <motion.div
@@ -936,7 +936,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background gradient-page flex flex-col">
+    <div className="theme-light min-h-screen bg-background flex flex-col">
       {/* Progress bar */}
       <div className="px-6 pt-4">
         <div className="flex items-center justify-between mb-2">
@@ -957,7 +957,7 @@ const Onboarding = () => {
             {step + 1} de {total}
           </span>
         </div>
-        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-secondary to-success rounded-full"
             animate={{ width: `${progress}%` }}
@@ -1002,8 +1002,8 @@ const Onboarding = () => {
             disabled={!canProceed()}
             className={`w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base transition-all duration-200 ${
               canProceed()
-                ? "gradient-primary text-foreground hover:opacity-90"
-                : "bg-white/[0.06] text-muted-foreground cursor-not-allowed"
+                ? "bg-primary text-primary-foreground hover:opacity-90"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}
           >
             {step === total - 1 ? "Ver Meu Diagnóstico" : "Continuar"}
