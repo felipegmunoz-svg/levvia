@@ -1,25 +1,30 @@
 
 
-# Fix Accent-Insensitive Pantry Matching
+# Add Lightness Score to DayReview Diary Sections
 
 ## Summary
-Add Unicode accent normalization to `scorePantryMatch` so ingredients like "maçã" match pantry items like "maca" (and vice versa).
+Display the lightness score (`lightnessScore`) in all 3 diary rendering blocks of `DayReview.tsx`, immediately after the energy level line in each block.
 
-## Changes in `src/lib/profileEngine.ts`
+## Changes in `src/components/journey/DayReview.tsx`
 
-### 1. Add `normAccent` helper (before line 461)
-```ts
-function normAccent(str: string): string {
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
+### Edit 1 — After line 326 (journal.energyLevel block)
+Insert lightness score check using `journal.lightnessScore` before the notes line.
+
+### Edit 2 — After line 351 (diary.energyLevel block)
+Insert lightness score check using `diary.lightnessScore` before the notes line.
+
+### Edit 3 — After line 436 (journal.energy_level / EnergyDots block)
+Insert lightness score check using `journal.lightnessScore` before the notes line.
+
+All 3 insertions use the same pattern:
+```tsx
+{x.lightnessScore != null && (
+  <p className="text-sm text-foreground">
+    Score de leveza: <span className="font-semibold text-primary">{x.lightnessScore}/10</span>
+  </p>
+)}
 ```
 
-### 2. Update `scorePantryMatch` (lines 465-467)
-Replace `ingLower` with `ingNorm` using `normAccent`, and normalize `p` inside the loop.
-
-### 3. Update `pantryLower` creation (line 450)
-Apply `normAccent` when building `pantryLower` array.
-
 ## Files modified
-- `src/lib/profileEngine.ts` — 3 surgical edits
+- `src/components/journey/DayReview.tsx` — 3 insertions (no other files touched)
 
