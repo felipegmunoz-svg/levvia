@@ -29,6 +29,7 @@ const Celebration = () => {
     lightnessScores,
     dayHistory,
     day1HeatMapData,
+    pantryItems,
     loading,
   } = useCelebrationData();
 
@@ -51,6 +52,7 @@ const Celebration = () => {
         lightnessScores,
         dayHistory,
         doctorMessage,
+        pantryItems,
       });
       toast.success("Dossiê gerado com sucesso! Verifique seus downloads.");
     } catch (err) {
