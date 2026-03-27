@@ -115,6 +115,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Alimento que Cura',
     purpose: 'Anti-inflamação',
     affirmation: 'Eu nutro meu corpo com o que há de melhor na natureza.',
+    affirmationRescue: 'Cada alimento que eu escolho é um gesto de amor pelo meu corpo. Um passo de cada vez.',
     isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Alongamento de Borboleta' },
@@ -224,6 +225,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'O Poder das Especiarias',
     purpose: 'Tempero que Cura',
     affirmation: 'Eu uso a sabedoria da terra para fortalecer minha saúde.',
+    affirmationRescue: 'O meu ritmo é perfeito para mim. Cada tempero é um aliado gentil na minha jornada.',
     isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Rotação de Ombros' },
@@ -270,6 +272,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'O Marco da Leveza',
     purpose: 'Celebrar a primeira semana e visualizar a transformação do Fogo para o Fluxo',
     affirmation: 'Eu celebro cada pequena vitória e a leveza que conquistei nesta semana. Meu corpo é um templo de fluxo.',
+    affirmationRescue: 'Chegar até o Dia 7 já é uma vitória. Eu me honro por estar aqui, do jeito que estou.',
     isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Drenagem Ativa' },
@@ -674,6 +677,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'O Novo Eu',
     purpose: 'Consolidação total, celebração e plano de manutenção',
     affirmation: 'Eu não sou mais a mesma do Dia 1. Eu sou leve, forte e fluida. Minha jornada continua.',
+    affirmationRescue: 'Eu completei 14 dias cuidando de mim. Independente do caminho, eu apareci. E isso é tudo.',
     isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Alongamento Total' },

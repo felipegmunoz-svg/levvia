@@ -232,7 +232,7 @@ const DayTouchpointView = ({
                             {s.slot === "afternoon" && (
                               <AfternoonSlot
                                 dayNumber={dayNumber}
-                                hydrationText={touchpoints.afternoon.hydrationText}
+                                hydrationText={hydration ? (touchpoints.afternoon.hydrationText || "").replace("{meta}", String(hydration.subGoalMl)) : (touchpoints.afternoon.hydrationText || "")}
                                 microMovement={touchpoints.afternoon.microMovement}
                                 snackRecipe={touchpoints.afternoon.snackRecipe}
                                 isReviewMode={isReviewMode || isDone}
