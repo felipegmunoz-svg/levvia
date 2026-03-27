@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { NightTechnique } from "@/data/touchpointConfig";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
+import HeatMapComparative from "@/components/journey/HeatMapComparative";
 import BreathingCircle from "@/components/journey/BreathingCircle";
 import FoodTrafficLight from "@/components/journey/FoodTrafficLight";
 import HydrationModule from "./HydrationModule";
@@ -24,6 +25,7 @@ interface NightSlotProps {
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
   isCheckpointDay?: boolean;
+  heatMapDay1Data?: Record<string, number> | null;
   onComplete: (data: { technique_done: boolean; journal?: DiaryData }) => void;
 }
 
@@ -34,6 +36,7 @@ const NightSlot = ({
   isReviewMode,
   hydration,
   isCheckpointDay = false,
+  heatMapDay1Data,
   onComplete,
 }: NightSlotProps) => {
   const [techniqueDone, setTechniqueDone] = useState(isReviewMode);
@@ -106,6 +109,15 @@ const NightSlot = ({
           );
         }
         return <FoodTrafficLight onContinue={() => setTechniqueDone(true)} />;
+
+      case "heatmap-comparative":
+        return (
+          <HeatMapComparative
+            day1Data={heatMapDay1Data || null}
+            onNext={() => setTechniqueDone(true)}
+            isReviewMode={isReviewMode}
+          />
+        );
 
       case "text-guide":
       case "legs-elevation":

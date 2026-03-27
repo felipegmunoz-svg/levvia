@@ -73,6 +73,7 @@ export interface TouchpointData {
   night: {
     technique: NightTechnique;
     closingMessage: string;
+    heatMapDay1Data?: Record<string, number> | null;
   };
 }
 
@@ -413,6 +414,9 @@ export function useChallengeData(rescueMode: string = "neutral") {
       night: {
         technique: effectiveNightTechnique,
         closingMessage: effectiveClosingMessage,
+        heatMapDay1Data: effectiveNightTechnique.type === "heatmap-comparative"
+          ? ((profile.heatMapDay1 as Record<string, number>) || null)
+          : undefined,
       },
     };
   }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading, rescueMode]);
