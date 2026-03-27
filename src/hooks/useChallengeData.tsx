@@ -54,6 +54,28 @@ interface DayData {
   phrase: string;
 }
 
+export interface TouchpointData {
+  morning: {
+    affirmation: string;
+    schedule: { slot: string; time: string; label: string }[];
+    exercise: ChallengeActivity | null;
+    shotRecipe: ChallengeActivity | null;
+  };
+  lunch: {
+    recipes: ChallengeActivity[];
+    tip: string;
+  };
+  afternoon: {
+    hydrationText: string;
+    microMovement: ChallengeActivity | null;
+    snackRecipe: ChallengeActivity | null;
+  };
+  night: {
+    technique: NightTechnique;
+    closingMessage: string;
+  };
+}
+
 // Motivational phrases that adapt to pain level
 const dailyPhrases = [
   { normal: "Cada pequeno passo é uma vitória. Comece hoje, com carinho por você.", high: "Seu corpo merece gentileza. Comece devagar, com amor por você." },
