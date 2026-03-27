@@ -165,7 +165,7 @@ function generateMealsForDay(
   return meals;
 }
 
-export function useChallengeData() {
+export function useChallengeData(rescueMode: string = "neutral") {
   const { profile, loading: profileLoading } = useProfile();
   const { user } = useAuth();
   const renderCount = useRef(0);
@@ -363,11 +363,17 @@ export function useChallengeData() {
     const config = getTouchpointConfig(currentDay);
     const filteredEx = filterExercisesForProfile(exercises, profile);
 
-    const morningEx = selectMorningExercise(filteredEx, profile, currentDay);
-    const morningShot = selectShotRecipe(filteredRecipes, profile, currentDay);
-    const lunchRecs = selectLunchRecipes(filteredRecipes, profile, currentDay);
-    const microMov = selectMicroMovement(filteredEx, profile, currentDay, morningEx?.id);
-    const snack = selectSnackRecipe(filteredRecipes, profile, currentDay);
+    const morningEx = selectMorningExercise(filteredEx, profile, currentDay, rescueMode);
+    const morningShot = selectShotRecipe(filteredRecipes, profile, currentDay, rescueMode);
+    const lunchRecs = selectLunchRecipes(filteredRecipes, profile, currentDay, rescueMode);
+    const microMov = selectMicroMovement(filteredEx, profile, currentDay, morningEx?.id, rescueMode);
+    const snack = selectSnackRecipe(filteredRecipes, profile, currentDay, rescueMode);
+
+    // Use rescue-aware config fields
+    const effectiveAffirmation = (rescueMode === "resgate" && config.affirmationRescue) ? config.affirmationRescue : config.affirmation;
+    const effectiveLunchTip = (rescueMode === "resgate" && config.lunchTipRescue) ? config.lunchTipRescue : config.lunchTip;
+    const effectiveNightTechnique = (rescueMode === "resgate" && config.nightTechniqueRescue) ? config.nightTechniqueRescue : config.nightTechnique;
+    const effectiveClosingMessage = (rescueMode === "resgate" && config.closingMessageRescue) ? config.closingMessageRescue : config.closingMessage;
 
     const toActivity = (
       item: DbExercise | DbRecipe | null,
@@ -385,7 +391,7 @@ export function useChallengeData() {
 
     return {
       morning: {
-        affirmation: config.affirmation,
+        affirmation: effectiveAffirmation,
         schedule: config.schedule,
         exercise: toActivity(morningEx, "exercise", "morning-ex"),
         shotRecipe: toActivity(morningShot, "recipe", "morning-shot"),
@@ -397,7 +403,7 @@ export function useChallengeData() {
           label: r.title,
           recipe: r,
         })),
-        tip: config.lunchTip,
+        tip: effectiveLunchTip,
       },
       afternoon: {
         hydrationText: config.afternoonHydrationText,
@@ -405,11 +411,11 @@ export function useChallengeData() {
         snackRecipe: toActivity(snack, "recipe", "afternoon-snack"),
       },
       night: {
-        technique: config.nightTechnique,
-        closingMessage: config.closingMessage,
+        technique: effectiveNightTechnique,
+        closingMessage: effectiveClosingMessage,
       },
     };
-  }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading]);
+  }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading, rescueMode]);
 
   const dayTitle = dayTitles[(currentDay - 1) % dayTitles.length];
   const dayObjective = dayObjectives[(currentDay - 1) % dayObjectives.length];
