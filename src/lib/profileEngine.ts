@@ -385,15 +385,27 @@ export function filterRecipesForProfile(
 
   // Dietary restrictions
   if (profile.dietaryRestrictions.includes("Vegano")) {
-    filtered = filtered.filter((r) => r.tags.includes("Vegano"));
+    filtered = filtered.filter((r) => {
+      const dp = (r.diet_profile || []).map(d => d.toLowerCase());
+      return dp.includes("vegana") || dp.includes("vegano");
+    });
   } else if (profile.dietaryRestrictions.includes("Vegetariano")) {
-    filtered = filtered.filter((r) => r.tags.includes("Vegetariano") || r.tags.includes("Vegano"));
+    filtered = filtered.filter((r) => {
+      const dp = (r.diet_profile || []).map(d => d.toLowerCase());
+      return dp.includes("vegetariana") || dp.includes("vegetariano") || dp.includes("vegana") || dp.includes("vegano");
+    });
   }
   if (profile.dietaryRestrictions.includes("Sem Glúten")) {
-    filtered = filtered.filter((r) => r.tags.includes("Sem Glúten"));
+    filtered = filtered.filter((r) => {
+      const af = (r.allergen_free || []).map(a => a.toLowerCase());
+      return af.includes("sem glúten") || af.includes("gluten-free") || af.includes("livre de glúten") || (r.tags || []).some(t => t.toLowerCase().includes("glúten"));
+    });
   }
   if (profile.dietaryRestrictions.includes("Sem Lactose")) {
-    filtered = filtered.filter((r) => r.tags.includes("Sem Lactose"));
+    filtered = filtered.filter((r) => {
+      const af = (r.allergen_free || []).map(a => a.toLowerCase());
+      return af.includes("sem lactose") || af.includes("lactose-free") || af.includes("livre de lactose") || (r.tags || []).some(t => t.toLowerCase().includes("lactose"));
+    });
   }
   if (profile.dietaryRestrictions.includes("Alergia a Frutos do Mar")) {
     filtered = filtered.filter((r) =>
