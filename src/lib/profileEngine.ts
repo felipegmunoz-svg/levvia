@@ -823,7 +823,7 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
       else if (hour < 18) mealType = 'Lanche da Tarde';
 
       const top5 = withFinal.slice(0, 5);
-      selected = top5.find(r => r.tipo_refeicao?.includes(mealType)) || withFinal[0];
+      selected = top5.find(r => r.tipo_refeicao?.some(t => t.toLowerCase() === mealType.toLowerCase())) || withFinal[0];
     }
 
 
