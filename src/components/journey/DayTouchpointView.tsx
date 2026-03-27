@@ -26,6 +26,7 @@ interface DayTouchpointViewProps {
   progress: DayTouchpointProgress;
   isReviewMode?: boolean;
   hydration?: HydrationProps;
+  rescueMode?: string;
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
 }
 
@@ -50,12 +51,15 @@ const SLOT_INDICES: Record<TouchpointSlot, number> = {
   night: 3,
 };
 
+const CHECKPOINT_DAYS = [3, 6, 7, 10, 14];
+
 const DayTouchpointView = ({
   dayNumber,
   touchpoints,
   progress,
   isReviewMode = false,
   hydration,
+  rescueMode,
   onSlotComplete,
 }: DayTouchpointViewProps) => {
   const config = getTouchpointConfig(dayNumber);
@@ -243,6 +247,7 @@ const DayTouchpointView = ({
                                 closingMessage={touchpoints.night.closingMessage}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
+                                isCheckpointDay={CHECKPOINT_DAYS.includes(dayNumber)}
                                 onComplete={(data) => onSlotComplete("night", data)}
                               />
                             )}

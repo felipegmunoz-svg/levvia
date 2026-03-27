@@ -17,6 +17,7 @@ import { usePremium } from "@/hooks/usePremium";
 import { useChallengeData } from "@/hooks/useChallengeData";
 import { useTouchpointProgress } from "@/hooks/useTouchpointProgress";
 import { useHydration } from "@/hooks/useHydration";
+import { useRescueMode } from "@/hooks/useRescueMode";
 import type { TouchpointSlot } from "@/data/touchpointConfig";
 
 const Today = () => {
@@ -75,13 +76,19 @@ const Today = () => {
   const effectiveDay = replayDay ?? currentDay;
   const { progress, activeSlot, isDayComplete, completedSlots, markSlotDone, loading: tpLoading } = useTouchpointProgress(effectiveDay);
   const hydration = useHydration(profile?.weightKg ?? null, effectiveDay);
+  const { rescueMode, evaluateCheckpoint, isCheckpointDay } = useRescueMode();
 
   const handleSlotComplete = useCallback(async (slot: TouchpointSlot, data: any) => {
     await markSlotDone(slot, data);
     if (slot === 'night') {
+      // Evaluate rescue mode at checkpoint days
+      const score = data?.journal?.lightnessScore;
+      if (score != null) {
+        evaluateCheckpoint(effectiveDay, score);
+      }
       toast("Sua jornada continua amanhã. Descanse — você merece.");
     }
-  }, [markSlotDone]);
+  }, [markSlotDone, evaluateCheckpoint, effectiveDay]);
 
   // Debug render instrumentation
   const branch = (loading && !forceReady) || premiumLoading
@@ -146,6 +153,7 @@ const Today = () => {
         touchpoints={todayTouchpoints}
         progress={progress}
         hydration={hydration}
+        rescueMode={rescueMode}
         onSlotComplete={handleSlotComplete}
       />
     );
