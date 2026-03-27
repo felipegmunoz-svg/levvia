@@ -12,6 +12,7 @@ interface GenerateDossieParams {
   lightnessScores: { day: number; score: number }[];
   dayHistory: DayHistoryItem[];
   doctorMessage: string;
+  pantryItems: string[];
 }
 
 export async function generateDossie(params: GenerateDossieParams): Promise<void> {
@@ -24,6 +25,7 @@ export async function generateDossie(params: GenerateDossieParams): Promise<void
     lightnessScores,
     dayHistory,
     doctorMessage,
+    pantryItems,
   } = params;
 
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -194,6 +196,49 @@ export async function generateDossie(params: GenerateDossieParams): Promise<void
     curY += msgH + 6;
   }
 
+  // ── Seção 3.5: Inventário da Despensa ─────────────────
+  if (pantryItems.length > 0) {
+    const sectionH = 12 + Math.ceil(pantryItems.length / 5) * 8;
+    if (curY + sectionH > pageH - 30) {
+      doc.addPage();
+      curY = 20;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...dark);
+    doc.text("Inventário da Despensa", marginL, curY);
+    curY += 4;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...gray);
+    doc.text("Ingredientes disponíveis na residência da paciente durante a jornada:", marginL, curY);
+    curY += 5;
+
+    const chipH = 6;
+    const chipPadX = 3;
+    const gapX = 2;
+    let chipX = marginL;
+    let chipY = curY;
+
+    for (const item of pantryItems) {
+      const itemW = doc.getTextWidth(item) + chipPadX * 2;
+      if (chipX + itemW > marginL + contentW) {
+        chipX = marginL;
+        chipY += chipH + 2;
+      }
+      doc.setFillColor(...blueLight);
+      doc.roundedRect(chipX, chipY, itemW, chipH, 1.5, 1.5, "F");
+      doc.setTextColor(...blue);
+      doc.setFontSize(7);
+      doc.text(item, chipX + chipPadX, chipY + 4.2);
+      chipX += itemW + gapX;
+    }
+
+    curY = chipY + chipH + 8;
+  }
+
   // ── Seção 4: Histórico dia a dia ───────────────────────
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
@@ -223,8 +268,8 @@ export async function generateDossie(params: GenerateDossieParams): Promise<void
       0: { cellWidth: 14 },
       1: { cellWidth: 22, halign: "center" },
       2: { cellWidth: 22, halign: "center" },
-      3: { cellWidth: 100 },
-      4: { cellWidth: 16, halign: "center" },
+      3: { cellWidth: 95, overflow: "linebreak" as const },
+      4: { cellWidth: 13, halign: "center" },
     },
     margin: { left: marginL, right: marginR },
   });

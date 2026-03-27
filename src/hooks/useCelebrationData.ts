@@ -19,6 +19,7 @@ export interface CelebrationData {
   lightnessScores: { day: number; score: number }[];
   dayHistory: DayHistoryItem[];
   day1HeatMapData: Record<string, number> | null;
+  pantryItems: string[];
   loading: boolean;
 }
 
@@ -33,6 +34,7 @@ export function useCelebrationData(): CelebrationData {
     lightnessScores: [],
     dayHistory: [],
     day1HeatMapData: null,
+    pantryItems: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +45,7 @@ export function useCelebrationData(): CelebrationData {
       try {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("challenge_progress, name, email")
+          .select("challenge_progress, name, email, pantry_items")
           .eq("id", user!.id)
           .maybeSingle();
 
@@ -85,6 +87,7 @@ export function useCelebrationData(): CelebrationData {
 
         const rawName = profile?.name ?? profile?.email ?? "Guerreira";
         const userName = rawName.split("@")[0].split(" ")[0];
+        const pantryItems = (profile as any)?.pantry_items ?? [];
 
         setData({
           userName,
@@ -95,6 +98,7 @@ export function useCelebrationData(): CelebrationData {
           lightnessScores,
           dayHistory,
           day1HeatMapData,
+          pantryItems,
         });
       } catch (err) {
         console.error("useCelebrationData error:", err);
