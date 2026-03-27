@@ -1,50 +1,72 @@
 
 
-# Create FlowSilhouette Component
+# Create Hydration Tracking System
 
 ## Summary
-Create a premium visual component that renders a glassmorphism feminine silhouette with two dynamic layers: heat zones (pain/inflammation) and a rising blue hydration aura. Includes score display and hydration progress bar.
+Add a hydration tracking hook (`useHydration`) and a visual module (`HydrationModule`) that appears in every touchpoint slot. Personalized daily goal based on body weight (35ml/kg), divided into 4 sub-goals per touchpoint, with tap buttons and persistence in challenge_progress JSONB.
 
-## New File: `src/components/FlowSilhouette.tsx`
+## New Files
 
-### Props
-- `heatMapData: Record<string, number>` — area IDs to intensity 0-3
-- `waterIntakeMl: number`, `waterGoalMl: number`
-- `size: "small" | "large"` (default "large")
-- `animated: boolean` (default true)
+### 1. `src/hooks/useHydration.ts`
+- Receives `weightKg` (number | null) and `dayNumber` (number)
+- Computes `dailyGoalMl = Math.round((weightKg || 60) * 35)`, `subGoalMl = Math.round(dailyGoalMl / 4)`
+- State: `currentIntakeMl` from localStorage key `levvia_hydration_day_{dayNumber}`, default 0
+- `addWater(ml)`: updates state + localStorage immediately, then merges `water_intake_ml` into `challenge_progress.touchpoints.day{N}` via saveWithRetry (read-merge-write like useTouchpointProgress)
+- Returns `{ dailyGoalMl, subGoalMl, currentIntakeMl, dailyPercent, addWater, slotPercent }`
+- `slotPercent(slotIndex)`: computes how much of slot N's sub-goal is filled based on total intake vs slot boundaries
 
-### SVG Structure (viewBox 0 0 220 440, matching HeatMapInteractive coordinate system)
+### 2. `src/components/journey/touchpoints/HydrationModule.tsx`
+- Props: `dailyGoalMl`, `subGoalMl`, `currentIntakeMl`, `dailyPercent`, `slotSubGoalMl`, `slotLabel`, `hydrationText`, `onAddWater`, `isReviewMode`
+- Layout (levvia-card p-5):
+  - Header: "💧 Hidratação" + badge showing `{currentIntakeMl}ml / {dailyGoalMl}ml`
+  - Progress bar (h-3 rounded-full) with 4 tick marks labeled M A T N
+  - Motivational text from config + "Meta deste momento: {slotSubGoalMl}ml"
+  - Two tap buttons (+250ml, +500ml) with brief green check animation (framer-motion)
+  - Goal-reached celebration when dailyPercent >= 1.0
+  - Review mode: bar + value only, no buttons
 
-1. **Defs**: Define radial gradients for each heat intensity level, a vertical linear gradient for the blue aura, and a `<clipPath>` using the full silhouette outline path
+## Modified Files
 
-2. **Base Silhouette**: Single elegant feminine SVG path — narrower shoulders, defined waist/hips. Fill `rgba(240,245,250,0.15)`, stroke `rgba(180,200,220,0.3)` for glassmorphism effect
+### `src/data/touchpointConfig.ts`
+- Add `hydrationTexts` field to `DayTouchpointConfig`: `{ morning: string, lunch: string, afternoon: string, night: string }`
+- Use `{meta}` placeholder in text strings, replaced at render time with actual subGoalMl
+- Fill days 1-6 with unique motivational texts; days 7-14 use generic placeholder texts
+- Add `afternoonKnowledgePill` string field to each day config
 
-3. **Heat Layer**: Reuse the 9 area paths from HeatMapInteractive. Each area filled with its intensity color (transparent/yellow-orange/orange/red)
+### `src/components/journey/DayTouchpointView.tsx`
+- Add `hydration` prop: `{ dailyGoalMl, subGoalMl, currentIntakeMl, dailyPercent, addWater }`
+- Pass hydration data + appropriate `slotLabel` and `hydrationText` (from config) to each slot component
 
-4. **Flow Aura Layer**: A rect clipped to the silhouette shape via clipPath. The rect is positioned so its top edge corresponds to hydration percentage (0% = bottom only, 100% = full body). Filled with linear gradient from `rgba(46,196,182,0.4)` to transparent at top edge. When `animated=true`, the top edge pulses via CSS keyframe (opacity 0.3↔0.5, 2s ease-in-out infinite)
+### `src/components/journey/touchpoints/MorningSlot.tsx`
+- Add hydration-related props; render `<HydrationModule>` between Shot section and Complete button with `slotLabel="da manhã"`
 
-### Size Variants
-- `"large"`: w-[280px] h-[420px], container is `levvia-card p-6`
-- `"small"`: w-[140px] h-[210px], no card wrapper
+### `src/components/journey/touchpoints/LunchSlot.tsx`
+- Add hydration props; render `<HydrationModule>` between Dica and Complete button with `slotLabel="do almoço"`
 
-### Score Display (below SVG)
-- `calculateFlowScore(heatMapData)`: `Math.round((1 - sum/27) * 100)`
-- Text: "Score de Fluxo: {score}%" with red/yellow/teal color coding
-- Exported as named function for reuse
+### `src/components/journey/touchpoints/AfternoonSlot.tsx`
+- Add hydration props; render `<HydrationModule>` between Snack section and Complete button with `slotLabel="da tarde"`
+- Replace the old simple hydration checkbox with HydrationModule
 
-### Hydration Bar (below score)
-- Horizontal bar: `bg-muted` track, `bg-primary` fill, rounded
-- Label: `{waterIntakeMl}ml / {waterGoalMl}ml` in `text-xs text-levvia-muted`
+### `src/components/journey/touchpoints/NightSlot.tsx`
+- Add hydration props; render `<HydrationModule>` before the technique section with `slotLabel="da noite"`
 
-### Animation
-- Entry: framer-motion fade-in + scale 0.95→1.0
-- Aura pulse: CSS keyframe on the gradient rect opacity (when `animated=true`)
+### `src/pages/Today.tsx`
+- Import and call `useHydration(profile?.weightKg, effectiveDay)`
+- Pass hydration return values to `DayTouchpointView` as `hydration` prop
 
-### Exports
-- `default` — FlowSilhouette component
-- `calculateFlowScore` — named export
+## Technical Details
+- Persistence: localStorage as immediate cache (`levvia_hydration_day_{N}`), Supabase via saveWithRetry merging into `challenge_progress.touchpoints.day{N}.water_intake_ml`
+- Default weight fallback: 60kg if profile.weightKg is null
+- `{meta}` placeholder replacement happens in DayTouchpointView when passing hydrationText to slots
 
 ## Files
-- `src/components/FlowSilhouette.tsx` — NEW
-- No existing files modified
+- `src/hooks/useHydration.ts` — NEW
+- `src/components/journey/touchpoints/HydrationModule.tsx` — NEW
+- `src/data/touchpointConfig.ts` — ADD hydrationTexts + afternoonKnowledgePill fields
+- `src/components/journey/DayTouchpointView.tsx` — ADD hydration prop pass-through
+- `src/components/journey/touchpoints/MorningSlot.tsx` — ADD HydrationModule
+- `src/components/journey/touchpoints/LunchSlot.tsx` — ADD HydrationModule
+- `src/components/journey/touchpoints/AfternoonSlot.tsx` — REPLACE old checkbox with HydrationModule
+- `src/components/journey/touchpoints/NightSlot.tsx` — ADD HydrationModule
+- `src/pages/Today.tsx` — ADD useHydration + pass to DayTouchpointView
 
