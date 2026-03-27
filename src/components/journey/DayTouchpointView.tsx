@@ -248,6 +248,7 @@ const DayTouchpointView = ({
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
                                 isCheckpointDay={CHECKPOINT_DAYS.includes(dayNumber)}
+                                heatMapDay1Data={touchpoints.night.heatMapDay1Data}
                                 onComplete={(data) => onSlotComplete("night", data)}
                               />
                             )}
