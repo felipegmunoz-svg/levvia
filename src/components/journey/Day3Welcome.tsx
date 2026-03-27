@@ -42,7 +42,7 @@ const Day3Welcome = ({ onNext }: Day3WelcomeProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.6 }}
-        className="glass-card p-6 max-w-md mb-8"
+        className="levvia-card p-6 max-w-md mb-8"
       >
         <p className="text-secondary text-sm font-medium mb-3">✨ Afirmação do Dia</p>
         <p
@@ -78,7 +78,7 @@ const Day3Welcome = ({ onNext }: Day3WelcomeProps) => {
         transition={{ delay: 1.2, duration: 0.4 }}
         whileTap={{ scale: 0.97 }}
         onClick={onNext}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         Descobrir meu Semáforo →
       </motion.button>

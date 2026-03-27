@@ -84,7 +84,7 @@ const Day1ClosingPublic = () => {
           transition={{ delay: 1.0 }}
           whileTap={{ scale: 0.97 }}
           onClick={handleGoToPlans}
-          className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+          className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
         >
           Começar minha jornada →
         </motion.button>
@@ -109,7 +109,7 @@ const Day1ClosingPublic = () => {
             className={`py-3 px-4 rounded-2xl text-sm font-medium transition-all border ${
               legSensation === s
                 ? "border-secondary bg-secondary/15 text-secondary"
-                : "border-white/10 bg-white/[0.06] text-foreground/80"
+                : "border-border bg-muted text-foreground/80"
             }`}
           >
             {s}
@@ -132,7 +132,7 @@ const Day1ClosingPublic = () => {
               className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all border ${
                 guiltBefore === n
                   ? "border-secondary bg-secondary/15 text-secondary"
-                  : "border-white/10 bg-white/[0.06] text-foreground/60"
+                  : "border-border bg-muted text-foreground/60"
               }`}
             >
               {n}
@@ -153,7 +153,7 @@ const Day1ClosingPublic = () => {
               className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all border ${
                 guiltAfter === n
                   ? "border-secondary bg-secondary/15 text-secondary"
-                  : "border-white/10 bg-white/[0.06] text-foreground/60"
+                  : "border-border bg-muted text-foreground/60"
               }`}
             >
               {n}
@@ -167,7 +167,7 @@ const Day1ClosingPublic = () => {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Observações do meu Dia 1..."
-          className="w-full bg-white/[0.05] border border-white/10 rounded-xl p-4 text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:border-secondary/40 transition-colors resize-none"
+          className="w-full bg-muted border border-border rounded-xl p-4 text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:border-secondary/40 transition-colors resize-none"
           style={{ minHeight: "80px", fontWeight: 400 }}
         />
       </div>
@@ -177,8 +177,8 @@ const Day1ClosingPublic = () => {
         disabled={!legSensation}
         className={`w-full max-w-xs mx-auto py-4 rounded-3xl font-medium text-sm transition-all ${
           legSensation
-            ? "gradient-primary text-foreground"
-            : "bg-white/10 text-foreground/30 cursor-not-allowed"
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-foreground/30 cursor-not-allowed"
         }`}
       >
         Salvar meu Dia 1

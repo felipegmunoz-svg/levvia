@@ -56,7 +56,7 @@ const Day3Closing = ({ onComplete }: Day3ClosingProps) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="glass-card p-5 max-w-sm w-full mb-6"
+        className="levvia-card p-5 max-w-sm w-full mb-6"
       >
         <p className="text-secondary text-sm font-medium mb-3">Suas Conquistas</p>
         <div className="space-y-2.5">
@@ -85,7 +85,7 @@ const Day3Closing = ({ onComplete }: Day3ClosingProps) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.1 }}
-        className="glass-card p-5 max-w-sm w-full mb-10"
+        className="levvia-card p-5 max-w-sm w-full mb-10"
       >
         <p className="text-secondary text-sm font-medium mb-2">💜 O que vem a seguir</p>
         <p
@@ -105,7 +105,7 @@ const Day3Closing = ({ onComplete }: Day3ClosingProps) => {
         whileTap={{ scale: 0.97 }}
         onClick={handleComplete}
         disabled={saving}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         {saving ? "Salvando..." : "Ver o Que Vem a Seguir →"}
       </motion.button>

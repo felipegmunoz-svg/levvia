@@ -161,7 +161,7 @@ const FoodTrafficLight = ({ onContinue }: FoodTrafficLightProps) => {
                   {section.foods.map((food) => (
                     <div
                       key={food.name}
-                      className="flex items-center gap-2 bg-white/[0.04] rounded-xl px-3 py-2"
+                      className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2"
                     >
                       <span className="text-lg">{food.icon}</span>
                       <span className="text-foreground/80 text-xs">
@@ -184,7 +184,7 @@ const FoodTrafficLight = ({ onContinue }: FoodTrafficLightProps) => {
       >
         <button
           onClick={onContinue}
-          className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+          className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
         >
           Continuar para o Cardápio do Dia →
         </button>

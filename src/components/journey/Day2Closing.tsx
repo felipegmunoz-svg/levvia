@@ -54,7 +54,7 @@ const Day2Closing = ({ onComplete }: Day2ClosingProps) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="glass-card p-5 max-w-sm w-full mb-10"
+        className="levvia-card p-5 max-w-sm w-full mb-10"
       >
         <p className="text-secondary text-sm font-medium mb-2">📅 Amanhã: Dia 3</p>
         <p
@@ -74,7 +74,7 @@ const Day2Closing = ({ onComplete }: Day2ClosingProps) => {
         whileTap={{ scale: 0.97 }}
         onClick={handleComplete}
         disabled={saving}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         {saving ? "Salvando..." : "Completar Dia 2 →"}
       </motion.button>

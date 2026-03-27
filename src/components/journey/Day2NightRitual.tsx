@@ -77,7 +77,7 @@ const Day2NightRitual = ({ onNext }: Day2NightRitualProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + i * 0.15 }}
             onClick={() => toggleStep(i)}
-            className={`glass-card p-4 w-full text-left transition-all ${
+            className={`levvia-card p-4 w-full text-left transition-all ${
               completed[i] ? "border-secondary/30" : ""
             }`}
           >
@@ -86,7 +86,7 @@ const Day2NightRitual = ({ onNext }: Day2NightRitualProps) => {
                 className={`w-6 h-6 rounded-full border flex-shrink-0 flex items-center justify-center mt-0.5 transition-all ${
                   completed[i]
                     ? "bg-secondary border-secondary"
-                    : "border-white/20"
+                    : "border-border"
                 }`}
               >
                 {completed[i] && <Check size={14} className="text-foreground" />}
@@ -122,8 +122,8 @@ const Day2NightRitual = ({ onNext }: Day2NightRitualProps) => {
         disabled={!allDone}
         className={`w-full max-w-xs py-4 rounded-3xl font-medium text-sm transition-all ${
           allDone
-            ? "gradient-primary text-foreground"
-            : "bg-white/10 text-foreground/30 cursor-not-allowed"
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-foreground/30 cursor-not-allowed"
         }`}
       >
         {allDone ? "Completei o Ritual →" : "Complete os 3 passos acima"}

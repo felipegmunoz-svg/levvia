@@ -61,14 +61,14 @@ const Day4SleepHygiene = ({ onContinue }: Day4SleepHygieneProps) => {
               className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${
                 checklist[item.key]
                   ? "border-success/40 bg-success/5"
-                  : "border-white/10 bg-white/[0.04] hover:border-secondary/30"
+                  : "border-border bg-muted hover:border-secondary/30"
               }`}
             >
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                   checklist[item.key]
                     ? "bg-success text-white"
-                    : "border-2 border-white/20"
+                    : "border-2 border-border"
                 }`}
               >
                 {checklist[item.key] && <Check size={14} strokeWidth={3} />}
@@ -92,7 +92,7 @@ const Day4SleepHygiene = ({ onContinue }: Day4SleepHygieneProps) => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-card p-4 mb-6 text-center"
+              className="levvia-card p-4 mb-6 text-center"
             >
               <p className="text-success text-sm font-medium">
                 ✨ Perfeito! Você criou um ambiente ideal para descanso restaurador.
@@ -107,10 +107,10 @@ const Day4SleepHygiene = ({ onContinue }: Day4SleepHygieneProps) => {
       </motion.div>
 
       {/* Sticky bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={() => onContinue(checklist)}
-          className="w-full max-w-xs mx-auto py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm block"
+          className="w-full max-w-xs mx-auto py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm block"
         >
           Continuar para Respiração Guiada →
         </button>

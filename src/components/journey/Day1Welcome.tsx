@@ -82,7 +82,7 @@ const Day1Welcome = ({ onNext }: Day1WelcomeProps) => {
         transition={{ delay: 1.3, duration: 0.4 }}
         whileTap={{ scale: 0.97 }}
         onClick={onNext}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         Entender o meu fogo →
       </motion.button>

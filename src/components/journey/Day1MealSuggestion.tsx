@@ -122,7 +122,7 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="glass-card p-5 w-full max-w-sm mb-6"
+          className="levvia-card p-5 w-full max-w-sm mb-6"
         >
           {suggestedRecipe.image_url && (
             <img
@@ -152,7 +152,7 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
       )}
 
       {!suggestedRecipe && (
-        <div className="glass-card p-5 w-full max-w-sm mb-6">
+        <div className="levvia-card p-5 w-full max-w-sm mb-6">
           <p className="text-foreground/60 text-center text-sm">
             Não encontramos uma receita perfeita para você hoje. Que tal explorar nossas opções?
           </p>
@@ -169,7 +169,7 @@ const Day1MealSuggestion = ({ profile, onNext }: Day1MealSuggestionProps) => {
 
       <button
         onClick={onNext}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         Registrar meu Dia 1 →
       </button>

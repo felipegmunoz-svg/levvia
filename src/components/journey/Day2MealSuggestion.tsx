@@ -141,7 +141,7 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
       </motion.p>
 
       {fetchError && (
-        <div className="glass-card p-5 w-full max-w-sm mb-6 text-center">
+        <div className="levvia-card p-5 w-full max-w-sm mb-6 text-center">
           <p className="text-foreground/60 text-sm mb-3">
             Não conseguimos carregar a receita. Verifique sua conexão.
           </p>
@@ -162,7 +162,7 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="glass-card p-5 w-full max-w-sm mb-6"
+          className="levvia-card p-5 w-full max-w-sm mb-6"
         >
           {recipe.image_url && (
             <img
@@ -173,7 +173,7 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
           )}
           <h3 className="text-foreground font-medium text-base mb-2">{recipe.title}</h3>
 
-          <div className="glass-card p-4 mb-4">
+          <div className="levvia-card p-4 mb-4">
             <p className="text-secondary text-xs font-medium mb-1">💡 Por que esta receita?</p>
             <p className="text-foreground/60 text-sm leading-relaxed" style={{ fontWeight: 300 }}>
               {recipe.por_que_resfria ||
@@ -191,7 +191,7 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
       )}
 
       {!fetchError && !recipe && (
-        <div className="glass-card p-5 w-full max-w-sm mb-6">
+        <div className="levvia-card p-5 w-full max-w-sm mb-6">
           <p className="text-foreground/60 text-center text-sm">
             Não encontramos uma receita perfeita para hoje. Que tal explorar nossas opções no cardápio?
           </p>
@@ -200,7 +200,7 @@ const Day2MealSuggestion = ({ profile, onNext }: Day2MealSuggestionProps) => {
 
       <button
         onClick={onNext}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         Continuar →
       </button>

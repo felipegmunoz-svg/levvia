@@ -100,7 +100,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
         </div>
 
         {/* Checklist */}
-        <div className="glass-card p-5 mb-6">
+        <div className="levvia-card p-5 mb-6">
           <h3 className="text-foreground text-sm font-bold mb-4">Suas Atividades:</h3>
           <div className="space-y-3">
             {activities.map((a, i) => (
@@ -118,7 +118,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
 
         {/* Mapa de Calor Comparação */}
         {heatMapDay1 && (
-          <div className="glass-card p-5 mb-6">
+          <div className="levvia-card p-5 mb-6">
             <h3 className="text-foreground text-sm font-bold mb-1">Veja Sua Evolução:</h3>
             <p className="text-foreground/50 text-xs mb-4" style={{ fontWeight: 300, lineHeight: 1.7 }}>
               Compare como suas pernas estavam no Dia 1 vs Hoje (Dia 5)
@@ -161,7 +161,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
         )}
 
         {/* Timeline Progresso */}
-        <div className="glass-card p-5 mb-6">
+        <div className="levvia-card p-5 mb-6">
           <h3 className="text-foreground text-sm font-bold mb-4">Sua Jornada até Aqui:</h3>
           <div className="space-y-3">
             {journeyDays.map((d) => (
@@ -203,7 +203,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
 
         {/* Insight personalizado */}
         {sensation === "muito_mais_leves" && (
-          <div className="glass-card p-5 mb-6 border border-green-500/20">
+          <div className="levvia-card p-5 mb-6 border border-green-500/20">
             <p className="text-foreground text-sm font-bold mb-2">🎉 Suas pernas estão muito mais leves!</p>
             <p className="text-foreground/60 text-xs" style={{ fontWeight: 300, lineHeight: 1.7 }}>
               Isso não é coincidência — é resultado direto do movimento que você cultivou hoje.
@@ -213,7 +213,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
           </div>
         )}
         {sensation === "um_pouco_mais_leves" && (
-          <div className="glass-card p-5 mb-6 border border-blue-500/20">
+          <div className="levvia-card p-5 mb-6 border border-blue-500/20">
             <p className="text-foreground text-sm font-bold mb-2">💙 Você sentiu melhora!</p>
             <p className="text-foreground/60 text-xs" style={{ fontWeight: 300, lineHeight: 1.7 }}>
               Mesmo que sutil, "um pouco mais leve" é progresso real.
@@ -223,7 +223,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
           </div>
         )}
         {sensation === "iguais" && (
-          <div className="glass-card p-5 mb-6 border border-amber-500/20">
+          <div className="levvia-card p-5 mb-6 border border-amber-500/20">
             <p className="text-foreground text-sm font-bold mb-2">🌱 Progresso não é sempre linear</p>
             <p className="text-foreground/60 text-xs" style={{ fontWeight: 300, lineHeight: 1.7 }}>
               Dias sem mudança perceptível são normais — o corpo precisa de tempo
@@ -233,7 +233,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
           </div>
         )}
         {sensation === "mais_pesadas" && (
-          <div className="glass-card p-5 mb-6 border border-purple-500/20">
+          <div className="levvia-card p-5 mb-6 border border-purple-500/20">
             <p className="text-foreground text-sm font-bold mb-2">💜 Validando sua experiência</p>
             <p className="text-foreground/60 text-xs" style={{ fontWeight: 300, lineHeight: 1.7 }}>
               Dias difíceis acontecem. Pernas mais pesadas podem ser resultado
@@ -245,7 +245,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
         )}
 
         {/* Fogo Interno */}
-        <div className="glass-card p-5 mb-6">
+        <div className="levvia-card p-5 mb-6">
           <h3 className="text-foreground text-sm font-bold mb-1">Seu Fogo Interno:</h3>
           <p className="text-foreground/50 text-xs mb-4" style={{ fontWeight: 300, lineHeight: 1.7 }}>
             O "Fogo Interno" representa a inflamação crônica do Lipedema.
@@ -289,7 +289,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
         </div>
 
         {/* Lavínia */}
-        <div className="glass-card p-4 mb-8 text-center">
+        <div className="levvia-card p-4 mb-8 text-center">
           <p className="text-foreground/50 text-xs italic" style={{ fontWeight: 300, lineHeight: 1.7 }}>
             💜 <strong>Lavínia diz:</strong> Você provou hoje que o movimento
             é o melhor remédio. Amanhã, vamos potencializar isso com o
@@ -301,7 +301,7 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border/30 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={onContinue}
-          className="w-full max-w-xs mx-auto py-4 rounded-3xl font-medium text-sm block gradient-primary text-foreground transition-all"
+          className="w-full max-w-xs mx-auto py-4 rounded-3xl font-medium text-sm block bg-primary text-primary-foreground transition-all"
         >
           Finalizar Dia 5 →
         </button>
