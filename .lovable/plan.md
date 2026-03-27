@@ -1,47 +1,97 @@
 
 
-# Fix Light Theme in Journey Components
+# Migrate Onboarding, Auth & Diagnosis to Light Theme
 
-## Problem
-Journey components use hardcoded dark-theme classes (`gradient-primary`, `glass-card`, `border-white/*`, `bg-white/[0.0x]`) that are invisible or illegible when `.theme-light` is active.
+## Summary
+Add `.theme-light` wrapper and replace all hardcoded dark-theme classes in these 3 pages. Blue logos already exist in `src/assets/`.
 
 ## Changes
 
-### 1. `src/index.css` — Global border fix
-Line 83: Change `* { @apply border-white/10; }` → `* { @apply border-border; }`
+### 1. `src/pages/Onboarding.tsx`
 
-### 2. Replace `gradient-primary text-foreground` → `bg-primary text-primary-foreground` in CTA buttons
+**Line 11** — Logo import: `logo_livvia_branco.png` → `logo_livvia_azul.png`
 
-**Files (26 total with gradient-primary):**
-- Day1Welcome.tsx, Day1Closing.tsx, Day1ClosingPublic.tsx, Day1MealSuggestion.tsx
-- Day2Welcome.tsx, Day2MealSuggestion.tsx
-- Day3Welcome.tsx, Day3CardapioPersonalizado.tsx
-- Day4Welcome.tsx, Day4CardapioNoturno.tsx, Day4SleepHygiene.tsx
-- Day5Dashboard.tsx, Day5Lunch.tsx, Day5MicroChallenge.tsx, Day5Snack.tsx, Day5LegsElevation.tsx, Day5MovementGuide.tsx
-- Day6Flow.tsx
-- BreathingCircle.tsx, FoodTrafficLight.tsx, HeatMapInteractive.tsx
-- PaywallModal.tsx, DiaryReflection.tsx, DayReview.tsx, Day2DrainageGuide.tsx, Day2NightRitual.tsx, Day2Closing.tsx, Day3Closing.tsx, Day4Closing.tsx, Day5Closing.tsx, Day2InflammationMap.tsx
+**Line 939** — Root div: add `theme-light`, remove `gradient-page`:
+```tsx
+<div className="theme-light min-h-screen bg-background flex flex-col">
+```
 
-Also replace disabled state `bg-white/[0.06]` → `bg-muted` and `bg-white/10` → `bg-muted`
+**Line 960** — Progress bar track: `bg-white/10` → `bg-muted`
 
-### 3. Replace `glass-card` → `levvia-card` (21 files)
-- Day2Welcome.tsx, Day2DrainageGuide.tsx, Day3Closing.tsx
-- Day5Dashboard.tsx, Day5MicroChallenge.tsx, Day5LegsElevation.tsx
-- And all other files found in the search above
+**Lines 535, 584, 651, 727, 762, 872** — Icon containers: `gradient-primary` → `bg-primary`
+**Lines 537, 586, 653, 729, 764, 874** — Heart/icon inside: `text-foreground` → `text-primary-foreground`
 
-### 4. Replace `border-white/5`, `border-white/10`, `border-white/20`, `border-white/[0.06]` → `border-border` (15 files)
-Includes sticky footer patterns and form inputs.
+**Line 75** (ResultScreen) — `bg-white/[0.06] border border-white/10` → `bg-muted border border-border`
+**Line 92** — `glass-card` → `levvia-card`
 
-### 5. Replace `bg-white/[0.04]`, `bg-white/[0.05]`, `bg-white/[0.06]`, `bg-white/[0.08]` → `bg-muted` 
-In form fields, unselected buttons, and decorative containers (7 files).
+**Line 505** (disclaimer) — `border-white/10 bg-white/[0.06]` → `border-border bg-muted`
 
-## What stays unchanged
-- `:root` CSS variables (dark theme preserved for Auth/Onboarding)
-- `.theme-light` block in index.css
-- All pages (`Today.tsx`, `Journey.tsx`, etc.)
-- Component logic and structure
-- `WaitingScreen.tsx` (intentionally dark)
+**Line 566** (name input) — `border-white/10 bg-white/[0.06]` → `border-border bg-muted`, remove `backdrop-blur-[10px]`
+**Line 618** (number input) — same
+**Lines 685, 698** (body_metrics inputs) — same
 
-## Technical detail
-All replacements use Tailwind's CSS-variable-based classes (`bg-primary`, `border-border`, `bg-muted`) which automatically resolve to the correct color based on whether `.theme-light` is active or not. This makes components work correctly in both dark (Auth) and light (Journey) contexts.
+**Lines 817-818** (pantry unselected) — `bg-white/[0.06] text-muted-foreground border-white/10 hover:border-white/20` → `bg-muted text-muted-foreground border-border hover:border-primary/30`
+
+**Line 834** (pantry custom input container) — `border-white/10 bg-white/[0.06]` → `border-border bg-muted`
+**Line 844** (textarea) — `border-white/10 bg-white/[0.04]` → `border-border bg-muted`
+
+**Lines 914-917** (single/multi options unselected) — `border-white/10 bg-white/[0.06] hover:border-secondary/30` → `border-border bg-muted hover:border-secondary/30`
+
+**Lines 1003-1006** (CTA button):
+- Enabled: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
+- Disabled: `bg-white/[0.06] text-muted-foreground` → `bg-muted text-muted-foreground`
+
+### 2. `src/pages/Auth.tsx`
+
+**Line 11** — Logo import: `logo_livvia_branco_icone.png` → `logo_livvia_azul_icone.png`
+
+**Line 111** — Root div: add `theme-light`:
+```tsx
+<div className="theme-light min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
+```
+
+**Line 125** — Success circle: `gradient-primary` → `bg-primary`
+**Line 127** — Check icon: `text-foreground` → `text-primary-foreground`
+
+**Line 152** — Logo container: `gradient-primary` → `bg-primary`
+
+**Lines 178, 196, 210, 236** — Input fields: `bg-white/[0.06] border-white/10` → `bg-muted border-border`
+
+**Line 251** — Submit button: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
+
+### 3. `src/pages/Diagnosis.tsx`
+
+**Line 11** — Logo import: `logo_livvia_branco.png` → `logo_livvia_azul.png`
+
+**Line 83** — Root div: remove `gradient-page`, add `theme-light`:
+```tsx
+<div className="theme-light min-h-screen bg-background flex flex-col">
+```
+
+**Lines 111, 136, 170, 211, 228, 271, 288** — `glass-card` → `levvia-card`
+
+**Line 117** — `bg-white/[0.06]` → `bg-muted`
+
+**Lines 143, 150, 178, 184, 190, 196** — `bg-white/[0.04]` → `bg-muted`
+**Line 143** — `border border-white/10` → `border border-border`
+
+**Line 323** — `bg-white/[0.08]` → `bg-muted`
+
+**Lines 341-342** — CTA gradient background:
+```tsx
+background: "linear-gradient(135deg, hsl(174 63% 47% / 0.08), hsl(196 58% 42% / 0.12))"
+```
+
+**Line 384** — CTA button: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
+
+## Files changed
+- `src/pages/Onboarding.tsx` — ~20 class replacements + logo swap
+- `src/pages/Auth.tsx` — ~8 class replacements + logo swap
+- `src/pages/Diagnosis.tsx` — ~15 class replacements + logo swap
+
+## Not changed
+- Component logic, data flow, Supabase calls
+- `src/components/journey/*` (already fixed)
+- `src/index.css` (already correct)
+- WaitingScreen (stays dark)
 
