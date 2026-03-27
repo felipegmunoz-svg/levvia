@@ -82,6 +82,8 @@ export interface DbRecipe {
   cook_time_minutes: number | null;
   difficulty: string | null;
   nutritional_highlights: string | null;
+  nutrient_density_score: number | null;
+  food_categories: string[] | null;
   image_url: string | null;
 }
 
@@ -820,3 +822,210 @@ export const selectDay1Recipe = async (profile: UserProfile): Promise<DbRecipe |
     return null;
   }
 };
+
+// ─── Touchpoint-aware selection functions ───
+
+const MORNING_CATEGORIES = [
+  "Respiração e Relaxamento",
+  "Drenagem Linfática Manual",
+  "Movimento Articular Suave",
+];
+
+function scoreForTouchpoint(exercise: DbExercise, profile: UserProfile): number {
+  let score = 0;
+  // body_part match with affectedAreas
+  if (exercise.body_part?.length && profile.affectedAreas?.length) {
+    for (const part of exercise.body_part) {
+      if (profile.affectedAreas.some(a => part.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(part.toLowerCase()))) {
+        score += 10;
+      }
+    }
+  }
+  // clinical_benefit match with healthConditions
+  if (exercise.clinical_benefit && profile.healthConditions?.length) {
+    for (const cond of profile.healthConditions) {
+      if (exercise.clinical_benefit.toLowerCase().includes(cond.toLowerCase())) {
+        score += 5;
+      }
+    }
+  }
+  return score;
+}
+
+export function selectMorningExercise(
+  filteredExercises: DbExercise[],
+  profile: UserProfile,
+  dayNumber: number
+): DbExercise | null {
+  if (!filteredExercises?.length) return null;
+
+  let candidates = filteredExercises.filter(e =>
+    MORNING_CATEGORIES.includes(e.category)
+  );
+
+  // Prefer short exercises
+  if (candidates.length > 1) {
+    const short = candidates.filter(e =>
+      (e.duration_seconds != null && e.duration_seconds <= 300) ||
+      /[35]\s*min/i.test(e.duration || "")
+    );
+    if (short.length > 0) candidates = short;
+  }
+
+  // High pain: only pain_suitability >= 4
+  if (isHighPain(profile.painLevel)) {
+    const suitable = candidates.filter(e =>
+      e.pain_suitability == null || e.pain_suitability >= 4
+    );
+    if (suitable.length > 0) candidates = suitable;
+  }
+
+  if (candidates.length === 0) return null;
+
+  // Score and sort
+  const scored = candidates
+    .map(e => ({ e, score: scoreForTouchpoint(e, profile) }))
+    .sort((a, b) => b.score - a.score);
+
+  const idx = (dayNumber - 1) % scored.length;
+  return scored[idx].e;
+}
+
+export function selectShotRecipe(
+  filteredRecipes: DbRecipe[],
+  profile: UserProfile,
+  dayNumber: number
+): DbRecipe | null {
+  if (!filteredRecipes?.length) return null;
+
+  let candidates = filteredRecipes.filter(r =>
+    r.tipo_refeicao?.some(t => /bebida/i.test(t)) ||
+    r.tags?.some(t => /shot/i.test(t)) ||
+    /bebida|shot/i.test(r.category || "")
+  );
+
+  if (candidates.length === 0) return null;
+
+  // Score
+  const scored = candidates.map(r => {
+    let score = (r.inflammation_score ?? 0) * 10;
+    score += (r.nutrient_density_score ?? 0) * 2;
+    // health_goals overlap
+    if (r.health_goals?.length && profile.objectives?.length) {
+      for (const g of r.health_goals) {
+        if (profile.objectives.some(o => o.toLowerCase().includes(g.toLowerCase()))) {
+          score += 10;
+        }
+      }
+    }
+    // High pain: prefer simpler
+    if (isHighPain(profile.painLevel) && r.pantry_complexity) {
+      if (r.pantry_complexity.toLowerCase() === 'simples') score += 5;
+      if (r.pantry_complexity.toLowerCase() === 'complexa') score -= 5;
+    }
+    return { r, score };
+  }).sort((a, b) => b.score - a.score);
+
+  const idx = (dayNumber - 1) % scored.length;
+  return scored[idx].r;
+}
+
+export function selectMicroMovement(
+  filteredExercises: DbExercise[],
+  profile: UserProfile,
+  dayNumber: number,
+  excludeId?: string
+): DbExercise | null {
+  if (!filteredExercises?.length) return null;
+
+  const MICRO_CATEGORIES = ["Movimento Articular Suave", "Drenagem Linfática Manual"];
+
+  let candidates = filteredExercises.filter(e => {
+    if (excludeId && e.id === excludeId) return false;
+    const isShort = (e.duration_seconds != null && e.duration_seconds <= 120) ||
+      /[12]\s*min/i.test(e.duration || "");
+    const isCategory = MICRO_CATEGORIES.includes(e.category);
+    return isShort || isCategory;
+  });
+
+  if (excludeId) {
+    candidates = candidates.filter(e => e.id !== excludeId);
+  }
+
+  if (candidates.length === 0) return null;
+
+  // Score: prefer accessible environments + affected areas
+  const scored = candidates.map(e => {
+    let score = scoreForTouchpoint(e, profile);
+    if (e.environment?.some(env => /cama|cadeira|sof[aá]/i.test(env))) {
+      score += 5;
+    }
+    return { e, score };
+  }).sort((a, b) => b.score - a.score);
+
+  const idx = ((dayNumber - 1) + 7) % scored.length;
+  return scored[idx].e;
+}
+
+export function selectSnackRecipe(
+  filteredRecipes: DbRecipe[],
+  profile: UserProfile,
+  dayNumber: number
+): DbRecipe | null {
+  if (!filteredRecipes?.length) return null;
+
+  let candidates = filteredRecipes.filter(r =>
+    r.tipo_refeicao?.some(t => /lanche/i.test(t)) ||
+    /lanche|snack/i.test(r.category || "")
+  );
+
+  if (candidates.length === 0) return null;
+
+  const scored = candidates.map(r => {
+    let score = (r.inflammation_score ?? 0) * 5;
+    score += (r.common_pantry_match ?? 0) * 3;
+    return { r, score };
+  }).sort((a, b) => b.score - a.score);
+
+  const idx = (dayNumber - 1) % scored.length;
+  return scored[idx].r;
+}
+
+export function selectLunchRecipes(
+  filteredRecipes: DbRecipe[],
+  profile: UserProfile,
+  dayNumber: number
+): DbRecipe[] {
+  if (!filteredRecipes?.length) return [];
+
+  let candidates = filteredRecipes.filter(r =>
+    r.tipo_refeicao?.some(t => /almo[çc]o/i.test(t)) ||
+    /almo[çc]o/i.test(r.category || "")
+  );
+
+  if (candidates.length === 0) return [];
+
+  const scored = candidates.map(r => {
+    let score = (r.inflammation_score ?? 0) * 5;
+    score += (r.nutrient_density_score ?? 0) * 5;
+    // health_goals overlap
+    if (r.health_goals?.length && profile.objectives?.length) {
+      for (const g of r.health_goals) {
+        if (profile.objectives.some(o => o.toLowerCase().includes(g.toLowerCase()))) {
+          score += 10;
+        }
+      }
+    }
+    score += (r.common_pantry_match ?? 0) * 3;
+    return { r, score };
+  }).sort((a, b) => b.score - a.score);
+
+  // Day-based window for top 3
+  const startIdx = ((dayNumber - 1) * 3) % scored.length;
+  const result: DbRecipe[] = [];
+  for (let i = 0; i < 3 && i < scored.length; i++) {
+    const idx = (startIdx + i) % scored.length;
+    result.push(scored[idx].r);
+  }
+  return result;
+}
