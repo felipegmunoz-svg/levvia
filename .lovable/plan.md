@@ -1,46 +1,74 @@
 
 
-# Fix Day 1 Bugs + Detail Components + Logo Swaps
+# Rewrite DayReview.tsx — Visual Formatted Display
 
-## Changes
+## Summary
+Complete rewrite of `DayReview.tsx` to replace raw JSON rendering with formatted, human-readable cards per day. Single file change.
 
-### 1. `src/components/RecipeDetail.tsx` — Light theme migration
-- Line 28: `bg-white/[0.08]` → `bg-muted`
-- Line 44: `gradient-page` → remove, keep `px-6 pt-10 pb-8 rounded-b-3xl bg-background`
-- Line 55: `bg-white/[0.08]` → `bg-muted`
-- Lines 80, 94, 101, 118, 127: `glass-card` → `levvia-card`
-- Line 140: `bg-white/[0.08]` → `bg-muted`, `border-white/10` → `border-border`
-- Line 149: `border-white/[0.08]` → `border-border`
-- Line 152: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
+## Changes in `src/components/journey/DayReview.tsx`
 
-### 2. `src/components/ExerciseDetail.tsx` — Light theme migration
-- Line 19: `gradient-page` → remove, keep `px-6 pt-10 pb-8 rounded-b-3xl bg-background`
-- Lines 30, 42: `bg-white/[0.08]` → `bg-muted`
-- Lines 51, 73: `border-white/10` → `border-border`
-- Lines 120, 133, 143, 152, 162: `glass-card` → `levvia-card`
-- Line 134: `gradient-primary` → `bg-primary`, line 135: `text-foreground` → `text-primary-foreground`
-- Line 179: `border-white/[0.08]` → `border-border`
-- Line 182: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
+### Constants update
+- **dayTitles**: Use em-dash format ("Dia 1 — Consciência Corporal", etc.) with corrected Day 4/5/6 titles
+- **dayIcons**: Fix Day 4 → "😴", Day 5 → "🏃‍♀️", Day 6 → "🌿"
+- **dayDescriptions**: Updated per user spec
 
-### 3. `src/components/journey/Day1Closing.tsx` — Replace alert() with toast
-- Add import: `import { toast } from "sonner";`
-- Line 72: Replace `alert("Sua jornada continua amanhã. Descanse — você merece.");` with `toast("Sua jornada continua amanhã. Descanse — você merece. 💜");`
+### Remove
+- `formatKey()` helper function
+- `renderJsonCards()` generic function
 
-### 4. `src/pages/Onboarding.tsx` — Remove confetti from ResultScreen
-- Lines 37-65: Delete the entire `useEffect` block that fires confetti
-- Line 10: Remove `import confetti from "canvas-confetti";`
-- Lines 28-34: Remove `fireConfettiColors` constant
+### Container
+- Root: `className="theme-light levvia-page min-h-screen pb-24"` (replaces `bg-[#FAFBFC]`)
+- Loading spinner: same change
+- Back button: `bg-primary text-primary-foreground` (replaces hardcoded colors)
 
-### 5. Logo swaps (white → blue)
-- `src/pages/History.tsx`: `logo_livvia_branco_icone` → `logo_livvia_azul_icone`
-- `src/pages/Learn.tsx`: `logo_livvia_branco_icone` → `logo_livvia_azul_icone`
-- `src/pages/Checkout.tsx`: `logo_livvia_branco` → `logo_livvia_azul`
-- `src/pages/ResetPassword.tsx`: `logo_livvia_branco_icone` → `logo_livvia_azul_icone`
-- `src/components/InstallPWAPrompt.tsx`: `logo_livvia_branco` → `logo_livvia_azul`
-- **NOT changed**: `WaitingScreen.tsx`, `AdminLayout.tsx` (intentionally dark)
+### Day-specific rendering (replaces `renderDayContent`)
+
+**Day 1** — Keep HeatMapInteractive readOnly as-is (already works)
+
+**Day 2** — Parse `day2_inflammation_map.markedAreas` array. Each area rendered as levvia-card showing:
+- Area name formatted (e.g. `panturrilha_esq` → "Panturrilha Esquerda")
+- Type icons: Dor=🔴, Inchaço=🟡, Peso=🔵, Sensibilidade=🟣
+- Notes in separate card with 📝 if present
+
+**Day 3** — Static content: 3 colored-border cards (green/yellow/red) with food categories
+
+**Day 4** — Parse `day4_sleep_data`:
+- Hygiene checklist card: 5 items mapped to labels with ✅/⬜
+- Breathing card: breathingCompleted status
+- Date if createdAt exists
+
+**Day 5** — Parse `day5_movement_data`:
+- Exercises card, Meals card, Micro-challenge card, Legs elevation card, Journal card
+- Each with ✅/⬜ or formatted values
+
+**Day 6** — Parse `day6_spice_data`:
+- Activities checklist (4 items with labels)
+- Diary reflection card
+
+### Card styling pattern
+```tsx
+<div className="levvia-card p-5 space-y-3">
+  <h3 className="font-semibold text-foreground flex items-center gap-2">icon title</h3>
+  {items.map(item => (
+    <div className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+      <span>{checked ? "✅" : "⬜"}</span>
+      <span className="text-sm text-foreground">{label}</span>
+    </div>
+  ))}
+</div>
+```
+
+### Area name formatter
+Helper mapping for inflammation areas:
+```
+ombro_esq → "Ombro Esquerdo", coxa_dir → "Coxa Direita",
+panturrilha_esq → "Panturrilha Esquerda", abdomen → "Abdômen", etc.
+```
+
+## Files
+- `src/components/journey/DayReview.tsx` — full rewrite (same imports, same fetch logic)
 
 ## Not changed
-- Component logic, data flow, Supabase calls
-- Previously corrected journey components
-- `src/index.css`
+- Supabase query, ProfileData interface, useEffect, HeatMapInteractive import
+- No other files
 
