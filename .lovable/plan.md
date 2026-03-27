@@ -1,54 +1,54 @@
 
 
-# Create HeatMapComparative Component for Day 7
+# Integrate FlowSilhouette into Progress Page
 
 ## Summary
-Create a side-by-side heatmap comparison component showing Day 1 vs Today, and wire it into the NightSlot for `heatmap-comparative` technique type. The Day 1 data is already available via `profile.heatMapDay1` in the existing data flow.
+Replace the static donut chart with the FlowSilhouette component showing real heat map data and hydration progress. Add dynamic evolution bars and a hydration summary card.
 
-## New File: `src/components/journey/HeatMapComparative.tsx`
+## Changes in `src/pages/Progress.tsx`
 
-### Props
-- `day1Data: Record<string, number> | null` — from `profile.heatMapDay1`
-- `onNext: () => void` — called on completion
-- `isReviewMode: boolean` (default false)
+### Imports
+- Add: `FlowSilhouette`, `calculateFlowScore` from `@/components/FlowSilhouette`
+- Add: `useHydration` from `@/hooks/useHydration`
+- Add: `useProfile` from `@/hooks/useProfile`
+- Add: `useAuth` from `@/hooks/useAuth`
+- Add: `useState`, `useEffect`, `useMemo` from React
+- Add: `supabase` from `@/integrations/supabase/client`
+- Remove: `ProgressCircle` import
 
-### Layout (vertical stack, space-y-6)
-1. **Header**: "Seu Progresso Visual" (font-heading semibold xl) + subtitle
-2. **Side-by-side** (flex-row gap-4):
-   - Left: "Dia 1" label (text-red-400), `HeatMapInteractive` readOnly size="small" with `initialData={day1Data}`, intensity summary badges below
-   - Right: "Hoje" label (text-primary), interactive or readOnly `HeatMapInteractive` size="small"
-   - If `day1Data` is null/empty: show only "Hoje" full-width with "Dados do Dia 1 não disponíveis" note
-3. **Improvement Summary** (after today map completed): levvia-card comparing each area's intensity change → improved/same/worsened counts with colored badges + motivational message
-4. **Continue button** (after completion, not in review mode)
+### Data fetching
+- Use `useProfile()` to get `profile` (contains `heatMapDay1`, `weightKg`)
+- Use `useAuth()` to get `user`
+- Fetch `challenge_progress` from profiles table to check for Day 7+ heat map data stored in `challenge_progress.touchpoints.day7.night`
+- Derive `currentHeatMap`: use Day 7 data if available, else fall back to `profile.heatMapDay1`
+- Compute current day number from `profile` challenge_start (or default to 1)
+- Call `useHydration(profile.weightKg, dayNumber)` to get `currentIntakeMl`, `dailyGoalMl`
 
-### State
-- `todayData: Record<string, number> | null`
-- `showSummary: boolean`
+### Replace donut chart section (lines 40-76)
+Replace the `ProgressCircle`-based card with:
+- `FlowSilhouette` component with `heatMapData={currentHeatMap}`, `waterIntakeMl={currentIntakeMl}`, `waterGoalMl={dailyGoalMl}`, `size="large"`, `animated={true}`
+- Below it, score context label using `calculateFlowScore`:
+  - 0-40: "🔥 Fogo Ativo" (red)
+  - 41-70: "🌊 Em Transição" (yellow)  
+  - 71-100: "💧 Fluxo Ativo" (teal)
+- Updated legend with new labels
 
-## Modified Files
+### Update evolution bars (lines 78-111)
+- Replace hardcoded `evoData` with dynamic data computed from `challenge_progress` if available
+- Color logic per bar: score > 70 → teal (`#2EC4B6`), 41-70 → yellow (`#F59E0B`), 0-40 → red (`#EF4444`)
+- Fall back to static placeholder data if no real progress data exists yet
 
-### `src/hooks/useChallengeData.tsx`
-- Add `heatMapDay1Data` to `TouchpointData.night` when technique type is `heatmap-comparative`:
-  ```ts
-  night: {
-    technique: effectiveNightTechnique,
-    closingMessage: effectiveClosingMessage,
-    heatMapDay1Data: effectiveNightTechnique.type === 'heatmap-comparative' ? (profile.heatMapDay1 || null) : undefined,
-  }
-  ```
-- Update `TouchpointData.night` interface to include `heatMapDay1Data?: Record<string, number> | null`
+### Add hydration summary card (new section after evolution)
+- `levvia-card p-5` with "💧 Hidratação Hoje" header
+- Progress bar showing `currentIntakeMl / dailyGoalMl`
+- If `currentIntakeMl >= dailyGoalMl`, show "Meta atingida! 🎉" badge
 
-### `src/components/journey/DayTouchpointView.tsx`
-- Pass `heatMapDay1Data={touchpoints.night.heatMapDay1Data}` to NightSlot
+### Preserved
+- Header with logo, title, subtitle
+- `theme-light levvia-page` wrapper
+- `BottomNav` at bottom
+- `pb-24` spacing
 
-### `src/components/journey/touchpoints/NightSlot.tsx`
-- Add `heatMapDay1Data?: Record<string, number> | null` to props
-- Add case `"heatmap-comparative"` in `renderTechnique()` switch:
-  - Render `HeatMapComparative` with `day1Data={heatMapDay1Data}`, `onNext={() => setTechniqueDone(true)}`, `isReviewMode`
-
-## Files
-- `src/components/journey/HeatMapComparative.tsx` — NEW
-- `src/hooks/useChallengeData.tsx` — MODIFY (add heatMapDay1Data to night touchpoint)
-- `src/components/journey/DayTouchpointView.tsx` — MODIFY (pass heatMapDay1Data)
-- `src/components/journey/touchpoints/NightSlot.tsx` — MODIFY (add heatmap-comparative case)
+## Files changed
+- `src/pages/Progress.tsx` — MAJOR MODIFICATION
 
