@@ -1,47 +1,44 @@
 
 
-# Create 4 Touchpoint Slot Components
+# Create DayTouchpointView Component
 
 ## Summary
-Create 4 new components under `src/components/journey/touchpoints/` that render the content for each daily touchpoint slot. All use existing design tokens and overlay pattern for detail views.
+Create the main touchpoint template that assembles 4 expandable/collapsible slot cards into a scrollable day experience, replacing the old DayTemplate for the new architecture.
 
-## New Files
+## New File: `src/components/journey/DayTouchpointView.tsx`
 
-### 1. `src/components/journey/touchpoints/MorningSlot.tsx`
-- **Props**: `dayNumber`, `affirmation`, `schedule`, `exercise` (ChallengeActivity|null), `shotRecipe` (ChallengeActivity|null), `isReviewMode`, `onComplete`
-- **5 sections**: Affirmation card (sparkle + italic text), Schedule card (4 time rows with emojis), Exercise card (with "Ver Exercício" → ExerciseDetail overlay), Shot card (with "Ver Receita" → RecipeDetail overlay), Complete button
-- **Local state**: `showExercise`, `showRecipe` (overlay toggles), `exerciseDone`, `shotDone` (checkboxes)
-- **Overlay pattern**: `fixed inset-0 z-50 bg-background overflow-y-auto`
+### Props
+- `dayNumber: number`
+- `touchpoints: TouchpointData` (from `useChallengeData`)
+- `progress: DayTouchpointProgress` (from `useTouchpointProgress`)
+- `isReviewMode?: boolean` (default false)
+- `onSlotComplete: (slot: TouchpointSlot, data: any) => void`
 
-### 2. `src/components/journey/touchpoints/LunchSlot.tsx`
-- **Props**: `dayNumber`, `recipes` (ChallengeActivity[]), `tip`, `isReviewMode`, `onComplete`
-- **4 sections**: Header, selectable recipe cards (radio-style with border-primary when selected, each with RecipeDetail overlay), Dica Lavínia card (bg-primary/5), Complete button
-- **Local state**: `selectedRecipeId`, `showRecipeIdx` (which recipe overlay is open)
+### Structure
+1. **Root**: `theme-light levvia-page min-h-screen pb-24`
+2. **Header** (px-6 pt-8 pb-4): Centered logo (`logo_livvia_azul.png`, h-8), day number label, theme title (`font-heading`), purpose subtitle
+3. **Progress Bar** (px-6 pb-4): 4 circles (w-3 h-3) connected by lines, colored `bg-primary` if done / `bg-muted` if not, with `{completedSlots}/4` counter
+4. **4 Touchpoint Cards** (px-6 space-y-3): Each is a `levvia-card` with:
+   - **Header button** (always visible): emoji in colored circle (bg-primary/10 if done, bg-secondary/10 if active, bg-muted otherwise), slot name + time, green checkmark or chevron-down
+   - **Body** (AnimatePresence, motion.div with height animation): renders MorningSlot/LunchSlot/AfternoonSlot/NightSlot with appropriate props
+5. **Celebration card**: Only when all 4 done — "Dia N completo!" with warm subtitle, no confetti
+6. **BottomNav** at bottom
 
-### 3. `src/components/journey/touchpoints/AfternoonSlot.tsx`
-- **Props**: `dayNumber`, `hydrationText`, `microMovement` (ChallengeActivity|null), `snackRecipe` (ChallengeActivity|null), `isReviewMode`, `onComplete`
-- **4 sections**: Hydration card (with checkbox "Bebi minha água"), Micro-Movement card (ExerciseDetail overlay + checkbox), Snack card (RecipeDetail overlay), Complete button
-- **Local state**: `hydrated`, `microDone`, `showExercise`, `showRecipe`
+### Auto-expand Logic
+- `expandedSlot` state (TouchpointSlot | null)
+- On mount + progress changes: auto-expand first undone slot; if all done, collapse all
+- Clicking a card header toggles it (accordion — only one open at a time)
+- Review mode: all collapsed by default, clickable
 
-### 4. `src/components/journey/touchpoints/NightSlot.tsx`
-- **Props**: `dayNumber`, `technique` (NightTechnique), `closingMessage`, `isReviewMode`, `onComplete`
-- **4 sections**: Dynamic technique renderer (heatmap/breathing/food-traffic-light/text-guide/legs-elevation/meditation), DiaryReflection (only after technique done & not review), Closing message card (after diary saved or review), Complete button (after diary saved, hidden in review)
-- **Local state**: `techniqueDone`, `diaryData`
-- **Imports**: HeatMapInteractive, BreathingCircle, FoodTrafficLight, DiaryReflection
-
-## Shared Patterns
-- All cards: `levvia-card` class
-- Buttons: `bg-primary text-primary-foreground rounded-xl`
-- Text: `text-levvia-fg`, `text-levvia-muted`, `font-body`, `font-heading`
-- Detail overlays: `fixed inset-0 z-50 bg-background overflow-y-auto` with ArrowLeft back button
-- Exercise/Recipe passed as `ChallengeActivity` — extract `.exercise` or `.recipe` for detail components
+### Imports
+- `getTouchpointConfig` from touchpointConfig
+- `TouchpointData` from useChallengeData
+- `DayTouchpointProgress` from useTouchpointProgress
+- `TouchpointSlot` from touchpointConfig
+- 4 slot components from touchpoints/
+- `BottomNav`, logo, `AnimatePresence`/`motion`, `Check`/`ChevronDown` from lucide-react
 
 ## Files
-- `src/components/journey/touchpoints/MorningSlot.tsx` — NEW
-- `src/components/journey/touchpoints/LunchSlot.tsx` — NEW
-- `src/components/journey/touchpoints/AfternoonSlot.tsx` — NEW
-- `src/components/journey/touchpoints/NightSlot.tsx` — NEW
-
-## Not changed
+- `src/components/journey/DayTouchpointView.tsx` — NEW
 - No existing files modified
 
