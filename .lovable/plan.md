@@ -1,54 +1,38 @@
 
 
-# Integrate FlowSilhouette into Progress Page
+# Fix Dietary Filtering — Use diet_profile Instead of tags
 
 ## Summary
-Replace the static donut chart with the FlowSilhouette component showing real heat map data and hydration progress. Add dynamic evolution bars and a hydration summary card.
+Update `filterRecipesForProfile` in `profileEngine.ts` to use `diet_profile` and `allergen_free` fields instead of `tags` for dietary filtering. Also harden fallbacks in selection functions to never bypass dietary restrictions.
 
-## Changes in `src/pages/Progress.tsx`
+## Changes in `src/lib/profileEngine.ts`
 
-### Imports
-- Add: `FlowSilhouette`, `calculateFlowScore` from `@/components/FlowSilhouette`
-- Add: `useHydration` from `@/hooks/useHydration`
-- Add: `useProfile` from `@/hooks/useProfile`
-- Add: `useAuth` from `@/hooks/useAuth`
-- Add: `useState`, `useEffect`, `useMemo` from React
-- Add: `supabase` from `@/integrations/supabase/client`
-- Remove: `ProgressCircle` import
+### 1. Fix dietary filters in `filterRecipesForProfile` (lines 387-397)
 
-### Data fetching
-- Use `useProfile()` to get `profile` (contains `heatMapDay1`, `weightKg`)
-- Use `useAuth()` to get `user`
-- Fetch `challenge_progress` from profiles table to check for Day 7+ heat map data stored in `challenge_progress.touchpoints.day7.night`
-- Derive `currentHeatMap`: use Day 7 data if available, else fall back to `profile.heatMapDay1`
-- Compute current day number from `profile` challenge_start (or default to 1)
-- Call `useHydration(profile.weightKg, dayNumber)` to get `currentIntakeMl`, `dailyGoalMl`
+Replace tag-based checks with `diet_profile` and `allergen_free` field lookups:
 
-### Replace donut chart section (lines 40-76)
-Replace the `ProgressCircle`-based card with:
-- `FlowSilhouette` component with `heatMapData={currentHeatMap}`, `waterIntakeMl={currentIntakeMl}`, `waterGoalMl={dailyGoalMl}`, `size="large"`, `animated={true}`
-- Below it, score context label using `calculateFlowScore`:
-  - 0-40: "🔥 Fogo Ativo" (red)
-  - 41-70: "🌊 Em Transição" (yellow)  
-  - 71-100: "💧 Fluxo Ativo" (teal)
-- Updated legend with new labels
+- **Vegano** (line 387-388): Check `r.diet_profile` array for "vegana"/"vegano" (case-insensitive)
+- **Vegetariano** (line 389-391): Check `r.diet_profile` for "vegetariana"/"vegetariano"/"vegana"/"vegano"
+- **Sem Glúten** (line 392-393): Check `r.allergen_free` for gluten-free variants + fallback to tags
+- **Sem Lactose** (line 395-396): Check `r.allergen_free` for lactose-free variants + fallback to tags
 
-### Update evolution bars (lines 78-111)
-- Replace hardcoded `evoData` with dynamic data computed from `challenge_progress` if available
-- Color logic per bar: score > 70 → teal (`#2EC4B6`), 41-70 → yellow (`#F59E0B`), 0-40 → red (`#EF4444`)
-- Fall back to static placeholder data if no real progress data exists yet
+All checks use `.map(x => x.toLowerCase())` for case-insensitive matching with null-safe `|| []` guards.
 
-### Add hydration summary card (new section after evolution)
-- `levvia-card p-5` with "💧 Hidratação Hoje" header
-- Progress bar showing `currentIntakeMl / dailyGoalMl`
-- If `currentIntakeMl >= dailyGoalMl`, show "Meta atingida! 🎉" badge
+### 2. Harden fallbacks to preserve dietary restrictions
 
-### Preserved
-- Header with logo, title, subtitle
-- `theme-light levvia-page` wrapper
-- `BottomNav` at bottom
-- `pb-24` spacing
+Three functions have fallbacks that could bypass dietary filters by falling back to `filteredRecipes` (which is already diet-filtered) — these are actually safe. But the key change:
+
+- **`selectLunchRecipes`** (line 1082): The fallback `candidates = [...filteredRecipes]` already uses the diet-filtered list, so this is safe. No change needed here.
+- **`selectShotRecipe`** (line 927-931): Fallback uses `filteredRecipes` — already safe.
+- **`selectSnackRecipe`** (line 1035-1040): Fallback uses `filteredRecipes` — already safe.
+
+All three functions receive `filteredRecipes` which is the output of `filterRecipesForProfile`, so dietary restrictions are already preserved in fallbacks. No fallback changes needed.
+
+### 3. Also update `mealPlan.ts` (lines 31-47)
+
+The same tag-based filtering exists in `src/data/mealPlan.ts` `filterByRestrictions` function. Update it to also check `diet_profile` and `allergen_free` with the same pattern, since local recipe data may have these fields populated.
 
 ## Files changed
-- `src/pages/Progress.tsx` — MAJOR MODIFICATION
+- `src/lib/profileEngine.ts` — Fix lines 387-397 (dietary filter logic)
+- `src/data/mealPlan.ts` — Mirror the same fix in `filterByRestrictions`
 
