@@ -127,10 +127,10 @@ const Day3Flow = ({ onComplete, isReviewMode = false }: Day3FlowProps) => {
     );
   }
 
-  if (step === "welcome") return <Day3Welcome onNext={() => goTo("semaforo")} />;
-  if (step === "semaforo") return <FoodTrafficLight onContinue={() => goTo("cardapio")} />;
-  if (step === "cardapio") return <Day3CardapioPersonalizado onContinue={() => goTo("closing")} />;
-  if (step === "closing") return <Day3Closing onComplete={handleDay3Complete} />;
+  if (step === "welcome") return <><Day3Welcome onNext={() => goTo("semaforo")} /><BottomNav /></>;
+  if (step === "semaforo") return <><FoodTrafficLight onContinue={() => goTo("cardapio")} /><BottomNav /></>;
+  if (step === "cardapio") return <><Day3CardapioPersonalizado onContinue={() => goTo("closing")} /><BottomNav /></>;
+  if (step === "closing") return <><Day3Closing onComplete={handleDay3Complete} /><BottomNav /></>;
 
   return null;
 };

@@ -169,6 +169,7 @@ const Day5Flow = ({ onComplete, isReviewMode = false }: Day5FlowProps) => {
   };
 
   return (
+    <>
     <AnimatePresence mode="wait">
       {step === "welcome" && (
         <motion.div key="welcome" {...stepVariants} transition={{ duration: 0.3 }}>
@@ -216,6 +217,8 @@ const Day5Flow = ({ onComplete, isReviewMode = false }: Day5FlowProps) => {
         </motion.div>
       )}
     </AnimatePresence>
+    <BottomNav />
+    </>
   );
 };
 

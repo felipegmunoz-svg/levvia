@@ -186,14 +186,12 @@ const Day2Flow = ({ onComplete, isReviewMode = false }: Day2FlowProps) => {
     );
   }
 
-  if (step === "welcome") return <Day2Welcome onNext={() => goTo("drainage")} />;
-  if (step === "drainage") return <Day2DrainageGuide onNext={() => goTo("map")} />;
-  if (step === "map") {
-    return <Day2InflammationMap onComplete={handleMapComplete} />;
-  }
-  if (step === "meal") return <Day2MealSuggestion profile={profile} onNext={() => goTo("night")} />;
-  if (step === "night") return <Day2NightRitual onNext={() => goTo("closing")} />;
-  if (step === "closing") return <Day2Closing onComplete={handleDay2Complete} />;
+  if (step === "welcome") return <><Day2Welcome onNext={() => goTo("drainage")} /><BottomNav /></>;
+  if (step === "drainage") return <><Day2DrainageGuide onNext={() => goTo("map")} /><BottomNav /></>;
+  if (step === "map") return <><Day2InflammationMap onComplete={handleMapComplete} /><BottomNav /></>;
+  if (step === "meal") return <><Day2MealSuggestion profile={profile} onNext={() => goTo("night")} /><BottomNav /></>;
+  if (step === "night") return <><Day2NightRitual onNext={() => goTo("closing")} /><BottomNav /></>;
+  if (step === "closing") return <><Day2Closing onComplete={handleDay2Complete} /><BottomNav /></>;
 
   return null;
 };

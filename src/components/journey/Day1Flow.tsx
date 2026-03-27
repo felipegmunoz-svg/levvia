@@ -309,11 +309,11 @@ const Day1Flow = ({ onComplete, isReviewMode = false }: Day1FlowProps) => {
     );
   }
 
-  if (step === 1) return <Day1Welcome onNext={handleWelcomeDone} />;
-  if (step === 2) return <HeatMapInteractive onNext={handleHeatMapDone} />;
+  if (step === 1) return <><Day1Welcome onNext={handleWelcomeDone} /><BottomNav /></>;
+  if (step === 2) return <><HeatMapInteractive onNext={handleHeatMapDone} /><BottomNav /></>;
   if (step === 3) return <Navigate to="/onboarding" replace />;
-  if (step === 4) return <Day1MealSuggestion profile={profile} onNext={() => setStep(5)} />;
-  if (step === 5 && user?.id) return <Day1Closing userId={user.id} onComplete={onComplete} />;
+  if (step === 4) return <><Day1MealSuggestion profile={profile} onNext={() => setStep(5)} /><BottomNav /></>;
+  if (step === 5 && user?.id) return <><Day1Closing userId={user.id} onComplete={onComplete} /><BottomNav /></>;
 
   return null;
 };
