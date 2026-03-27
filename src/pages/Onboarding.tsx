@@ -7,7 +7,7 @@ import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-confetti";
+
 import logoFull from "@/assets/logo_livvia_azul.png";
 
 const slideVariants = {
@@ -25,44 +25,7 @@ const slideVariants = {
   }),
 };
 
-const fireConfettiColors: Record<string, string[]> = {
-  "Sem dor": ["#2dd4a8", "#34d399", "#6ee7b7"],
-  "Dor leve": ["#f0c456", "#fbbf24", "#fcd34d"],
-  "Dor moderada": ["#fb923c", "#f97316", "#fdba74"],
-  "Dor intensa": ["#f87171", "#ef4444", "#fca5a5"],
-  "Dor muito intensa": ["#f87171", "#ef4444", "#fca5a5"],
-};
-
 const ResultScreen = ({ fireResult, painAnswer }: { fireResult: import("@/data/onboarding").FireResult | null; painAnswer: string }) => {
-  useEffect(() => {
-    const colors = fireConfettiColors[painAnswer] || ["#2dd4a8", "#34d399"];
-    
-    const end = Date.now() + 1500;
-    let rafId: number;
-    const frame = () => {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.6 },
-        colors,
-        gravity: 0.8,
-        scalar: 0.9,
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.6 },
-        colors,
-        gravity: 0.8,
-        scalar: 0.9,
-      });
-      if (Date.now() < end) rafId = requestAnimationFrame(frame);
-    };
-    frame();
-    return () => { if (rafId) cancelAnimationFrame(rafId); };
-  }, [fireResult]);
 
   return (
     <div className="flex-1 flex flex-col justify-center px-6 py-8">

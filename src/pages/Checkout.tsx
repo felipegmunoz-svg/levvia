@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CreditCard, Lock, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import logoFull from "@/assets/logo_livvia_branco.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 const planDetails: Record<string, { name: string; price: string; subtitle: string }> = {
   "challenge-14": {

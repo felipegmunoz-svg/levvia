@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,7 +70,7 @@ const Day1Closing = ({ userId, onComplete }: Day1ClosingProps) => {
       }
     }
     // Still same day - show gentle message
-    alert("Sua jornada continua amanhã. Descanse — você merece.");
+    toast("Sua jornada continua amanhã. Descanse — você merece. 💜");
     onComplete();
     navigate("/today", { replace: true });
   };

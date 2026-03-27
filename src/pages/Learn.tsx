@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { GraduationCap, Lock, ChevronRight, Lightbulb, Sparkles, HelpCircle, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
-import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
