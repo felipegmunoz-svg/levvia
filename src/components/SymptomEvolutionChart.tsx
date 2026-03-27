@@ -136,26 +136,26 @@ const SymptomEvolutionChart = () => {
                   <stop offset="95%" stopColor="hsl(196, 58%, 42%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
               <XAxis
                 dataKey="day"
                 tick={{ fontSize: 10, fill: "hsl(210, 33%, 65%)" }}
-                axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
+                axisLine={{ stroke: "rgba(0,0,0,0.08)" }}
                 tickLine={false}
               />
               <YAxis
                 domain={[0, 10]}
                 tick={{ fontSize: 10, fill: "hsl(210, 33%, 65%)" }}
-                axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
+                axisLine={{ stroke: "rgba(0,0,0,0.08)" }}
                 tickLine={false}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(210, 50%, 16%)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  backgroundColor: "hsl(0, 0%, 100%)",
+                  border: "1px solid rgba(0,0,0,0.08)",
                   borderRadius: "12px",
                   fontSize: "12px",
-                  color: "hsl(214, 32%, 91%)",
+                  color: "hsl(210, 30%, 20%)",
                 }}
                 formatter={(value: number) => [`${value}/10`, "Dor"]}
               />
