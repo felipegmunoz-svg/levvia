@@ -54,7 +54,7 @@ const Progress = () => {
 
   const { currentIntakeMl, dailyGoalMl } = useHydration(profile?.weightKg ?? null, dayNumber);
 
-  const flowScore = calculateFlowScore(currentHeatMap);
+  const flowScore = calculateFlowScore(currentHeatMap || {});
   const scoreColor = flowScore <= 40 ? "#EF4444" : flowScore <= 70 ? "#F59E0B" : "#2EC4B6";
   const scoreLabel = flowScore <= 40 ? "🔥 Fogo Ativo" : flowScore <= 70 ? "🌊 Em Transição" : "💧 Fluxo Ativo";
   const scoreMessage =
@@ -89,7 +89,7 @@ const Progress = () => {
 
       let score: number;
       if (heatMap && Object.keys(heatMap).length > 0) {
-        score = calculateFlowScore(heatMap);
+        score = calculateFlowScore(heatMap || {});
       } else {
         // Estimate from completion — simple heuristic
         const completed = dayData.completed;

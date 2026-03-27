@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 interface FlowSilhouetteProps {
-  heatMapData: Record<string, number>;
+  heatMapData: Record<string, number> | null | undefined;
   waterIntakeMl: number;
   waterGoalMl: number;
   size?: "small" | "large";
@@ -15,8 +15,11 @@ const intensityColors: Record<number, string> = {
   3: "rgba(198,40,40,0.7)",
 };
 
-export function calculateFlowScore(heatMapData: Record<string, number>): number {
-  const total = Object.values(heatMapData).reduce((s, v) => s + v, 0);
+export function calculateFlowScore(heatMapData: Record<string, number> | null | undefined): number {
+  if (!heatMapData || typeof heatMapData !== 'object') return 100;
+  const values = Object.values(heatMapData);
+  if (values.length === 0) return 100;
+  const total = values.reduce((s, v) => s + (typeof v === 'number' ? v : 0), 0);
   return Math.round((1 - total / 27) * 100);
 }
 
@@ -27,15 +30,16 @@ const FlowSilhouette = ({
   size = "large",
   animated = true,
 }: FlowSilhouetteProps) => {
-  const hydrationPercent = Math.min(waterIntakeMl / waterGoalMl, 1);
-  const score = calculateFlowScore(heatMapData);
+  const safeHeatMap = heatMapData || {};
+  const hydrationPercent = waterGoalMl > 0 ? Math.min(waterIntakeMl / waterGoalMl, 1) : 0;
+  const score = calculateFlowScore(safeHeatMap);
   const scoreColor = score <= 40 ? "text-red-500" : score <= 70 ? "text-yellow-500" : "text-primary";
 
   const isLarge = size === "large";
   const svgW = isLarge ? "w-[280px]" : "w-[140px]";
   const svgH = isLarge ? "h-[420px]" : "h-[210px]";
 
-  const getColor = (area: string) => intensityColors[heatMapData[area] ?? 0];
+  const getColor = (area: string) => intensityColors[safeHeatMap[area] ?? 0];
 
   // The aura rect top: 440 = 0%, 0 = 100%
   const auraTop = 440 * (1 - hydrationPercent);
