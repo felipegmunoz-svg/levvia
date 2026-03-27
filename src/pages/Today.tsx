@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import { useChallengeData } from "@/hooks/useChallengeData";
 import { useTouchpointProgress } from "@/hooks/useTouchpointProgress";
+import { useHydration } from "@/hooks/useHydration";
 import type { TouchpointSlot } from "@/data/touchpointConfig";
 
 const Today = () => {
@@ -73,6 +74,7 @@ const Today = () => {
   // Touchpoint progress for the active day (or replay day)
   const effectiveDay = replayDay ?? currentDay;
   const { progress, activeSlot, isDayComplete, completedSlots, markSlotDone, loading: tpLoading } = useTouchpointProgress(effectiveDay);
+  const hydration = useHydration(profile?.weight_kg ?? null, effectiveDay);
 
   const handleSlotComplete = useCallback(async (slot: TouchpointSlot, data: any) => {
     await markSlotDone(slot, data);
@@ -143,6 +145,7 @@ const Today = () => {
         dayNumber={currentDay}
         touchpoints={todayTouchpoints}
         progress={progress}
+        hydration={hydration}
         onSlotComplete={handleSlotComplete}
       />
     );
