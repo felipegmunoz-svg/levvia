@@ -1,28 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Lock, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ProgressCircle from "@/components/ui/ProgressCircle";
 import logoFull from "@/assets/logo_livvia_azul.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-
-const dayTitles: Record<number, string> = {
-  1: "Consciência Corporal",
-  2: "Drenagem & Inflamação",
-  3: "Semáforo Alimentar",
-  4: "Sono & Recuperação",
-  5: "Movimento Sem Dor",
-  6: "O Poder das Especiarias",
-  7: "Em breve",
-  8: "Em breve",
-  9: "Em breve",
-  10: "Em breve",
-  11: "Em breve",
-  12: "Em breve",
-  13: "Em breve",
-  14: "Em breve",
-};
+import { getTouchpointConfig } from "@/data/touchpointConfig";
 
 const daySubtitles: Record<number, string> = {
   1: "Mapeou seu Fogo Interno",
@@ -33,48 +18,79 @@ const daySubtitles: Record<number, string> = {
   6: "Especiarias medicinais",
 };
 
+type SlotStatus = { morning: boolean; lunch: boolean; afternoon: boolean; night: boolean };
+
 const Journey = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [completedDays, setCompletedDays] = useState<number[]>([]);
+  const [touchpointData, setTouchpointData] = useState<Record<number, SlotStatus>>({});
 
   useEffect(() => {
     if (!user?.id) return;
     supabase
       .from("profiles")
-      .select("day1_completed, day2_completed, day3_completed, day4_completed, day5_completed, day6_completed")
+      .select("day1_completed, day2_completed, day3_completed, day4_completed, day5_completed, day6_completed, challenge_progress")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         if (!data) return;
+
         const days: number[] = [];
-        if (data.day1_completed) days.push(1);
-        if (data.day2_completed) days.push(2);
-        if (data.day3_completed) days.push(3);
-        if (data.day4_completed) days.push(4);
-        if (data.day5_completed) days.push(5);
-        if (data.day6_completed) days.push(6);
+        const legacyFlags: Record<number, boolean> = {
+          1: !!data.day1_completed,
+          2: !!data.day2_completed,
+          3: !!data.day3_completed,
+          4: !!data.day4_completed,
+          5: !!data.day5_completed,
+          6: !!data.day6_completed,
+        };
+
+        const cp = (data.challenge_progress as any) ?? {};
+        const touchpoints = cp?.touchpoints ?? {};
+        const tpMap: Record<number, SlotStatus> = {};
+
+        for (let d = 1; d <= 14; d++) {
+          const dayTp = touchpoints?.[`day${d}`] ?? {};
+          tpMap[d] = {
+            morning: !!dayTp?.morning?.done,
+            lunch: !!dayTp?.lunch?.done,
+            afternoon: !!dayTp?.afternoon?.done,
+            night: !!dayTp?.night?.done,
+          };
+
+          const isComplete = tpMap[d].night || (legacyFlags[d] ?? false);
+          if (isComplete) days.push(d);
+        }
+
         setCompletedDays(days);
+        setTouchpointData(tpMap);
       });
   }, [user?.id]);
 
   const totalCompleted = completedDays.length;
-  const nextDay = totalCompleted + 1;
+
+  const isDayCompleted = (day: number) => completedDays.includes(day);
+
+  const isDayUnlocked = (day: number) => {
+    if (day === 1) return true;
+    return isDayCompleted(day - 1);
+  };
 
   const handleDayClick = (day: number) => {
-    if (day > 6) return; // days 7-14 locked
-    const isCompleted = completedDays.includes(day);
-    if (isCompleted) {
+    if (!isDayUnlocked(day)) {
+      toast("Complete o dia anterior primeiro");
+      return;
+    }
+    if (isDayCompleted(day)) {
       navigate(`/today?review=${day}`);
     } else {
-      // Linear mode: any uncompleted day navigates to /today (sequential flow handles it)
       navigate("/today");
     }
   };
 
   return (
     <div className="theme-light levvia-page min-h-screen pb-24">
-      {/* Header */}
       <header className="px-6 pt-10 pb-6">
         <div className="flex justify-center mb-4">
           <img src={logoFull} alt="Levvia" className="h-10" />
@@ -87,87 +103,87 @@ const Journey = () => {
         </p>
       </header>
 
-      {/* Progress circle */}
       <div className="flex justify-center mb-8">
         <div className="levvia-card flex flex-col items-center p-6">
           <p className="text-[11px] font-medium text-levvia-muted uppercase tracking-wider mb-4 font-body">
             Progresso da Jornada
           </p>
-          <ProgressCircle
-            value={totalCompleted}
-            max={14}
-            size="sm"
-            color="#2EC4B6"
-            label="dias completos"
-          />
+          <ProgressCircle value={totalCompleted} max={14} size="sm" color="#2EC4B6" label="dias completos" />
           <p className="text-xs text-levvia-muted font-body mt-3">
             {Math.round((totalCompleted / 14) * 100)}% completo
           </p>
         </div>
       </div>
 
-      {/* Day list */}
       <main className="px-5 space-y-2">
         {Array.from({ length: 14 }, (_, i) => {
           const day = i + 1;
-          const isCompleted = completedDays.includes(day);
-          const isAvailable = day <= 6; // days 1-6 always available in linear mode
-          const isNext = day === nextDay && day <= 6;
-          const isLocked = !isAvailable;
-          const isClickable = isAvailable;
+          const config = getTouchpointConfig(day);
+          const completed = isDayCompleted(day);
+          const unlocked = isDayUnlocked(day);
+          const isNext = unlocked && !completed && (day === 1 || isDayCompleted(day - 1));
+          const locked = !unlocked;
+          const tp = touchpointData[day];
+          const hasAnyTp = tp && (tp.morning || tp.lunch || tp.afternoon || tp.night);
 
           return (
             <button
               key={day}
-              onClick={() => isClickable && handleDayClick(day)}
-              disabled={!isClickable}
+              onClick={() => handleDayClick(day)}
+              disabled={locked}
               className={`levvia-card flex items-center gap-4 p-4 w-full text-left transition-all ${
-                isCompleted
+                completed
                   ? "border-levvia-success/20 cursor-pointer hover:border-levvia-success/40"
-                  : isAvailable
+                  : unlocked
                   ? "border-levvia-warning/30 cursor-pointer hover:border-levvia-warning/50"
                   : "opacity-60 cursor-default"
               }`}
             >
-              {/* Status icon */}
               <div
                 className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${
-                  isCompleted
+                  completed
                     ? "border-levvia-success"
                     : isNext
                     ? "border-levvia-warning"
                     : "border-gray-300"
                 }`}
               >
-                {isCompleted && (
-                  <Check size={13} strokeWidth={2.5} className="text-levvia-success" />
-                )}
-                {isLocked && (
-                  <Lock size={10} strokeWidth={2} className="text-gray-300" />
-                )}
+                {completed && <Check size={13} strokeWidth={2.5} className="text-levvia-success" />}
+                {locked && <Lock size={10} strokeWidth={2} className="text-gray-300" />}
               </div>
 
-              {/* Info */}
               <div className="flex-1 min-w-0">
-                <p
-                  className={`text-[13px] font-medium font-body ${
-                    isCompleted || isAvailable ? "text-levvia-fg" : "text-levvia-muted"
-                  }`}
-                >
+                <p className={`text-[13px] font-medium font-body ${completed || unlocked ? "text-levvia-fg" : "text-levvia-muted"}`}>
                   Dia {day}
                 </p>
                 <p className="text-[11px] text-levvia-muted font-body truncate">
-                  {dayTitles[day]}
+                  {config.theme}
                 </p>
-                {isCompleted && daySubtitles[day] && (
+                {completed && daySubtitles[day] && (
                   <p className="text-[10px] text-levvia-success font-body mt-0.5">
                     {daySubtitles[day]}
                   </p>
                 )}
+
+                {hasAnyTp && tp && (
+                  <div className="mt-1.5">
+                    <div className="flex gap-1.5">
+                      <span className={`w-2 h-2 rounded-full inline-block ${tp.morning ? "bg-primary" : "bg-muted"}`} />
+                      <span className={`w-2 h-2 rounded-full inline-block ${tp.lunch ? "bg-primary" : "bg-muted"}`} />
+                      <span className={`w-2 h-2 rounded-full inline-block ${tp.afternoon ? "bg-primary" : "bg-muted"}`} />
+                      <span className={`w-2 h-2 rounded-full inline-block ${tp.night ? "bg-primary" : "bg-muted"}`} />
+                    </div>
+                    <div className="flex gap-1.5 mt-0.5">
+                      <span className="text-[8px] text-levvia-muted w-2 text-center">M</span>
+                      <span className="text-[8px] text-levvia-muted w-2 text-center">A</span>
+                      <span className="text-[8px] text-levvia-muted w-2 text-center">T</span>
+                      <span className="text-[8px] text-levvia-muted w-2 text-center">N</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Badge / Arrow */}
-              {isCompleted && (
+              {completed && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] font-medium text-levvia-success bg-levvia-success/10 px-2 py-0.5 rounded-full font-body">
                     Rever
@@ -175,7 +191,7 @@ const Journey = () => {
                   <ChevronRight size={14} className="text-levvia-muted" />
                 </div>
               )}
-              {isNext && !isCompleted && (
+              {isNext && !completed && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] font-medium text-levvia-warning bg-levvia-warning/10 px-2 py-0.5 rounded-full font-body">
                     Próximo
@@ -183,7 +199,7 @@ const Journey = () => {
                   <ChevronRight size={14} className="text-levvia-warning" />
                 </div>
               )}
-              {isAvailable && !isCompleted && !isNext && (
+              {unlocked && !completed && !isNext && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] font-medium text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full font-body">
                     Disponível
