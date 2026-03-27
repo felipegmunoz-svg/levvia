@@ -82,6 +82,8 @@ export interface DbRecipe {
   cook_time_minutes: number | null;
   difficulty: string | null;
   nutritional_highlights: string | null;
+  nutrient_density_score: number | null;
+  food_categories: string[] | null;
   image_url: string | null;
 }
 
