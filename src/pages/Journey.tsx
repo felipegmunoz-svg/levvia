@@ -16,6 +16,14 @@ const daySubtitles: Record<number, string> = {
   4: "Noite reparadora",
   5: "Gentileza com o corpo",
   6: "Especiarias medicinais",
+  7: "O Marco da Leveza",
+  8: "Intestino como aliado",
+  9: "Resiliência em ação",
+  10: "Sabedoria em suplementos",
+  11: "Mãos que cuidam",
+  12: "A nova identidade",
+  13: "Planejando o futuro",
+  14: "Sua Nova Vida",
 };
 
 type SlotStatus = { morning: boolean; lunch: boolean; afternoon: boolean; night: boolean };
