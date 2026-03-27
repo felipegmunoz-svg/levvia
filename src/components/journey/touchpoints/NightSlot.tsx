@@ -58,7 +58,7 @@ const NightSlot = ({
         if (isReviewMode) {
           return (
             <div className="levvia-card p-5 flex items-center gap-3">
-              <span className="text-green-500">✅</span>
+              <span className="text-primary">✅</span>
               <span className="text-sm text-levvia-fg font-body">
                 Respiração 4-7-8 concluída
               </span>
@@ -78,7 +78,7 @@ const NightSlot = ({
         if (isReviewMode) {
           return (
             <div className="levvia-card p-5 flex items-center gap-3">
-              <span className="text-green-500">✅</span>
+              <span className="text-primary">✅</span>
               <span className="text-sm text-levvia-fg font-body">
                 Semáforo Alimentar revisado
               </span>
