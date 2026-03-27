@@ -74,7 +74,7 @@ const Today = () => {
   // Touchpoint progress for the active day (or replay day)
   const effectiveDay = replayDay ?? currentDay;
   const { progress, activeSlot, isDayComplete, completedSlots, markSlotDone, loading: tpLoading } = useTouchpointProgress(effectiveDay);
-  const hydration = useHydration(profile?.weight_kg ?? null, effectiveDay);
+  const hydration = useHydration(profile?.weightKg ?? null, effectiveDay);
 
   const handleSlotComplete = useCallback(async (slot: TouchpointSlot, data: any) => {
     await markSlotDone(slot, data);
