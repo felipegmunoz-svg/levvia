@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Check, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -108,7 +108,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="theme-light min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Success overlay */}
       <AnimatePresence>
         {success && (
@@ -122,9 +122,9 @@ const Auth = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
-              className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center mb-6"
+              className="w-20 h-20 rounded-full bg-primary flex items-center justify-center mb-6"
             >
-              <Check className="w-10 h-10 text-foreground" strokeWidth={2.5} />
+              <Check className="w-10 h-10 text-primary-foreground" strokeWidth={2.5} />
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 12 }}
@@ -149,7 +149,7 @@ const Auth = () => {
 
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
             <img src={logoIcon} alt="Levvia" className="w-10 h-auto" />
           </div>
           <h1 className="text-2xl font-light text-foreground">
@@ -175,7 +175,7 @@ const Auth = () => {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Seu nome"
                   required
-                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+                   className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
               <div className="space-y-2">
@@ -193,7 +193,7 @@ const Auth = () => {
                   }}
                   placeholder="(11) 99999-9999"
                   required
-                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+                   className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </>
@@ -207,7 +207,7 @@ const Auth = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
               required
-              className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
             />
           </div>
           {mode !== "forgot" && (
@@ -233,7 +233,7 @@ const Auth = () => {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground pr-10"
+                  className="bg-muted border-border text-foreground placeholder:text-muted-foreground pr-10"
                 />
                 <button
                   type="button"
@@ -248,7 +248,7 @@ const Auth = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full gradient-primary text-foreground font-medium"
+            className="w-full bg-primary text-primary-foreground font-medium"
           >
             {loading
               ? "Carregando..."

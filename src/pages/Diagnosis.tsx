@@ -8,7 +8,7 @@ import {
   Flame, Heart, Activity, Target, ShieldAlert, MapPin,
   UtensilsCrossed, ArrowRight, Sparkles, TrendingUp,
 } from "lucide-react";
-import logoFull from "@/assets/logo_livvia_branco.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 
 const Diagnosis = () => {
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ const Diagnosis = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background gradient-page flex flex-col">
+    <div className="theme-light min-h-screen bg-background flex flex-col">
       {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
@@ -108,13 +108,13 @@ const Diagnosis = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="glass-card rounded-2xl p-5"
+            className="levvia-card rounded-2xl p-5"
           >
             <div className="flex items-center gap-3 mb-3">
               <motion.div
                 animate={{ rotate: [0, -5, 5, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                className="w-14 h-14 rounded-xl bg-white/[0.06] flex items-center justify-center"
+                className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center"
               >
                 <Flame size={28} strokeWidth={1.5} className={fireResult.colorClass} />
               </motion.div>
@@ -133,21 +133,21 @@ const Diagnosis = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="glass-card rounded-2xl p-5"
+            className="levvia-card rounded-2xl p-5"
           >
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={18} className="text-accent" />
               <h2 className="text-base font-medium text-foreground">Seu Perfil de Inflamação</h2>
             </div>
 
-            <div className="rounded-2xl bg-white/[0.04] border border-white/10 mb-4">
+            <div className="rounded-2xl bg-muted border border-border mb-4">
               <HeatMapInteractive initialData={heatMapDay1} readOnly size="small" />
             </div>
 
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Áreas mais afetadas</p>
               {heatMapEntries.map((item) => (
-                <div key={item.key} className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-3">
+                <div key={item.key} className="flex items-center gap-3 rounded-xl bg-muted px-3 py-3">
                   <span className="text-sm font-medium min-w-14">{item.emoji}</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">{item.area}</p>
@@ -167,7 +167,7 @@ const Diagnosis = () => {
           variants={itemVariants}
           initial="hidden"
           animate="visible"
-          className="glass-card rounded-2xl p-5"
+          className="levvia-card rounded-2xl p-5"
         >
           <div className="flex items-center gap-2 mb-4">
             <Heart size={18} className="text-secondary" />
@@ -175,25 +175,25 @@ const Diagnosis = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {age && (
-              <div className="bg-white/[0.04] rounded-xl px-3 py-2.5">
+              <div className="bg-muted rounded-xl px-3 py-2.5">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Idade</p>
                 <p className="text-sm font-medium text-foreground">{age} anos</p>
               </div>
             )}
             {sex && (
-              <div className="bg-white/[0.04] rounded-xl px-3 py-2.5">
+              <div className="bg-muted rounded-xl px-3 py-2.5">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Sexo</p>
                 <p className="text-sm font-medium text-foreground">{sex}</p>
               </div>
             )}
             {weightKg > 0 && (
-              <div className="bg-white/[0.04] rounded-xl px-3 py-2.5">
+              <div className="bg-muted rounded-xl px-3 py-2.5">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Peso</p>
                 <p className="text-sm font-medium text-foreground">{weightKg} kg</p>
               </div>
             )}
             {heightCm > 0 && (
-              <div className="bg-white/[0.04] rounded-xl px-3 py-2.5">
+              <div className="bg-muted rounded-xl px-3 py-2.5">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Altura</p>
                 <p className="text-sm font-medium text-foreground">{heightCm} cm</p>
               </div>
@@ -208,7 +208,7 @@ const Diagnosis = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="glass-card rounded-2xl p-5"
+            className="levvia-card rounded-2xl p-5"
           >
             <div className="flex items-center gap-2 mb-2">
               <Activity size={18} className="text-success" />
@@ -225,7 +225,7 @@ const Diagnosis = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="glass-card rounded-2xl p-5"
+            className="levvia-card rounded-2xl p-5"
           >
             <div className="flex items-center gap-2 mb-3">
               <ShieldAlert size={18} className="text-accent" />
@@ -268,7 +268,7 @@ const Diagnosis = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="glass-card rounded-2xl p-5"
+            className="levvia-card rounded-2xl p-5"
           >
             <div className="flex items-center gap-2 mb-2">
               <Target size={18} className="text-secondary" />
@@ -285,7 +285,7 @@ const Diagnosis = () => {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="glass-card rounded-2xl p-5"
+            className="levvia-card rounded-2xl p-5"
           >
             <div className="flex items-center gap-2 mb-3">
               <UtensilsCrossed size={18} className="text-success" />
@@ -320,7 +320,7 @@ const Diagnosis = () => {
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Restrições alimentares</p>
                 <div className="flex flex-wrap gap-1.5">
                   {restrictions.map((r) => (
-                    <span key={r} className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.08] text-foreground/70">
+                    <span key={r} className="text-[11px] px-2.5 py-1 rounded-full bg-muted text-foreground/70">
                       {r}
                     </span>
                   ))}
@@ -338,7 +338,7 @@ const Diagnosis = () => {
           animate="visible"
           className="rounded-2xl p-5 border border-secondary/30 relative overflow-hidden"
           style={{
-            background: "linear-gradient(135deg, hsl(196 58% 42% / 0.12), hsl(212 59% 26% / 0.2))",
+            background: "linear-gradient(135deg, hsl(174 63% 47% / 0.08), hsl(196 58% 42% / 0.12))",
           }}
         >
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-secondary/10 blur-3xl" />
@@ -381,7 +381,7 @@ const Diagnosis = () => {
           transition={{ delay: 1.2 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => navigate(user ? "/today" : "/auth")}
-          className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base gradient-primary text-foreground hover:opacity-90 transition-all"
+          className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-4 rounded-3xl font-medium text-base bg-primary text-primary-foreground hover:opacity-90 transition-all"
         >
           Continuar
           <ArrowRight size={18} strokeWidth={1.5} />
