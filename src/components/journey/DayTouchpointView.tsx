@@ -53,6 +53,14 @@ const SLOT_INDICES: Record<TouchpointSlot, number> = {
 
 const CHECKPOINT_DAYS = [3, 6, 7, 10, 14];
 
+const SLOT_ORDER: TouchpointSlot[] = ["morning", "lunch", "afternoon", "night"];
+
+const canExpandSlot = (slot: TouchpointSlot, progress: DayTouchpointProgress): boolean => {
+  const idx = SLOT_ORDER.indexOf(slot);
+  if (idx === 0) return true;
+  return SLOT_ORDER.slice(0, idx).every((s) => progress[s].done);
+};
+
 const DayTouchpointView = ({
   dayNumber,
   touchpoints,
@@ -91,6 +99,9 @@ const DayTouchpointView = ({
   }, [activeSlot, isReviewMode]);
 
   const toggleSlot = (slot: TouchpointSlot) => {
+    if (!isReviewMode && !progress[slot].done && !canExpandSlot(slot, progress)) {
+      return;
+    }
     setExpandedSlot((prev) => (prev === slot ? null : slot));
   };
 
@@ -147,7 +158,12 @@ const DayTouchpointView = ({
               {/* Card Header */}
               <button
                 onClick={() => toggleSlot(s.slot)}
-                className="w-full p-4 flex items-center gap-3"
+                disabled={!isReviewMode && !progress[s.slot].done && !canExpandSlot(s.slot, progress)}
+                className={`w-full p-4 flex items-center gap-3 ${
+                  !isReviewMode && !progress[s.slot].done && !canExpandSlot(s.slot, progress)
+                    ? "opacity-40 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
