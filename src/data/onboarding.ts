@@ -168,6 +168,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
       "Sem Lactose",
       "Alergia a Frutos do Mar",
       "Alergia a Amendoim",
+      "Alergia a Soja",
       "Alergia a Oleaginosas",
     ],
     icon: "shield",
