@@ -1,29 +1,22 @@
 
 
-# Install Packages and Create useCelebrationData Hook
+# Create generateDossie.ts
 
 ## Summary
-Install `jspdf` and `jspdf-autotable` npm packages, and create a new hook file that aggregates 14-day challenge data from the user's profile for a celebration/summary screen.
+Create a single new file `src/lib/generateDossie.ts` with the exact content provided by the user. No other files modified.
 
-## Changes
-
-### 1. Install npm packages
-- `jspdf`
-- `jspdf-autotable`
-
-### 2. Create `src/hooks/useCelebrationData.ts` (NEW)
-- Hook that reads `challenge_progress` from the `profiles` table
-- Iterates over 14 days of touchpoint data to compute:
-  - Total water intake (liters)
-  - Total movement minutes (morning × 15 + afternoon × 5)
-  - Lightness scores per day
-  - Day 1 vs Day 14 score comparison
-  - Day 1 heat map data
-  - Per-day history (score, notes, water, night completion)
-- Returns `CelebrationData` interface with loading state
-- Exact content as specified by user
+## Details
+- The file uses `jspdf` and `jspdf-autotable` (already installed in previous step)
+- Imports the existing logo asset from `@/assets/logo_livvia_azul.png` (confirmed it exists)
+- Imports `DayHistoryItem` type from `@/hooks/useCelebrationData` (created in previous step)
+- Generates a branded PDF "Dossiê de Autocuidado" with:
+  - Header with logo and date
+  - Achievement cards (water, movement, lightness evolution, days completed)
+  - Lightness score chart (line graph)
+  - Doctor message section
+  - Day-by-day history table via autoTable
+  - Footer with disclaimer on all pages
 
 ## Files
-- `src/hooks/useCelebrationData.ts` — NEW
-- `package.json` — ADD jspdf, jspdf-autotable
+- `src/lib/generateDossie.ts` — NEW (exact content as specified)
 
