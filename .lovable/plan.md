@@ -1,28 +1,29 @@
 
 
-# Fix Case-Sensitive tipo_refeicao Match in selectDay1Recipe
+# Install Packages and Create useCelebrationData Hook
 
 ## Summary
-Most selection functions already use case-insensitive regex (`/i` flag) for `tipo_refeicao` matching. The only case-sensitive match is on **line 826** in `selectDay1Recipe`, which uses `.includes(mealType)`. Fix this one line.
+Install `jspdf` and `jspdf-autotable` npm packages, and create a new hook file that aggregates 14-day challenge data from the user's profile for a celebration/summary screen.
 
-## Changes in `src/lib/profileEngine.ts`
+## Changes
 
-**Line 826** — Replace `.includes(mealType)` with case-insensitive regex match:
+### 1. Install npm packages
+- `jspdf`
+- `jspdf-autotable`
 
-```ts
-// Before
-selected = top5.find(r => r.tipo_refeicao?.includes(mealType)) || withFinal[0];
+### 2. Create `src/hooks/useCelebrationData.ts` (NEW)
+- Hook that reads `challenge_progress` from the `profiles` table
+- Iterates over 14 days of touchpoint data to compute:
+  - Total water intake (liters)
+  - Total movement minutes (morning × 15 + afternoon × 5)
+  - Lightness scores per day
+  - Day 1 vs Day 14 score comparison
+  - Day 1 heat map data
+  - Per-day history (score, notes, water, night completion)
+- Returns `CelebrationData` interface with loading state
+- Exact content as specified by user
 
-// After
-selected = top5.find(r => r.tipo_refeicao?.some(t => t.toLowerCase() === mealType.toLowerCase())) || withFinal[0];
-```
-
-### No other changes needed
-- `selectShotRecipe` (line 933): already uses `/bebida/i` regex
-- `selectSnackRecipe` (line 1043): already uses `/lanche/i` regex  
-- `selectLunchRecipes` (line 1078): already uses `/almo[çc]o/i` regex
-- `selectMorningExercise` / `selectMicroMovement`: filter exercises by category, not tipo_refeicao
-
-## Files changed
-- `src/lib/profileEngine.ts` — 1 line
+## Files
+- `src/hooks/useCelebrationData.ts` — NEW
+- `package.json` — ADD jspdf, jspdf-autotable
 
