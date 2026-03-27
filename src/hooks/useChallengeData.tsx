@@ -356,6 +356,61 @@ export function useChallengeData() {
     };
   }, [exercises, filteredRecipes, habits, profile, currentDay, dataLoading, profileLoading]);
 
+  // Touchpoint-aware data for 4-slot architecture
+  const todayTouchpoints = useMemo((): TouchpointData | null => {
+    if (dataLoading || profileLoading || !profile) return null;
+
+    const config = getTouchpointConfig(currentDay);
+    const filteredEx = filterExercisesForProfile(exercises, profile);
+
+    const morningEx = selectMorningExercise(filteredEx, profile, currentDay);
+    const morningShot = selectShotRecipe(filteredRecipes, profile, currentDay);
+    const lunchRecs = selectLunchRecipes(filteredRecipes, profile, currentDay);
+    const microMov = selectMicroMovement(filteredEx, profile, currentDay, morningEx?.id);
+    const snack = selectSnackRecipe(filteredRecipes, profile, currentDay);
+
+    const toActivity = (
+      item: DbExercise | DbRecipe | null,
+      type: "exercise" | "recipe",
+      prefix: string
+    ): ChallengeActivity | null => {
+      if (!item) return null;
+      return {
+        id: `day${currentDay}-${prefix}`,
+        type,
+        label: item.title,
+        ...(type === "exercise" ? { exercise: item as DbExercise } : { recipe: item as DbRecipe }),
+      };
+    };
+
+    return {
+      morning: {
+        affirmation: config.affirmation,
+        schedule: config.schedule,
+        exercise: toActivity(morningEx, "exercise", "morning-ex"),
+        shotRecipe: toActivity(morningShot, "recipe", "morning-shot"),
+      },
+      lunch: {
+        recipes: lunchRecs.map((r, i) => ({
+          id: `day${currentDay}-lunch-${i}`,
+          type: "recipe" as const,
+          label: r.title,
+          recipe: r,
+        })),
+        tip: config.lunchTip,
+      },
+      afternoon: {
+        hydrationText: config.afternoonHydrationText,
+        microMovement: toActivity(microMov, "exercise", "afternoon-micro"),
+        snackRecipe: toActivity(snack, "recipe", "afternoon-snack"),
+      },
+      night: {
+        technique: config.nightTechnique,
+        closingMessage: config.closingMessage,
+      },
+    };
+  }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading]);
+
   const dayTitle = dayTitles[(currentDay - 1) % dayTitles.length];
   const dayObjective = dayObjectives[(currentDay - 1) % dayObjectives.length];
 
@@ -363,6 +418,7 @@ export function useChallengeData() {
     profile,
     currentDay,
     todayData,
+    todayTouchpoints,
     dayTitle,
     dayObjective,
     loading: dataLoading || profileLoading,
