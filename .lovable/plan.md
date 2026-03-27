@@ -1,30 +1,30 @@
 
 
-# Add Lightness Score to DayReview Diary Sections
+# Add Soy Allergy Filter
 
 ## Summary
-Display the lightness score (`lightnessScore`) in all 3 diary rendering blocks of `DayReview.tsx`, immediately after the energy level line in each block.
+Add "Alergia a Soja" as a dietary restriction option and filter out soy-containing recipes for users who select it.
 
-## Changes in `src/components/journey/DayReview.tsx`
+## Changes
 
-### Edit 1 — After line 326 (journal.energyLevel block)
-Insert lightness score check using `journal.lightnessScore` before the notes line.
+### 1. `src/data/onboarding.ts` — Line 171
+Insert `"Alergia a Soja",` between "Alergia a Amendoim" and "Alergia a Oleaginosas".
 
-### Edit 2 — After line 351 (diary.energyLevel block)
-Insert lightness score check using `diary.lightnessScore` before the notes line.
-
-### Edit 3 — After line 436 (journal.energy_level / EnergyDots block)
-Insert lightness score check using `journal.lightnessScore` before the notes line.
-
-All 3 insertions use the same pattern:
-```tsx
-{x.lightnessScore != null && (
-  <p className="text-sm text-foreground">
-    Score de leveza: <span className="font-semibold text-primary">{x.lightnessScore}/10</span>
-  </p>
-)}
+### 2. `src/lib/profileEngine.ts` — After line 425
+Insert soy filter block after the oleaginosas filter:
+```ts
+if (normRestr.some(r => r.includes("soja") || r.includes("soy"))) {
+  filtered = filtered.filter((r) =>
+    !r.ingredients.some((i) =>
+      /soja|tofu|edamame|proteína texturizada|leite de soja|shoyu|missô|miso/i.test(i)
+    )
+  );
+}
 ```
 
+Note: `profileEngine.ts` already has `"alergia a soja": "soy"` in its restriction mapping (line 622), so the normalization will work correctly with the new option.
+
 ## Files modified
-- `src/components/journey/DayReview.tsx` — 3 insertions (no other files touched)
+- `src/data/onboarding.ts` — 1 line added
+- `src/lib/profileEngine.ts` — 6 lines added
 
