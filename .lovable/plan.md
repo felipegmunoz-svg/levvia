@@ -1,20 +1,22 @@
 
 
-# Add Celebration Route and Day 14 Redirect
+# Add maximumFileSizeToCacheInBytes to Workbox Config
 
 ## Summary
-Two surgical edits: add the `/celebration` route in App.tsx and redirect users there after completing Day 14's night slot in Today.tsx.
+The build fails because the main JS chunk (2.12 MB) exceeds the default 2 MB PWA precache limit. Add `maximumFileSizeToCacheInBytes: 4 * 1024 * 1024` to the existing `workbox` config.
 
-## Changes
+## Change in `vite.config.ts`
 
-### 1. `src/App.tsx`
-- Add `import Celebration from "./pages/Celebration";` with other page imports
-- Add route `<Route path="/celebration" element={<ProtectedRoute><Celebration /></ProtectedRoute>} />` after the `/today` route
+**Line 23** — Add the property to the existing `workbox` object:
 
-### 2. `src/pages/Today.tsx`
-- In `handleSlotComplete`, replace the night slot block to check if `effectiveDay === 14`: if so, show a congratulations toast and navigate to `/celebration` after 2 seconds; otherwise show the existing "continue tomorrow" toast
+```ts
+workbox: {
+  maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+  globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+  // ... rest unchanged
+},
+```
 
 ## Files modified
-- `src/App.tsx` — 2 additions (import + route)
-- `src/pages/Today.tsx` — Replace ~5 lines in handleSlotComplete
+- `vite.config.ts` — 1 line added
 
