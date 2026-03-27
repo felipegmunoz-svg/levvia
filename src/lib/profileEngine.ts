@@ -423,6 +423,13 @@ export function filterRecipesForProfile(
       !r.ingredients.some((i) => /nozes|castanha|amêndoa|amendoa|pistache|avelã/i.test(i))
     );
   }
+  if (normRestr.some(r => r.includes("soja") || r.includes("soy"))) {
+    filtered = filtered.filter((r) =>
+      !r.ingredients.some((i) =>
+        /soja|tofu|edamame|proteína texturizada|leite de soja|shoyu|missô|miso/i.test(i)
+      )
+    );
+  }
 
   // Dietary preferences
   if (profile.dietaryPreferences.includes("Prefiro refeições rápidas")) {
