@@ -1,22 +1,24 @@
 
 
-# Create generateDossie.ts
+# Create Celebration.tsx Page
 
 ## Summary
-Create a single new file `src/lib/generateDossie.ts` with the exact content provided by the user. No other files modified.
+Create a single new file `src/pages/Celebration.tsx` — a celebration/completion page shown after the 14-day challenge. No other files modified.
 
-## Details
-- The file uses `jspdf` and `jspdf-autotable` (already installed in previous step)
-- Imports the existing logo asset from `@/assets/logo_livvia_azul.png` (confirmed it exists)
-- Imports `DayHistoryItem` type from `@/hooks/useCelebrationData` (created in previous step)
-- Generates a branded PDF "Dossiê de Autocuidado" with:
-  - Header with logo and date
-  - Achievement cards (water, movement, lightness evolution, days completed)
-  - Lightness score chart (line graph)
-  - Doctor message section
-  - Day-by-day history table via autoTable
-  - Footer with disclaimer on all pages
+## Notes
+The user's message had JSX tags stripped by the markdown parser. I will reconstruct the full component based on the visible class names, text content, structure, and the intact code sections (Block 5 onward). The component structure is:
+
+1. **Loading state** — spinner with "Preparando sua celebração..."
+2. **Header** — logo, wave emoji, completion title
+3. **Lavínia message** — motivational quote in a card
+4. **Victory dashboard** — 4 metric cards (water, movement, lightness evolution, adherence)
+5. **HeatMap comparative** — visual transformation using `HeatMapComparative`
+6. **PDF generator** — textarea for doctor message + generate button
+7. **Annual plan CTA** — upsell to `/plans`
+8. **Footer** — thank you message + `BottomNav`
+
+All sections use `motion.div` with the `fadeUp` variants. Uses existing imports: `useCelebrationData`, `generateDossie`, `HeatMapComparative`, `BottomNav`, logo asset.
 
 ## Files
-- `src/lib/generateDossie.ts` — NEW (exact content as specified)
+- `src/pages/Celebration.tsx` — NEW
 
