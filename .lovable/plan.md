@@ -1,71 +1,47 @@
 
 
-# Adapt Data Engine for 4-Touchpoint Architecture
+# Create 4 Touchpoint Slot Components
 
 ## Summary
-Add 5 new selection functions to `profileEngine.ts` and a `todayTouchpoints` computation to `useChallengeData.tsx`. Purely additive — no existing code modified.
+Create 4 new components under `src/components/journey/touchpoints/` that render the content for each daily touchpoint slot. All use existing design tokens and overlay pattern for detail views.
 
-## Changes
+## New Files
 
-### 1. `src/lib/profileEngine.ts` — Add 5 functions after existing code (after line 822)
+### 1. `src/components/journey/touchpoints/MorningSlot.tsx`
+- **Props**: `dayNumber`, `affirmation`, `schedule`, `exercise` (ChallengeActivity|null), `shotRecipe` (ChallengeActivity|null), `isReviewMode`, `onComplete`
+- **5 sections**: Affirmation card (sparkle + italic text), Schedule card (4 time rows with emojis), Exercise card (with "Ver Exercício" → ExerciseDetail overlay), Shot card (with "Ver Receita" → RecipeDetail overlay), Complete button
+- **Local state**: `showExercise`, `showRecipe` (overlay toggles), `exerciseDone`, `shotDone` (checkboxes)
+- **Overlay pattern**: `fixed inset-0 z-50 bg-background overflow-y-auto`
 
-**`selectMorningExercise(exercises, profile, dayNumber)`**
-- Filters pre-filtered exercises for categories: "Respiração e Relaxamento", "Drenagem Linfática Manual", "Movimento Articular Suave"
-- Prefers `duration_seconds <= 300` or duration string containing "3"/"5"
-- High pain: only `pain_suitability >= 4` (if field exists)
-- Scores: +10 for `body_part` matching `affectedAreas`, +5 for `clinical_benefit` matching `healthConditions`
-- Day rotation: `(dayNumber - 1) % length`
-- Returns 1 `DbExercise | null`
+### 2. `src/components/journey/touchpoints/LunchSlot.tsx`
+- **Props**: `dayNumber`, `recipes` (ChallengeActivity[]), `tip`, `isReviewMode`, `onComplete`
+- **4 sections**: Header, selectable recipe cards (radio-style with border-primary when selected, each with RecipeDetail overlay), Dica Lavínia card (bg-primary/5), Complete button
+- **Local state**: `selectedRecipeId`, `showRecipeIdx` (which recipe overlay is open)
 
-**`selectShotRecipe(recipes, profile, dayNumber)`**
-- Filters for `tipo_refeicao` includes "Bebidas" OR `tags` includes "Shot" OR category includes "Bebida"/"Shot"
-- Sorts by `inflammation_score` desc, tiebreak by `nutrient_density_score`
-- +10 for `health_goals` overlapping `profile.objectives`
-- High pain: prefer lower `pantry_complexity`
-- Day rotation, returns 1 `DbRecipe | null`
+### 3. `src/components/journey/touchpoints/AfternoonSlot.tsx`
+- **Props**: `dayNumber`, `hydrationText`, `microMovement` (ChallengeActivity|null), `snackRecipe` (ChallengeActivity|null), `isReviewMode`, `onComplete`
+- **4 sections**: Hydration card (with checkbox "Bebi minha água"), Micro-Movement card (ExerciseDetail overlay + checkbox), Snack card (RecipeDetail overlay), Complete button
+- **Local state**: `hydrated`, `microDone`, `showExercise`, `showRecipe`
 
-**`selectMicroMovement(exercises, profile, dayNumber, excludeId?)`**
-- Filters for `duration_seconds <= 120` or duration "1"/"2"
-- Categories: "Movimento Articular Suave", "Drenagem Linfática Manual"
-- Prefers `environment` matching "cama"/"cadeira"/"sofa"
-- Excludes `excludeId` to avoid morning duplicate
-- Rotation offset +7, returns 1 `DbExercise | null`
+### 4. `src/components/journey/touchpoints/NightSlot.tsx`
+- **Props**: `dayNumber`, `technique` (NightTechnique), `closingMessage`, `isReviewMode`, `onComplete`
+- **4 sections**: Dynamic technique renderer (heatmap/breathing/food-traffic-light/text-guide/legs-elevation/meditation), DiaryReflection (only after technique done & not review), Closing message card (after diary saved or review), Complete button (after diary saved, hidden in review)
+- **Local state**: `techniqueDone`, `diaryData`
+- **Imports**: HeatMapInteractive, BreathingCircle, FoodTrafficLight, DiaryReflection
 
-**`selectSnackRecipe(recipes, profile, dayNumber)`**
-- Filters `tipo_refeicao` includes "Lanche"/"Lanche da Tarde" or category "Lanche"/"Snack"
-- Scores by `inflammation_score`, `common_pantry_match`
-- Day rotation, returns 1 `DbRecipe | null`
+## Shared Patterns
+- All cards: `levvia-card` class
+- Buttons: `bg-primary text-primary-foreground rounded-xl`
+- Text: `text-levvia-fg`, `text-levvia-muted`, `font-body`, `font-heading`
+- Detail overlays: `fixed inset-0 z-50 bg-background overflow-y-auto` with ArrowLeft back button
+- Exercise/Recipe passed as `ChallengeActivity` — extract `.exercise` or `.recipe` for detail components
 
-**`selectLunchRecipes(recipes, profile, dayNumber)`**
-- Filters `tipo_refeicao` includes "Almoço" or category "Almoço"
-- Composite score: `inflammation_score`, `nutrient_density_score`, `health_goals` overlap, `common_pantry_match`
-- Returns top 3 with day-based window shift
-
-All functions use optional chaining, handle empty arrays gracefully, return null/empty on no matches.
-
-### 2. `src/hooks/useChallengeData.tsx` — Add touchpoint computation
-
-**New imports** (line ~5): `getTouchpointConfig` from touchpointConfig, new selection functions from profileEngine, `NightTechnique` type
-
-**New interface** `TouchpointData` (after `DayData` interface ~line 48):
-```ts
-export interface TouchpointData {
-  morning: { affirmation: string; schedule: {...}[]; exercise: ChallengeActivity | null; shotRecipe: ChallengeActivity | null };
-  lunch: { recipes: ChallengeActivity[]; tip: string };
-  afternoon: { hydrationText: string; microMovement: ChallengeActivity | null; snackRecipe: ChallengeActivity | null };
-  night: { technique: NightTechnique; closingMessage: string };
-}
-```
-
-**New `useMemo`** (after `todayData` memo, ~line 328): Computes `todayTouchpoints` using `getTouchpointConfig(currentDay)` + the 5 new selection functions. Wraps exercise/recipe results into `ChallengeActivity` format.
-
-**Add to return** (line 333): `todayTouchpoints` alongside existing values.
-
-## Files changed
-- `src/lib/profileEngine.ts` — ADD 5 new exported functions
-- `src/hooks/useChallengeData.tsx` — ADD imports, TouchpointData interface, todayTouchpoints memo, return value
+## Files
+- `src/components/journey/touchpoints/MorningSlot.tsx` — NEW
+- `src/components/journey/touchpoints/LunchSlot.tsx` — NEW
+- `src/components/journey/touchpoints/AfternoonSlot.tsx` — NEW
+- `src/components/journey/touchpoints/NightSlot.tsx` — NEW
 
 ## Not changed
-- All existing functions, interfaces, return values unchanged
-- `src/data/touchpointConfig.ts` — just imported
+- No existing files modified
 
