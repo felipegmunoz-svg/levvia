@@ -1,21 +1,17 @@
 
 
-# Create Touchpoint Configuration File
+# Update `useTouchpointProgress` Plan — isDayComplete Logic
 
-## Summary
-Create `src/data/touchpointConfig.ts` — a pure data file defining content for all 14 days of the Levvia journey with 4 daily touchpoints each.
+## Change
 
-## File: `src/data/touchpointConfig.ts` (NEW)
+In the plan for `src/hooks/useTouchpointProgress.ts`:
 
-**Types**: `TouchpointSlot`, `NightTechnique`, `DayTouchpointConfig` — as specified.
+**`isDayComplete`** computed value:
 
-**Content**: 
-- Days 1-6 with full themed content (affirmations, schedules, exercises, shots, tips, night techniques with steps, closing messages)
-- Days 7-14 with placeholder structure ("Em Construção" theme, "Em breve" labels, generic reflection night technique)
+- **Before**: `all 4 slots done`
+- **After**: `progress.night.done === true`
 
-**Exports**:
-- `TOUCHPOINT_CONFIGS: DayTouchpointConfig[]` (14 items)
-- `getTouchpointConfig(dayNumber: number): DayTouchpointConfig` helper
+The night slot (journal/technique) is the sole gate for marking a day as complete. Other slots can be done in any order and don't affect day completion status.
 
-No other files modified. Pure data, zero side effects.
+This is a plan-level update only — no files exist yet to modify.
 
