@@ -167,7 +167,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       description: 'Técnica de respiração que acalma o sistema nervoso, preparando para o sono profundo.',
       duration: '5 min',
     },
-    closingMessage: 'Seu corpo se repara enquanto você dorme. Hoje você preparou o terreno para a cura noturna.',
+    closingMessage: 'Seu corpo se repara enquanto você dorme. Hoje você preparou o terreno para a regeneração noturna.',
     hydrationTexts: {
       morning: 'Bom dia! Hidrate o corpo que descansou: {meta}ml para começar.',
       lunch: 'Proteínas leves + água = digestão sem peso. Meta: {meta}ml.',

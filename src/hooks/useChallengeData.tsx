@@ -84,7 +84,7 @@ const dailyPhrases = [
   { normal: "Movimento é vida. Cada alongamento é um abraço para suas articulações.", high: "Mova-se no seu ritmo. Cada gesto suave é um ato de cuidado." },
   { normal: "Fortalecer-se é um ato de amor próprio. Vá no seu ritmo.", high: "Cada respiração profunda é um passo para o alívio. Respeite seus limites." },
   { normal: "Hidratar, nutrir, mover. Três pilares para a sua leveza.", high: "Você não está sozinha nessa jornada. Cada dia é uma nova oportunidade." },
-  { normal: "Seu corpo é seu templo. Cuide dele com carinho e constância.", high: "A cura vem de dentro. Cada gesto gentil conta." },
+  { normal: "Seu corpo é seu templo. Cuide dele com carinho e constância.", high: "O alívio vem de dentro. Cada gesto gentil conta." },
   { normal: "Uma semana de cuidado! Celebre cada conquista, por menor que pareça.", high: "Metade da jornada! Cada dia que você chegou aqui é uma vitória." },
   { normal: "Transformação acontece um dia de cada vez. Continue firme!", high: "Permita-se descansar quando preciso. Descanso também é cuidado." },
   { normal: "Você é mais forte do que imagina. Confie no processo.", high: "Sua força interior é maior que qualquer desconforto. Um passo de cada vez." },

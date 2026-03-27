@@ -214,7 +214,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     id: 17,
     type: "info",
     title: "Análise Completa! ✨",
-    subtitle: "Reunimos todas as suas informações. Vamos ver seu diagnóstico personalizado e descobrir como o Levvia pode te ajudar!",
+    subtitle: "Reunimos todas as suas informações. Vamos ver seu mapeamento de bem-estar personalizado e descobrir como o Levvia pode te ajudar!",
     icon: "sparkles",
   },
 ];

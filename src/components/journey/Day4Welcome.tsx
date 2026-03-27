@@ -59,7 +59,7 @@ const Day4Welcome = ({ onContinue }: Day4WelcomeProps) => {
         className="text-foreground/60 text-center max-w-[440px] mb-10"
         style={{ fontWeight: 300, fontSize: "0.9rem", lineHeight: 1.8 }}
       >
-        Hoje você vai descobrir como transformar suas noites em um ritual de cura.
+        Hoje você vai descobrir como transformar suas noites em um ritual de regeneração.
         O sono não é tempo perdido — é quando seu corpo se repara, desinfla e se renova.
       </motion.p>
 

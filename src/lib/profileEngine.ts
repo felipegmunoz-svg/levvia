@@ -876,7 +876,7 @@ export function selectMorningExercise(
   if (rescueMode === "resgate") {
     categories = ["Drenagem Linfática Manual", "Respiração e Relaxamento"];
   } else if (rescueMode === "consagracao") {
-    categories = [...MORNING_CATEGORIES, "Fortalecimento Suave", "Mobilidade"];
+    categories = [...MORNING_CATEGORIES, "Fortalecimento Leve", "Caminhada e Movimento Funcional"];
   }
 
   let candidates = filteredExercises.filter(e =>
@@ -982,7 +982,7 @@ export function selectMicroMovement(
 
   let microCategories = ["Movimento Articular Suave", "Drenagem Linfática Manual"];
   if (rescueMode === "consagracao") {
-    microCategories = [...microCategories, "Fortalecimento Suave"];
+    microCategories = [...microCategories, "Fortalecimento Leve"];
   }
 
   const durationCap = rescueMode === "resgate" ? 600 : 120;

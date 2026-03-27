@@ -165,10 +165,10 @@ const Day6Flow = ({ onComplete, isReviewMode = false }: Day6FlowProps) => {
     <DayTemplate
       dayNumber={6}
       title="O Poder das Especiarias"
-      affirmation="Cada tempero é uma medicina natural que meu corpo merece."
+      affirmation="Cada tempero é um aliado natural que meu corpo merece."
       objectives={[
         "Descobrir especiarias anti-inflamatórias",
-        "Preparar chá medicinal de cúrcuma",
+        "Preparar chá de cúrcuma",
         "Aprender automassagem com óleos",
         "Incluir especiarias no jantar",
       ]}

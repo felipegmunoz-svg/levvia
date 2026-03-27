@@ -88,7 +88,7 @@ export const challengeDays: ChallengeDay[] = [
     ],
     habits: [
       { id: "day4-hab1", type: "habit", label: "Beber 2 litros de água", modalContent: "A hidratação adequada é fundamental para o sistema linfático. Distribua ao longo do dia." },
-      { id: "day4-hab2", type: "habit", label: "Meditação Guiada de Visualização por 5 minutos", modalContent: "Feche os olhos, respire profundamente e visualize uma luz curativa descendo pelo seu corpo, aliviando cada área de tensão." },
+      { id: "day4-hab2", type: "habit", label: "Meditação Guiada de Visualização por 5 minutos", modalContent: "Feche os olhos, respire profundamente e visualize uma luz refrescante e relaxante descendo pelo seu corpo, aliviando cada área de tensão." },
     ],
   },
   {
@@ -163,7 +163,7 @@ export const challengeDays: ChallengeDay[] = [
     day: 9,
     title: "Foco na Drenagem dos Braços e Relaxamento",
     objective: "Reduzir o inchaço nos braços e relaxar.",
-    phrase: "Respire fundo, relaxe os ombros. A calma traz a cura.",
+    phrase: "Respire fundo, relaxe os ombros. A calma traz alívio.",
     exercises: [
       { id: "day9-ex1", type: "exercise", label: "Drenagem Linfática dos Braços", exerciseId: 11 },
       { id: "day9-ex2", type: "exercise", label: "Respiração 4-7-8 para Acalmar", exerciseId: 2 },

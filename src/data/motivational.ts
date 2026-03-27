@@ -95,7 +95,7 @@ export const motivationalPhrases: string[] = [
   "Celebre cada pequena vitória. Elas importam! 🎉",
   "Seu bem-estar é prioridade, não luxo. 🌟",
   "Movimentar o corpo é um presente que você se dá. 🤸‍♀️",
-  "A natureza cura. Inclua mais verde no seu prato e na sua vida. 🥗",
+  "A natureza nutre. Inclua mais verde no seu prato e na sua vida. 🥗",
 ];
 
 export const getDailyPhrase = (painLevel?: string): string => {
