@@ -53,7 +53,7 @@ const Day5Welcome = ({ onContinue }: Day5WelcomeProps) => {
         </div>
       </motion.div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border/30 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-[68px] left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border/30 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <Button onClick={onContinue} className="w-full">
           Ativar Minha Bomba Linfática →
         </Button>

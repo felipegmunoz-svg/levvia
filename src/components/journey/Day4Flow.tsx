@@ -150,6 +150,7 @@ const Day4Flow = ({ onComplete, isReviewMode = false }: Day4FlowProps) => {
   };
 
   return (
+    <>
     <AnimatePresence mode="wait">
       {step === "welcome" && (
         <motion.div key="welcome" {...stepVariants} transition={{ duration: 0.3 }}>
@@ -177,6 +178,8 @@ const Day4Flow = ({ onComplete, isReviewMode = false }: Day4FlowProps) => {
         </motion.div>
       )}
     </AnimatePresence>
+    <BottomNav />
+    </>
   );
 };
 

@@ -156,7 +156,7 @@ const BreathingCircle = ({ onContinue }: BreathingCircleProps) => {
       </motion.div>
 
       {/* Sticky bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-[68px] left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <div className="max-w-xs mx-auto space-y-3">
           {!isActive && !canFinish && (
             <button

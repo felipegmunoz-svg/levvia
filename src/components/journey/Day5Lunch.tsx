@@ -231,7 +231,7 @@ const Day5Lunch = ({ onContinue }: Day5LunchProps) => {
         </motion.div>
       </motion.div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-[68px] left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={() => selectedMeal && onContinue(selectedMeal)}
           disabled={!canContinue}
