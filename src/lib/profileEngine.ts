@@ -860,8 +860,11 @@ export function selectMorningExercise(
   if (!filteredExercises?.length) return null;
 
   let candidates = filteredExercises.filter(e =>
-    MORNING_CATEGORIES.includes(e.category)
+    MORNING_CATEGORIES.some(cat => cat.toLowerCase() === (e.category || '').toLowerCase())
   );
+
+  // Fallback: if no morning-specific category matches, use all exercises
+  if (candidates.length === 0) candidates = [...filteredExercises];
 
   // Prefer short exercises
   if (candidates.length > 1) {
@@ -904,6 +907,13 @@ export function selectShotRecipe(
     /bebida|shot/i.test(r.category || "")
   );
 
+  // Fallback: broader match for snack/lanche/bebida types
+  if (candidates.length === 0) {
+    candidates = filteredRecipes.filter(r =>
+      r.tipo_refeicao?.some(t => /lanche|bebida|snack/i.test(t)) || false
+    );
+  }
+
   if (candidates.length === 0) return null;
 
   // Score
@@ -944,12 +954,17 @@ export function selectMicroMovement(
     if (excludeId && e.id === excludeId) return false;
     const isShort = (e.duration_seconds != null && e.duration_seconds <= 120) ||
       /[12]\s*min/i.test(e.duration || "");
-    const isCategory = MICRO_CATEGORIES.includes(e.category);
+    const isCategory = MICRO_CATEGORIES.some(cat => cat.toLowerCase() === (e.category || '').toLowerCase());
     return isShort || isCategory;
   });
 
   if (excludeId) {
     candidates = candidates.filter(e => e.id !== excludeId);
+  }
+
+  // Fallback: any exercise except the morning one
+  if (candidates.length === 0) {
+    candidates = filteredExercises.filter(e => e.id !== excludeId);
   }
 
   if (candidates.length === 0) return null;
@@ -979,6 +994,13 @@ export function selectSnackRecipe(
     /lanche|snack/i.test(r.category || "")
   );
 
+  // Fallback: any recipe that's not strictly almoço/jantar
+  if (candidates.length === 0) {
+    candidates = filteredRecipes.filter(r =>
+      !r.tipo_refeicao?.some(t => /almo[çc]o|jantar/i.test(t))
+    );
+  }
+
   if (candidates.length === 0) return null;
 
   const scored = candidates.map(r => {
@@ -1002,6 +1024,9 @@ export function selectLunchRecipes(
     r.tipo_refeicao?.some(t => /almo[çc]o/i.test(t)) ||
     /almo[çc]o/i.test(r.category || "")
   );
+
+  // Fallback: use all available recipes
+  if (candidates.length === 0) candidates = [...filteredRecipes];
 
   if (candidates.length === 0) return [];
 
