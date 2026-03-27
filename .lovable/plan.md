@@ -1,74 +1,61 @@
 
 
-# Rewrite DayReview.tsx — Visual Formatted Display
+# Add BottomNav to All Day Flow Steps
 
 ## Summary
-Complete rewrite of `DayReview.tsx` to replace raw JSON rendering with formatted, human-readable cards per day. Single file change.
+Add BottomNav to normal-mode steps in Day1-Day5 flows, and shift sticky bottom buttons up by 68px to avoid overlap. Day6 already has BottomNav via DayTemplate.
 
-## Changes in `src/components/journey/DayReview.tsx`
+## Changes
 
-### Constants update
-- **dayTitles**: Use em-dash format ("Dia 1 — Consciência Corporal", etc.) with corrected Day 4/5/6 titles
-- **dayIcons**: Fix Day 4 → "😴", Day 5 → "🏃‍♀️", Day 6 → "🌿"
-- **dayDescriptions**: Updated per user spec
+### 1. Day Flow files — Add BottomNav to normal mode
 
-### Remove
-- `formatKey()` helper function
-- `renderJsonCards()` generic function
+**`src/components/journey/Day1Flow.tsx`** (lines 312-316)
+Wrap each step return in `<>...&lt;BottomNav /&gt;</>`. Already imports BottomNav.
 
-### Container
-- Root: `className="theme-light levvia-page min-h-screen pb-24"` (replaces `bg-[#FAFBFC]`)
-- Loading spinner: same change
-- Back button: `bg-primary text-primary-foreground` (replaces hardcoded colors)
+**`src/components/journey/Day2Flow.tsx`** (lines ~178-184)
+Same pattern for welcome/drainage/map/meal/night/closing returns. Already imports BottomNav.
 
-### Day-specific rendering (replaces `renderDayContent`)
+**`src/components/journey/Day3Flow.tsx`** (lines ~115-119)
+Same pattern for welcome/semaforo/cardapio/closing. Add BottomNav import.
 
-**Day 1** — Keep HeatMapInteractive readOnly as-is (already works)
+**`src/components/journey/Day4Flow.tsx`** (lines ~143-166)
+Add `<BottomNav />` after `</AnimatePresence>` (outside, so it persists across transitions). Already imports BottomNav.
 
-**Day 2** — Parse `day2_inflammation_map.markedAreas` array. Each area rendered as levvia-card showing:
-- Area name formatted (e.g. `panturrilha_esq` → "Panturrilha Esquerda")
-- Type icons: Dor=🔴, Inchaço=🟡, Peso=🔵, Sensibilidade=🟣
-- Notes in separate card with 📝 if present
+**`src/components/journey/Day5Flow.tsx`** (lines ~171-218)
+Same — add `<BottomNav />` after `</AnimatePresence>`. Already imports BottomNav.
 
-**Day 3** — Static content: 3 colored-border cards (green/yellow/red) with food categories
+**`src/components/journey/Day6Flow.tsx`** — NO CHANGE (DayTemplate already renders BottomNav)
 
-**Day 4** — Parse `day4_sleep_data`:
-- Hygiene checklist card: 5 items mapped to labels with ✅/⬜
-- Breathing card: breathingCompleted status
-- Date if createdAt exists
+### 2. Sticky buttons — Shift up from `bottom-0` to `bottom-[68px]`
 
-**Day 5** — Parse `day5_movement_data`:
-- Exercises card, Meals card, Micro-challenge card, Legs elevation card, Journal card
-- Each with ✅/⬜ or formatted values
+All 13 components with `fixed bottom-0 left-0 right-0` in their action button container:
 
-**Day 6** — Parse `day6_spice_data`:
-- Activities checklist (4 items with labels)
-- Diary reflection card
+- `Day4Welcome.tsx` (line 67)
+- `Day4SleepHygiene.tsx` (line 110)
+- `BreathingCircle.tsx` (line 159)
+- `Day4CardapioNoturno.tsx` (line 356)
+- `Day4Closing.tsx` (line 93)
+- `Day5Welcome.tsx` (line 56)
+- `Day5MovementGuide.tsx` (line 138)
+- `Day5Lunch.tsx` (line 234)
+- `Day5Snack.tsx` (line 230)
+- `Day5MicroChallenge.tsx` (line 150)
+- `Day5LegsElevation.tsx` (line 208)
+- `Day5Journal.tsx` (line 132)
+- `Day5Dashboard.tsx` (line 301)
+- `Day5Closing.tsx` (line 50)
 
-### Card styling pattern
-```tsx
-<div className="levvia-card p-5 space-y-3">
-  <h3 className="font-semibold text-foreground flex items-center gap-2">icon title</h3>
-  {items.map(item => (
-    <div className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-      <span>{checked ? "✅" : "⬜"}</span>
-      <span className="text-sm text-foreground">{label}</span>
-    </div>
-  ))}
-</div>
-```
+Each: `fixed bottom-0` → `fixed bottom-[68px]`
 
-### Area name formatter
-Helper mapping for inflammation areas:
-```
-ombro_esq → "Ombro Esquerdo", coxa_dir → "Coxa Direita",
-panturrilha_esq → "Panturrilha Esquerda", abdomen → "Abdômen", etc.
-```
-
-## Files
-- `src/components/journey/DayReview.tsx` — full rewrite (same imports, same fetch logic)
+### 3. DayTemplate.tsx sticky buttons — already inline (no fixed positioning), no change needed.
 
 ## Not changed
-- Supabase query, ProfileData interface, useEffect, HeatMapInteractive import
-- No other files
+- BottomNav.tsx itself
+- Component logic, data flow, step transitions
+- Review mode (already has BottomNav)
+- Onboarding, Auth, Diagnosis, WaitingScreen
+- Day6Flow (already covered by DayTemplate)
+
+## Technical note
+For Day4/Day5 which use `<AnimatePresence>`, placing `<BottomNav />` as a sibling after `</AnimatePresence>` (wrapped in a fragment) ensures it renders persistently without being affected by step transitions.
 
