@@ -1,7 +1,7 @@
 export type TouchpointSlot = 'morning' | 'lunch' | 'afternoon' | 'night';
 
 export interface NightTechnique {
-  type: 'heatmap' | 'breathing' | 'food-traffic-light' | 'text-guide' | 'legs-elevation' | 'meditation';
+  type: 'heatmap' | 'breathing' | 'food-traffic-light' | 'text-guide' | 'legs-elevation' | 'meditation' | 'heatmap-comparative';
   title: string;
   description: string;
   steps?: string[];
@@ -13,20 +13,28 @@ export interface DayTouchpointConfig {
   theme: string;
   purpose: string;
   affirmation: string;
+  affirmationRescue?: string;
   schedule: { slot: TouchpointSlot; time: string; label: string }[];
   morningExerciseLabel: string;
+  morningExerciseLabelRescue?: string;
   morningShotLabel: string;
   lunchTip: string;
+  lunchTipRescue?: string;
   afternoonHydrationText: string;
   afternoonMicroMovementLabel: string;
+  afternoonMicroMovementLabelRescue?: string;
   afternoonSnackLabel: string;
   nightTechnique: NightTechnique;
+  nightTechniqueRescue?: NightTechnique;
   closingMessage: string;
+  closingMessageRescue?: string;
   hydrationTexts: { morning: string; lunch: string; afternoon: string; night: string };
   afternoonKnowledgePill: string;
+  isCheckpointDay?: boolean;
 }
 
 const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
+  // ── Day 1 ──
   {
     dayNumber: 1,
     theme: 'Consciência Corporal',
@@ -59,6 +67,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     },
     afternoonKnowledgePill: 'A linfa não tem bomba própria — ela depende do seu movimento e da sua hidratação para fluir.',
   },
+  // ── Day 2 ──
   {
     dayNumber: 2,
     theme: 'O Rio Interno',
@@ -100,11 +109,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     },
     afternoonKnowledgePill: 'O sistema linfático transporta 3 litros de fluido por dia — sem água suficiente, ele estagna.',
   },
+  // ── Day 3 ──
   {
     dayNumber: 3,
     theme: 'Alimento que Cura',
     purpose: 'Anti-inflamação',
     affirmation: 'Eu nutro meu corpo com o que há de melhor na natureza.',
+    isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Alongamento de Borboleta' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Anti-inflamatória' },
@@ -132,6 +143,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     },
     afternoonKnowledgePill: 'A cúrcuma precisa de pimenta preta e gordura para ser absorvida — biodisponibilidade importa!',
   },
+  // ── Day 4 ──
   {
     dayNumber: 4,
     theme: 'O Sono Restaurador',
@@ -164,6 +176,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     },
     afternoonKnowledgePill: 'Durante o sono profundo, o sistema glinfático do cérebro faz uma "lavagem" — mas precisa de hidratação adequada.',
   },
+  // ── Day 5 ──
   {
     dayNumber: 5,
     theme: 'Movimento Sem Dor',
@@ -205,11 +218,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     },
     afternoonKnowledgePill: 'As panturrilhas são chamadas de "segundo coração" — ao contraí-las, bombeiam sangue e linfa de volta.',
   },
+  // ── Day 6 ──
   {
     dayNumber: 6,
     theme: 'O Poder das Especiarias',
     purpose: 'Tempero que Cura',
     affirmation: 'Eu uso a sabedoria da terra para fortalecer minha saúde.',
+    isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Rotação de Ombros' },
       { slot: 'lunch', time: '12:00', label: 'Curry Anti-inflamatório' },
@@ -249,44 +264,455 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     },
     afternoonKnowledgePill: 'O gengibre contém gingerol, um composto que reduz inflamação de forma comparável a anti-inflamatórios.',
   },
-  // Days 7-14: Placeholder
-  ...Array.from({ length: 8 }, (_, i) => ({
-    dayNumber: 7 + i,
-    theme: 'Em Construção',
-    purpose: 'Conteúdo em desenvolvimento',
-    affirmation: 'Cada dia é uma oportunidade de cuidar de mim.',
+  // ── Day 7 — O Marco da Leveza ──
+  {
+    dayNumber: 7,
+    theme: 'O Marco da Leveza',
+    purpose: 'Celebrar a primeira semana e visualizar a transformação do Fogo para o Fluxo',
+    affirmation: 'Eu celebro cada pequena vitória e a leveza que conquistei nesta semana. Meu corpo é um templo de fluxo.',
+    isCheckpointDay: true,
     schedule: [
-      { slot: 'morning' as TouchpointSlot, time: '08:00', label: 'Em breve' },
-      { slot: 'lunch' as TouchpointSlot, time: '12:00', label: 'Em breve' },
-      { slot: 'afternoon' as TouchpointSlot, time: '15:00', label: 'Em breve' },
-      { slot: 'night' as TouchpointSlot, time: '21:00', label: 'Em breve' },
+      { slot: 'morning', time: '08:00', label: 'Drenagem Ativa' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Celebrativa' },
+      { slot: 'afternoon', time: '15:00', label: 'Hidratação' },
+      { slot: 'night', time: '21:00', label: 'Comparativo do Fogo' },
     ],
-    morningExerciseLabel: 'Em breve',
-    morningShotLabel: 'Em breve',
-    lunchTip: 'Em breve',
-    afternoonHydrationText: 'Em breve',
-    afternoonMicroMovementLabel: 'Em breve',
-    afternoonSnackLabel: 'Em breve',
+    morningExerciseLabel: 'Drenagem Linfática Ativa (Bicicleta no Ar) - 5 min',
+    morningExerciseLabelRescue: 'Elevação de Pernas com Drenagem - 10 min',
+    morningShotLabel: 'Shot de Limão, Gengibre e Canela',
+    lunchTip: 'Olhe para o seu prato e veja o arco-íris de nutrientes que você deu ao seu corpo nos últimos 7 dias. Você é sua melhor cuidadora.',
+    lunchTipRescue: 'Cada escolha é um passo para a leveza. Confie no processo.',
+    afternoonHydrationText: 'Uma semana de hidratação! Continue com água ou chá gelado para celebrar.',
+    afternoonMicroMovementLabel: 'Elevação de Calcanhares (Panturrilha) - 2 min',
+    afternoonMicroMovementLabelRescue: 'Massagem de Varredura Suave - 5 min',
+    afternoonSnackLabel: 'Smoothie de Frutas Vermelhas',
     nightTechnique: {
-      type: 'text-guide' as const,
-      title: 'Reflexão do Dia',
-      description: 'Momento de pausa e reflexão.',
-      steps: [
-        'Respire fundo.',
-        'Observe como seu corpo se sente.',
-        'Agradeça por mais um dia de cuidado.',
-      ],
-      duration: '3 min',
+      type: 'heatmap-comparative',
+      title: 'Comparativo do Fogo',
+      description: 'Marque como se sente hoje e compare com o Dia 1.',
+      duration: '5 min',
     },
-    closingMessage: 'Mais um dia de cuidado. Você está no caminho certo.',
+    closingMessage: 'Uma semana de cuidado. Você não é mais a mesma do Dia 1.',
     hydrationTexts: {
-      morning: 'Bom dia! Sua meta matinal: {meta}ml para ativar o fluxo.',
-      lunch: 'Continue hidratando: mais {meta}ml para manter o ritmo.',
-      afternoon: 'A tarde é o momento crítico. Meta: {meta}ml agora.',
-      night: 'Última meta do dia: {meta}ml. Descanse bem hidratada.',
+      morning: 'Celebre com hidratação! Meta matinal: {meta}ml para manter o fluxo.',
+      lunch: 'Uma semana nutrindo seu corpo. Continue: {meta}ml agora.',
+      afternoon: 'Você chegou até aqui! Meta da tarde: {meta}ml.',
+      night: 'Última meta da semana 1: {meta}ml. Descanse orgulhosa.',
     },
-    afternoonKnowledgePill: 'Cada dia de cuidado contínuo fortalece os hábitos que transformam sua saúde.',
-  })),
+    afternoonKnowledgePill: 'Após 7 dias de hidratação consistente, o sistema linfático já mostra melhora na eficiência de drenagem.',
+  },
+  // ── Day 8 — Intensificação ──
+  {
+    dayNumber: 8,
+    theme: 'Intensificação',
+    purpose: 'Intensificar drenagem e controle inflamatório',
+    affirmation: 'Eu sou a prova viva da minha transformação. Meu corpo é um rio de vida.',
+    affirmationRescue: 'Minha força interior me guia para a leveza. Eu mereço me sentir bem.',
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Agachamento na Parede' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Intensificada' },
+      { slot: 'afternoon', time: '15:00', label: 'Caminhada Consciente' },
+      { slot: 'night', time: '21:00', label: 'Meditação de Gratidão' },
+    ],
+    morningExerciseLabel: 'Agachamento na Parede (Isometria) - 3 min',
+    morningExerciseLabelRescue: 'Drenagem Linfática Ativa (Bicicleta no Ar) - 7 min',
+    morningShotLabel: 'Shot de Gengibre, Limão e Pimenta Caiena',
+    lunchTip: 'Seu corpo é seu templo. Continue nutrindo-o com amor e consciência.',
+    lunchTipRescue: 'Se você ainda sente peso, cada refeição é uma oportunidade de virar o jogo.',
+    afternoonHydrationText: 'Intensifique a hidratação: água com gengibre e limão para potência máxima.',
+    afternoonMicroMovementLabel: 'Caminhada Consciente - 10 min',
+    afternoonMicroMovementLabelRescue: 'Automassagem das Pernas (Drenagem Ascendente) - 7 min',
+    afternoonSnackLabel: 'Smoothie de Abacaxi com Hortelã',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Gratidão',
+      description: 'Foco em bem-estar e reconhecimento.',
+      duration: '5 min',
+      steps: [
+        'Deite-se confortavelmente.',
+        'Feche os olhos e respire fundo 3 vezes.',
+        'Pense em 3 coisas que seu corpo fez por você hoje.',
+        'Agradeça por cada pequena vitória.',
+        'Visualize-se leve e fluida.',
+        'Permaneça nessa sensação por 2 minutos.',
+        'Abra os olhos lentamente.',
+      ],
+    },
+    nightTechniqueRescue: {
+      type: 'text-guide',
+      title: 'Escalda-pés Terapêutico',
+      description: 'Alívio e drenagem com sal grosso e óleos essenciais.',
+      duration: '15 min',
+      steps: [
+        'Aqueça água até ficar morna (não quente).',
+        'Adicione 2 colheres de sal grosso.',
+        'Adicione 3 gotas de óleo essencial de lavanda ou menta.',
+        'Mergulhe os pés e pernas até a canela.',
+        'Permaneça por 15 minutos.',
+        'Seque com cuidado, massageando de baixo para cima.',
+        'Aplique um creme hidratante com movimentos ascendentes.',
+      ],
+    },
+    closingMessage: 'Cada dia é uma nova oportunidade de fluxo.',
+    hydrationTexts: {
+      morning: 'Dia de intensificação! Meta matinal: {meta}ml.',
+      lunch: 'Nutra e hidrate: {meta}ml para potencializar.',
+      afternoon: 'Após o movimento, reidrate: {meta}ml.',
+      night: 'Meta noturna: {meta}ml. Seu corpo agradece.',
+    },
+    afternoonKnowledgePill: 'A isometria (como o agachamento na parede) ativa a bomba muscular sem impacto nas articulações.',
+  },
+  // ── Day 9 ──
+  {
+    dayNumber: 9,
+    theme: 'Intensificação',
+    purpose: 'Intensificar drenagem e controle inflamatório',
+    affirmation: 'Meu corpo responde ao cuidado que eu ofereço. Eu sinto a diferença.',
+    affirmationRescue: 'Cada passo conta. A leveza está mais perto do que parece.',
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Agachamento na Parede' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Intensificada' },
+      { slot: 'afternoon', time: '15:00', label: 'Caminhada Consciente' },
+      { slot: 'night', time: '21:00', label: 'Meditação de Gratidão' },
+    ],
+    morningExerciseLabel: 'Agachamento na Parede (Isometria) - 3 min',
+    morningExerciseLabelRescue: 'Drenagem Linfática Ativa (Bicicleta no Ar) - 7 min',
+    morningShotLabel: 'Shot de Gengibre, Limão e Pimenta Caiena',
+    lunchTip: 'Seu corpo é seu templo. Continue nutrindo-o com amor e consciência.',
+    lunchTipRescue: 'Se você ainda sente peso, cada refeição é uma oportunidade de virar o jogo.',
+    afternoonHydrationText: 'Continue hidratando: água com gengibre para manter o ritmo.',
+    afternoonMicroMovementLabel: 'Caminhada Consciente - 10 min',
+    afternoonMicroMovementLabelRescue: 'Automassagem das Pernas (Drenagem Ascendente) - 7 min',
+    afternoonSnackLabel: 'Smoothie de Abacaxi com Hortelã',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Gratidão',
+      description: 'Foco em bem-estar e reconhecimento.',
+      duration: '5 min',
+      steps: [
+        'Deite-se confortavelmente.',
+        'Feche os olhos e respire fundo 3 vezes.',
+        'Pense em 3 coisas que seu corpo fez por você hoje.',
+        'Agradeça por cada pequena vitória.',
+        'Visualize-se leve e fluida.',
+        'Permaneça nessa sensação por 2 minutos.',
+        'Abra os olhos lentamente.',
+      ],
+    },
+    nightTechniqueRescue: {
+      type: 'text-guide',
+      title: 'Escalda-pés Terapêutico',
+      description: 'Alívio e drenagem com sal grosso e óleos essenciais.',
+      duration: '15 min',
+      steps: [
+        'Aqueça água até ficar morna (não quente).',
+        'Adicione 2 colheres de sal grosso.',
+        'Adicione 3 gotas de óleo essencial de lavanda ou menta.',
+        'Mergulhe os pés e pernas até a canela.',
+        'Permaneça por 15 minutos.',
+        'Seque com cuidado, massageando de baixo para cima.',
+        'Aplique um creme hidratante com movimentos ascendentes.',
+      ],
+    },
+    closingMessage: 'Você está sentindo a diferença. Continue confiando no processo.',
+    hydrationTexts: {
+      morning: 'Mais um dia de fluxo! Meta matinal: {meta}ml.',
+      lunch: 'Continue nutrindo: {meta}ml para manter o ritmo.',
+      afternoon: 'A tarde pede hidratação: {meta}ml agora.',
+      night: 'Quase lá! Meta noturna: {meta}ml.',
+    },
+    afternoonKnowledgePill: 'A caminhada consciente (10 min) ativa a bomba muscular da panturrilha e melhora o retorno venoso em até 30%.',
+  },
+  // ── Day 10 ──
+  {
+    dayNumber: 10,
+    theme: 'Intensificação',
+    purpose: 'Intensificar drenagem e controle inflamatório',
+    affirmation: 'Eu construo minha saúde um dia de cada vez. Hoje eu escolho o fluxo.',
+    affirmationRescue: 'Não desisto. Meu corpo merece toda a minha dedicação.',
+    isCheckpointDay: true,
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Agachamento na Parede' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Intensificada' },
+      { slot: 'afternoon', time: '15:00', label: 'Caminhada Consciente' },
+      { slot: 'night', time: '21:00', label: 'Meditação de Gratidão' },
+    ],
+    morningExerciseLabel: 'Agachamento na Parede (Isometria) - 3 min',
+    morningExerciseLabelRescue: 'Drenagem Linfática Ativa (Bicicleta no Ar) - 7 min',
+    morningShotLabel: 'Shot de Gengibre, Limão e Pimenta Caiena',
+    lunchTip: 'Seu corpo é seu templo. Continue nutrindo-o com amor e consciência.',
+    lunchTipRescue: 'Se você ainda sente peso, cada refeição é uma oportunidade de virar o jogo.',
+    afternoonHydrationText: 'Checkpoint de hidratação! Reforce com {meta}ml agora.',
+    afternoonMicroMovementLabel: 'Caminhada Consciente - 10 min',
+    afternoonMicroMovementLabelRescue: 'Automassagem das Pernas (Drenagem Ascendente) - 7 min',
+    afternoonSnackLabel: 'Smoothie de Abacaxi com Hortelã',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Gratidão',
+      description: 'Foco em bem-estar e reconhecimento.',
+      duration: '5 min',
+      steps: [
+        'Deite-se confortavelmente.',
+        'Feche os olhos e respire fundo 3 vezes.',
+        'Pense em 3 coisas que seu corpo fez por você hoje.',
+        'Agradeça por cada pequena vitória.',
+        'Visualize-se leve e fluida.',
+        'Permaneça nessa sensação por 2 minutos.',
+        'Abra os olhos lentamente.',
+      ],
+    },
+    nightTechniqueRescue: {
+      type: 'text-guide',
+      title: 'Escalda-pés Terapêutico',
+      description: 'Alívio e drenagem com sal grosso e óleos essenciais.',
+      duration: '15 min',
+      steps: [
+        'Aqueça água até ficar morna (não quente).',
+        'Adicione 2 colheres de sal grosso.',
+        'Adicione 3 gotas de óleo essencial de lavanda ou menta.',
+        'Mergulhe os pés e pernas até a canela.',
+        'Permaneça por 15 minutos.',
+        'Seque com cuidado, massageando de baixo para cima.',
+        'Aplique um creme hidratante com movimentos ascendentes.',
+      ],
+    },
+    closingMessage: 'Dia 10! Você construiu uma base sólida de saúde. O fluxo é seu.',
+    hydrationTexts: {
+      morning: 'Checkpoint! Meta matinal: {meta}ml para avaliar seu progresso.',
+      lunch: 'Continue forte: {meta}ml para manter a intensificação.',
+      afternoon: 'Reta final da tarde: {meta}ml.',
+      night: 'Dia 10 concluído! Última meta: {meta}ml.',
+    },
+    afternoonKnowledgePill: 'Após 10 dias de movimento consistente, o corpo começa a criar novos caminhos linfáticos colaterais.',
+  },
+  // ── Day 11 — Autonomia ──
+  {
+    dayNumber: 11,
+    theme: 'Autonomia',
+    purpose: 'Fortalecimento suave e escolhas conscientes',
+    affirmation: 'Eu sou forte, capaz e faço escolhas que me nutrem. Meu corpo é meu aliado.',
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Consciente' },
+      { slot: 'afternoon', time: '15:00', label: 'Subida de Degraus' },
+      { slot: 'night', time: '21:00', label: 'Visualização do Futuro' },
+    ],
+    morningExerciseLabel: 'Ponte de Glúteos (Elevação Pélvica) - 5 min',
+    morningExerciseLabelRescue: 'Elevação de Pernas na Parede (Viparita Karani) - 10 min',
+    morningShotLabel: 'Shot de Maçã, Canela e Pimenta do Reino',
+    lunchTip: 'Você se tornou uma expert em nutrir seu corpo. Confie na sua intuição.',
+    lunchTipRescue: 'Cada escolha alimentar é um voto de confiança no seu corpo.',
+    afternoonHydrationText: 'Autonomia inclui se hidratar por conta própria. Continue!',
+    afternoonMicroMovementLabel: 'Subida e Descida de Degraus (Adaptado) - 5 min',
+    afternoonMicroMovementLabelRescue: 'Flexão e Extensão dos Pés - 3 min',
+    afternoonSnackLabel: 'Chá Gelado de Hibisco com Maçã',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Visualização (Seu Futuro Leve)',
+      description: 'Foco em reforçar a nova identidade.',
+      duration: '7 min',
+      steps: [
+        'Deite-se confortavelmente e feche os olhos.',
+        'Respire fundo 3 vezes.',
+        'Imagine-se daqui a 30 dias, mais leve e forte.',
+        'Visualize suas pernas fluindo com energia.',
+        'Sinta a gratidão pelo caminho percorrido.',
+        'Projete seus próximos passos de saúde.',
+        'Abra os olhos com um sorriso.',
+      ],
+    },
+    nightTechniqueRescue: {
+      type: 'text-guide',
+      title: 'Relaxamento Progressivo (Scan Corporal)',
+      description: 'Alívio da tensão muscular e mental.',
+      duration: '10 min',
+      steps: [
+        'Deite-se e feche os olhos.',
+        'Comece pelos pés: contraia por 5 segundos, depois solte.',
+        'Suba para as panturrilhas: contraia e solte.',
+        'Continue com coxas, glúteos, abdômen.',
+        'Agora peito, braços e mãos.',
+        'Finalize com ombros, pescoço e rosto.',
+        'Permaneça relaxada por 2 minutos.',
+        'Respire profundamente e abra os olhos.',
+      ],
+    },
+    closingMessage: 'Você está construindo sua autonomia. Cada escolha te fortalece.',
+    hydrationTexts: {
+      morning: 'Autonomia começa com autocuidado. Meta: {meta}ml.',
+      lunch: 'Escolhas conscientes + água = poder. Meta: {meta}ml.',
+      afternoon: 'Você já sabe o caminho. Meta da tarde: {meta}ml.',
+      night: 'Noite de fortalecimento. Última meta: {meta}ml.',
+    },
+    afternoonKnowledgePill: 'A ponte de glúteos fortalece o assoalho pélvico e melhora a circulação na região das pernas.',
+  },
+  // ── Day 12 ──
+  {
+    dayNumber: 12,
+    theme: 'Autonomia',
+    purpose: 'Fortalecimento suave e escolhas conscientes',
+    affirmation: 'Meu corpo e eu somos um time. Juntos, somos imbatíveis.',
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Consciente' },
+      { slot: 'afternoon', time: '15:00', label: 'Subida de Degraus' },
+      { slot: 'night', time: '21:00', label: 'Visualização do Futuro' },
+    ],
+    morningExerciseLabel: 'Ponte de Glúteos (Elevação Pélvica) - 5 min',
+    morningExerciseLabelRescue: 'Elevação de Pernas na Parede (Viparita Karani) - 10 min',
+    morningShotLabel: 'Shot de Maçã, Canela e Pimenta do Reino',
+    lunchTip: 'Você se tornou uma expert em nutrir seu corpo. Confie na sua intuição.',
+    lunchTipRescue: 'Cada escolha alimentar é um voto de confiança no seu corpo.',
+    afternoonHydrationText: 'Continue se hidratando com autonomia. Você sabe o que seu corpo precisa.',
+    afternoonMicroMovementLabel: 'Subida e Descida de Degraus (Adaptado) - 5 min',
+    afternoonMicroMovementLabelRescue: 'Flexão e Extensão dos Pés - 3 min',
+    afternoonSnackLabel: 'Chá Gelado de Hibisco com Maçã',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Visualização (Seu Futuro Leve)',
+      description: 'Foco em reforçar a nova identidade.',
+      duration: '7 min',
+      steps: [
+        'Deite-se confortavelmente e feche os olhos.',
+        'Respire fundo 3 vezes.',
+        'Imagine-se daqui a 30 dias, mais leve e forte.',
+        'Visualize suas pernas fluindo com energia.',
+        'Sinta a gratidão pelo caminho percorrido.',
+        'Projete seus próximos passos de saúde.',
+        'Abra os olhos com um sorriso.',
+      ],
+    },
+    nightTechniqueRescue: {
+      type: 'text-guide',
+      title: 'Relaxamento Progressivo (Scan Corporal)',
+      description: 'Alívio da tensão muscular e mental.',
+      duration: '10 min',
+      steps: [
+        'Deite-se e feche os olhos.',
+        'Comece pelos pés: contraia por 5 segundos, depois solte.',
+        'Suba para as panturrilhas: contraia e solte.',
+        'Continue com coxas, glúteos, abdômen.',
+        'Agora peito, braços e mãos.',
+        'Finalize com ombros, pescoço e rosto.',
+        'Permaneça relaxada por 2 minutos.',
+        'Respire profundamente e abra os olhos.',
+      ],
+    },
+    closingMessage: 'Sua força interior brilha a cada dia.',
+    hydrationTexts: {
+      morning: 'Bom dia, guerreira! Meta matinal: {meta}ml.',
+      lunch: 'Seu time (corpo + mente) precisa de {meta}ml.',
+      afternoon: 'Reta final da tarde: {meta}ml.',
+      night: 'Mais um dia vencido. Última meta: {meta}ml.',
+    },
+    afternoonKnowledgePill: 'Subir degraus ativa a panturrilha de forma mais intensa que caminhar no plano — bomba linfática natural.',
+  },
+  // ── Day 13 ──
+  {
+    dayNumber: 13,
+    theme: 'Autonomia',
+    purpose: 'Fortalecimento suave e escolhas conscientes',
+    affirmation: 'Eu confio no meu corpo e no caminho que construí.',
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição Consciente' },
+      { slot: 'afternoon', time: '15:00', label: 'Subida de Degraus' },
+      { slot: 'night', time: '21:00', label: 'Visualização do Futuro' },
+    ],
+    morningExerciseLabel: 'Ponte de Glúteos (Elevação Pélvica) - 5 min',
+    morningExerciseLabelRescue: 'Elevação de Pernas na Parede (Viparita Karani) - 10 min',
+    morningShotLabel: 'Shot de Maçã, Canela e Pimenta do Reino',
+    lunchTip: 'Você se tornou uma expert em nutrir seu corpo. Confie na sua intuição.',
+    lunchTipRescue: 'Cada escolha alimentar é um voto de confiança no seu corpo.',
+    afternoonHydrationText: 'Amanhã é o grande dia! Prepare-se hidratando bem hoje.',
+    afternoonMicroMovementLabel: 'Subida e Descida de Degraus (Adaptado) - 5 min',
+    afternoonMicroMovementLabelRescue: 'Flexão e Extensão dos Pés - 3 min',
+    afternoonSnackLabel: 'Chá Gelado de Hibisco com Maçã',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Visualização (Seu Futuro Leve)',
+      description: 'Foco em reforçar a nova identidade.',
+      duration: '7 min',
+      steps: [
+        'Deite-se confortavelmente e feche os olhos.',
+        'Respire fundo 3 vezes.',
+        'Imagine-se daqui a 30 dias, mais leve e forte.',
+        'Visualize suas pernas fluindo com energia.',
+        'Sinta a gratidão pelo caminho percorrido.',
+        'Projete seus próximos passos de saúde.',
+        'Abra os olhos com um sorriso.',
+      ],
+    },
+    nightTechniqueRescue: {
+      type: 'text-guide',
+      title: 'Relaxamento Progressivo (Scan Corporal)',
+      description: 'Alívio da tensão muscular e mental.',
+      duration: '10 min',
+      steps: [
+        'Deite-se e feche os olhos.',
+        'Comece pelos pés: contraia por 5 segundos, depois solte.',
+        'Suba para as panturrilhas: contraia e solte.',
+        'Continue com coxas, glúteos, abdômen.',
+        'Agora peito, braços e mãos.',
+        'Finalize com ombros, pescoço e rosto.',
+        'Permaneça relaxada por 2 minutos.',
+        'Respire profundamente e abra os olhos.',
+      ],
+    },
+    closingMessage: 'Amanhã é o grande dia. Prepare-se para celebrar.',
+    hydrationTexts: {
+      morning: 'Penúltimo dia! Meta matinal: {meta}ml.',
+      lunch: 'Quase lá! Continue: {meta}ml.',
+      afternoon: 'Preparação final: {meta}ml.',
+      night: 'Véspera do grande dia. Última meta: {meta}ml.',
+    },
+    afternoonKnowledgePill: 'A consistência de 13 dias já criou um hábito neurológico — seu cérebro agora associa movimento a bem-estar.',
+  },
+  // ── Day 14 — O Novo Eu ──
+  {
+    dayNumber: 14,
+    theme: 'O Novo Eu',
+    purpose: 'Consolidação total, celebração e plano de manutenção',
+    affirmation: 'Eu não sou mais a mesma do Dia 1. Eu sou leve, forte e fluida. Minha jornada continua.',
+    isCheckpointDay: true,
+    schedule: [
+      { slot: 'morning', time: '08:00', label: 'Alongamento Total' },
+      { slot: 'lunch', time: '12:00', label: 'Refeição de Celebração' },
+      { slot: 'afternoon', time: '15:00', label: 'Micro-movimento' },
+      { slot: 'night', time: '21:00', label: 'Ritual de Passagem' },
+    ],
+    morningExerciseLabel: 'Alongamento de Parede para o Corpo Todo - 5 min',
+    morningShotLabel: 'Shot de Cúrcuma, Gengibre e Pimenta Preta (Manutenção)',
+    lunchTip: 'Você se tornou uma alquimista da sua saúde. Continue explorando e nutrindo seu corpo com sabedoria.',
+    afternoonHydrationText: 'Último dia de jornada! Celebre cada gole.',
+    afternoonMicroMovementLabel: 'Rotação de Quadril (Deitado) - 3 min',
+    afternoonSnackLabel: 'Energy Balls de Tâmaras e Coco',
+    nightTechnique: {
+      type: 'meditation',
+      title: 'Meditação Guiada de Visualização (Seu Futuro Leve)',
+      description: 'Reforçar a nova identidade e projetar o futuro.',
+      duration: '10 min',
+      steps: [
+        'Deite-se e feche os olhos.',
+        'Respire fundo e sinta todo o seu corpo.',
+        'Visualize a silhueta do Dia 1 — o fogo, a dor.',
+        'Agora visualize-se hoje — o fluxo, a leveza.',
+        'Sinta a diferença em cada célula.',
+        'Projete-se no futuro: 30, 60, 90 dias mantendo seus hábitos.',
+        'Veja-se leve, forte, fluida.',
+        'Agradeça a si mesma pela coragem de começar.',
+        'Abra os olhos. Você é o Novo Eu.',
+      ],
+    },
+    closingMessage: 'Parabéns! Você concluiu a jornada Levvia de 14 dias. Você não é mais a mesma. Seu corpo flui, sua mente está leve. Continue explorando a biblioteca de hábitos e receitas. O Levvia estará sempre aqui para você.',
+    hydrationTexts: {
+      morning: 'Último dia! Meta matinal de celebração: {meta}ml.',
+      lunch: 'Brinde ao seu corpo: {meta}ml.',
+      afternoon: 'Quase concluindo: {meta}ml.',
+      night: 'Última meta da jornada: {meta}ml. Você conseguiu! 🎉',
+    },
+    afternoonKnowledgePill: 'Parabéns! 14 dias de cuidado criaram novos padrões neurais e linfáticos. A manutenção é o próximo capítulo.',
+  },
 ];
 
 export { TOUCHPOINT_CONFIGS };
