@@ -1,97 +1,39 @@
 
 
-# Migrate Onboarding, Auth & Diagnosis to Light Theme
+# Fix Invisible SVG Silhouettes + Separators in Light Theme
 
 ## Summary
-Add `.theme-light` wrapper and replace all hardcoded dark-theme classes in these 3 pages. Blue logos already exist in `src/assets/`.
+Replace hardcoded dark-theme SVG colors (`rgba(237,242,247,...)`) and separator colors (`rgba(255,255,255,...)`) with neutral gray-blue values visible on both light and dark backgrounds.
 
 ## Changes
 
-### 1. `src/pages/Onboarding.tsx`
+### 1. `src/components/journey/HeatMapInteractive.tsx`
+- Line 35: intensity 0 fill `rgba(237,242,247,0.08)` → `rgba(140,160,180,0.15)`
+- Lines 117-122: decorative parts fill `rgba(237,242,247,0.12)` → `rgba(140,160,180,0.15)`, stroke `rgba(237,242,247,0.3)` → `rgba(140,160,180,0.4)`
+- Lines 123-131: interactive area strokes `rgba(237,242,247,0.3)` → `rgba(140,160,180,0.4)` (fills stay as intensityColors)
 
-**Line 11** — Logo import: `logo_livvia_branco.png` → `logo_livvia_azul.png`
+### 2. `src/components/journey/Day2InflammationMap.tsx`
+- Lines 61-62: `BASE_FILL` → `rgba(140,160,180,0.15)`, `STROKE` → `rgba(140,160,180,0.4)`
+- Lines 210-215: decorative fills `rgba(237,242,247,0.12)` → `rgba(140,160,180,0.15)`
 
-**Line 939** — Root div: add `theme-light`, remove `gradient-page`:
-```tsx
-<div className="theme-light min-h-screen bg-background flex flex-col">
-```
+### 3. `src/components/HeatMapCard.tsx`
+- Line 30: intensity 0 → `rgba(140,160,180,0.15)`
+- Line 67: stroke → `rgba(140,160,180,0.4)`
+- Lines 72-77: decorative fills → `rgba(140,160,180,0.15)`
 
-**Line 960** — Progress bar track: `bg-white/10` → `bg-muted`
+### 4. `src/pages/Plans.tsx`
+- Line 24: root div — remove `style={{ background: "hsl(210, 63%, 13%)" }}`, add `className="theme-light min-h-screen flex flex-col bg-background"`
+- Lines 72, 142, 211, 213: separators `rgba(255,255,255,0.08)` → `rgba(0,0,0,0.06)`
+- Line 212: "ou" text color `rgba(237,242,247,0.35)` → `rgba(140,160,180,0.5)`
 
-**Lines 535, 584, 651, 727, 762, 872** — Icon containers: `gradient-primary` → `bg-primary`
-**Lines 537, 586, 653, 729, 764, 874** — Heart/icon inside: `text-foreground` → `text-primary-foreground`
-
-**Line 75** (ResultScreen) — `bg-white/[0.06] border border-white/10` → `bg-muted border border-border`
-**Line 92** — `glass-card` → `levvia-card`
-
-**Line 505** (disclaimer) — `border-white/10 bg-white/[0.06]` → `border-border bg-muted`
-
-**Line 566** (name input) — `border-white/10 bg-white/[0.06]` → `border-border bg-muted`, remove `backdrop-blur-[10px]`
-**Line 618** (number input) — same
-**Lines 685, 698** (body_metrics inputs) — same
-
-**Lines 817-818** (pantry unselected) — `bg-white/[0.06] text-muted-foreground border-white/10 hover:border-white/20` → `bg-muted text-muted-foreground border-border hover:border-primary/30`
-
-**Line 834** (pantry custom input container) — `border-white/10 bg-white/[0.06]` → `border-border bg-muted`
-**Line 844** (textarea) — `border-white/10 bg-white/[0.04]` → `border-border bg-muted`
-
-**Lines 914-917** (single/multi options unselected) — `border-white/10 bg-white/[0.06] hover:border-secondary/30` → `border-border bg-muted hover:border-secondary/30`
-
-**Lines 1003-1006** (CTA button):
-- Enabled: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
-- Disabled: `bg-white/[0.06] text-muted-foreground` → `bg-muted text-muted-foreground`
-
-### 2. `src/pages/Auth.tsx`
-
-**Line 11** — Logo import: `logo_livvia_branco_icone.png` → `logo_livvia_azul_icone.png`
-
-**Line 111** — Root div: add `theme-light`:
-```tsx
-<div className="theme-light min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
-```
-
-**Line 125** — Success circle: `gradient-primary` → `bg-primary`
-**Line 127** — Check icon: `text-foreground` → `text-primary-foreground`
-
-**Line 152** — Logo container: `gradient-primary` → `bg-primary`
-
-**Lines 178, 196, 210, 236** — Input fields: `bg-white/[0.06] border-white/10` → `bg-muted border-border`
-
-**Line 251** — Submit button: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
-
-### 3. `src/pages/Diagnosis.tsx`
-
-**Line 11** — Logo import: `logo_livvia_branco.png` → `logo_livvia_azul.png`
-
-**Line 83** — Root div: remove `gradient-page`, add `theme-light`:
-```tsx
-<div className="theme-light min-h-screen bg-background flex flex-col">
-```
-
-**Lines 111, 136, 170, 211, 228, 271, 288** — `glass-card` → `levvia-card`
-
-**Line 117** — `bg-white/[0.06]` → `bg-muted`
-
-**Lines 143, 150, 178, 184, 190, 196** — `bg-white/[0.04]` → `bg-muted`
-**Line 143** — `border border-white/10` → `border border-border`
-
-**Line 323** — `bg-white/[0.08]` → `bg-muted`
-
-**Lines 341-342** — CTA gradient background:
-```tsx
-background: "linear-gradient(135deg, hsl(174 63% 47% / 0.08), hsl(196 58% 42% / 0.12))"
-```
-
-**Line 384** — CTA button: `gradient-primary text-foreground` → `bg-primary text-primary-foreground`
-
-## Files changed
-- `src/pages/Onboarding.tsx` — ~20 class replacements + logo swap
-- `src/pages/Auth.tsx` — ~8 class replacements + logo swap
-- `src/pages/Diagnosis.tsx` — ~15 class replacements + logo swap
+### 5. `src/components/SymptomEvolutionChart.tsx`
+- Line 139: grid stroke → `rgba(0,0,0,0.06)`
+- Lines 143, 149: axis stroke → `rgba(0,0,0,0.08)`
+- Line 155: tooltip border → `rgba(0,0,0,0.08)`
+- Line 154: tooltip bg `hsl(210,50%,16%)` → `hsl(0,0%,100%)` and line 158 text color → `hsl(210,30%,20%)` (light-compatible tooltip)
 
 ## Not changed
-- Component logic, data flow, Supabase calls
-- `src/components/journey/*` (already fixed)
-- `src/index.css` (already correct)
-- WaitingScreen (stays dark)
+- Intensity colors 1/2/3 (yellow, red — already visible)
+- Component logic, click handlers, data flow
+- Previously corrected journey components
 
