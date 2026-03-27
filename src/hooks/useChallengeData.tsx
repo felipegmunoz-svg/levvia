@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useProfile } from "./useProfile";
 import { useAuth } from "./useAuth";
 import { debugRender } from "@/lib/renderDebug";
@@ -8,13 +8,20 @@ import {
   fetchHabits,
   selectExercisesForDay,
   filterRecipesForProfile,
+  filterExercisesForProfile,
   selectHabitsForDay,
+  selectMorningExercise,
+  selectShotRecipe,
+  selectMicroMovement,
+  selectSnackRecipe,
+  selectLunchRecipes,
   isHighPain,
   type DbExercise,
   type DbRecipe,
   type DbHabit,
   type UserProfile,
 } from "@/lib/profileEngine";
+import { getTouchpointConfig, type NightTechnique } from "@/data/touchpointConfig";
 import { supabase } from "@/integrations/supabase/client";
 
 let dataCache: { exercises: DbExercise[]; recipes: DbRecipe[]; habits: DbHabit[]; ts: number } | null = null;
