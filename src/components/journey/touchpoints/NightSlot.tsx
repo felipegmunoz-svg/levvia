@@ -41,16 +41,20 @@ const NightSlot = ({
           );
         }
         return (
-          <div className="levvia-card p-5">
-            <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-              🗺️ {technique.title}
-            </h3>
-            {technique.description && (
-              <p className="text-sm text-levvia-muted font-body mb-4">
-                {technique.description}
-              </p>
-            )}
-            <HeatMapInteractive onNext={() => setTechniqueDone(true)} />
+          <div className="space-y-4">
+            <div className="levvia-card p-5 overflow-visible">
+              <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
+                🗺️ {technique.title}
+              </h3>
+              {technique.description && (
+                <p className="text-sm text-levvia-muted font-body mb-4">
+                  {technique.description}
+                </p>
+              )}
+            </div>
+            <div className="min-h-[480px]">
+              <HeatMapInteractive onNext={() => setTechniqueDone(true)} />
+            </div>
           </div>
         );
 
