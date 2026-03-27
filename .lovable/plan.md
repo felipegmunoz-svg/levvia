@@ -1,58 +1,47 @@
 
 
-# Fix: Day Flow Components Missing theme-light
+# Fix Light Theme in Journey Components
 
 ## Problem
-`theme-light` is only applied to the **dashboard** view (line 384 of Today.tsx). When a Day flow renders (Day1Flow → Day1Welcome, Day1Closing, etc.), those components use `bg-background` and `text-foreground` which resolve to the **dark** `:root` variables because they're rendered **outside** the `theme-light` wrapper.
+Journey components use hardcoded dark-theme classes (`gradient-primary`, `glass-card`, `border-white/*`, `bg-white/[0.0x]`) that are invisible or illegible when `.theme-light` is active.
 
-The Day flow components (Day1Welcome, Day1Closing, HeatMapInteractive, Day2Welcome, etc.) all use:
-- `bg-background` → dark navy
-- `text-foreground` → light gray  
-- `gradient-primary` → dark gradient
+## Changes
 
-## Solution
-Wrap **each Day flow render** in Today.tsx with `theme-light`, and also add `theme-light` to the Day flow components' own root wrappers.
+### 1. `src/index.css` — Global border fix
+Line 83: Change `* { @apply border-white/10; }` → `* { @apply border-border; }`
 
-### Changes
+### 2. Replace `gradient-primary text-foreground` → `bg-primary text-primary-foreground` in CTA buttons
 
-**1. `src/pages/Today.tsx` — Wrap Day flow renders (lines ~320-348)**
+**Files (26 total with gradient-primary):**
+- Day1Welcome.tsx, Day1Closing.tsx, Day1ClosingPublic.tsx, Day1MealSuggestion.tsx
+- Day2Welcome.tsx, Day2MealSuggestion.tsx
+- Day3Welcome.tsx, Day3CardapioPersonalizado.tsx
+- Day4Welcome.tsx, Day4CardapioNoturno.tsx, Day4SleepHygiene.tsx
+- Day5Dashboard.tsx, Day5Lunch.tsx, Day5MicroChallenge.tsx, Day5Snack.tsx, Day5LegsElevation.tsx, Day5MovementGuide.tsx
+- Day6Flow.tsx
+- BreathingCircle.tsx, FoodTrafficLight.tsx, HeatMapInteractive.tsx
+- PaywallModal.tsx, DiaryReflection.tsx, DayReview.tsx, Day2DrainageGuide.tsx, Day2NightRitual.tsx, Day2Closing.tsx, Day3Closing.tsx, Day4Closing.tsx, Day5Closing.tsx, Day2InflammationMap.tsx
 
-Each Day flow assignment needs wrapping:
-```tsx
-content = <div className="theme-light"><Day1Flow onComplete={...} /></div>;
-content = <div className="theme-light"><Day2Flow onComplete={...} /></div>;
-// ... same for Day3-6
-```
+Also replace disabled state `bg-white/[0.06]` → `bg-muted` and `bg-white/10` → `bg-muted`
 
-**2. `src/components/journey/Day1Welcome.tsx`**
-Change line 10:
-```tsx
-<div className="theme-light min-h-screen bg-background ...">
-```
+### 3. Replace `glass-card` → `levvia-card` (21 files)
+- Day2Welcome.tsx, Day2DrainageGuide.tsx, Day3Closing.tsx
+- Day5Dashboard.tsx, Day5MicroChallenge.tsx, Day5LegsElevation.tsx
+- And all other files found in the search above
 
-**3. `src/components/journey/Day1Closing.tsx`**
-Add `theme-light` to both render paths' root divs.
+### 4. Replace `border-white/5`, `border-white/10`, `border-white/20`, `border-white/[0.06]` → `border-border` (15 files)
+Includes sticky footer patterns and form inputs.
 
-**4. `src/components/journey/Day1Flow.tsx`**
-Add `theme-light` to loading spinner div (line 306).
+### 5. Replace `bg-white/[0.04]`, `bg-white/[0.05]`, `bg-white/[0.06]`, `bg-white/[0.08]` → `bg-muted` 
+In form fields, unselected buttons, and decorative containers (7 files).
 
-**5. Same pattern for Day2-6 Welcome/Closing/Flow components**
-Each component that renders `bg-background` or `text-foreground` at its root needs `theme-light` on its outermost div.
+## What stays unchanged
+- `:root` CSS variables (dark theme preserved for Auth/Onboarding)
+- `.theme-light` block in index.css
+- All pages (`Today.tsx`, `Journey.tsx`, etc.)
+- Component logic and structure
+- `WaitingScreen.tsx` (intentionally dark)
 
-### Simpler alternative (recommended)
-Instead of editing 15+ component files, wrap **once** in Today.tsx around the entire render:
-
-In Today.tsx, find the final `return` and wrap `content` in a theme-light div:
-```tsx
-return (
-  <div className="theme-light">
-    {content}
-  </div>
-);
-```
-
-This single wrapper ensures ALL content rendered by Today.tsx (Day flows, dashboard, exercise details, recipe details, loading spinner) inherits the light theme variables. One line change instead of 15+ files.
-
-### Files
-- `src/pages/Today.tsx` — wrap final return in `<div className="theme-light">{content}</div>`
+## Technical detail
+All replacements use Tailwind's CSS-variable-based classes (`bg-primary`, `border-border`, `bg-muted`) which automatically resolve to the correct color based on whether `.theme-light` is active or not. This makes components work correctly in both dark (Auth) and light (Journey) contexts.
 
