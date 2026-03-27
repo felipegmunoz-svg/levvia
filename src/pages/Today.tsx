@@ -34,6 +34,8 @@ const Today = () => {
   }, []);
 
   const { user, loading: authLoading } = useAuth();
+  const { rescueMode, evaluateCheckpoint, isCheckpointDay } = useRescueMode();
+
   const {
     profile,
     currentDay,
@@ -42,7 +44,7 @@ const Today = () => {
     dayTitle,
     dayObjective,
     loading,
-  } = useChallengeData();
+  } = useChallengeData(rescueMode);
 
   const { hasPremium, loading: premiumLoading } = usePremium();
   const [showPaywall, setShowPaywall] = useState(false);
@@ -76,7 +78,7 @@ const Today = () => {
   const effectiveDay = replayDay ?? currentDay;
   const { progress, activeSlot, isDayComplete, completedSlots, markSlotDone, loading: tpLoading } = useTouchpointProgress(effectiveDay);
   const hydration = useHydration(profile?.weightKg ?? null, effectiveDay);
-  const { rescueMode, evaluateCheckpoint, isCheckpointDay } = useRescueMode();
+  // rescueMode already initialized above (line 37)
 
   const handleSlotComplete = useCallback(async (slot: TouchpointSlot, data: any) => {
     await markSlotDone(slot, data);
