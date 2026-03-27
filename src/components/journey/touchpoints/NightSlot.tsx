@@ -4,12 +4,25 @@ import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryRefle
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import BreathingCircle from "@/components/journey/BreathingCircle";
 import FoodTrafficLight from "@/components/journey/FoodTrafficLight";
+import HydrationModule from "./HydrationModule";
+
+interface HydrationSlotProps {
+  dailyGoalMl: number;
+  subGoalMl: number;
+  currentIntakeMl: number;
+  dailyPercent: number;
+  slotSubGoalMl: number;
+  slotLabel: string;
+  hydrationText: string;
+  onAddWater: (ml: number) => void;
+}
 
 interface NightSlotProps {
   dayNumber: number;
   technique: NightTechnique;
   closingMessage: string;
   isReviewMode: boolean;
+  hydration?: HydrationSlotProps;
   onComplete: (data: { technique_done: boolean; journal?: DiaryData }) => void;
 }
 
@@ -18,6 +31,7 @@ const NightSlot = ({
   technique,
   closingMessage,
   isReviewMode,
+  hydration,
   onComplete,
 }: NightSlotProps) => {
   const [techniqueDone, setTechniqueDone] = useState(isReviewMode);
@@ -152,6 +166,14 @@ const NightSlot = ({
 
   return (
     <div className="space-y-5">
+      {/* Hydration */}
+      {hydration && (
+        <HydrationModule
+          {...hydration}
+          isReviewMode={isReviewMode}
+        />
+      )}
+
       {/* Technique */}
       {renderTechnique()}
 

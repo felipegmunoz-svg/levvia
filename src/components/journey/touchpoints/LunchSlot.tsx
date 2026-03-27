@@ -1,12 +1,25 @@
 import { useState } from "react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import RecipeDetail from "@/components/RecipeDetail";
+import HydrationModule from "./HydrationModule";
+
+interface HydrationSlotProps {
+  dailyGoalMl: number;
+  subGoalMl: number;
+  currentIntakeMl: number;
+  dailyPercent: number;
+  slotSubGoalMl: number;
+  slotLabel: string;
+  hydrationText: string;
+  onAddWater: (ml: number) => void;
+}
 
 interface LunchSlotProps {
   dayNumber: number;
   recipes: ChallengeActivity[];
   tip: string;
   isReviewMode: boolean;
+  hydration?: HydrationSlotProps;
   onComplete: (data: { recipe_choice_id?: string }) => void;
 }
 
@@ -15,6 +28,7 @@ const LunchSlot = ({
   recipes,
   tip,
   isReviewMode,
+  hydration,
   onComplete,
 }: LunchSlotProps) => {
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
@@ -106,6 +120,14 @@ const LunchSlot = ({
             {tip}
           </p>
         </div>
+      )}
+
+      {/* Hydration */}
+      {hydration && (
+        <HydrationModule
+          {...hydration}
+          isReviewMode={isReviewMode}
+        />
       )}
 
       {/* Complete Button */}

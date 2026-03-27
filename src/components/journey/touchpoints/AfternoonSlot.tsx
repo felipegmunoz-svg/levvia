@@ -2,6 +2,18 @@ import { useState } from "react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
+import HydrationModule from "./HydrationModule";
+
+interface HydrationSlotProps {
+  dailyGoalMl: number;
+  subGoalMl: number;
+  currentIntakeMl: number;
+  dailyPercent: number;
+  slotSubGoalMl: number;
+  slotLabel: string;
+  hydrationText: string;
+  onAddWater: (ml: number) => void;
+}
 
 interface AfternoonSlotProps {
   dayNumber: number;
@@ -9,6 +21,7 @@ interface AfternoonSlotProps {
   microMovement: ChallengeActivity | null;
   snackRecipe: ChallengeActivity | null;
   isReviewMode: boolean;
+  hydration?: HydrationSlotProps;
   onComplete: (data: { hydration: boolean; micro_challenge_id?: string; snack_id?: string }) => void;
 }
 
@@ -18,6 +31,7 @@ const AfternoonSlot = ({
   microMovement,
   snackRecipe,
   isReviewMode,
+  hydration,
   onComplete,
 }: AfternoonSlotProps) => {
   const [hydrated, setHydrated] = useState(false);
@@ -81,20 +95,27 @@ const AfternoonSlot = ({
 
   return (
     <div className="space-y-5">
-      {/* Hydration */}
-      <div className="levvia-card p-5">
-        <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-          💧 Hidratação
-        </h3>
-        <p className="text-sm text-levvia-fg font-body leading-relaxed mb-3">
-          {hydrationText}
-        </p>
-        <CheckBox
-          checked={hydrated}
-          onChange={() => setHydrated(!hydrated)}
-          label="Bebi minha água"
+      {/* Hydration Module (replaces old checkbox) */}
+      {hydration ? (
+        <HydrationModule
+          {...hydration}
+          isReviewMode={isReviewMode}
         />
-      </div>
+      ) : (
+        <div className="levvia-card p-5">
+          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
+            💧 Hidratação
+          </h3>
+          <p className="text-sm text-levvia-fg font-body leading-relaxed mb-3">
+            {hydrationText}
+          </p>
+          <CheckBox
+            checked={hydrated}
+            onChange={() => setHydrated(!hydrated)}
+            label="Bebi minha água"
+          />
+        </div>
+      )}
 
       {/* Micro-Movement */}
       {microMovement && (

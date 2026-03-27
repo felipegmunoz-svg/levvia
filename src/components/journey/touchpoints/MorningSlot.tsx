@@ -3,6 +3,18 @@ import { ArrowLeft } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
+import HydrationModule from "./HydrationModule";
+
+interface HydrationSlotProps {
+  dailyGoalMl: number;
+  subGoalMl: number;
+  currentIntakeMl: number;
+  dailyPercent: number;
+  slotSubGoalMl: number;
+  slotLabel: string;
+  hydrationText: string;
+  onAddWater: (ml: number) => void;
+}
 
 interface MorningSlotProps {
   dayNumber: number;
@@ -11,6 +23,7 @@ interface MorningSlotProps {
   exercise: ChallengeActivity | null;
   shotRecipe: ChallengeActivity | null;
   isReviewMode: boolean;
+  hydration?: HydrationSlotProps;
   onComplete: (data: { exercise_id?: string; shot_id?: string }) => void;
 }
 
@@ -28,6 +41,7 @@ const MorningSlot = ({
   exercise,
   shotRecipe,
   isReviewMode,
+  hydration,
   onComplete,
 }: MorningSlotProps) => {
   const [showExercise, setShowExercise] = useState(false);
@@ -166,7 +180,15 @@ const MorningSlot = ({
         </div>
       )}
 
-      {/* Section 5 — Complete Button */}
+      {/* Section 5 — Hydration */}
+      {hydration && (
+        <HydrationModule
+          {...hydration}
+          isReviewMode={isReviewMode}
+        />
+      )}
+
+      {/* Section 6 — Complete Button */}
       {!isReviewMode && (
         <button
           onClick={() =>
