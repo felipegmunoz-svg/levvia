@@ -1,30 +1,21 @@
 
 
-# Add Soy Allergy Filter
+# Add Sequential Slot Locking to DayTouchpointView
 
 ## Summary
-Add "Alergia a Soja" as a dietary restriction option and filter out soy-containing recipes for users who select it.
+Prevent users from opening a later touchpoint slot without completing all prior ones. Adds both logical blocking (can't expand) and visual feedback (dimmed + disabled).
 
-## Changes
+## Changes in `src/components/journey/DayTouchpointView.tsx`
 
-### 1. `src/data/onboarding.ts` — Line 171
-Insert `"Alergia a Soja",` between "Alergia a Amendoim" and "Alergia a Oleaginosas".
+### 1. Add `SLOT_ORDER` and `canExpandSlot` helper (after `CHECKPOINT_DAYS`, ~line 56)
+Constants and function to check if all previous slots are done before allowing expansion.
 
-### 2. `src/lib/profileEngine.ts` — After line 425
-Insert soy filter block after the oleaginosas filter:
-```ts
-if (normRestr.some(r => r.includes("soja") || r.includes("soy"))) {
-  filtered = filtered.filter((r) =>
-    !r.ingredients.some((i) =>
-      /soja|tofu|edamame|proteína texturizada|leite de soja|shoyu|missô|miso/i.test(i)
-    )
-  );
-}
-```
+### 2. Replace `toggleSlot` function (~line 82)
+Add guard: if not in review mode, slot not done, and previous slots incomplete → silently block.
 
-Note: `profileEngine.ts` already has `"alergia a soja": "soy"` in its restriction mapping (line 622), so the normalization will work correctly with the new option.
+### 3. Update card header button (~line 120)
+Add `disabled` prop and conditional `opacity-40 cursor-not-allowed` classes for locked slots.
 
 ## Files modified
-- `src/data/onboarding.ts` — 1 line added
-- `src/lib/profileEngine.ts` — 6 lines added
+- `src/components/journey/DayTouchpointView.tsx` — 3 surgical edits
 
