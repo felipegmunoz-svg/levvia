@@ -40,6 +40,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Consciência Corporal',
     purpose: 'Mapear o Fogo',
     affirmation: 'Eu escolho ouvir o meu corpo com amor e paciência hoje.',
+    affirmationRescue: 'Hoje é sobre começar, não sobre ser perfeita. Cada passo que eu der é exatamente o suficiente.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Respiração Diafragmática' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Anti-inflamatória' },
@@ -73,6 +74,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'O Rio Interno',
     purpose: 'Drenagem',
     affirmation: 'Minha linfa flui livremente, trazendo leveza para minhas pernas.',
+    affirmationRescue: 'Minha linfa flui no ritmo que posso oferecer. Gentileza comigo é o meu maior remédio.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Deslizamento de Calcanhar' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Hidratante' },
@@ -150,6 +152,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'O Sono Restaurador',
     purpose: 'Repouso',
     affirmation: 'Eu respeito o ritmo do meu corpo e o tempo de descanso.',
+    affirmationRescue: 'Meu descanso é sagrado. Eu dou permissão ao meu corpo para se restaurar no seu próprio tempo.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
       { slot: 'lunch', time: '12:00', label: 'Proteína Leve' },
@@ -183,6 +186,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Movimento Sem Dor',
     purpose: 'Bomba Linfática',
     affirmation: 'Cada movimento que eu faço libera o fluxo da minha vida.',
+    affirmationRescue: 'Cada pequeno movimento é uma vitória. Eu honro o que o meu corpo consegue fazer hoje.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Elevação de Calcanhares' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Energética' },
@@ -310,7 +314,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Intensificação',
     purpose: 'Intensificar drenagem e controle inflamatório',
     affirmation: 'Eu sou a prova viva da minha transformação. Meu corpo é um rio de vida.',
-    affirmationRescue: 'Minha força interior me guia para a leveza. Eu mereço me sentir bem.',
+    affirmationRescue: 'Meu intestino é meu aliado. Cada escolha gentil nutre não só o corpo, mas a minha paz.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Agachamento na Parede' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Intensificada' },
@@ -371,7 +375,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Intensificação',
     purpose: 'Intensificar drenagem e controle inflamatório',
     affirmation: 'Meu corpo responde ao cuidado que eu ofereço. Eu sinto a diferença.',
-    affirmationRescue: 'Cada passo conta. A leveza está mais perto do que parece.',
+    affirmationRescue: 'Eu sei reconhecer os momentos difíceis — e sei que eles passam. Eu cuido de mim agora.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Agachamento na Parede' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Intensificada' },
@@ -432,7 +436,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Intensificação',
     purpose: 'Intensificar drenagem e controle inflamatório',
     affirmation: 'Eu construo minha saúde um dia de cada vez. Hoje eu escolho o fluxo.',
-    affirmationRescue: 'Não desisto. Meu corpo merece toda a minha dedicação.',
+    affirmationRescue: 'Saber pedir ajuda é sabedoria. Eu me apoio em quem me ampara, incluindo a mim mesma.',
     isCheckpointDay: true,
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Agachamento na Parede' },
@@ -494,6 +498,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Autonomia',
     purpose: 'Fortalecimento suave e escolhas conscientes',
     affirmation: 'Eu sou forte, capaz e faço escolhas que me nutrem. Meu corpo é meu aliado.',
+    affirmationRescue: 'Minhas mãos têm o poder de aliviar. Cada toque gentil é um ato de amor de mim para mim.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Consciente' },
@@ -555,6 +560,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Autonomia',
     purpose: 'Fortalecimento suave e escolhas conscientes',
     affirmation: 'Meu corpo e eu somos um time. Juntos, somos imbatíveis.',
+    affirmationRescue: 'Eu me olho com compaixão. Meu corpo carrega histórias de força, não de falhas.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Consciente' },
@@ -616,6 +622,7 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
     theme: 'Autonomia',
     purpose: 'Fortalecimento suave e escolhas conscientes',
     affirmation: 'Eu confio no meu corpo e no caminho que construí.',
+    affirmationRescue: 'Cada dia que cuido de mim é um tijolo da minha nova identidade. Eu construo devagar — e com amor.',
     schedule: [
       { slot: 'morning', time: '08:00', label: 'Ponte de Glúteos' },
       { slot: 'lunch', time: '12:00', label: 'Refeição Consciente' },
