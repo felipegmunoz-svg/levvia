@@ -1,30 +1,36 @@
 
 
-# Fix Empty Exercise/Recipe Selection in Touchpoint Slots
+# Fix HeatMap Inside NightSlot Accordion Card
 
-## Summary
-Add fallback logic to all 5 selection functions in `profileEngine.ts` so they never return empty when valid exercises/recipes exist. Also fix case-insensitive category matching.
+## Changes
 
-## Changes in `src/lib/profileEngine.ts`
+### 1. `src/components/journey/touchpoints/NightSlot.tsx` (lines 43-55)
+Replace the heatmap non-review case to separate the title card from the HeatMap component, giving it its own unclipped container:
 
-### 1. `selectMorningExercise` (line 862-864)
-- Case-insensitive category match: `MORNING_CATEGORIES.some(cat => cat.toLowerCase() === (e.category || '').toLowerCase())`
-- After line 864, add: `if (candidates.length === 0) candidates = [...filteredExercises];`
+```tsx
+return (
+  <div className="space-y-4">
+    <div className="levvia-card p-5 overflow-visible">
+      <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
+        🗺️ {technique.title}
+      </h3>
+      {technique.description && (
+        <p className="text-sm text-levvia-muted font-body mb-4">
+          {technique.description}
+        </p>
+      )}
+    </div>
+    <div className="min-h-[480px]">
+      <HeatMapInteractive onNext={() => setTechniqueDone(true)} />
+    </div>
+  </div>
+);
+```
 
-### 2. `selectShotRecipe` (line 907)
-- Replace `return null` with broader fallback: filter for `lanche|bebida|snack` in `tipo_refeicao`
-- If still empty, then `return null`
-
-### 3. `selectMicroMovement` (line 943-948)
-- Case-insensitive category match for `MICRO_CATEGORIES`
-- After line 955, add fallback: `candidates = filteredExercises.filter(e => e.id !== excludeId);`
-
-### 4. `selectSnackRecipe` (line 982)
-- Replace `return null` with fallback: all `filteredRecipes` excluding almoço/jantar types
-
-### 5. `selectLunchRecipes` (line 1006)
-- Replace `return []` with fallback: all `filteredRecipes`
+### 2. `src/components/journey/HeatMapInteractive.tsx` (line 82)
+Change `min-h-screen py-10` to `py-6` in the non-readOnly container class so the parent controls height.
 
 ## Files changed
-- `src/lib/profileEngine.ts` — 5 functions updated with fallback + case-insensitive fixes
+- `src/components/journey/touchpoints/NightSlot.tsx`
+- `src/components/journey/HeatMapInteractive.tsx`
 
