@@ -1,22 +1,28 @@
 
 
-# Fix Gluten-Free Filter — Add Raw Values
+# Fix Case-Sensitive tipo_refeicao Match in selectDay1Recipe
 
 ## Summary
-Add "gluten" and "lactose" as accepted values in the allergen filter since the database stores these without the "sem" prefix.
+Most selection functions already use case-insensitive regex (`/i` flag) for `tipo_refeicao` matching. The only case-sensitive match is on **line 826** in `selectDay1Recipe`, which uses `.includes(mealType)`. Fix this one line.
 
 ## Changes in `src/lib/profileEngine.ts`
 
-**Line 401** — Add `af.includes("gluten")` to the Sem Glúten check:
-```
-return af.includes("gluten") || af.includes("sem glúten") || af.includes("gluten-free") || af.includes("livre de glúten") || (r.tags || []).some(t => t.toLowerCase().includes("glúten"));
+**Line 826** — Replace `.includes(mealType)` with case-insensitive regex match:
+
+```ts
+// Before
+selected = top5.find(r => r.tipo_refeicao?.includes(mealType)) || withFinal[0];
+
+// After
+selected = top5.find(r => r.tipo_refeicao?.some(t => t.toLowerCase() === mealType.toLowerCase())) || withFinal[0];
 ```
 
-**Line 407** — Add `af.includes("lactose")` to the Sem Lactose check:
-```
-return af.includes("lactose") || af.includes("sem lactose") || af.includes("lactose-free") || af.includes("livre de lactose") || (r.tags || []).some(t => t.toLowerCase().includes("lactose"));
-```
+### No other changes needed
+- `selectShotRecipe` (line 933): already uses `/bebida/i` regex
+- `selectSnackRecipe` (line 1043): already uses `/lanche/i` regex  
+- `selectLunchRecipes` (line 1078): already uses `/almo[çc]o/i` regex
+- `selectMorningExercise` / `selectMicroMovement`: filter exercises by category, not tipo_refeicao
 
 ## Files changed
-- `src/lib/profileEngine.ts` — 2 lines
+- `src/lib/profileEngine.ts` — 1 line
 
