@@ -57,7 +57,7 @@ const PaywallModal = ({ onClose }: PaywallModalProps) => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="glass-card p-5 max-w-md w-full mb-8"
+          className="levvia-card p-5 max-w-md w-full mb-8"
         >
           <p className="text-secondary text-sm font-medium mb-4">
             O que você vai conquistar nos próximos 11 dias:
@@ -117,7 +117,7 @@ const PaywallModal = ({ onClose }: PaywallModalProps) => {
             href={CHECKOUT_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm text-center"
+            className="block w-full py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm text-center"
           >
             Continuar Minha Jornada de Leveza 💜
           </a>

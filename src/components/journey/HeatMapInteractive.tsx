@@ -147,7 +147,7 @@ const HeatMapInteractive = ({
           <button
             onClick={handleSubmit}
             disabled={!hasSelection}
-            className={`w-full max-w-xs py-4 rounded-3xl text-sm font-medium transition-all ${hasSelection ? "gradient-primary text-foreground" : "bg-white/[0.06] text-muted-foreground cursor-not-allowed"}`}
+            className={`w-full max-w-xs py-4 rounded-3xl text-sm font-medium transition-all ${hasSelection ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
           >
             Este é o meu mapa de fogo →
           </button>

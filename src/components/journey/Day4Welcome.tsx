@@ -41,7 +41,7 @@ const Day4Welcome = ({ onContinue }: Day4WelcomeProps) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="glass-card p-5 max-w-sm w-full mb-8"
+        className="levvia-card p-5 max-w-sm w-full mb-8"
       >
         <p
           className="text-foreground/70 text-center italic leading-relaxed"
@@ -64,14 +64,14 @@ const Day4Welcome = ({ onContinue }: Day4WelcomeProps) => {
       </motion.p>
 
       {/* Sticky bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
           whileTap={{ scale: 0.97 }}
           onClick={onContinue}
-          className="w-full max-w-xs mx-auto py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm block"
+          className="w-full max-w-xs mx-auto py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm block"
         >
           Preparar Meu Ritual de Sono →
         </motion.button>

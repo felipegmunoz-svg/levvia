@@ -53,7 +53,7 @@ const Day4Closing = ({ onComplete }: Day4ClosingProps) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="glass-card p-5 max-w-sm w-full mb-6"
+        className="levvia-card p-5 max-w-sm w-full mb-6"
       >
         <p className="text-secondary text-sm font-medium mb-3">Suas Conquistas</p>
         <div className="space-y-2.5">
@@ -77,7 +77,7 @@ const Day4Closing = ({ onComplete }: Day4ClosingProps) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="glass-card p-5 max-w-sm w-full mb-10"
+        className="levvia-card p-5 max-w-sm w-full mb-10"
       >
         <p className="text-secondary text-sm font-medium mb-2">💜 Amanhã: Dia 5</p>
         <p
@@ -90,7 +90,7 @@ const Day4Closing = ({ onComplete }: Day4ClosingProps) => {
       </motion.div>
 
       {/* Sticky bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -98,7 +98,7 @@ const Day4Closing = ({ onComplete }: Day4ClosingProps) => {
           whileTap={{ scale: 0.97 }}
           onClick={handleComplete}
           disabled={saving}
-          className="w-full max-w-xs mx-auto py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm block"
+          className="w-full max-w-xs mx-auto py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm block"
         >
           {saving ? "Salvando..." : "Salvar Progresso →"}
         </motion.button>

@@ -87,7 +87,7 @@ const Day5LegsElevation = ({ onContinue }: Day5LegsElevationProps) => {
           />
         </div>
 
-        <div className="glass-card p-5 mb-6">
+        <div className="levvia-card p-5 mb-6">
           <h3 className="text-foreground text-lg font-bold mb-4">
             Como Fazer:
           </h3>
@@ -127,7 +127,7 @@ const Day5LegsElevation = ({ onContinue }: Day5LegsElevationProps) => {
                 <button
                   key={opt.value}
                   onClick={() => setDuration(opt.value)}
-                  className="glass-card p-4 text-center hover:ring-1 hover:ring-secondary/40 transition-all"
+                  className="levvia-card p-4 text-center hover:ring-1 hover:ring-secondary/40 transition-all"
                 >
                   <span className="text-2xl block mb-1">{opt.emoji}</span>
                   <p className="text-foreground text-xs font-bold">
@@ -193,7 +193,7 @@ const Day5LegsElevation = ({ onContinue }: Day5LegsElevationProps) => {
           </p>
         </div>
 
-        <div className="glass-card p-4 mb-8 text-center">
+        <div className="levvia-card p-4 mb-8 text-center">
           <p
             className="text-foreground/50 text-xs italic"
             style={{ fontWeight: 300, lineHeight: 1.7 }}
@@ -205,13 +205,13 @@ const Day5LegsElevation = ({ onContinue }: Day5LegsElevationProps) => {
         </div>
       </motion.div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={() => duration && onContinue(duration)}
           disabled={!completed}
           className={`w-full max-w-xs mx-auto py-4 rounded-3xl font-medium text-sm block transition-all ${
             completed
-              ? "gradient-primary text-foreground"
+              ? "bg-primary text-primary-foreground"
               : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
           }`}
         >

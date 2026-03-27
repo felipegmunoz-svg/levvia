@@ -115,7 +115,7 @@ const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
           {uniqueAreas.map((area) => {
             const areaMarks = markedAreas.filter((m) => m.area === area);
             return (
-              <div key={area} className="glass-card p-4">
+              <div key={area} className="levvia-card p-4">
                 <p className="text-foreground text-sm font-medium mb-1">
                   {areaLabels[area]} {areaMarks.map((m) => tools.find((t) => t.type === m.type)?.emoji).join(" ")}
                 </p>
@@ -124,7 +124,7 @@ const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
                   onChange={(e) => setNotes({ ...notes, [area]: e.target.value })}
                   placeholder="Como você sente essa área..."
                   maxLength={200}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-xl p-3 text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:border-secondary/40 transition-colors resize-none"
+                  className="w-full bg-muted border border-border rounded-xl p-3 text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:border-secondary/40 transition-colors resize-none"
                   style={{ minHeight: "60px" }}
                 />
               </div>
@@ -133,7 +133,7 @@ const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
         </div>
         <button
           onClick={handleSave}
-          className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+          className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
         >
           Salvar Meu Mapa →
         </button>
@@ -189,7 +189,7 @@ const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
             className={`px-3 py-2 rounded-full text-xs font-medium transition-all border ${
               currentTool === t.type
                 ? "border-secondary bg-secondary/15 text-secondary"
-                : "border-white/10 bg-white/[0.06] text-foreground/70"
+                : "border-border bg-muted text-foreground/70"
             }`}
           >
             {t.emoji} {t.label}
@@ -267,8 +267,8 @@ const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
         disabled={!hasMarks}
         className={`w-full max-w-xs py-4 rounded-3xl font-medium text-sm transition-all ${
           hasMarks
-            ? "gradient-primary text-foreground"
-            : "bg-white/10 text-foreground/30 cursor-not-allowed"
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-foreground/30 cursor-not-allowed"
         }`}
       >
         {hasMarks ? "Adicionar Notas →" : "Marque pelo menos 1 área"}

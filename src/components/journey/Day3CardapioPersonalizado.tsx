@@ -118,7 +118,7 @@ const Day3CardapioPersonalizado = ({ onContinue }: Day3CardapioProps) => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * i }}
-                className="glass-card overflow-hidden"
+                className="levvia-card overflow-hidden"
               >
                 <button
                   onClick={() => setExpandedSlot(isExpanded ? null : slot)}
@@ -147,7 +147,7 @@ const Day3CardapioPersonalizado = ({ onContinue }: Day3CardapioProps) => {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="px-4 pb-4 border-t border-white/[0.06]"
+                    className="px-4 pb-4 border-t border-border"
                   >
                     {/* Meta */}
                     <div className="flex gap-4 mt-3 mb-3">
@@ -232,7 +232,7 @@ const Day3CardapioPersonalizado = ({ onContinue }: Day3CardapioProps) => {
       >
         <button
           onClick={onContinue}
-          className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+          className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
         >
           Finalizar Dia 3 →
         </button>

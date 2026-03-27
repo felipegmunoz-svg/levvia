@@ -74,7 +74,7 @@ const Day2DrainageGuide = ({ onNext }: Day2DrainageGuideProps) => {
         initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
-        className="glass-card p-5 w-full max-w-sm mb-6"
+        className="levvia-card p-5 w-full max-w-sm mb-6"
       >
         <img
           src={positions[current].image}
@@ -102,7 +102,7 @@ const Day2DrainageGuide = ({ onNext }: Day2DrainageGuideProps) => {
         <button
           onClick={() => setCurrent(Math.max(0, current - 1))}
           disabled={current === 0}
-          className="p-2 rounded-full border border-white/10 text-foreground/60 disabled:opacity-30 hover:border-secondary/30 transition-colors"
+          className="p-2 rounded-full border border-border text-foreground/60 disabled:opacity-30 hover:border-secondary/30 transition-colors"
         >
           <ChevronLeft size={18} />
         </button>
@@ -113,7 +113,7 @@ const Day2DrainageGuide = ({ onNext }: Day2DrainageGuideProps) => {
               key={i}
               onClick={() => setCurrent(i)}
               className={`w-2.5 h-2.5 rounded-full transition-all ${
-                i === current ? "bg-secondary scale-110" : "bg-white/20"
+                i === current ? "bg-secondary scale-110" : "bg-muted"
               }`}
             />
           ))}
@@ -122,7 +122,7 @@ const Day2DrainageGuide = ({ onNext }: Day2DrainageGuideProps) => {
         <button
           onClick={() => setCurrent(Math.min(2, current + 1))}
           disabled={current === 2}
-          className="p-2 rounded-full border border-white/10 text-foreground/60 disabled:opacity-30 hover:border-secondary/30 transition-colors"
+          className="p-2 rounded-full border border-border text-foreground/60 disabled:opacity-30 hover:border-secondary/30 transition-colors"
         >
           <ChevronRight size={18} />
         </button>
@@ -137,7 +137,7 @@ const Day2DrainageGuide = ({ onNext }: Day2DrainageGuideProps) => {
 
       <button
         onClick={onNext}
-        className="w-full max-w-xs py-4 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+        className="w-full max-w-xs py-4 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
       >
         Completei as 3 Posições →
       </button>

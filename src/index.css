@@ -80,7 +80,7 @@
 
 @layer base {
   * {
-    @apply border-white/10;
+    @apply border-border;
   }
 
   body {

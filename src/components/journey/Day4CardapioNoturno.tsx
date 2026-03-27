@@ -246,10 +246,10 @@ const Day4CardapioNoturno = ({ onContinue }: Day4CardapioNoturnoProps) => {
                     <motion.div
                       key={option.id}
                       layout
-                      className={`glass-card overflow-hidden cursor-pointer transition-all duration-200 ${
+                      className={`levvia-card overflow-hidden cursor-pointer transition-all duration-200 ${
                         isSelected
                           ? "ring-2 ring-secondary/60"
-                          : "hover:ring-1 hover:ring-white/10"
+                          : "hover:ring-1 hover:ring-border"
                       }`}
                       onClick={() => toggleSelection(category.id, option.id)}
                     >
@@ -293,7 +293,7 @@ const Day4CardapioNoturno = ({ onContinue }: Day4CardapioNoturnoProps) => {
                             transition={{ duration: 0.3, ease: "easeInOut" }}
                             className="overflow-hidden"
                           >
-                            <div className="px-4 pb-4 space-y-3 border-t border-white/5 pt-3">
+                            <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
                               <div>
                                 <p className="text-foreground/80 text-xs font-medium mb-1.5">
                                   Ingredientes:
@@ -339,7 +339,7 @@ const Day4CardapioNoturno = ({ onContinue }: Day4CardapioNoturnoProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="glass-card p-4 mb-8 text-center"
+          className="levvia-card p-4 mb-8 text-center"
         >
           <p
             className="text-foreground/50 text-xs italic"
@@ -353,13 +353,13 @@ const Day4CardapioNoturno = ({ onContinue }: Day4CardapioNoturnoProps) => {
       </motion.div>
 
       {/* Sticky bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-white/5 z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border z-10 md:relative md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0">
         <button
           onClick={onContinue}
           disabled={!allSelected}
           className={`w-full max-w-xs mx-auto py-4 rounded-3xl font-medium text-sm block transition-all ${
             allSelected
-              ? "gradient-primary text-foreground"
+              ? "bg-primary text-primary-foreground"
               : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
           }`}
         >
