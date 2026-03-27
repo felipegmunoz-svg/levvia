@@ -27,15 +27,27 @@ function filterByRestrictions(allRecipes: Recipe[], restrictions: string[]): Rec
   let filtered = [...allRecipes];
 
   if (restrictions.includes("Vegano")) {
-    filtered = filtered.filter((r) => r.tags.includes("Vegano"));
+    filtered = filtered.filter((r) => {
+      const dp = ((r as any).diet_profile || []).map((d: string) => d.toLowerCase());
+      return dp.includes("vegana") || dp.includes("vegano");
+    });
   } else if (restrictions.includes("Vegetariano")) {
-    filtered = filtered.filter((r) => r.tags.includes("Vegetariano") || r.tags.includes("Vegano"));
+    filtered = filtered.filter((r) => {
+      const dp = ((r as any).diet_profile || []).map((d: string) => d.toLowerCase());
+      return dp.includes("vegetariana") || dp.includes("vegetariano") || dp.includes("vegana") || dp.includes("vegano");
+    });
   }
   if (restrictions.includes("Sem Glúten")) {
-    filtered = filtered.filter((r) => r.tags.includes("Sem Glúten"));
+    filtered = filtered.filter((r) => {
+      const af = ((r as any).allergen_free || []).map((a: string) => a.toLowerCase());
+      return af.includes("sem glúten") || af.includes("gluten-free") || af.includes("livre de glúten") || (r.tags || []).some(t => t.toLowerCase().includes("glúten"));
+    });
   }
   if (restrictions.includes("Sem Lactose")) {
-    filtered = filtered.filter((r) => r.tags.includes("Sem Lactose"));
+    filtered = filtered.filter((r) => {
+      const af = ((r as any).allergen_free || []).map((a: string) => a.toLowerCase());
+      return af.includes("sem lactose") || af.includes("lactose-free") || af.includes("livre de lactose") || (r.tags || []).some(t => t.toLowerCase().includes("lactose"));
+    });
   }
   if (restrictions.includes("Alergia a Frutos do Mar")) {
     filtered = filtered.filter((r) => !r.ingredients.some((i) => /salmão|peixe|tilápia|atum|sardinha|camarão|frutos do mar/i.test(i)));
