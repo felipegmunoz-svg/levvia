@@ -22,6 +22,8 @@ export interface DayTouchpointConfig {
   afternoonSnackLabel: string;
   nightTechnique: NightTechnique;
   closingMessage: string;
+  hydrationTexts: { morning: string; lunch: string; afternoon: string; night: string };
+  afternoonKnowledgePill: string;
 }
 
 const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
@@ -49,6 +51,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       duration: '5 min',
     },
     closingMessage: 'Você deu o primeiro passo. Seu fogo tem nome agora — e você já começou a resfriá-lo.',
+    hydrationTexts: {
+      morning: 'Sua meta de ativação: {meta}ml até o almoço. Vamos juntas!',
+      lunch: 'Você está no caminho certo! Mais {meta}ml até o lanche da tarde para manter o fluxo.',
+      afternoon: 'Momento crítico do inchaço! Mantenha o fluxo: faltam {meta}ml para sua meta da tarde.',
+      night: 'Finalizando o dia: {meta}ml para limpar o sistema antes de dormir. Você conseguiu!',
+    },
+    afternoonKnowledgePill: 'A linfa não tem bomba própria — ela depende do seu movimento e da sua hidratação para fluir.',
   },
   {
     dayNumber: 2,
@@ -83,6 +92,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       ],
     },
     closingMessage: 'Seu rio interno está fluindo. Você ativou canais que estavam adormecidos.',
+    hydrationTexts: {
+      morning: 'O rio interno precisa de água para fluir. Sua meta matinal: {meta}ml.',
+      lunch: 'Alimentos ricos em água + hidratação = drenagem natural. Meta: {meta}ml agora.',
+      afternoon: 'A linfa desacelera à tarde. Reative com {meta}ml de água ou chá.',
+      night: 'Última meta do dia: {meta}ml. Seu corpo vai drenar enquanto você dorme.',
+    },
+    afternoonKnowledgePill: 'O sistema linfático transporta 3 litros de fluido por dia — sem água suficiente, ele estagna.',
   },
   {
     dayNumber: 3,
@@ -108,6 +124,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       duration: '3 min',
     },
     closingMessage: 'Você aprendeu a linguagem do seu corpo através da comida. Cada cor no prato é um escudo.',
+    hydrationTexts: {
+      morning: 'Antioxidantes precisam de água para agir. Comece com {meta}ml.',
+      lunch: 'Cada cor no prato é um escudo — potencialize com {meta}ml de água.',
+      afternoon: 'Chá de gengibre conta! Meta da tarde: {meta}ml para acelerar o metabolismo.',
+      night: 'Fechando o ciclo anti-inflamatório: {meta}ml antes de descansar.',
+    },
+    afternoonKnowledgePill: 'A cúrcuma precisa de pimenta preta e gordura para ser absorvida — biodisponibilidade importa!',
   },
   {
     dayNumber: 4,
@@ -133,6 +156,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       duration: '5 min',
     },
     closingMessage: 'Seu corpo se repara enquanto você dorme. Hoje você preparou o terreno para a cura noturna.',
+    hydrationTexts: {
+      morning: 'Bom dia! Hidrate o corpo que descansou: {meta}ml para começar.',
+      lunch: 'Proteínas leves + água = digestão sem peso. Meta: {meta}ml.',
+      afternoon: 'Prepare o corpo para o descanso: {meta}ml de hidratação agora.',
+      night: 'Último gole consciente: {meta}ml. Seu corpo vai se reparar à noite.',
+    },
+    afternoonKnowledgePill: 'Durante o sono profundo, o sistema glinfático do cérebro faz uma "lavagem" — mas precisa de hidratação adequada.',
   },
   {
     dayNumber: 5,
@@ -167,6 +197,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       ],
     },
     closingMessage: 'Suas pernas agradecem. A gravidade trabalhou a seu favor esta noite.',
+    hydrationTexts: {
+      morning: 'Suas panturrilhas precisam de fluido para bombear. Meta: {meta}ml.',
+      lunch: 'Movimento + água = bomba linfática ativa. Mais {meta}ml agora.',
+      afternoon: 'Após o movimento, reidrate: {meta}ml com pepino é refrescante e anti-inflamatório.',
+      night: 'Meta final: {meta}ml. A gravidade vai ajudar a drenar enquanto suas pernas descansam.',
+    },
+    afternoonKnowledgePill: 'As panturrilhas são chamadas de "segundo coração" — ao contraí-las, bombeiam sangue e linfa de volta.',
   },
   {
     dayNumber: 6,
@@ -204,6 +241,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       ],
     },
     closingMessage: 'A natureza tem tudo que você precisa. Hoje você usou seus aliados mais poderosos.',
+    hydrationTexts: {
+      morning: 'Especiarias + água = potência máxima. Comece com {meta}ml.',
+      lunch: 'A pimenta preta ativa a cúrcuma — e a água leva tudo até as células. Meta: {meta}ml.',
+      afternoon: 'Chá de gengibre com limão conta! Meta da tarde: {meta}ml.',
+      night: 'Visualize a água limpando seu sistema. Última meta: {meta}ml.',
+    },
+    afternoonKnowledgePill: 'O gengibre contém gingerol, um composto que reduz inflamação de forma comparável a anti-inflamatórios.',
   },
   // Days 7-14: Placeholder
   ...Array.from({ length: 8 }, (_, i) => ({
@@ -235,6 +279,13 @@ const TOUCHPOINT_CONFIGS: DayTouchpointConfig[] = [
       duration: '3 min',
     },
     closingMessage: 'Mais um dia de cuidado. Você está no caminho certo.',
+    hydrationTexts: {
+      morning: 'Bom dia! Sua meta matinal: {meta}ml para ativar o fluxo.',
+      lunch: 'Continue hidratando: mais {meta}ml para manter o ritmo.',
+      afternoon: 'A tarde é o momento crítico. Meta: {meta}ml agora.',
+      night: 'Última meta do dia: {meta}ml. Descanse bem hidratada.',
+    },
+    afternoonKnowledgePill: 'Cada dia de cuidado contínuo fortalece os hábitos que transformam sua saúde.',
   })),
 ];
 
