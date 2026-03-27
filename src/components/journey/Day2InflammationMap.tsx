@@ -58,8 +58,8 @@ const emojiCenters: Record<AreaId, { x: number; y: number }> = {
   panturrilha_dir: { x: 140, y: 354 },
 };
 
-const BASE_FILL = "rgba(237,242,247,0.08)";
-const STROKE = "rgba(237,242,247,0.3)";
+const BASE_FILL = "rgba(140,160,180,0.15)";
+const STROKE = "rgba(140,160,180,0.4)";
 
 const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
   const [currentTool, setCurrentTool] = useState<ToolType>("pain");
@@ -207,12 +207,12 @@ const Day2InflammationMap = ({ onComplete }: Day2InflammationMapProps) => {
       >
         <svg viewBox="0 0 220 440" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           {/* Decorative (non-interactive) */}
-          <ellipse cx="110" cy="38" rx="20" ry="25" fill="rgba(237,242,247,0.12)" stroke={STROKE} strokeWidth="1.2" />
-          <rect x="102" y="58" width="16" height="18" rx="4" fill="rgba(237,242,247,0.12)" stroke={STROKE} strokeWidth="1.2" />
-          <ellipse cx="40" cy="225" rx="8" ry="10" fill="rgba(237,242,247,0.12)" stroke={STROKE} strokeWidth="1" />
-          <ellipse cx="180" cy="225" rx="8" ry="10" fill="rgba(237,242,247,0.12)" stroke={STROKE} strokeWidth="1" />
-          <path d="M68 390 Q66 400 64 406 Q62 412 66 414 L90 414 Q94 412 94 406 Q94 400 92 390 Z" fill="rgba(237,242,247,0.12)" stroke={STROKE} strokeWidth="1" />
-          <path d="M128 390 Q126 400 126 406 Q126 412 130 414 L154 414 Q158 412 156 406 Q156 400 152 390 Z" fill="rgba(237,242,247,0.12)" stroke={STROKE} strokeWidth="1" />
+          <ellipse cx="110" cy="38" rx="20" ry="25" fill="rgba(140,160,180,0.15)" stroke={STROKE} strokeWidth="1.2" />
+          <rect x="102" y="58" width="16" height="18" rx="4" fill="rgba(140,160,180,0.15)" stroke={STROKE} strokeWidth="1.2" />
+          <ellipse cx="40" cy="225" rx="8" ry="10" fill="rgba(140,160,180,0.15)" stroke={STROKE} strokeWidth="1" />
+          <ellipse cx="180" cy="225" rx="8" ry="10" fill="rgba(140,160,180,0.15)" stroke={STROKE} strokeWidth="1" />
+          <path d="M68 390 Q66 400 64 406 Q62 412 66 414 L90 414 Q94 412 94 406 Q94 400 92 390 Z" fill="rgba(140,160,180,0.15)" stroke={STROKE} strokeWidth="1" />
+          <path d="M128 390 Q126 400 126 406 Q126 412 130 414 L154 414 Q158 412 156 406 Q156 400 152 390 Z" fill="rgba(140,160,180,0.15)" stroke={STROKE} strokeWidth="1" />
 
           {/* Interactive areas */}
           {areaPath("braco_esq", "M68 78 Q56 84 48 100 Q42 116 38 140 Q34 165 34 190 Q33 205 36 215 L52 215 Q54 205 54 190 Q54 165 58 140 Q62 116 66 100 Q70 90 78 82 Z")}

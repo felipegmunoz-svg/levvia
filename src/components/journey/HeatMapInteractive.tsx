@@ -32,7 +32,7 @@ export const areaLabels: Record<AreaId, string> = {
 };
 
 const intensityColors: Record<number, string> = {
-  0: "rgba(237,242,247,0.08)",
+  0: "rgba(140,160,180,0.15)",
   1: "rgba(244,165,53,0.4)",
   2: "rgba(244,165,53,0.75)",
   3: "rgba(198,40,40,0.85)",

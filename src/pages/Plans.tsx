@@ -21,7 +21,7 @@ const Plans = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "hsl(210, 63%, 13%)" }}>
+    <div className="theme-light min-h-screen flex flex-col bg-background">
       <div className="flex-1 overflow-y-auto px-6 pb-10">
         {/* Logo */}
         <motion.div
@@ -69,7 +69,7 @@ const Plans = () => {
 
         {/* Divider */}
         <div className="max-w-[480px] mx-auto mb-8">
-          <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
+          <div style={{ height: 1, background: "rgba(0,0,0,0.06)" }} />
         </div>
 
         {/* Challenge Card */}
@@ -139,7 +139,7 @@ const Plans = () => {
           </p>
 
           {/* Inner divider */}
-          <div style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: 20 }} />
+          <div style={{ height: 1, background: "rgba(0,0,0,0.06)", marginBottom: 20 }} />
 
           {/* Benefits */}
           <div className="space-y-3">
@@ -208,9 +208,9 @@ const Plans = () => {
 
         {/* Separator */}
         <div className="max-w-[480px] mx-auto flex items-center gap-4 my-6">
-          <div className="flex-1" style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.85rem", color: "rgba(237,242,247,0.35)" }}>ou</span>
-          <div className="flex-1" style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
+          <div className="flex-1" style={{ height: 1, background: "rgba(0,0,0,0.06)" }} />
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.85rem", color: "rgba(140,160,180,0.5)" }}>ou</span>
+          <div className="flex-1" style={{ height: 1, background: "rgba(0,0,0,0.06)" }} />
         </div>
 
         {/* Free link */}
