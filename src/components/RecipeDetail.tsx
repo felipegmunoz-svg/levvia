@@ -25,7 +25,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
           </button>
           <div className="absolute bottom-4 left-6 right-6">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-xs font-medium text-muted-foreground bg-white/[0.08] px-3 py-1 rounded-full backdrop-blur-sm">
+              <span className="text-xs font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full backdrop-blur-sm">
                 {recipe.category}
               </span>
             </div>
@@ -41,7 +41,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
           </div>
         </div>
       ) : (
-        <div className="gradient-page px-6 pt-10 pb-8 rounded-b-3xl">
+        <div className="bg-background px-6 pt-10 pb-8 rounded-b-3xl">
           <button
             onClick={onBack}
             className="text-muted-foreground hover:text-foreground transition-colors mb-4"
@@ -52,7 +52,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
             <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
               <UtensilsCrossed size={20} strokeWidth={1.5} className="text-accent" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground bg-white/[0.08] px-3 py-1 rounded-full">
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
               {recipe.category}
             </span>
           </div>
@@ -77,7 +77,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
         </section>
 
         {(recipe as any).dica && (
-          <section className="glass-card p-4 border-secondary/20">
+          <section className="levvia-card p-4 border-secondary/20">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-secondary text-sm">💡</span>
               <h2 className="text-sm font-medium text-foreground">Dica</h2>
@@ -91,14 +91,14 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
           {recipe.ingredients && recipe.ingredients.length > 0 ? (
             <div className="space-y-2">
               {recipe.ingredients.map((ingredient, i) => (
-                <div key={i} className="flex items-center gap-3 glass-card p-3">
+                <div key={i} className="flex items-center gap-3 levvia-card p-3">
                   <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary" />
                   <span className="text-sm text-foreground">{ingredient}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="glass-card p-5 text-center">
+            <div className="levvia-card p-5 text-center">
               <span className="text-2xl mb-2 block">🛒</span>
               <p className="text-sm text-muted-foreground">
                 Ingredientes não disponíveis para esta receita.
@@ -115,7 +115,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
           {recipe.instructions && recipe.instructions.length > 0 ? (
             <div className="space-y-3">
               {recipe.instructions.map((instruction, i) => (
-                <div key={i} className="flex items-start gap-3 glass-card p-3">
+                <div key={i} className="flex items-start gap-3 levvia-card p-3">
                   <div className="flex-shrink-0 w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
                     <span className="text-xs font-medium text-accent">{i + 1}</span>
                   </div>
@@ -124,7 +124,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
               ))}
             </div>
           ) : (
-            <div className="glass-card p-5 text-center">
+            <div className="levvia-card p-5 text-center">
               <span className="text-2xl mb-2 block">👩‍🍳</span>
               <p className="text-sm text-muted-foreground">
                 Modo de preparo não disponível para esta receita.
@@ -137,7 +137,7 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
           {recipe.tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.08] text-muted-foreground font-medium border border-white/10"
+              className="text-xs px-3 py-1.5 rounded-full bg-muted text-muted-foreground font-medium border border-border"
             >
               {tag}
             </span>
@@ -146,10 +146,10 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
       </main>
 
       {onMarkDone && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-white/[0.08]">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border">
           <button
             onClick={onMarkDone}
-            className="w-full py-3.5 rounded-3xl gradient-primary text-foreground font-medium text-sm"
+            className="w-full py-3.5 rounded-3xl bg-primary text-primary-foreground font-medium text-sm"
           >
             ✅ Marcar como Feito
           </button>

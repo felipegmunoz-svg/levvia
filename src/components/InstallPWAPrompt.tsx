@@ -1,4 +1,4 @@
-import logoFull from "@/assets/logo_livvia_branco.png";
+import logoFull from "@/assets/logo_livvia_azul.png";
 import { Share, MoreVertical, PlusSquare, CheckCircle } from "lucide-react";
 
 interface InstallPWAPromptProps {

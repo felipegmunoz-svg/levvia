@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import { useChallengeData } from "@/hooks/useChallengeData";
-import logoIcon from "@/assets/logo_livvia_branco_icone.png";
+import logoIcon from "@/assets/logo_livvia_azul_icone.png";
 
 const History = () => {
   const navigate = useNavigate();
