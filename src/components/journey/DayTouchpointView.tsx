@@ -11,11 +11,21 @@ import NightSlot from "./touchpoints/NightSlot";
 import BottomNav from "@/components/BottomNav";
 import logoFull from "@/assets/logo_livvia_azul.png";
 
+export interface HydrationProps {
+  dailyGoalMl: number;
+  subGoalMl: number;
+  currentIntakeMl: number;
+  dailyPercent: number;
+  addWater: (ml: number) => void;
+  slotPercent: (slotIndex: number) => number;
+}
+
 interface DayTouchpointViewProps {
   dayNumber: number;
   touchpoints: TouchpointData;
   progress: DayTouchpointProgress;
   isReviewMode?: boolean;
+  hydration?: HydrationProps;
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
 }
 
@@ -26,11 +36,26 @@ const SLOTS: { slot: TouchpointSlot; label: string; emoji: string; time: string 
   { slot: "night", label: "Noite", emoji: "🌙", time: "21:00" },
 ];
 
+const SLOT_LABELS: Record<TouchpointSlot, string> = {
+  morning: "da manhã",
+  lunch: "do almoço",
+  afternoon: "da tarde",
+  night: "da noite",
+};
+
+const SLOT_INDICES: Record<TouchpointSlot, number> = {
+  morning: 0,
+  lunch: 1,
+  afternoon: 2,
+  night: 3,
+};
+
 const DayTouchpointView = ({
   dayNumber,
   touchpoints,
   progress,
   isReviewMode = false,
+  hydration,
   onSlotComplete,
 }: DayTouchpointViewProps) => {
   const config = getTouchpointConfig(dayNumber);
@@ -161,45 +186,69 @@ const DayTouchpointView = ({
                     transition={{ duration: 0.3 }}
                   >
                     <div className="px-4 pb-4">
-                      {s.slot === "morning" && (
-                        <MorningSlot
-                          dayNumber={dayNumber}
-                          affirmation={touchpoints.morning.affirmation}
-                          schedule={touchpoints.morning.schedule}
-                          exercise={touchpoints.morning.exercise}
-                          shotRecipe={touchpoints.morning.shotRecipe}
-                          isReviewMode={isReviewMode || isDone}
-                          onComplete={(data) => onSlotComplete("morning", data)}
-                        />
-                      )}
-                      {s.slot === "lunch" && (
-                        <LunchSlot
-                          dayNumber={dayNumber}
-                          recipes={touchpoints.lunch.recipes}
-                          tip={touchpoints.lunch.tip}
-                          isReviewMode={isReviewMode || isDone}
-                          onComplete={(data) => onSlotComplete("lunch", data)}
-                        />
-                      )}
-                      {s.slot === "afternoon" && (
-                        <AfternoonSlot
-                          dayNumber={dayNumber}
-                          hydrationText={touchpoints.afternoon.hydrationText}
-                          microMovement={touchpoints.afternoon.microMovement}
-                          snackRecipe={touchpoints.afternoon.snackRecipe}
-                          isReviewMode={isReviewMode || isDone}
-                          onComplete={(data) => onSlotComplete("afternoon", data)}
-                        />
-                      )}
-                      {s.slot === "night" && (
-                        <NightSlot
-                          dayNumber={dayNumber}
-                          technique={touchpoints.night.technique}
-                          closingMessage={touchpoints.night.closingMessage}
-                          isReviewMode={isReviewMode || isDone}
-                          onComplete={(data) => onSlotComplete("night", data)}
-                        />
-                      )}
+                      {(() => {
+                        const hydrationText = hydration
+                          ? (config.hydrationTexts?.[s.slot] || "").replace("{meta}", String(hydration.subGoalMl))
+                          : "";
+                        const hydrationProps = hydration ? {
+                          dailyGoalMl: hydration.dailyGoalMl,
+                          subGoalMl: hydration.subGoalMl,
+                          currentIntakeMl: hydration.currentIntakeMl,
+                          dailyPercent: hydration.dailyPercent,
+                          slotSubGoalMl: hydration.subGoalMl,
+                          slotLabel: SLOT_LABELS[s.slot],
+                          hydrationText,
+                          onAddWater: hydration.addWater,
+                        } : undefined;
+
+                        return (
+                          <>
+                            {s.slot === "morning" && (
+                              <MorningSlot
+                                dayNumber={dayNumber}
+                                affirmation={touchpoints.morning.affirmation}
+                                schedule={touchpoints.morning.schedule}
+                                exercise={touchpoints.morning.exercise}
+                                shotRecipe={touchpoints.morning.shotRecipe}
+                                isReviewMode={isReviewMode || isDone}
+                                hydration={hydrationProps}
+                                onComplete={(data) => onSlotComplete("morning", data)}
+                              />
+                            )}
+                            {s.slot === "lunch" && (
+                              <LunchSlot
+                                dayNumber={dayNumber}
+                                recipes={touchpoints.lunch.recipes}
+                                tip={touchpoints.lunch.tip}
+                                isReviewMode={isReviewMode || isDone}
+                                hydration={hydrationProps}
+                                onComplete={(data) => onSlotComplete("lunch", data)}
+                              />
+                            )}
+                            {s.slot === "afternoon" && (
+                              <AfternoonSlot
+                                dayNumber={dayNumber}
+                                hydrationText={touchpoints.afternoon.hydrationText}
+                                microMovement={touchpoints.afternoon.microMovement}
+                                snackRecipe={touchpoints.afternoon.snackRecipe}
+                                isReviewMode={isReviewMode || isDone}
+                                hydration={hydrationProps}
+                                onComplete={(data) => onSlotComplete("afternoon", data)}
+                              />
+                            )}
+                            {s.slot === "night" && (
+                              <NightSlot
+                                dayNumber={dayNumber}
+                                technique={touchpoints.night.technique}
+                                closingMessage={touchpoints.night.closingMessage}
+                                isReviewMode={isReviewMode || isDone}
+                                hydration={hydrationProps}
+                                onComplete={(data) => onSlotComplete("night", data)}
+                              />
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </motion.div>
                 )}
