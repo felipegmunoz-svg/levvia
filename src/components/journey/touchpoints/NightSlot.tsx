@@ -23,6 +23,7 @@ interface NightSlotProps {
   closingMessage: string;
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
+  isCheckpointDay?: boolean;
   onComplete: (data: { technique_done: boolean; journal?: DiaryData }) => void;
 }
 
@@ -32,6 +33,7 @@ const NightSlot = ({
   closingMessage,
   isReviewMode,
   hydration,
+  isCheckpointDay = false,
   onComplete,
 }: NightSlotProps) => {
   const [techniqueDone, setTechniqueDone] = useState(isReviewMode);
@@ -187,6 +189,19 @@ const NightSlot = ({
             dayNumber={dayNumber}
             onSave={(data) => setDiaryData(data)}
           />
+        </div>
+      )}
+
+      {/* Checkpoint feedback — after diary saved */}
+      {diaryData && isCheckpointDay && diaryData.lightnessScore != null && (
+        <div className={`levvia-card p-5 ${diaryData.lightnessScore < 5 ? "bg-primary/5" : "bg-primary/5"}`}>
+          <p className="text-sm text-levvia-fg italic font-body text-center">
+            {diaryData.lightnessScore < 5
+              ? "Entendemos que o caminho está difícil. Vamos adaptar sua jornada para trazer mais alívio nos próximos dias. Estamos juntas. 💙"
+              : diaryData.lightnessScore >= 7
+              ? "Que alegria ver seu progresso! Vamos continuar fortalecendo essa leveza. 🌊"
+              : null}
+          </p>
         </div>
       )}
 
