@@ -83,12 +83,18 @@ const Today = () => {
   const handleSlotComplete = useCallback(async (slot: TouchpointSlot, data: any) => {
     await markSlotDone(slot, data);
     if (slot === 'night') {
-      // Evaluate rescue mode at checkpoint days
       const score = data?.journal?.lightnessScore;
       if (score != null) {
         evaluateCheckpoint(effectiveDay, score);
       }
-      toast("Sua jornada continua amanhã. Descanse — você merece.");
+      if (effectiveDay === 14) {
+        toast("Parabéns! Você completou os 14 dias. 🌊");
+        setTimeout(() => {
+          navTo('/celebration');
+        }, 2000);
+      } else {
+        toast("Sua jornada continua amanhã. Descanse — você merece.");
+      }
     }
   }, [markSlotDone, evaluateCheckpoint, effectiveDay]);
 

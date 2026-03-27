@@ -35,6 +35,7 @@ import Financial from "./pages/admin/Financial";
 import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
 import Day1Journey from "./pages/Day1Journey";
+import Celebration from "./pages/Celebration";
 import NotFound from "./pages/NotFound";
 
 // build v6 – review mode + SW fix
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/day1-journey" element={<Day1Journey />} />
             <Route path="/today" element={<ProtectedRoute><Today /></ProtectedRoute>} />
+            <Route path="/celebration" element={<ProtectedRoute><Celebration /></ProtectedRoute>} />
             <Route path="/journey" element={<ProtectedRoute><Journey /></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
