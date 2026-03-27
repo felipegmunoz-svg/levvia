@@ -1,24 +1,20 @@
 
 
-# Create Celebration.tsx Page
+# Add Celebration Route and Day 14 Redirect
 
 ## Summary
-Create a single new file `src/pages/Celebration.tsx` — a celebration/completion page shown after the 14-day challenge. No other files modified.
+Two surgical edits: add the `/celebration` route in App.tsx and redirect users there after completing Day 14's night slot in Today.tsx.
 
-## Notes
-The user's message had JSX tags stripped by the markdown parser. I will reconstruct the full component based on the visible class names, text content, structure, and the intact code sections (Block 5 onward). The component structure is:
+## Changes
 
-1. **Loading state** — spinner with "Preparando sua celebração..."
-2. **Header** — logo, wave emoji, completion title
-3. **Lavínia message** — motivational quote in a card
-4. **Victory dashboard** — 4 metric cards (water, movement, lightness evolution, adherence)
-5. **HeatMap comparative** — visual transformation using `HeatMapComparative`
-6. **PDF generator** — textarea for doctor message + generate button
-7. **Annual plan CTA** — upsell to `/plans`
-8. **Footer** — thank you message + `BottomNav`
+### 1. `src/App.tsx`
+- Add `import Celebration from "./pages/Celebration";` with other page imports
+- Add route `<Route path="/celebration" element={<ProtectedRoute><Celebration /></ProtectedRoute>} />` after the `/today` route
 
-All sections use `motion.div` with the `fadeUp` variants. Uses existing imports: `useCelebrationData`, `generateDossie`, `HeatMapComparative`, `BottomNav`, logo asset.
+### 2. `src/pages/Today.tsx`
+- In `handleSlotComplete`, replace the night slot block to check if `effectiveDay === 14`: if so, show a congratulations toast and navigate to `/celebration` after 2 seconds; otherwise show the existing "continue tomorrow" toast
 
-## Files
-- `src/pages/Celebration.tsx` — NEW
+## Files modified
+- `src/App.tsx` — 2 additions (import + route)
+- `src/pages/Today.tsx` — Replace ~5 lines in handleSlotComplete
 
