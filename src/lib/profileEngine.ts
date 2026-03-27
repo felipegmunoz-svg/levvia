@@ -447,7 +447,7 @@ export function filterRecipesForProfile(
 
   // Pantry-based boost: sort recipes that match more pantry items higher
   if (profile.pantryItems.length > 0) {
-    const pantryLower = profile.pantryItems.map((p) => p.toLowerCase());
+    const pantryLower = profile.pantryItems.map((p) => normAccent(p.toLowerCase()));
     filtered.sort((a, b) => {
       const scoreA = scorePantryMatch(a, pantryLower);
       const scoreB = scorePantryMatch(b, pantryLower);
@@ -458,13 +458,18 @@ export function filterRecipesForProfile(
   return filtered;
 }
 
+function normAccent(str: string): string {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function scorePantryMatch(recipe: DbRecipe, pantryLower: string[]): number {
   if (!recipe.ingredients || recipe.ingredients.length === 0) return 0;
   let matches = 0;
   for (const ing of recipe.ingredients) {
-    const ingLower = ing.toLowerCase();
+    const ingNorm = normAccent(ing.toLowerCase());
     for (const p of pantryLower) {
-      if (ingLower.includes(p) || p.includes(ingLower.split(" ")[0])) {
+      const pNorm = normAccent(p);
+      if (ingNorm.includes(pNorm) || pNorm.includes(ingNorm.split(" ")[0])) {
         matches++;
         break;
       }
