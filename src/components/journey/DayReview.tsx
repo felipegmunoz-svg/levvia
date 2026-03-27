@@ -324,6 +324,11 @@ const DayReview = () => {
           <SectionCard icon="📓" title="Diário">
             {journal.legsSensation && <p className="text-sm text-foreground">Sensação nas pernas: {String(journal.legsSensation)}</p>}
             {journal.energyLevel && <p className="text-sm text-foreground">Nível de energia: {String(journal.energyLevel)}</p>}
+            {(journal as Record<string, unknown>).lightnessScore != null && (
+              <p className="text-sm text-foreground">
+                Score de leveza: <span className="font-semibold text-primary">{String((journal as Record<string, unknown>).lightnessScore)}/10</span>
+              </p>
+            )}
             {journal.notes && <p className="text-sm text-muted-foreground mt-1">{String(journal.notes)}</p>}
           </SectionCard>
         )}
@@ -349,6 +354,11 @@ const DayReview = () => {
           <SectionCard icon="📓" title="Reflexão do Dia">
             {diary.legSensation && <p className="text-sm text-foreground">Sensação nas pernas: {String(diary.legSensation)}</p>}
             {diary.energyLevel && <p className="text-sm text-foreground">Nível de energia: {String(diary.energyLevel)}</p>}
+            {(diary as Record<string, unknown>).lightnessScore != null && (
+              <p className="text-sm text-foreground">
+                Score de leveza: <span className="font-semibold text-primary">{String((diary as Record<string, unknown>).lightnessScore)}/10</span>
+              </p>
+            )}
             {diary.notes && <p className="text-sm text-muted-foreground mt-1">{String(diary.notes)}</p>}
           </SectionCard>
         )}
@@ -433,6 +443,11 @@ const DayReview = () => {
                     <span className="text-sm text-foreground">Energia:</span>
                     <EnergyDots level={Number(journal.energy_level) || 0} />
                   </div>
+                )}
+                {(journal as Record<string, unknown>).lightnessScore != null && (
+                  <p className="text-sm text-foreground">
+                    Score de leveza: <span className="font-semibold text-primary">{String((journal as Record<string, unknown>).lightnessScore)}/10</span>
+                  </p>
                 )}
                 {journal.notes && (
                   <p className="text-sm text-muted-foreground mt-1">{String(journal.notes)}</p>
