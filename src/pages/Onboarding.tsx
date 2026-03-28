@@ -102,6 +102,7 @@ const Onboarding = () => {
   });
   const [selectedSingle, setSelectedSingle] = useState<string | null>(null);
   const [customPantryInput, setCustomPantryInput] = useState("");
+  const [otherText, setOtherText] = useState("");
 
   // Persist answers to localStorage on every change
   useEffect(() => {
@@ -227,6 +228,18 @@ const Onboarding = () => {
       // Safety net: persist immediately to avoid React state race conditions
       localStorage.setItem("levvia_pantry_items", JSON.stringify(combined));
     }
+
+    // "Outros (especifique)" → "Outros: <text>" for multi steps 7 and 13
+    if (current.type === "multi" && (current.id === 7 || current.id === 13)) {
+      const items = (answers[current.id] as string[]) || [];
+      if (items.includes("Outros (especifique)") && otherText.trim()) {
+        const processed = items.map(item =>
+          item === "Outros (especifique)" ? `Outros: ${otherText.trim()}` : item
+        );
+        setAnswers(a => ({ ...a, [current.id]: processed }));
+      }
+    }
+    setOtherText("");
 
     // Backup restrictions (step 13) — same safety net pattern as pantry
     if (current.type === "multi" && current.id === 13) {
@@ -946,6 +959,19 @@ const Onboarding = () => {
                 <span className="text-sm font-medium text-foreground">{option}</span>
               </motion.button>
             ))}
+            {/* Free-text input for "Outros" on health conditions and dietary restrictions */}
+            {current.type === "multi" && (current.id === 7 || current.id === 13) &&
+             isSelected("Outros (especifique)") && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                <input
+                  type="text"
+                  placeholder="Descreva aqui..."
+                  value={otherText}
+                  onChange={(e) => setOtherText(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-border bg-muted px-4 py-3 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary"
+                />
+              </motion.div>
+            )}
           </div>
         )}
       </div>
