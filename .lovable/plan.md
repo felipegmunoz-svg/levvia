@@ -1,30 +1,36 @@
 
 
-# Text Adjustments — 3 Files
+# Convert Food Screens to Educational (Info) Screens
+
+## Summary
+Change onboarding steps 11 ("Inimigos Inflamatórios") and 12 ("Aliados Anti-inflamatórios") from interactive multi-select to read-only educational screens. No data saved from these steps.
 
 ## Changes
 
-### 1. `src/data/onboarding.ts` — Line 54
-Replace `"Qual o seu sexo biológico?"` → `"Qual o seu sexo?"`
+### 1. `src/data/onboarding.ts` — Interface + Steps
 
-### 2. `src/components/journey/HeatMapInteractive.tsx` — Line 100
-Replace the single instruction line with multi-line instructions:
-```
-Toque nas áreas onde você sente mais dor, inchaço ou desconforto.
-```
-Plus 3 sub-instructions below:
-- "Toque uma vez para dor leve (Amarelo)"
-- "Toque duas vezes para dor moderada (Laranja)"
-- "Toque três vezes para dor intensa (Vermelho)"
+**Interface (line 2)**: Add `"info_list"` to the type union and add `items?: string[]` field.
 
-### 3. `src/pages/Diagnosis.tsx` — Line 97
-Replace `"Seu Diagnóstico, {userName}"` → `"Seu Perfil Levvia, {userName}"`
+**Step id 11 (lines 125–141)**: Change `type` to `"info_list"`, remove `options`, update `subtitle`, add `items` array with the 5 educational items.
 
-### 4. `src/pages/Diagnosis.tsx` — Line 160
-Replace `"Vamos focar nesses pontos nos próximos 14 dias."` → `"Estas são as áreas que você identificou com mais atenção em seu corpo. Acompanhe a evolução delas em sua jornada de leveza."`
+**Step id 12 (lines 142–157)**: Same — change to `"info_list"`, remove `options`, update `subtitle`, add `items` with 6 educational items.
+
+### 2. `src/pages/Onboarding.tsx` — Validation + Rendering
+
+**Validation (line 176)**: Add `"info_list"` alongside `"result"` and `"info"` so it always passes validation (no selection needed).
+
+**Rendering (~line 679)**: Add a new `if (current.type === "info_list")` block before the existing `"info"` block. Renders:
+- Title (same style as other screens)
+- `subtitle` as description paragraph
+- `items` as a styled list with leaf/flame icons
+- No checkboxes, no state, no data saving
+
+The `handleNext` function already doesn't save data for unknown types, so no changes needed there.
+
+### New type rationale
+Using `"info_list"` instead of reusing `"info"` because the existing `"info"` block (line 679) has special logic for the final "Análise Completa" screen (personalized subtitle with objectives). A separate type avoids interference.
 
 ## Files modified
-- `src/data/onboarding.ts` — 1 text edit
-- `src/components/journey/HeatMapInteractive.tsx` — 1 text edit (expanded instructions)
-- `src/pages/Diagnosis.tsx` — 2 text edits
+- `src/data/onboarding.ts` — interface update + 2 step rewrites
+- `src/pages/Onboarding.tsx` — validation tweak + new render block
 
