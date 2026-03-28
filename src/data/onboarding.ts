@@ -51,7 +51,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
   {
     id: 4,
     type: "single",
-    title: "Qual o seu sexo biológico?",
+    title: "Qual o seu sexo?",
     subtitle: "Esta informação nos ajuda a personalizar melhor o seu plano.",
     options: ["Feminino", "Masculino", "Prefiro não informar"],
     icon: "user",
