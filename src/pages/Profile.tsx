@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import FlowSilhouette from "@/components/FlowSilhouette";
 import NotificationSettings from "@/components/NotificationSettings";
 import { useNavigate } from "react-router-dom";
 import EditProfileDialog from "@/components/EditProfileDialog";
@@ -385,6 +386,26 @@ const Profile = () => {
                   <p className="text-sm font-medium text-foreground pl-6">{item.value}</p>
                 </div>
               ))}
+            </section>
+
+            {/* Flow Silhouette with hydration */}
+            <section className="glass-card p-5 flex flex-col items-center">
+              <h2 className="text-sm font-medium text-foreground flex items-center gap-2 mb-4 self-start">
+                💧 Meu Mapa de Fluxo
+              </h2>
+              <FlowSilhouette
+                painAreas={(() => {
+                  const hm = (profile as any).heatMapDay1;
+                  if (!hm || typeof hm !== "object") return {};
+                  const mapped: Record<string, 0 | 1 | 2 | 3> = {};
+                  for (const [k, v] of Object.entries(hm)) {
+                    mapped[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0)) as 0 | 1 | 2 | 3;
+                  }
+                  return mapped;
+                })()}
+                showHydrationWave={true}
+                hydrationLevel={50}
+              />
             </section>
 
             {/* Pantry section */}
