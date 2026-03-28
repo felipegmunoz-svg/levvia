@@ -1,36 +1,56 @@
 
 
-# Convert Food Screens to Educational (Info) Screens
+# Add "Outros (especifique)" Free-Text Field to Multi-Select Screens
 
 ## Summary
-Change onboarding steps 11 ("Inimigos Inflamatórios") and 12 ("Aliados Anti-inflamatórios") from interactive multi-select to read-only educational screens. No data saved from these steps.
+Add an "Outros (especifique)" option to the health conditions (id 7) and dietary restrictions (id 13) multi-select screens. When selected, a text input appears for the user to type custom info. On advance, the selection is saved as `"Outros: <typed text>"`.
+
+## Clarification
+The user referenced "tela 10" and "tela 15" by screen position. The actual step IDs in the data are **id 7** (Condições de Saúde) and **id 13** (Restrições Alimentares).
 
 ## Changes
 
-### 1. `src/data/onboarding.ts` — Interface + Steps
+### 1. `src/data/onboarding.ts`
+- **Line 106**: Add `"Outros (especifique)"` at end of id 7 options array
+- **Line 170**: Add `"Outros (especifique)"` at end of id 13 options array
 
-**Interface (line 2)**: Add `"info_list"` to the type union and add `items?: string[]` field.
+### 2. `src/pages/Onboarding.tsx`
 
-**Step id 11 (lines 125–141)**: Change `type` to `"info_list"`, remove `options`, update `subtitle`, add `items` array with the 5 educational items.
+**New state** (~line 104, near other state declarations):
+```ts
+const [otherText, setOtherText] = useState("");
+```
 
-**Step id 12 (lines 142–157)**: Same — change to `"info_list"`, remove `options`, update `subtitle`, add `items` with 6 educational items.
+**Reset on step change**: In the existing step-change logic, add `setOtherText("")` when step changes.
 
-### 2. `src/pages/Onboarding.tsx` — Validation + Rendering
+**Render free-text input** (~after line 948, after the options map closes): When `current.type === "multi"` and `(current.id === 7 || current.id === 13)` and `"Outros (especifique)"` is selected, render a text input:
+```tsx
+{current.type === "multi" && (current.id === 7 || current.id === 13) && 
+ isSelected("Outros (especifique)") && (
+  <input
+    type="text"
+    placeholder="Descreva aqui..."
+    value={otherText}
+    onChange={(e) => setOtherText(e.target.value)}
+    className="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary"
+  />
+)}
+```
 
-**Validation (line 176)**: Add `"info_list"` alongside `"result"` and `"info"` so it always passes validation (no selection needed).
-
-**Rendering (~line 679)**: Add a new `if (current.type === "info_list")` block before the existing `"info"` block. Renders:
-- Title (same style as other screens)
-- `subtitle` as description paragraph
-- `items` as a styled list with leaf/flame icons
-- No checkboxes, no state, no data saving
-
-The `handleNext` function already doesn't save data for unknown types, so no changes needed there.
-
-### New type rationale
-Using `"info_list"` instead of reusing `"info"` because the existing `"info"` block (line 679) has special logic for the final "Análise Completa" screen (personalized subtitle with objectives). A separate type avoids interference.
+**handleNext modification** (~line 232): For multi steps with id 7 or 13, before saving, replace `"Outros (especifique)"` with `"Outros: " + otherText` if otherText is non-empty:
+```ts
+if (current.type === "multi" && (current.id === 7 || current.id === 13)) {
+  const items = (answers[current.id] as string[]) || [];
+  const processed = items.map(item => 
+    item === "Outros (especifique)" && otherText.trim()
+      ? `Outros: ${otherText.trim()}`
+      : item
+  );
+  setAnswers(a => ({ ...a, [current.id]: processed }));
+}
+```
 
 ## Files modified
-- `src/data/onboarding.ts` — interface update + 2 step rewrites
-- `src/pages/Onboarding.tsx` — validation tweak + new render block
+- `src/data/onboarding.ts` — 2 lines added
+- `src/pages/Onboarding.tsx` — state + render block + handleNext logic
 
