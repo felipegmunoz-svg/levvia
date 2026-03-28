@@ -97,6 +97,7 @@ const HeatMapComparative = ({
               readOnly
               size="small"
               initialData={day1Data as Record<string, number>}
+              showHydrationAura
             />
             <div className="flex gap-1 justify-center mt-2 flex-wrap">
               {day1Counts.leve > 0 && (
@@ -134,11 +135,13 @@ const HeatMapComparative = ({
               readOnly
               size="small"
               initialData={todayData || undefined}
+              showHydrationAura
             />
           ) : (
             <HeatMapInteractive
               size="small"
               onNext={handleTodayComplete}
+              showHydrationAura
             />
           )}
         </div>

@@ -127,12 +127,12 @@ const Day5Dashboard = ({ movementData, heatMapDay1, onContinue }: Day5DashboardP
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
                 <p className="text-xs font-semibold text-foreground/80 mb-2">Dia 1 (Início)</p>
-                <HeatMapInteractive initialData={heatMapDay1} readOnly size="small" />
+                <HeatMapInteractive initialData={heatMapDay1} readOnly size="small" showHydrationAura />
               </div>
               <div className="text-center">
                 <p className="text-xs font-semibold text-foreground/80 mb-2">Hoje (Dia 5)</p>
                 {improvedMap ? (
-                  <HeatMapInteractive initialData={improvedMap} readOnly size="small" />
+                  <HeatMapInteractive initialData={improvedMap} readOnly size="small" showHydrationAura />
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <p className="text-xs text-muted-foreground">Sem dados</p>
