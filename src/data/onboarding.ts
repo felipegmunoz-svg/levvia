@@ -1,12 +1,14 @@
 export interface OnboardingQuestion {
   id: number;
-  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "number" | "body_metrics" | "pantry" | "install_pwa" | "heat_map";
+  type: "welcome" | "disclaimer" | "name" | "single" | "multi" | "result" | "info" | "info_list" | "number" | "body_metrics" | "pantry" | "install_pwa" | "heat_map";
   title: string;
   subtitle?: string;
   options?: string[];
   icon: string;
   /** For "number" type: input config */
   numberConfig?: { min?: number; max?: number; unit?: string; placeholder?: string };
+  /** For "info_list" type: items to display */
+  items?: string[];
 }
 
 export const onboardingSteps: OnboardingQuestion[] = [
@@ -124,37 +126,32 @@ export const onboardingSteps: OnboardingQuestion[] = [
   // ── Alimentação (11-15) ──
   {
     id: 11,
-    type: "multi",
+    type: "info_list",
     title: "Seus Inimigos Inflamatórios",
-    subtitle: "Quais desses alimentos você consome com frequência? Selecione todos que se aplicam.",
-    options: [
-      "Açúcar refinado",
-      "Alimentos ultraprocessados",
-      "Refrigerantes",
-      "Frituras",
-      "Farinha branca",
-      "Embutidos (salsicha, presunto)",
-      "Doces e sobremesas industrializadas",
-      "Fast food",
-    ],
+    subtitle: "Estes alimentos tendem a intensificar a inflamação no lipedema. Ao longo da sua jornada, vamos te ajudar a reduzi-los gentilmente, sem proibições.",
     icon: "flame",
+    items: [
+      "Açúcar refinado e ultraprocessados",
+      "Excesso de sal e embutidos",
+      "Álcool",
+      "Óleos vegetais refinados (soja, canola)",
+      "Farinhas brancas em excesso",
+    ],
   },
   {
     id: 12,
-    type: "multi",
+    type: "info_list",
     title: "Seus Aliados Anti-inflamatórios",
-    subtitle: "Quais desses alimentos você já inclui na sua rotina? Selecione todos que se aplicam.",
-    options: [
-      "Cúrcuma / Açafrão",
-      "Gengibre",
-      "Frutas vermelhas",
-      "Peixes ricos em ômega-3",
-      "Vegetais verde-escuros",
-      "Azeite de oliva extra virgem",
-      "Chá verde",
-      "Sementes (chia, linhaça)",
-    ],
+    subtitle: "Estes são seus aliados mais poderosos. Tente incluí-los na sua rotina — cada pequena escolha conta.",
     icon: "leaf",
+    items: [
+      "Cúrcuma com pimenta-do-reino",
+      "Gengibre fresco",
+      "Frutas vermelhas (mirtilo, framboesa, morango)",
+      "Peixes ricos em ômega-3 (sardinha, salmão)",
+      "Azeite de oliva extravirgem",
+      "Chás funcionais (hibisco, cavalinha, dente-de-leão)",
+    ],
   },
   {
     id: 13,
