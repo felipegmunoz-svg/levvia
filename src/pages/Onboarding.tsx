@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/data/onboarding";
-import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
+import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag, Leaf } from "lucide-react";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
@@ -173,7 +173,7 @@ const Onboarding = () => {
       const h = parseFloat(heightInput);
       return !isNaN(w) && w > 20 && w < 400 && !isNaN(h) && h > 50 && h < 300;
     }
-    if (current.type === "result" || current.type === "info") return true;
+    if (current.type === "result" || current.type === "info" || current.type === "info_list") return true;
     if (current.type === "pantry") return true; // optional
     if (current.type === "single") return !!answers[current.id];
     if (current.type === "multi") {
@@ -673,6 +673,57 @@ const Onboarding = () => {
     if (current.type === "result") {
       return (
         <ResultScreen fireResult={fireResult} painAnswer={painAnswer} />
+      );
+    }
+
+    if (current.type === "info_list") {
+      const isEnemies = current.id === 11;
+      return (
+        <div className="flex-1 flex flex-col justify-center px-6 py-8">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="flex justify-center mb-6"
+          >
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${isEnemies ? "bg-destructive/20" : "bg-primary/20"}`}>
+              {isEnemies
+                ? <Flame size={28} strokeWidth={1.5} className="text-destructive" />
+                : <Leaf size={28} strokeWidth={1.5} className="text-primary" />}
+            </div>
+          </motion.div>
+          <motion.h1
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="text-2xl font-bold text-foreground text-center mb-3"
+          >
+            {current.title}
+          </motion.h1>
+          <motion.p
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-muted-foreground text-center text-sm mb-8"
+          >
+            {current.subtitle}
+          </motion.p>
+          <motion.ul
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="space-y-3 max-w-sm mx-auto w-full"
+          >
+            {current.items?.map((item, idx) => (
+              <li key={idx} className="flex items-center gap-3 bg-card/60 rounded-xl px-4 py-3">
+                {isEnemies
+                  ? <Flame size={18} className="text-destructive shrink-0" />
+                  : <Leaf size={18} className="text-primary shrink-0" />}
+                <span className="text-foreground text-sm">{item}</span>
+              </li>
+            ))}
+          </motion.ul>
+        </div>
       );
     }
 
