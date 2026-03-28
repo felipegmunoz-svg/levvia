@@ -373,8 +373,11 @@ const Onboarding = () => {
 
     if (!isMobile || isStandalone || dismissed) {
       console.log("⏭️ Auto-skip install_pwa step");
-      setDirection(1);
-      setStep((s) => s + 1);
+      if (direction > 0) {
+        setStep((s) => s + 1);
+      } else {
+        setStep((s) => s - 1);
+      }
     }
   }, [step]);
 
