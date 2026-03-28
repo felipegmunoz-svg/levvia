@@ -408,6 +408,7 @@ const Onboarding = () => {
             setDirection(1);
             setStep((s) => s + 1);
           }}
+          showHydrationAura={false}
         />
       );
     }
