@@ -1,66 +1,52 @@
 
 
-# Redesign HeatMapInteractive Silhouette — Glassmorphism + Hydration Aura
+# Rewrite FlowSilhouette + Integrate into Onboarding, Profile & HeatMapInteractive
 
-## Summary
-Visual overhaul of the SVG silhouette to match the reference image: white translucent glassmorphism body, soft-glow heat spots, blue-tinted background, and an optional diagonal hydration aura ribbon.
+## Important Compatibility Issue
+
+`FlowSilhouette` is currently imported in `src/pages/Progress.tsx` (line 3) with the **old** props (`heatMapData`, `waterIntakeMl`, `waterGoalMl`, `size`, `animated`). Rewriting the interface will break Progress.tsx. Since you said "Não alterar nenhum outro arquivo", I have two options:
+
+- **Option A**: Keep a backward-compatible wrapper or adapter inside FlowSilhouette.tsx that maps old props to new ones (keeps Progress.tsx working without editing it).
+- **Option B**: Also update Progress.tsx to use the new props (adds 1 extra file).
+
+I'll go with **Option A** — export both the new component and a legacy wrapper, so Progress.tsx continues working. The `calculateFlowScore` export also needs to remain.
 
 ## Changes
 
-### 1. `src/components/journey/HeatMapInteractive.tsx`
+### 1. `src/components/FlowSilhouette.tsx` — Full rewrite
 
-**Interface** (line 4–9): Add `showHydrationAura?: boolean` prop.
+**New interface** as specified: `painAreas`, `onAreaClick`, `hydrationLevel`, `showHydrationWave`, `className`.
 
-**Intensity colors** (lines 34–39): Update to new gradient:
-```ts
-0: "rgba(255,255,255,0.0)",        // no selection = transparent (body is already white)
-1: "rgba(244,165,53,0.5)",         // leve — amber
-2: "rgba(224,90,58,0.65)",         // moderada — orange
-3: "rgba(200,40,40,0.8)",          // intensa — red
-```
+**SVG structure** (viewBox `0 0 280 520`):
+- Glassmorphism container with `backdrop-blur-md bg-white/10 border-white/20 rounded-3xl`
+- Same 9 body areas from current silhouette, scaled to new viewBox
+- Decorative parts (head, neck, hands, feet) with `fill="rgba(255,255,255,0.85)"`, `stroke="rgba(255,255,255,0.4)"`, `strokeWidth={1}`
+- Drop-shadow filter on the SVG element
 
-**Container background** (line 82): Add `rounded-2xl` and conditional background style `background: #E8EEF4`.
+**Pain colors** as specified (FBBF24, F59E0B, EF4444 with respective opacities). Each area path gets `blur(6px)` filter when intensity > 0.
 
-**SVG structure** (lines 117–137): Major rework:
-- Add `<defs>` with a `<filter id="glow">` containing `feGaussianBlur stdDeviation="8"` for heat spot blur.
-- Decorative parts (head, neck, hands, feet): change fill to `rgba(255,255,255,0.85)`, stroke to `rgba(255,255,255,0.6)`, add `filter: drop-shadow(0 4px 24px rgba(46,134,171,0.15))`.
-- Interactive body areas: same white fill when intensity=0 (via updated `intensityColors[0]` being transparent over white base), apply `filter="url(#glow)"` only when intensity > 0 via a separate `<g>` layer.
-- Architectural approach: render body parts in two layers — base white silhouette underneath, then heat overlay paths on top with blur filter when active.
+**Hydration wave** (framer-motion): When `showHydrationWave === true`, render an animated `motion.path` that oscillates vertically. Y position calculated from `hydrationLevel` (0=bottom at ~480, 100=top at ~60).
 
-**Hydration aura** (new, after body paths): When `showHydrationAura` is true, render a diagonal SVG path:
-```tsx
-{showHydrationAura && (
-  <path
-    d="M60 90 Q90 180 120 250 Q140 320 155 380"
-    fill="none"
-    stroke="rgba(46,134,171,0.55)"
-    strokeWidth="18"
-    strokeLinecap="round"
-    filter="url(#auraBlur)"
-  />
-)}
-```
-With a second filter `<filter id="auraBlur"><feGaussianBlur stdDeviation="6"/></filter>` in `<defs>`.
+**Legacy wrapper**: Keep `export default FlowSilhouette` as the new component. Add a named export `LegacyFlowSilhouette` that maps old props to new ones, plus re-export `calculateFlowScore`. Progress.tsx import stays working via a default export change — actually, Progress.tsx imports both `FlowSilhouette` (default) and `calculateFlowScore` (named). I'll keep `calculateFlowScore` as-is and make the default export accept old props via overloaded detection (check if `heatMapData` exists in props → use legacy mode). This avoids touching Progress.tsx.
 
-**Legend colors** (lines 142–145): Update to match new palette (amber, orange, red).
+### 2. `src/pages/Onboarding.tsx` — Line ~400
 
-### 2. Usage sites — Add `showHydrationAura={true}` for in-journey contexts
+Replace `<HeatMapInteractive onNext={...} />` with `<FlowSilhouette>` usage. But the onboarding heat_map step needs interactive click + submit button. FlowSilhouette alone doesn't have a submit button. I'll wrap it: use FlowSilhouette with `onAreaClick` for toggling, plus the existing submit button logic inline in Onboarding.tsx.
 
-Since `HeatMapInteractive` is NOT directly in Today.tsx or Profile.tsx, the aura prop goes to the sub-components that render it during the journey (not onboarding):
+### 3. `src/pages/Profile.tsx`
 
-- **`src/components/journey/touchpoints/NightSlot.tsx`** (lines 55, 75): Add `showHydrationAura`
-- **`src/components/journey/DayReview.tsx`** (lines 185, 428): Add `showHydrationAura`
-- **`src/components/journey/Day5Dashboard.tsx`** (lines 130, 135): Add `showHydrationAura`
-- **`src/components/journey/HeatMapComparative.tsx`** (lines 96, 133, 139): Add `showHydrationAura`
-- **`src/components/journey/Day1Flow.tsx`** (lines 271, 313): Add `showHydrationAura`
+Add FlowSilhouette with `showHydrationWave={true}` and `hydrationLevel` from profile/hydration data. Need to find where to place it — likely in the stats section.
 
-Onboarding.tsx (line 400) stays without the prop — no aura during onboarding.
+### 4. `src/components/journey/HeatMapInteractive.tsx`
 
-## Files modified
-- `src/components/journey/HeatMapInteractive.tsx` — visual overhaul + new prop
-- `src/components/journey/touchpoints/NightSlot.tsx` — pass `showHydrationAura`
-- `src/components/journey/DayReview.tsx` — pass `showHydrationAura`
-- `src/components/journey/Day5Dashboard.tsx` — pass `showHydrationAura`
-- `src/components/journey/HeatMapComparative.tsx` — pass `showHydrationAura`
-- `src/components/journey/Day1Flow.tsx` — pass `showHydrationAura`
+Replace the internal SVG with `<FlowSilhouette>`, passing through `painAreas`, `onAreaClick`, and `showHydrationWave={showHydrationAura}`. Keep all the surrounding UI (title, instructions, legend, submit button).
+
+## File-level summary
+
+| File | Change |
+|------|--------|
+| `src/components/FlowSilhouette.tsx` | Full rewrite with new props + legacy compatibility |
+| `src/pages/Onboarding.tsx` | Replace HeatMapInteractive with FlowSilhouette in heat_map step |
+| `src/pages/Profile.tsx` | Add FlowSilhouette with hydration wave |
+| `src/components/journey/HeatMapInteractive.tsx` | Replace internal SVG with FlowSilhouette |
 
