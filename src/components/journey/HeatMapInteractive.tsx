@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import FlowSilhouette from "@/components/FlowSilhouette";
 
 interface HeatMapInteractiveProps {
   onNext?: (heatMap: Record<string, number | string>) => void;
