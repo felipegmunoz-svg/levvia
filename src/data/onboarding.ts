@@ -180,7 +180,7 @@ export const onboardingSteps: OnboardingQuestion[] = [
     options: [
       "Não gosto de coentro",
       "Não gosto de pimenta",
-      "Prefiro refeições rápidas",
+      
       "Prefiro refeições com poucos ingredientes",
     ],
     icon: "heart",
