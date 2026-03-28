@@ -432,14 +432,6 @@ export function filterRecipesForProfile(
   }
 
   // Dietary preferences
-  if (profile.dietaryPreferences.includes("Prefiro refeições rápidas")) {
-    // Prioritize but don't exclude: sort by time
-    filtered.sort((a, b) => {
-      const timeA = parseMinutes(a.time || "");
-      const timeB = parseMinutes(b.time || "");
-      return timeA - timeB;
-    });
-  }
   if (profile.dietaryPreferences.includes("Prefiro refeições com poucos ingredientes")) {
     filtered.sort((a, b) => (a.ingredients?.length || 0) - (b.ingredients?.length || 0));
   }
