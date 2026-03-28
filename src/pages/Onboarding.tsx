@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { onboardingSteps, fireResults, getFilteredPantryCategories } from "@/data/onboarding";
-import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag } from "lucide-react";
+import { Heart, ArrowRight, ArrowLeft, Check, Flame, ShieldCheck, ShoppingBag, Leaf } from "lucide-react";
 import InstallPWAPrompt from "@/components/InstallPWAPrompt";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import { readOnboardingSnapshot, syncOnboardingToSupabase } from "@/lib/syncOnboarding";
