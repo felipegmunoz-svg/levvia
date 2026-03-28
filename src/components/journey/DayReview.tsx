@@ -182,7 +182,7 @@ const DayReview = () => {
   const renderDay1 = () => (
     <SectionCard icon="🗺️" title="Seu Mapa de Calor">
       {data?.heat_map_day1 && Object.values(data.heat_map_day1).some((v) => typeof v === "number" && v > 0) ? (
-        <HeatMapInteractive initialData={data.heat_map_day1 as Record<string, number>} readOnly size="small" />
+        <HeatMapInteractive initialData={data.heat_map_day1 as Record<string, number>} readOnly size="small" showHydrationAura />
       ) : (
         <EmptyState msg="Nenhuma área marcada." />
       )}
@@ -425,7 +425,7 @@ const DayReview = () => {
           {dayN === 1 && cfg.nightTechnique.type === 'heatmap' && data?.heat_map_day1 &&
             Object.values(data.heat_map_day1).some((v) => typeof v === "number" && v > 0) && (
             <div className="mt-2">
-              <HeatMapInteractive initialData={data.heat_map_day1 as Record<string, number>} readOnly size="small" />
+              <HeatMapInteractive initialData={data.heat_map_day1 as Record<string, number>} readOnly size="small" showHydrationAura />
             </div>
           )}
 
