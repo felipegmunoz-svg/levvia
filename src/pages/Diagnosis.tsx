@@ -94,7 +94,7 @@ const Diagnosis = () => {
         {/* Greeting */}
         <motion.div custom={0} variants={itemVariants} initial="hidden" animate="visible">
           <h1 className="text-2xl font-light text-foreground text-center mb-1">
-            Seu Diagnóstico, {userName}
+            Seu Perfil Levvia, {userName}
           </h1>
           <p className="text-sm text-muted-foreground text-center">
             Análise personalizada baseada nas suas respostas
@@ -157,7 +157,7 @@ const Diagnosis = () => {
               ))}
             </div>
 
-            <p className="text-sm text-foreground/70 mt-4">Vamos focar nesses pontos nos próximos 14 dias.</p>
+            <p className="text-sm text-foreground/70 mt-4">Estas são as áreas que você identificou com mais atenção em seu corpo. Acompanhe a evolução delas em sua jornada de leveza.</p>
           </motion.div>
         )}
 

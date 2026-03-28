@@ -94,11 +94,16 @@ const HeatMapInteractive = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-foreground/60 text-center mb-8 max-w-sm"
+            className="text-foreground/60 text-center mb-2 max-w-sm"
             style={{ fontWeight: 300, fontSize: "0.9rem" }}
           >
-            Toque nas áreas onde você sente mais dor, inchaço ou desconforto. Toque novamente para aumentar a intensidade.
+            Toque nas áreas onde você sente mais dor, inchaço ou desconforto.
           </motion.p>
+          <div className="flex flex-col items-center gap-1 mb-8 text-xs text-foreground/50" style={{ fontWeight: 300 }}>
+            <span>Toque uma vez para dor leve (Amarelo)</span>
+            <span>Toque duas vezes para dor moderada (Laranja)</span>
+            <span>Toque três vezes para dor intensa (Vermelho)</span>
+          </div>
         </>
       )}
 
