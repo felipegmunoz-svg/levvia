@@ -144,13 +144,15 @@ export function useTouchpointProgress(dayNumber: number) {
   const markSlotDone = useCallback(
     async (slot: TouchpointSlot, diary?: DiaryData) => {
       const now = new Date().toISOString();
+      const { journal, ...meta } = (diary as any) || {};
       const updated: DayTouchpointProgress = {
         ...progress,
         [slot]: {
           done: true,
           doneAt: now,
-          ...(diary ? { diary } : {}),
-        },
+          ...meta,
+          ...(journal ? { journal } : {}),
+        } as SlotProgress,
       };
 
       setProgress(updated);
