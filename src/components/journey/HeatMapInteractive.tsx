@@ -70,8 +70,7 @@ const HeatMapInteractive = ({
   });
 
   const hasSelection = Object.values(areas).some((value) => value > 0);
-  const silhouetteWidth = size === "small" ? "w-[160px]" : "w-[200px]";
-  const silhouetteHeight = size === "small" ? "300px" : "380px";
+  const silhouetteWidth = size === "small" ? "w-[160px]" : "w-full max-w-[600px]";
 
   const toggleArea = (id: AreaId) => {
     if (readOnly) return;
