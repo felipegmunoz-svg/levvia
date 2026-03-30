@@ -1,48 +1,22 @@
 
 
-# Add "Seu Fogo Interno" card to Today screen
+# Update dietary filtering in profileEngine.ts
 
-## Overview
-Add a compact card below the header in DayTouchpointView showing a miniature heat map silhouette. Tapping it navigates to `/progress`.
+## Summary
+Replace the dietary restrictions filter block (lines 389–432) in `filterRecipesForProfile` with updated logic that uses `.includes()` substring matching on `diet_profile`, `allergen_free`, and `tags` arrays instead of exact string equality. Also adds the soja/soy ingredient filter.
 
-## Changes
+## Changes — `src/lib/profileEngine.ts` (lines 389–432)
 
-### 1. `src/components/journey/DayTouchpointView.tsx`
+Replace the block from `// Dietary restrictions` through the oleaginosas filter (and add soja after) with the user's exact code:
 
-- Add imports: `useNavigate` from react-router-dom, `FlowSilhouette` from `@/components/FlowSilhouette`
-- Add `heatMapDay1?: Record<string, number> | null` to `DayTouchpointViewProps`
-- Destructure `heatMapDay1` in component props
-- Add `const navigate = useNavigate()` inside the component
-- After the Header `div` (line 122), before the Progress Bar, insert the "Seu Fogo Interno" card:
+- **Vegan/Vegetarian**: now uses `dp.some(d => d.includes("vegan"))` + `tags.some(t => t.includes("vegan"))` instead of `dp.includes("vegana")`
+- **Gluten**: uses `af.some(a => a.includes("glut"))` + tags check instead of exact `af.includes("gluten")`
+- **Lactose**: uses `af.some(a => a.includes("lactos"))` + tags check instead of exact matches
+- **Frutos do mar, amendoim, oleaginosas**: unchanged logic
+- **Soja/soy**: already present, kept as-is
 
-```tsx
-{heatMapDay1 && Object.keys(heatMapDay1).length > 0 && (
-  <div className="px-6 pb-2">
-    <button
-      onClick={() => navigate("/progress")}
-      className="w-full levvia-card p-4 flex items-center gap-4 text-left active:opacity-80 transition-opacity"
-    >
-      <div className="w-[60px] shrink-0">
-        <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={0} waterGoalMl={1} size="small" animated={false} />
-      </div>
-      <div>
-        <p className="text-sm font-heading font-semibold text-levvia-fg">Seu Fogo Interno</p>
-        <p className="text-xs text-levvia-muted font-body mt-0.5">Toque para ver sua evolução →</p>
-      </div>
-    </button>
-  </div>
-)}
-```
-
-### 2. `src/pages/Today.tsx` (lines 159–166)
-
-Add `heatMapDay1` prop to the `<DayTouchpointView>` call:
-
-```tsx
-heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
-```
+No other lines in the file are modified.
 
 ## Files modified
-- `src/components/journey/DayTouchpointView.tsx`
-- `src/pages/Today.tsx`
+- `src/lib/profileEngine.ts`
 
