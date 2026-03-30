@@ -25,29 +25,23 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
   return Math.round((1 - total / 27) * 100);
 }
 
-// ─── Zone configuration (percentage-based) ───
-const ZONE_CONFIG = [
-  { id: "braco_esq",       top: "30%", left: "22%", width: "8%",  height: "20%", rotate: "18deg" },
-  { id: "braco_dir",       top: "30%", left: "70%", width: "8%",  height: "20%", rotate: "-18deg" },
-  { id: "abdomen",         top: "30%", left: "40%", width: "20%", height: "15%", rotate: "0deg" },
-  { id: "quadril_esq",     top: "48%", left: "30%", width: "8%",  height: "8%",  rotate: "0deg" },
-  { id: "quadril_dir",     top: "48%", left: "62%", width: "8%",  height: "8%",  rotate: "0deg" },
-  { id: "coxa_esq",        top: "58%", left: "30%", width: "8%",  height: "20%", rotate: "5deg" },
-  { id: "coxa_dir",        top: "58%", left: "62%", width: "8%",  height: "20%", rotate: "-5deg" },
-  { id: "panturrilha_esq", top: "75%", left: "30%", width: "6%",  height: "12%", rotate: "2deg" },
-  { id: "panturrilha_dir", top: "75%", left: "62%", width: "6%",  height: "12%", rotate: "-2deg" },
+// ─── SVG ellipse zones (viewBox 0 0 200 500) ───
+const AREA_ELLIPSES = [
+  { id: "braco_esq",        cx: 44,  cy: 179, rx: 14, ry: 70, rotate: -8 },
+  { id: "braco_dir",        cx: 156, cy: 179, rx: 14, ry: 70, rotate:  8 },
+  { id: "abdomen",          cx: 100, cy: 157, rx: 39, ry: 75, rotate:  0 },
+  { id: "quadril_esq",      cx: 83,  cy: 250, rx: 17, ry: 25, rotate:  0 },
+  { id: "quadril_dir",      cx: 117, cy: 250, rx: 17, ry: 25, rotate:  0 },
+  { id: "coxa_esq",         cx: 79,  cy: 327, rx: 17, ry: 48, rotate:  0 },
+  { id: "coxa_dir",         cx: 121, cy: 327, rx: 17, ry: 48, rotate:  0 },
+  { id: "panturrilha_esq",  cx: 78,  cy: 429, rx: 16, ry: 40, rotate:  0 },
+  { id: "panturrilha_dir",  cx: 122, cy: 429, rx: 16, ry: 40, rotate:  0 },
 ];
 
 const GLOW_BACKGROUNDS: Record<number, string> = {
   1: "rgba(251, 191, 36, 0.9)",
   2: "rgba(249, 115, 22, 0.9)",
   3: "rgba(239, 68, 68, 0.9)",
-};
-
-const GLOW_SHADOWS: Record<number, string> = {
-  1: "0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(251, 191, 36, 0.3)",
-  2: "0 0 20px rgba(249, 115, 22, 0.7), 0 0 40px rgba(249, 115, 22, 0.3)",
-  3: "0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.4)",
 };
 
 // ─── Core renderer ───
@@ -79,50 +73,56 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
   return (
     <div
       className={`relative mx-auto w-full max-w-[450px] ${className}`}
-      style={{ aspectRatio: "3 / 4" }}
+      style={{ aspectRatio: "478 / 1271" }}
     >
       {/* Base image */}
       <img
         ref={imgRef}
         src={imgSrc}
         alt="Silhueta corporal"
-        className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+        className="absolute inset-0 w-full h-full object-fill select-none pointer-events-none"
         draggable={false}
       />
 
-      {/* Touch zone overlay */}
-      <div className="absolute inset-0">
-        {ZONE_CONFIG.map((zone) => {
+      {/* SVG overlay */}
+      <svg
+        viewBox="0 0 200 500"
+        className="absolute inset-0 w-full h-full"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
+        </defs>
+
+        {AREA_ELLIPSES.map((zone) => {
           const intensity = painAreas[zone.id] || 0;
           const isActive = intensity > 0;
 
           return (
-            <motion.div
+            <motion.ellipse
               key={zone.id}
+              cx={zone.cx}
+              cy={zone.cy}
+              rx={zone.rx}
+              ry={zone.ry}
+              transform={zone.rotate !== 0 ? `rotate(${zone.rotate}, ${zone.cx}, ${zone.cy})` : undefined}
               onClick={() => onAreaClick?.(zone.id)}
-              className={interactive ? "cursor-pointer" : ""}
               style={{
-                position: "absolute",
-                top: zone.top,
-                left: zone.left,
-                width: zone.width,
-                height: zone.height,
-                transform: `rotate(${zone.rotate})`,
-                borderRadius: "40%",
-                background: isActive ? GLOW_BACKGROUNDS[intensity] : "transparent",
-                boxShadow: isActive ? GLOW_SHADOWS[intensity] : "none",
-                filter: isActive ? "blur(5px)" : "none",
-                border: !isActive && interactive
-                  ? "1.5px dashed #60A5FA"
-                  : "none",
-                transition: "background 0.3s ease, box-shadow 0.3s ease",
+                cursor: interactive ? "pointer" : "default",
+                fill: isActive ? GLOW_BACKGROUNDS[intensity] : "transparent",
+                filter: isActive ? "url(#glow)" : "none",
+                stroke: !isActive && interactive ? "#60A5FA" : "none",
+                strokeWidth: !isActive && interactive ? 1.5 : 0,
+                strokeDasharray: !isActive && interactive ? "4 3" : "none",
               }}
               animate={isActive ? { opacity: [0.5, 0.9, 0.5] } : { opacity: 1 }}
               transition={isActive ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : {}}
             />
           );
         })}
-      </div>
+      </svg>
     </div>
   );
 };
