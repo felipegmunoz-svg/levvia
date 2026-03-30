@@ -38,6 +38,32 @@ export function useHydration(weightKg: number | null, dayNumber: number): UseHyd
     }
   }, [storageKey]);
 
+  // Restore from Supabase when localStorage is empty
+  useEffect(() => {
+    if (!user?.id || currentIntakeMl > 0) return;
+    (async () => {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("challenge_progress")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        const existing = (profile?.challenge_progress as any) || {};
+        const dayKey = `day${dayNumber}`;
+        const saved = existing?.touchpoints?.[dayKey]?.water_intake_ml;
+        if (saved && typeof saved === "number" && saved > 0) {
+          setCurrentIntakeMl(saved);
+          try {
+            localStorage.setItem(storageKey, String(saved));
+          } catch {}
+        }
+      } catch {
+        // silently ignore — localStorage value stays as fallback
+      }
+    })();
+  }, [user?.id, dayNumber, storageKey]);
+
   const dailyPercent = useMemo(
     () => Math.min(currentIntakeMl / dailyGoalMl, 1),
     [currentIntakeMl, dailyGoalMl]
