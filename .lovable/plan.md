@@ -1,23 +1,28 @@
 
 
-# FlowSilhouette: Container resize + Zone recalibration
+# FlowSilhouette: Update AREA_ELLIPSES coordinates
 
 ## Changes — `src/components/FlowSilhouette.tsx`
 
-### 1. Update AREA_ELLIPSES (lines 29–39)
-Replace with user's new coordinates (narrower rx values, adjusted cx/cy positions).
+Replace lines 35–45 (the `AREA_ELLIPSES` array) with the user's exact coordinates:
 
-### 2. Update container (lines 74–76)
-Remove `w-full max-w-[450px]` and `aspectRatio` style. Use inline style `width: "100%", maxWidth: "200px"`.
+```ts
+const AREA_ELLIPSES = [
+  { id: "braco_esq",        cx: 45,  cy: 180, rx: 15, ry: 65, rotate: -8 },
+  { id: "braco_dir",        cx: 155, cy: 180, rx: 15, ry: 65, rotate:  8 },
+  { id: "abdomen",          cx: 100, cy: 150, rx: 28, ry: 70, rotate:  0 },
+  { id: "quadril_esq",      cx: 85,  cy: 248, rx: 15, ry: 20, rotate:  0 },
+  { id: "quadril_dir",      cx: 115, cy: 248, rx: 15, ry: 20, rotate:  0 },
+  { id: "coxa_esq",         cx: 83,  cy: 325, rx: 14, ry: 46, rotate:  0 },
+  { id: "coxa_dir",         cx: 117, cy: 325, rx: 14, ry: 46, rotate:  0 },
+  { id: "panturrilha_esq",  cx: 82,  cy: 425, rx: 11, ry: 36, rotate:  0 },
+  { id: "panturrilha_dir",  cx: 118, cy: 425, rx: 11, ry: 36, rotate:  0 },
+];
+```
 
-### 3. Update image (lines 79–85)
-Remove `absolute inset-0 w-full h-full object-fill`. Use inline style `width: "100%", height: "auto", display: "block"`.
+Key differences from current values: arms moved outward (cx 60→45 / 140→155), wider rx on arms (10→15), abdomen ry slightly reduced (72→70), legs slightly adjusted toward center.
 
-### 4. Update SVG overlay (lines 88–91)
-Change from `absolute inset-0 w-full h-full` to positioning that matches the natural-sized image. Since the image now flows naturally (no aspect-ratio container), the SVG needs `position: absolute; top: 0; left: 0; width: 100%; height: 100%` to overlay it.
-
-### 5. Legacy wrapper (line 150)
-Update the small-size class from `max-w-[140px]` to match new scale if needed — keep as-is since 140px < 200px.
+No other files modified.
 
 ## Files modified
 - `src/components/FlowSilhouette.tsx`
