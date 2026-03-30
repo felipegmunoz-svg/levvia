@@ -52,7 +52,7 @@ const NightSlot = ({
               <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
                 🗺️ {technique.title}
               </h3>
-              <HeatMapInteractive onNext={() => {}} showHydrationAura />
+              <HeatMapInteractive onNext={() => {}} />
               <p className="mt-2 text-xs text-levvia-muted font-body">
                 Mapa registrado ✅
               </p>
@@ -72,7 +72,7 @@ const NightSlot = ({
               )}
             </div>
             <div className="min-h-[480px]">
-              <HeatMapInteractive onNext={() => setTechniqueDone(true)} showHydrationAura />
+              <HeatMapInteractive onNext={() => setTechniqueDone(true)} />
             </div>
           </div>
         );
