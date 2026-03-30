@@ -25,7 +25,7 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 
 const AREA_ELLIPSES = [
   { id: "braco_esq",        cx: 18,  cy: 80,  rx: 10, ry: 32, label: "Braço esq." },
-  { id: "braco_dir",        cx: 82,  cy: 80,  rx: 10, ry: 32, label: "Braço dir." },
+  { id: "braco_dir",        cx: 78,  cy: 80,  rx: 9,  ry: 32, label: "Braço dir." },
   { id: "abdomen",          cx: 50,  cy: 55,  rx: 17, ry: 24, label: "Torso" },
   { id: "quadril_esq",      cx: 37,  cy: 100, rx: 13, ry: 11, label: "Quadril esq." },
   { id: "quadril_dir",      cx: 63,  cy: 100, rx: 13, ry: 11, label: "Quadril dir." },
@@ -87,8 +87,8 @@ const FlowSilhouetteCore = ({
             <ellipse
               key={id}
               cx={cx} cy={cy} rx={rx} ry={ry}
-              fill={gradientId ? `url(#${gradientId})` : "rgba(255,255,255,0.06)"}
-              stroke={intensity > 0 ? "transparent" : "rgba(255,255,255,0.30)"}
+      fill={gradientId ? `url(#${gradientId})` : "rgba(46,134,171,0.04)"}
+      stroke={intensity > 0 ? "transparent" : "rgba(46,134,171,0.25)"}
               strokeWidth={0.6}
               strokeDasharray={intensity > 0 ? "0" : "2,2"}
               className={interactive ? "cursor-pointer" : ""}
