@@ -1,41 +1,54 @@
 
 
-# Add FlowSilhouette to Profile Evolution Section
-
-## Summary
-Add the body silhouette with hydration wave to the "Evolução" tab in Profile.tsx, between the stats row and the bar chart.
+# Fix FlowSilhouette: Visual Affordance + Corrected Coordinates
 
 ## Changes
 
-### `src/pages/Profile.tsx`
+### `src/components/FlowSilhouette.tsx`
 
-**After line 484** (closing `</div>` of the stats grid), insert a new `motion.div` block:
+**1. Replace `AREA_ELLIPSES` (lines 26–36)** with new coordinates and labels:
 
-```tsx
-<motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.33 }} className="glass-card p-5 flex flex-col items-center">
-  <h3 className="text-sm font-medium text-foreground flex items-center gap-2 mb-1 self-start">
-    💧 Seu mapa de leveza
-  </h3>
-  <p className="text-xs text-muted-foreground mb-4 self-start">
-    A fita azul cresce conforme sua hidratação do dia
-  </p>
-  <FlowSilhouette
-    painAreas={(() => {
-      const hm = (profile as any).heatMapDay1;
-      if (!hm || typeof hm !== "object") return {};
-      const mapped: Record<string, 0 | 1 | 2 | 3> = {};
-      for (const [k, v] of Object.entries(hm)) {
-        mapped[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0)) as 0 | 1 | 2 | 3;
-      }
-      return mapped;
-    })()}
-    showHydrationWave={true}
-  />
-</motion.div>
+```ts
+const AREA_ELLIPSES = [
+  { id: "braco_esq",        cx: 18,  cy: 80,  rx: 10, ry: 32, label: "Braço esq." },
+  { id: "braco_dir",        cx: 82,  cy: 80,  rx: 10, ry: 32, label: "Braço dir." },
+  { id: "abdomen",          cx: 50,  cy: 55,  rx: 17, ry: 24, label: "Torso" },
+  { id: "quadril_esq",      cx: 37,  cy: 100, rx: 13, ry: 11, label: "Quadril esq." },
+  { id: "quadril_dir",      cx: 63,  cy: 100, rx: 13, ry: 11, label: "Quadril dir." },
+  { id: "coxa_esq",         cx: 36,  cy: 124, rx: 12, ry: 17, label: "Coxa esq." },
+  { id: "coxa_dir",         cx: 64,  cy: 124, rx: 12, ry: 17, label: "Coxa dir." },
+  { id: "panturrilha_esq",  cx: 35,  cy: 150, rx: 10, ry: 13, label: "Panturrilha esq." },
+  { id: "panturrilha_dir",  cx: 65,  cy: 150, rx: 10, ry: 13, label: "Panturrilha dir." },
+];
 ```
 
-FlowSilhouette is already imported (line 2). No other files modified.
+**2. Replace ellipse rendering (lines 79–99)** to add dashed border when unselected and subtle white fill for affordance:
+
+```tsx
+{AREA_ELLIPSES.map(({ id, cx, cy, rx, ry }) => {
+  const intensity = (painAreas[id] ?? 0) as 0 | 1 | 2 | 3;
+  const gradientId = intensity === 1 ? "heat-leve"
+                   : intensity === 2 ? "heat-moderado"
+                   : intensity === 3 ? "heat-intenso"
+                   : null;
+  return (
+    <ellipse
+      key={id}
+      cx={cx} cy={cy} rx={rx} ry={ry}
+      fill={gradientId ? `url(#${gradientId})` : "rgba(255,255,255,0.06)"}
+      stroke={intensity > 0 ? "transparent" : "rgba(255,255,255,0.30)"}
+      strokeWidth={0.6}
+      strokeDasharray={intensity > 0 ? "0" : "2,2"}
+      className={interactive ? "cursor-pointer" : ""}
+      onClick={interactive ? () => onAreaClick!(id) : undefined}
+      style={{ transition: "fill 0.3s ease, stroke 0.3s ease" }}
+    />
+  );
+})}
+```
+
+No other files modified.
 
 ## Files modified
-- `src/pages/Profile.tsx` — 1 block inserted in evolution section
+- `src/components/FlowSilhouette.tsx` — coordinates + visual affordance
 
