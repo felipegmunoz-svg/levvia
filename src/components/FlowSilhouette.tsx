@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 
 // ─── Interfaces ───
@@ -29,7 +29,7 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 const AREA_ELLIPSES = [
   { id: "braco_esq",        cx: 68,  cy: 185, rx: 18, ry: 60, rotate: -5 },
   { id: "braco_dir",        cx: 132, cy: 185, rx: 18, ry: 60, rotate:  5 },
-  { id: "abdomen",          cx: 100, cy: 160, rx: 27, ry: 65, rotate:  0 },
+  { id: "abdomen",          cx: 100, cy: 190, rx: 27, ry: 68, rotate:  0 },
   { id: "quadril_esq",      cx: 82,  cy: 265, rx: 16, ry: 20, rotate:  0 },
   { id: "quadril_dir",      cx: 118, cy: 265, rx: 16, ry: 20, rotate:  0 },
   { id: "coxa_esq",         cx: 82,  cy: 330, rx: 14, ry: 46, rotate:  0 },
@@ -56,19 +56,6 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
     ? "/assets/flow_silhouette_full.png"
     : "/assets/flow_silhouette_base.png";
 
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (!imgRef.current) return;
-    const img = imgRef.current;
-    const onLoad = () => {
-      console.log("📐 Imagem natural:", img.naturalWidth, "x", img.naturalHeight);
-      console.log("📐 Imagem renderizada:", img.clientWidth, "x", img.clientHeight);
-      console.log("📐 Container:", img.parentElement?.clientWidth, "x", img.parentElement?.clientHeight);
-    };
-    if (img.complete) onLoad();
-    else img.addEventListener("load", onLoad);
-  }, []);
 
   return (
     <div
@@ -77,7 +64,6 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
     >
       {/* Base image */}
       <img
-        ref={imgRef}
         src={imgSrc}
         alt="Silhueta corporal"
         className="pointer-events-none select-none"
@@ -100,41 +86,17 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
         {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry, rotate }) => {
           const intensity = (painAreas?.[id] ?? 0) as 0 | 1 | 2 | 3;
           return (
-            <g key={id}>
-              <ellipse
-                cx={cx} cy={cy} rx={rx} ry={ry}
-                transform={`rotate(${rotate}, ${cx}, ${cy})`}
-                fill="rgba(96,165,250,0.15)"
-                stroke="#60A5FA"
-                strokeWidth={1.5}
-                strokeDasharray="4 3"
-                className={onAreaClick ? "cursor-pointer" : ""}
-                onClick={() => onAreaClick?.(id)}
-              />
-              <text
-                x={cx}
-                y={cy}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="6"
-                fill="#1e40af"
-                fontWeight="bold"
-                pointerEvents="none"
-              >
-                {id}
-              </text>
-              <text
-                x={cx}
-                y={cy + 9}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="5"
-                fill="#3b82f6"
-                pointerEvents="none"
-              >
-                {cx},{cy}
-              </text>
-            </g>
+            <ellipse
+              key={id}
+              cx={cx} cy={cy} rx={rx} ry={ry}
+              transform={`rotate(${rotate}, ${cx}, ${cy})`}
+              fill="rgba(96,165,250,0.15)"
+              stroke="#60A5FA"
+              strokeWidth={1.5}
+              strokeDasharray="4 3"
+              className={onAreaClick ? "cursor-pointer" : ""}
+              onClick={() => onAreaClick?.(id)}
+            />
           );
         })}
       </svg>
