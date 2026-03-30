@@ -96,7 +96,7 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
                 borderRadius: "40%",
                 background: isActive ? GLOW_BACKGROUNDS[intensity] : "transparent",
                 boxShadow: isActive ? GLOW_SHADOWS[intensity] : "none",
-                filter: isActive ? "blur(20px)" : "none",
+                filter: isActive ? "blur(5px)" : "none",
                 border: !isActive && interactive
                   ? "1px dashed #60A5FA"
                   : "none",
