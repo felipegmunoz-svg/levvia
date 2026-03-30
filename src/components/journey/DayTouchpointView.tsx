@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import FlowSilhouette from "@/components/FlowSilhouette";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import { getTouchpointConfig, type TouchpointSlot } from "@/data/touchpointConfig";
@@ -28,6 +30,7 @@ interface DayTouchpointViewProps {
   hydration?: HydrationProps;
   rescueMode?: string;
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
+  heatMapDay1?: Record<string, number> | null;
 }
 
 const SLOTS: { slot: TouchpointSlot; label: string; emoji: string; time: string }[] = [
@@ -69,7 +72,9 @@ const DayTouchpointView = ({
   hydration,
   rescueMode,
   onSlotComplete,
+  heatMapDay1,
 }: DayTouchpointViewProps) => {
+  const navigate = useNavigate();
   const config = getTouchpointConfig(dayNumber);
 
   // Compute active slot (first undone)
@@ -120,6 +125,23 @@ const DayTouchpointView = ({
           {config.purpose}
         </p>
       </div>
+
+      {heatMapDay1 && Object.keys(heatMapDay1).length > 0 && (
+        <div className="px-6 pb-2">
+          <button
+            onClick={() => navigate("/progress")}
+            className="w-full levvia-card p-4 flex items-center gap-4 text-left active:opacity-80 transition-opacity"
+          >
+            <div className="w-[60px] shrink-0">
+              <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={0} waterGoalMl={1} size="small" animated={false} />
+            </div>
+            <div>
+              <p className="text-sm font-heading font-semibold text-levvia-fg">Seu Fogo Interno</p>
+              <p className="text-xs text-levvia-muted font-body mt-0.5">Toque para ver sua evolução →</p>
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="px-6 pb-4">
