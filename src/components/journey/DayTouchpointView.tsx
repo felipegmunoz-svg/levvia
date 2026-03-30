@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import FlowSilhouette from "@/components/FlowSilhouette";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import { getTouchpointConfig, type TouchpointSlot } from "@/data/touchpointConfig";
