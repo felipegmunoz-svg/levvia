@@ -27,8 +27,8 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 
 // ─── Zone configuration (percentage-based) ───
 const ZONE_CONFIG = [
-  { id: "braco_esq",       top: "30%", left: "20%", width: "8%",  height: "20%", rotate: "15deg" },
-  { id: "braco_dir",       top: "30%", left: "72%", width: "8%",  height: "20%", rotate: "-15deg" },
+  { id: "braco_esq",       top: "30%", left: "28%", width: "8%",  height: "20%", rotate: "15deg" },
+  { id: "braco_dir",       top: "30%", left: "64%", width: "8%",  height: "20%", rotate: "-15deg" },
   { id: "abdomen",         top: "35%", left: "40%", width: "20%", height: "15%", rotate: "0deg" },
   { id: "quadril_esq",     top: "50%", left: "35%", width: "10%", height: "8%",  rotate: "0deg" },
   { id: "quadril_dir",     top: "50%", left: "55%", width: "10%", height: "8%",  rotate: "0deg" },
@@ -39,15 +39,15 @@ const ZONE_CONFIG = [
 ];
 
 const GLOW_BACKGROUNDS: Record<number, string> = {
-  1: "rgba(253, 230, 138, 0.5)",
-  2: "rgba(253, 186, 116, 0.6)",
-  3: "rgba(252, 165, 165, 0.7)",
+  1: "rgba(251, 191, 36, 0.9)",
+  2: "rgba(249, 115, 22, 0.9)",
+  3: "rgba(239, 68, 68, 0.9)",
 };
 
 const GLOW_SHADOWS: Record<number, string> = {
-  1: "0 0 20px rgba(245, 158, 11, 0.5), 0 0 40px rgba(245, 158, 11, 0.2)",
-  2: "0 0 20px rgba(234, 88, 12, 0.6), 0 0 40px rgba(234, 88, 12, 0.3)",
-  3: "0 0 20px rgba(220, 38, 38, 0.7), 0 0 40px rgba(220, 38, 38, 0.3)",
+  1: "0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(251, 191, 36, 0.3)",
+  2: "0 0 20px rgba(249, 115, 22, 0.7), 0 0 40px rgba(249, 115, 22, 0.3)",
+  3: "0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.4)",
 };
 
 // ─── Core renderer ───
@@ -64,7 +64,7 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
 
   return (
     <div
-      className={`relative mx-auto w-full max-w-[400px] max-h-[500px] ${className}`}
+      className={`relative mx-auto w-full max-w-[600px] ${className}`}
       style={{ aspectRatio: "3 / 4" }}
     >
       {/* Base image */}
@@ -96,9 +96,9 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
                 borderRadius: "40%",
                 background: isActive ? GLOW_BACKGROUNDS[intensity] : "transparent",
                 boxShadow: isActive ? GLOW_SHADOWS[intensity] : "none",
-                filter: isActive ? "blur(20px)" : "none",
+                filter: isActive ? "blur(5px)" : "none",
                 border: !isActive && interactive
-                  ? "1px dashed #60A5FA"
+                  ? "1.5px dashed #60A5FA"
                   : "none",
                 transition: "background 0.3s ease, box-shadow 0.3s ease",
               }}
