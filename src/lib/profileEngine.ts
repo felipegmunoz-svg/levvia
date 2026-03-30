@@ -390,24 +390,30 @@ export function filterRecipesForProfile(
   if (normRestr.some(r => r.includes("vegan"))) {
     filtered = filtered.filter((r) => {
       const dp = (r.diet_profile || []).map(d => d.toLowerCase());
-      return dp.includes("vegana") || dp.includes("vegano");
+      const tags = (r.tags || []).map(t => t.toLowerCase());
+      return dp.some(d => d.includes("vegan")) ||
+             tags.some(t => t.includes("vegan"));
     });
   } else if (normRestr.some(r => r.includes("vegetar"))) {
     filtered = filtered.filter((r) => {
       const dp = (r.diet_profile || []).map(d => d.toLowerCase());
-      return dp.includes("vegetariana") || dp.includes("vegetariano") || dp.includes("vegana") || dp.includes("vegano");
+      const tags = (r.tags || []).map(t => t.toLowerCase());
+      return dp.some(d => d.includes("vegetar") || d.includes("vegan")) ||
+             tags.some(t => t.includes("vegetar") || t.includes("vegan"));
     });
   }
   if (normRestr.some(r => r.includes("glut") || r.includes("gluten"))) {
     filtered = filtered.filter((r) => {
       const af = (r.allergen_free || []).map(a => a.toLowerCase());
-      return af.includes("gluten") || af.includes("sem glúten") || af.includes("gluten-free") || af.includes("livre de glúten") || (r.tags || []).some(t => t.toLowerCase().includes("glúten"));
+      return af.some(a => a.includes("glut")) ||
+             (r.tags || []).some(t => t.toLowerCase().includes("glúten") || t.toLowerCase().includes("gluten"));
     });
   }
   if (normRestr.some(r => r.includes("lactos"))) {
     filtered = filtered.filter((r) => {
       const af = (r.allergen_free || []).map(a => a.toLowerCase());
-      return af.includes("lactose") || af.includes("sem lactose") || af.includes("lactose-free") || af.includes("livre de lactose") || (r.tags || []).some(t => t.toLowerCase().includes("lactose"));
+      return af.some(a => a.includes("lactos")) ||
+             (r.tags || []).some(t => t.toLowerCase().includes("lactose"));
     });
   }
   if (normRestr.some(r => r.includes("fruto") || r.includes("mar") || r.includes("seafood"))) {
