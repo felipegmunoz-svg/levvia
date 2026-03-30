@@ -518,12 +518,20 @@ const DayReview = () => {
 
         {renderDayContent()}
 
-        <button
-          onClick={() => navigate("/journey")}
-          className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-medium text-base hover:opacity-90 transition-opacity"
-        >
-          ← Voltar para Jornada
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate("/journey")}
+            className="flex-1 py-3 border border-primary text-primary rounded-xl font-medium text-sm hover:bg-primary/5 transition-colors"
+          >
+            ← Jornada
+          </button>
+          <button
+            onClick={() => navigate("/today")}
+            className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-medium text-sm hover:opacity-90 transition-opacity"
+          >
+            Meu dia atual →
+          </button>
+        </div>
       </div>
 
       <BottomNav />
