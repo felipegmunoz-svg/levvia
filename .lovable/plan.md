@@ -1,32 +1,41 @@
 
 
-# Update Clickable Area Coordinates in FlowSilhouette
+# Add FlowSilhouette to Profile Evolution Section
 
-## Problem
-HeatMapInteractive already delegates rendering to `FlowSilhouette`, which contains the `AREA_ELLIPSES` array. The ellipses are too small and misaligned with the PNG silhouette.
+## Summary
+Add the body silhouette with hydration wave to the "Evolução" tab in Profile.tsx, between the stats row and the bar chart.
 
-## Change
+## Changes
 
-### `src/components/FlowSilhouette.tsx` — Lines 26–36
+### `src/pages/Profile.tsx`
 
-Replace `AREA_ELLIPSES` with the corrected, larger coordinates:
+**After line 484** (closing `</div>` of the stats grid), insert a new `motion.div` block:
 
-```ts
-const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 22,  cy: 62,  rx: 10, ry: 22 },
-  { id: "braco_dir",        cx: 78,  cy: 62,  rx: 10, ry: 22 },
-  { id: "abdomen",          cx: 50,  cy: 52,  rx: 18, ry: 20 },
-  { id: "quadril_esq",      cx: 38,  cy: 78,  rx: 13, ry: 11 },
-  { id: "quadril_dir",      cx: 62,  cy: 78,  rx: 13, ry: 11 },
-  { id: "coxa_esq",         cx: 38,  cy: 105, rx: 12, ry: 18 },
-  { id: "coxa_dir",         cx: 62,  cy: 105, rx: 12, ry: 18 },
-  { id: "panturrilha_esq",  cx: 37,  cy: 138, rx: 9,  ry: 16 },
-  { id: "panturrilha_dir",  cx: 63,  cy: 138, rx: 9,  ry: 16 },
-];
+```tsx
+<motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.33 }} className="glass-card p-5 flex flex-col items-center">
+  <h3 className="text-sm font-medium text-foreground flex items-center gap-2 mb-1 self-start">
+    💧 Seu mapa de leveza
+  </h3>
+  <p className="text-xs text-muted-foreground mb-4 self-start">
+    A fita azul cresce conforme sua hidratação do dia
+  </p>
+  <FlowSilhouette
+    painAreas={(() => {
+      const hm = (profile as any).heatMapDay1;
+      if (!hm || typeof hm !== "object") return {};
+      const mapped: Record<string, 0 | 1 | 2 | 3> = {};
+      for (const [k, v] of Object.entries(hm)) {
+        mapped[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0)) as 0 | 1 | 2 | 3;
+      }
+      return mapped;
+    })()}
+    showHydrationWave={true}
+  />
+</motion.div>
 ```
 
-No other files modified.
+FlowSilhouette is already imported (line 2). No other files modified.
 
 ## Files modified
-- `src/components/FlowSilhouette.tsx` — 1 array replacement
+- `src/pages/Profile.tsx` — 1 block inserted in evolution section
 
