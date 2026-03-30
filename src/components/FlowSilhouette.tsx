@@ -26,15 +26,15 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 }
 
 const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 22,  cy: 75,  rx: 11, ry: 30 },
-  { id: "braco_dir",        cx: 78,  cy: 75,  rx: 11, ry: 30 },
-  { id: "abdomen",          cx: 50,  cy: 52,  rx: 16, ry: 22 },
-  { id: "quadril_esq",      cx: 38,  cy: 97,  rx: 13, ry: 10 },
-  { id: "quadril_dir",      cx: 62,  cy: 97,  rx: 13, ry: 10 },
-  { id: "coxa_esq",         cx: 37,  cy: 120, rx: 11, ry: 17 },
-  { id: "coxa_dir",         cx: 63,  cy: 120, rx: 11, ry: 17 },
-  { id: "panturrilha_esq",  cx: 36,  cy: 147, rx: 9,  ry: 13 },
-  { id: "panturrilha_dir",  cx: 64,  cy: 147, rx: 9,  ry: 13 },
+  { id: "braco_esq",        cx: 26,  cy: 78,  rx: 9,  ry: 28, rotate: 12  },
+  { id: "braco_dir",        cx: 74,  cy: 78,  rx: 9,  ry: 28, rotate: -12 },
+  { id: "abdomen",          cx: 50,  cy: 52,  rx: 15, ry: 20, rotate: 0   },
+  { id: "quadril_esq",      cx: 39,  cy: 97,  rx: 12, ry: 10, rotate: 0   },
+  { id: "quadril_dir",      cx: 61,  cy: 97,  rx: 12, ry: 10, rotate: 0   },
+  { id: "coxa_esq",         cx: 38,  cy: 120, rx: 10, ry: 16, rotate: 0   },
+  { id: "coxa_dir",         cx: 62,  cy: 120, rx: 10, ry: 16, rotate: 0   },
+  { id: "panturrilha_esq",  cx: 38,  cy: 147, rx: 8,  ry: 12, rotate: 0   },
+  { id: "panturrilha_dir",  cx: 62,  cy: 147, rx: 8,  ry: 12, rotate: 0   },
 ];
 
 // ─── Core renderer ───
@@ -57,6 +57,7 @@ const FlowSilhouetteCore = ({
           : "/assets/flow_silhouette_base.png"}
         alt="Silhueta corporal"
         className="w-full h-auto block pointer-events-none select-none"
+        style={{ position: "relative", zIndex: 0 }}
         onLoad={() => forceUpdate()}
       />
 
@@ -69,6 +70,7 @@ const FlowSilhouetteCore = ({
           left: 0,
           width: "100%",
           height: "100%",
+          zIndex: 1,
         }}
       >
         <defs>
@@ -84,9 +86,12 @@ const FlowSilhouetteCore = ({
             <stop offset="0%" stopColor="#FCA5A5" stopOpacity={0.95} />
             <stop offset="100%" stopColor="#FCA5A5" stopOpacity={0} />
           </radialGradient>
+          <filter id="heatBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
         </defs>
 
-        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry }) => {
+        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry, rotate }) => {
           const intensity = (painAreas[id] ?? 0) as 0 | 1 | 2 | 3;
           const gradientId =
             intensity === 1 ? "heat-leve"
@@ -97,10 +102,10 @@ const FlowSilhouetteCore = ({
             <ellipse
               key={id}
               cx={cx} cy={cy} rx={rx} ry={ry}
+              transform={`rotate(${rotate}, ${cx}, ${cy})`}
               fill={gradientId ? `url(#${gradientId})` : "transparent"}
+              filter={intensity > 0 ? "url(#heatBlur)" : undefined}
               stroke="transparent"
-              strokeWidth={0}
-              strokeDasharray="0"
               className={interactive ? "cursor-pointer" : ""}
               onClick={interactive ? () => onAreaClick!(id) : undefined}
               style={{ transition: "fill 0.3s ease" }}
