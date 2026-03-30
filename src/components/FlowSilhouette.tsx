@@ -64,7 +64,6 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
     >
       {/* Base image */}
       <img
-        ref={imgRef}
         src={imgSrc}
         alt="Silhueta corporal"
         className="pointer-events-none select-none"
