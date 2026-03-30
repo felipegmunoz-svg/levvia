@@ -83,6 +83,7 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
     >
       {/* Base image */}
       <img
+        ref={imgRef}
         src={imgSrc}
         alt="Silhueta corporal"
         className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
