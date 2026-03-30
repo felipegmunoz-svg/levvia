@@ -165,9 +165,13 @@ const DayReview = () => {
     );
   }
 
-  const completedAt = dayNum <= 6
-    ? (data?.[`day${dayNum}_completed_at` as keyof ProfileData] as string | null)
-    : null;
+  const completedAt = (() => {
+    if (dayNum <= 6) {
+      return data?.[`day${dayNum}_completed_at` as keyof ProfileData] as string | null;
+    }
+    const touchpoints = data?.challenge_progress?.touchpoints as Record<string, any> | undefined;
+    return touchpoints?.[`day${dayNum}`]?.night?.doneAt ?? null;
+  })();
 
   // Get config for this day
   const config = getTouchpointConfig(dayNum);
