@@ -77,7 +77,7 @@ const FlowSilhouetteCore = ({
         </defs>
 
         {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry }) => {
-          const intensity = painAreas[id] ?? 0;
+          const intensity = (painAreas[id] ?? 0) as 0 | 1 | 2 | 3;
           const gradientId =
             intensity === 1 ? "heat-leve"
             : intensity === 2 ? "heat-moderado"
@@ -86,14 +86,14 @@ const FlowSilhouetteCore = ({
           return (
             <ellipse
               key={id}
-              cx={cx}
-              cy={cy}
-              rx={rx}
-              ry={ry}
-              fill={gradientId ? `url(#${gradientId})` : "transparent"}
+              cx={cx} cy={cy} rx={rx} ry={ry}
+              fill={gradientId ? `url(#${gradientId})` : "rgba(255,255,255,0.06)"}
+              stroke={intensity > 0 ? "transparent" : "rgba(255,255,255,0.30)"}
+              strokeWidth={0.6}
+              strokeDasharray={intensity > 0 ? "0" : "2,2"}
               className={interactive ? "cursor-pointer" : ""}
               onClick={interactive ? () => onAreaClick!(id) : undefined}
-              style={{ transition: "fill 0.3s ease" }}
+              style={{ transition: "fill 0.3s ease, stroke 0.3s ease" }}
             />
           );
         })}
