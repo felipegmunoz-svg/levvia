@@ -406,7 +406,7 @@ const DayReview = () => {
         <SectionCard icon="💧" title="Tarde">
           <StatusBadge done={!!afternoon.done} />
           <div className="flex items-center gap-2 text-sm text-foreground">
-            <span>{afternoon.hydration_done ? "✅" : "⬜"}</span>
+            <span>{(afternoon.hydration ?? afternoon.hydration_done) ? "✅" : "⬜"}</span>
             <span>Hidratação</span>
           </div>
           {afternoon.micro_challenge_id && (
@@ -433,9 +433,9 @@ const DayReview = () => {
             </div>
           )}
 
-          {/* Journal data */}
-          {night.journal && (() => {
-            const journal = night.journal as Record<string, unknown>;
+          {/* Journal data — check top-level (new format) or diary.journal (old format) */}
+          {(night.journal ?? (night.diary as any)?.journal) && (() => {
+            const journal = (night.journal ?? (night.diary as any)?.journal) as Record<string, unknown>;
             return (
               <div className="mt-2 space-y-1.5 bg-muted rounded-lg p-3">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Diário</p>

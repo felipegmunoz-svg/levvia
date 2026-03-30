@@ -38,20 +38,23 @@ const HistoryExercises = () => {
       const dayTp = (challengeProgress as any)?.touchpoints?.[`day${day}`];
       if (!dayTp) continue;
 
-      const morning = dayTp.morning;
-      if (!morning?.done) continue;
+      // Read exercise from morning and afternoon slots (backward compat: top-level and .diary)
+      const slotsToCheck = [dayTp.morning, dayTp.afternoon].filter(Boolean);
+      for (const slot of slotsToCheck) {
+        if (!slot?.done) continue;
+        const exerciseId =
+          slot.exercise_id ??
+          slot.micro_challenge_id ??
+          (slot.diary as any)?.exercise_id ??
+          (slot.diary as any)?.micro_challenge_id;
 
-      // Backward compat: check both top-level and .diary (old format)
-      const exerciseId =
-        morning.exercise_id ??
-        (morning.diary as any)?.exercise_id;
+        if (!exerciseId || seen.has(exerciseId)) continue;
+        seen.add(exerciseId);
 
-      if (!exerciseId || seen.has(exerciseId)) continue;
-      seen.add(exerciseId);
-
-      const exercise = allExercises.find((e) => e.id === exerciseId);
-      if (exercise) {
-        items.push({ exercise, day });
+        const exercise = allExercises.find((e) => e.id === exerciseId);
+        if (exercise) {
+          items.push({ exercise, day });
+        }
       }
     }
 
