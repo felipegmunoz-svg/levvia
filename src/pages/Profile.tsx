@@ -394,16 +394,18 @@ const Profile = () => {
                 💧 Meu Mapa de Fluxo
               </h2>
               <FlowSilhouette
-                painAreas={(() => {
+                heatMapData={(() => {
                   const hm = (profile as any).heatMapDay1;
                   if (!hm || typeof hm !== "object") return {};
-                  const mapped: Record<string, 0 | 1 | 2 | 3> = {};
+                  const mapped: Record<string, number> = {};
                   for (const [k, v] of Object.entries(hm)) {
-                    mapped[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0)) as 0 | 1 | 2 | 3;
+                    mapped[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0));
                   }
                   return mapped;
                 })()}
-                showHydrationWave={true}
+                waterIntakeMl={(profile as any)?.water_intake_ml ?? 0}
+                waterGoalMl={(profile as any)?.water_goal_ml ?? 2000}
+                interactive={false}
               />
             </section>
 
