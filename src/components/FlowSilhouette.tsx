@@ -39,9 +39,9 @@ const ZONE_CONFIG = [
 ];
 
 const GLOW_BACKGROUNDS: Record<number, string> = {
-  1: "rgba(253, 230, 138, 0.5)",
-  2: "rgba(253, 186, 116, 0.6)",
-  3: "rgba(252, 165, 165, 0.7)",
+  1: "rgba(251, 191, 36, 0.9)",
+  2: "rgba(249, 115, 22, 0.9)",
+  3: "rgba(239, 68, 68, 0.9)",
 };
 
 const GLOW_SHADOWS: Record<number, string> = {
