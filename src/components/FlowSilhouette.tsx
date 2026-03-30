@@ -80,7 +80,8 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
         ref={imgRef}
         src={imgSrc}
         alt="Silhueta corporal"
-        className="absolute inset-0 w-full h-full object-fill select-none pointer-events-none"
+        className="pointer-events-none select-none"
+        style={{ width: "100%", height: "auto", display: "block" }}
         draggable={false}
       />
 
