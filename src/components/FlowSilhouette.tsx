@@ -27,15 +27,15 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 
 // ─── SVG ellipse zones (viewBox 0 0 200 500) ───
 const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 60,  cy: 175, rx: 10, ry: 65, rotate: -7 },
-  { id: "braco_dir",        cx: 140, cy: 175, rx: 10, ry: 65, rotate:  7 },
-  { id: "abdomen",          cx: 100, cy: 150, rx: 28, ry: 72, rotate:  0 },
-  { id: "quadril_esq",      cx: 87,  cy: 248, rx: 15, ry: 20, rotate:  0 },
-  { id: "quadril_dir",      cx: 113, cy: 248, rx: 15, ry: 20, rotate:  0 },
-  { id: "coxa_esq",         cx: 85,  cy: 325, rx: 14, ry: 46, rotate:  0 },
-  { id: "coxa_dir",         cx: 115, cy: 325, rx: 14, ry: 46, rotate:  0 },
-  { id: "panturrilha_esq",  cx: 84,  cy: 425, rx: 11, ry: 36, rotate:  0 },
-  { id: "panturrilha_dir",  cx: 116, cy: 425, rx: 11, ry: 36, rotate:  0 },
+  { id: "braco_esq",        cx: 45,  cy: 180, rx: 15, ry: 65, rotate: -8 },
+  { id: "braco_dir",        cx: 155, cy: 180, rx: 15, ry: 65, rotate:  8 },
+  { id: "abdomen",          cx: 100, cy: 150, rx: 28, ry: 70, rotate:  0 },
+  { id: "quadril_esq",      cx: 85,  cy: 248, rx: 15, ry: 20, rotate:  0 },
+  { id: "quadril_dir",      cx: 115, cy: 248, rx: 15, ry: 20, rotate:  0 },
+  { id: "coxa_esq",         cx: 83,  cy: 325, rx: 14, ry: 46, rotate:  0 },
+  { id: "coxa_dir",         cx: 117, cy: 325, rx: 14, ry: 46, rotate:  0 },
+  { id: "panturrilha_esq",  cx: 82,  cy: 425, rx: 11, ry: 36, rotate:  0 },
+  { id: "panturrilha_dir",  cx: 118, cy: 425, rx: 11, ry: 36, rotate:  0 },
 ];
 
 const GLOW_BACKGROUNDS: Record<number, string> = {
