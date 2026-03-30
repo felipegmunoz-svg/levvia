@@ -1,64 +1,76 @@
 
 
-# Full SVG Rewrite of FlowSilhouette — Pure Organic Paths
+# FlowSilhouette: Image-Based with HTML Glow Zones
 
 ## Strategy
 
-Replace the PNG-based silhouette with a **pure SVG** feminine body drawn using organic `<path>` curves. No images, no geometric primitives. The silhouette will use glassmorphism aesthetics, and heat zones will be internal paths that glow **inside** the body.
+Abandon SVG body drawing entirely. Use the real PNG images as the visual base and overlay invisible `<div>` touch zones positioned with CSS percentages. When tapped, zones glow using CSS `box-shadow` / `filter: drop-shadow()` — creating the illusion of light emanating from inside the silhouette.
 
 ## Architecture
 
-The component keeps the same props interface (`painAreas`, `onAreaClick`, `showHydrationWave`, `className`) and the legacy wrapper for `Progress.tsx`. Only the rendering changes.
-
 ```text
-┌──────────────────────────────┐
-│  SVG viewBox="0 0 200 500"   │
-│                              │
-│  1. Body outline path        │
-│     fill: white/0.1          │
-│     stroke: white/0.3        │
-│                              │
-│  2. Heat zone paths (×9)     │
-│     Clipped inside body      │
-│     Glow via radialGradient  │
-│     Pulsing via motion.path  │
-│                              │
-│  3. Dashed zone outlines     │
-│     Visible affordance       │
-│                              │
-│  4. Optional hydration wave  │
-│     Animated gradient fill   │
-└──────────────────────────────┘
+┌─ Container (relative, aspect-[3/4]) ──────────┐
+│                                                │
+│  <img> — flow_silhouette_base/full.png         │
+│         object-contain, z-0                    │
+│                                                │
+│  ┌─ Overlay (absolute inset-0, z-10) ────────┐ │
+│  │                                           │ │
+│  │  9 × <div> touch zones                    │ │
+│  │    positioned via top/left/width/height %  │ │
+│  │    rotated via CSS transform              │ │
+│  │    invisible by default                   │ │
+│  │    on click → glow via box-shadow         │ │
+│  │    dashed border in onboarding mode       │ │
+│  └───────────────────────────────────────────┘ │
+└────────────────────────────────────────────────┘
 ```
 
 ## Changes — `src/components/FlowSilhouette.tsx`
 
 Full rewrite:
 
-1. **Body outline**: A single `<path>` with organic cubic Bézier curves forming a feminine silhouette (head, neck, shoulders, arms, torso with waist curve, hips, legs, calves, feet). `viewBox="0 0 200 500"`. Filled `white` at `0.1` opacity, stroked `white` at `0.3` opacity.
+### 1. Zone config — user's exact coordinates
+```ts
+const ZONE_CONFIG = [
+  { id: "braco_esq",       top: "28%", left: "18%", width: "12%", height: "25%", rotate: "15deg" },
+  { id: "braco_dir",       top: "28%", left: "70%", width: "12%", height: "25%", rotate: "-15deg" },
+  { id: "abdomen",         top: "30%", left: "38%", width: "24%", height: "20%", rotate: "0deg" },
+  { id: "quadril_esq",     top: "48%", left: "30%", width: "15%", height: "10%", rotate: "0deg" },
+  { id: "quadril_dir",     top: "48%", left: "55%", width: "15%", height: "10%", rotate: "0deg" },
+  { id: "coxa_esq",        top: "55%", left: "28%", width: "15%", height: "25%", rotate: "5deg" },
+  { id: "coxa_dir",        top: "55%", left: "57%", width: "15%", height: "25%", rotate: "-5deg" },
+  { id: "panturrilha_esq", top: "78%", left: "30%", width: "12%", height: "15%", rotate: "2deg" },
+  { id: "panturrilha_dir", top: "78%", left: "58%", width: "12%", height: "15%", rotate: "-2deg" },
+];
+```
 
-2. **clipPath**: The body outline doubles as a `<clipPath>` so all heat effects are confined inside the silhouette — glowing "inside the glass."
+### 2. Glow colors per intensity
+```ts
+const GLOW_COLORS = {
+  1: "rgba(253, 230, 138, 0.7)",  // yellow
+  2: "rgba(253, 186, 116, 0.8)",  // orange
+  3: "rgba(252, 165, 165, 0.9)",  // red
+};
+const GLOW_SHADOWS = {
+  1: "0 0 15px rgba(245, 158, 11, 0.5), 0 0 30px rgba(245, 158, 11, 0.2)",
+  2: "0 0 15px rgba(234, 88, 12, 0.6), 0 0 30px rgba(234, 88, 12, 0.3)",
+  3: "0 0 15px rgba(220, 38, 38, 0.7), 0 0 30px rgba(220, 38, 38, 0.3)",
+};
+```
 
-3. **9 heat zone paths**: Each area (`braco_esq`, `braco_dir`, `abdomen`, `quadril_esq/dir`, `coxa_esq/dir`, `panturrilha_esq/dir`) is an organic `<path>` that follows the body contour in that region. When `intensity > 0`:
-   - Filled with a `<radialGradient>` (yellow → orange → red based on intensity)
-   - Blurred via `<feGaussianBlur stdDeviation="6">`
-   - Pulsing opacity via `motion.path`
-   - All clipped to stay inside the body
+### 3. Core component
+- `<img>` with `object-contain` as base — chooses `flow_silhouette_full.png` when `showHydrationWave`, otherwise `flow_silhouette_base.png`
+- Absolute overlay with 9 `<div>` zones using the CSS positions above
+- Each zone: `border-radius: 40%` for organic shape, `transition: all 0.3s ease`
+- When `intensity > 0`: `background` + `boxShadow` from glow maps, pulsing via `motion.div` opacity animation
+- New prop `showGuides` (defaults to `true` when `onAreaClick` is set): shows dashed white borders on zones
+- When `intensity === 0` and `showGuides`: `border: 1px dashed rgba(255,255,255,0.2)`
 
-4. **Zone affordance**: Each zone has a subtle dashed outline (`stroke: rgba(200,200,200,0.25)`) so users know where to tap.
-
-5. **Glassmorphism**: The container `<div>` gets `backdrop-filter: blur(10px)` and a subtle background. The SVG body itself has the frosted-glass appearance via low-opacity white fill.
-
-6. **Hydration wave** (when `showHydrationWave=true`): A horizontal animated gradient that rises from the feet upward inside the body clipPath, simulating water filling.
-
-7. **Legacy wrapper** and `calculateFlowScore` preserved exactly as-is.
-
-## Why this fixes scaling
-
-Since everything is pure SVG with a fixed `viewBox`, it scales perfectly to any container size. No image loading, no alignment issues, no `preserveAspectRatio` hacks.
+### 4. Preserved exports
+- `calculateFlowScore` — unchanged
+- Legacy wrapper — unchanged (converts `heatMapData`/`waterIntakeMl` props)
 
 ## Files modified
-- `src/components/FlowSilhouette.tsx` — full rewrite (pure SVG)
-
-No other files modified.
+- `src/components/FlowSilhouette.tsx` — full rewrite (image + HTML glow zones)
 
