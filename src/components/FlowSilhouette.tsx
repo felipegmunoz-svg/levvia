@@ -29,7 +29,7 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 const AREA_ELLIPSES = [
   { id: "braco_esq",        cx: 68,  cy: 185, rx: 18, ry: 60, rotate: -5 },
   { id: "braco_dir",        cx: 132, cy: 185, rx: 18, ry: 60, rotate:  5 },
-  { id: "abdomen",          cx: 100, cy: 160, rx: 27, ry: 65, rotate:  0 },
+  { id: "abdomen",          cx: 100, cy: 190, rx: 27, ry: 68, rotate:  0 },
   { id: "quadril_esq",      cx: 82,  cy: 265, rx: 16, ry: 20, rotate:  0 },
   { id: "quadril_dir",      cx: 118, cy: 265, rx: 16, ry: 20, rotate:  0 },
   { id: "coxa_esq",         cx: 82,  cy: 330, rx: 14, ry: 46, rotate:  0 },
