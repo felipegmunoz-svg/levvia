@@ -127,9 +127,11 @@ const HeatMapInteractive = ({
         className={`relative ${silhouetteWidth} max-w-full`}
       >
         <FlowSilhouette
-          painAreas={areas as Record<string, 0 | 1 | 2 | 3>}
-          onAreaClick={readOnly ? undefined : (area) => toggleArea(area as AreaId)}
-          showHydrationWave={showHydrationAura}
+          heatMapData={areas as Record<string, number>}
+          interactive={!readOnly}
+          onZoneClick={(zone, level) => setAreas(prev => ({ ...prev, [zone as AreaId]: level }))}
+          waterIntakeMl={0}
+          waterGoalMl={1}
         />
       </motion.div>
 
