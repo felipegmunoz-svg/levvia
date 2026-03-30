@@ -84,9 +84,12 @@ const FlowSilhouetteCore = ({
             <stop offset="0%" stopColor="#FCA5A5" stopOpacity={0.95} />
             <stop offset="100%" stopColor="#FCA5A5" stopOpacity={0} />
           </radialGradient>
+          <filter id="heatBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
         </defs>
 
-        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry }) => {
+        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry, rotate }) => {
           const intensity = (painAreas[id] ?? 0) as 0 | 1 | 2 | 3;
           const gradientId =
             intensity === 1 ? "heat-leve"
@@ -97,10 +100,10 @@ const FlowSilhouetteCore = ({
             <ellipse
               key={id}
               cx={cx} cy={cy} rx={rx} ry={ry}
+              transform={`rotate(${rotate}, ${cx}, ${cy})`}
               fill={gradientId ? `url(#${gradientId})` : "transparent"}
+              filter={intensity > 0 ? "url(#heatBlur)" : undefined}
               stroke="transparent"
-              strokeWidth={0}
-              strokeDasharray="0"
               className={interactive ? "cursor-pointer" : ""}
               onClick={interactive ? () => onAreaClick!(id) : undefined}
               style={{ transition: "fill 0.3s ease" }}
