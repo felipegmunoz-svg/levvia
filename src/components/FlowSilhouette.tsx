@@ -72,8 +72,8 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
 
   return (
     <div
-      className={`relative mx-auto w-full max-w-[450px] ${className}`}
-      style={{ aspectRatio: "478 / 1271" }}
+      className={`relative mx-auto ${className ?? ""}`}
+      style={{ width: "100%", maxWidth: "200px" }}
     >
       {/* Base image */}
       <img
