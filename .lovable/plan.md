@@ -1,41 +1,41 @@
 
+Objetivo: corrigir o problema real de escala no onboarding e recalibrar as zonas sem perder a intensidade visual atual.
 
-# FlowSilhouette: Scale Up, Vibrant Colors, Sharp Heat
+1. Ajustar o gargalo de escala no onboarding
+- Hoje a silhueta não cresce porque `src/components/journey/HeatMapInteractive.tsx` limita o wrapper a `w-[200px]` / `w-[160px]`.
+- Vou remover esse limite fixo e trocar por um wrapper expansível, centralizado e sem padding/altura que apertem a imagem.
+- Isso é necessário: só mexer em `FlowSilhouette.tsx` não resolve o tamanho no `/onboarding`.
 
-## Changes — `src/components/FlowSilhouette.tsx`
+2. Escala máxima da silhueta no `src/components/FlowSilhouette.tsx`
+- No modo interativo (`onAreaClick` presente), o container passa a usar comportamento de tela cheia: `w-screen` com `max-w-[800px]`.
+- Remover qualquer `max-h` e qualquer restrição local que esteja encolhendo a imagem.
+- Manter `aspectRatio: "3 / 4"` e fazer a imagem ocupar 100% do container com `object-contain`.
+- Nos usos não interativos (perfil/progresso), preservar um tamanho mais contido para não quebrar cards existentes.
 
-### 1. Container scale up
-- Line 67: `max-w-[400px] max-h-[500px]` → `max-w-[600px]`
-- Remove `max-h-[500px]` (aspect-ratio handles proportions)
+3. Recalibrar zonas com os valores pedidos
+- Braço esquerdo: `left: "32%"`
+- Braço direito: `left: "60%"`
+- Braços com rotação `18deg` e `-18deg`
+- Coxa esquerda: mover 2% para o centro
+- Coxa direita: mover 2% para o centro
+- Panturrilha esquerda: mover 2% para o centro
+- Panturrilha direita: mover 2% para o centro
+- Demais dimensões e intensidades permanecem como estão, salvo onde o reposicionamento exigir consistência visual.
 
-### 2. Arm zones repositioned inward
-- `braco_esq`: `left: "20%"` → `left: "28%"`
-- `braco_dir`: `left: "72%"` → `left: "64%"`
+4. Preservar o visual forte já aprovado
+- Manter cores vibrantes com opacidade `0.9`
+- Manter blur reduzido em `5px`
+- Manter linhas-guia azuis `#60A5FA`
+- Aumentar espessura das linhas para `1.5px` em todas as zonas inativas clicáveis
 
-### 3. Vibrant heat colors (opacity 0.9)
-```ts
-const GLOW_BACKGROUNDS: Record<number, string> = {
-  1: "rgba(251, 191, 36, 0.9)",   // #FBBF24
-  2: "rgba(249, 115, 22, 0.9)",   // #F97316
-  3: "rgba(239, 68, 68, 0.9)",    // #EF4444
-};
-```
+5. Compatibilidade
+- Preservar `calculateFlowScore`
+- Preservar o wrapper legado de `Progress.tsx`
+- Garantir que o modo gigante aconteça só no fluxo interativo, sem estourar o layout do perfil/progresso
 
-### 4. Updated glow shadows to match new colors
-```ts
-const GLOW_SHADOWS: Record<number, string> = {
-  1: "0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(251, 191, 36, 0.3)",
-  2: "0 0 20px rgba(249, 115, 22, 0.7), 0 0 40px rgba(249, 115, 22, 0.3)",
-  3: "0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.4)",
-};
-```
-
-### 5. Reduce blur from 20px to 5px
-- Line 99: `filter: isActive ? "blur(20px)"` → `"blur(5px)"`
-
-### 6. Guide border thickness 1.5px
-- Line 101: `"1px dashed #60A5FA"` → `"1.5px dashed #60A5FA"`
-
-## Files modified
+Arquivos a alterar
 - `src/components/FlowSilhouette.tsx`
+- `src/components/journey/HeatMapInteractive.tsx`
 
+Nota técnica importante
+- A meta de “80% da altura da tela” entra em conflito com a proporção fixa `3 / 4` em celulares estreitos. A implementação correta será: ocupar a maior escala possível dentro do viewport, priorizando largura total no onboarding sem distorcer a imagem.
