@@ -1,52 +1,60 @@
 
 
-# Rewrite FlowSilhouette + Integrate into Onboarding, Profile & HeatMapInteractive
+# Rebuild FlowSilhouette with PNG Images + SVG Overlay
 
-## Important Compatibility Issue
+## Critical Compatibility Note
 
-`FlowSilhouette` is currently imported in `src/pages/Progress.tsx` (line 3) with the **old** props (`heatMapData`, `waterIntakeMl`, `waterGoalMl`, `size`, `animated`). Rewriting the interface will break Progress.tsx. Since you said "Não alterar nenhum outro arquivo", I have two options:
+The user's prompt uses **English area IDs** (`chest`, `leftArm`, `rightCalf`, etc.), but the entire codebase (HeatMapInteractive, HeatMapCard, syncOnboarding, Diagnosis, Profile, Progress, DayReview, etc. — 9+ files) uses **Portuguese IDs** (`abdomen`, `braco_esq`, `panturrilha_dir`, etc.). Changing the IDs would break data flow everywhere.
 
-- **Option A**: Keep a backward-compatible wrapper or adapter inside FlowSilhouette.tsx that maps old props to new ones (keeps Progress.tsx working without editing it).
-- **Option B**: Also update Progress.tsx to use the new props (adds 1 extra file).
+**Decision**: Keep the existing Portuguese area IDs in the ellipse definitions. Map the ellipse positions from the user's spec to the Portuguese IDs:
 
-I'll go with **Option A** — export both the new component and a legacy wrapper, so Progress.tsx continues working. The `calculateFlowScore` export also needs to remain.
+| User spec ID | Mapped to | Ellipse position |
+|---|---|---|
+| `chest` | `abdomen` (torso area) | cx:50, cy:52 |
+| `abdomen` | *merged into abdomen* | cx:50, cy:70 |
+| `hips` | split → `quadril_esq` + `quadril_dir` | cx:42/58, cy:86 |
+| `leftArm` | `braco_esq` | cx:25, cy:68 |
+| `rightArm` | `braco_dir` | cx:75, cy:68 |
+| `leftThigh` | `coxa_esq` | cx:39, cy:112 |
+| `rightThigh` | `coxa_dir` | cx:61, cy:112 |
+| `leftCalf` | `panturrilha_esq` | cx:38, cy:142 |
+| `rightCalf` | `panturrilha_dir` | cx:62, cy:142 |
+
+Since the original has 9 areas and the user spec has 9, I'll map `chest` → a new combined torso area or keep `abdomen` covering the full torso, and split `hips` into two ellipses for `quadril_esq`/`quadril_dir`. This preserves all 9 Portuguese IDs.
+
+## Pre-requisite
+
+Copy the two uploaded images to `public/assets/`:
+- `flow_silhouette_base.png`
+- `flow_silhouette_full.png`
 
 ## Changes
 
 ### 1. `src/components/FlowSilhouette.tsx` — Full rewrite
 
-**New interface** as specified: `painAreas`, `onAreaClick`, `hydrationLevel`, `showHydrationWave`, `className`.
+Replace the SVG-drawn silhouette with an image-based approach:
+- Container: `relative mx-auto w-full max-w-[260px]`
+- Base layer: `<img>` switching between `flow_silhouette_base.png` (no hydration) and `flow_silhouette_full.png` (with hydration wave)
+- Overlay: transparent SVG with `viewBox="0 0 100 180"`, `absolute inset-0`
+- Radial gradients in `<defs>` for 3 heat levels (leve/moderado/intenso) as specified
+- 9 ellipses using Portuguese area IDs with positions from the spec
+- **Preserve** `calculateFlowScore` named export
+- **Preserve** legacy wrapper detecting `heatMapData` prop for Progress.tsx compatibility (legacy mode renders the image-based silhouette with mapped pain areas + score/hydration bar below)
 
-**SVG structure** (viewBox `0 0 280 520`):
-- Glassmorphism container with `backdrop-blur-md bg-white/10 border-white/20 rounded-3xl`
-- Same 9 body areas from current silhouette, scaled to new viewBox
-- Decorative parts (head, neck, hands, feet) with `fill="rgba(255,255,255,0.85)"`, `stroke="rgba(255,255,255,0.4)"`, `strokeWidth={1}`
-- Drop-shadow filter on the SVG element
+### 2. `src/components/journey/HeatMapInteractive.tsx`
 
-**Pain colors** as specified (FBBF24, F59E0B, EF4444 with respective opacities). Each area path gets `blur(6px)` filter when intensity > 0.
-
-**Hydration wave** (framer-motion): When `showHydrationWave === true`, render an animated `motion.path` that oscillates vertically. Y position calculated from `hydrationLevel` (0=bottom at ~480, 100=top at ~60).
-
-**Legacy wrapper**: Keep `export default FlowSilhouette` as the new component. Add a named export `LegacyFlowSilhouette` that maps old props to new ones, plus re-export `calculateFlowScore`. Progress.tsx import stays working via a default export change — actually, Progress.tsx imports both `FlowSilhouette` (default) and `calculateFlowScore` (named). I'll keep `calculateFlowScore` as-is and make the default export accept old props via overloaded detection (check if `heatMapData` exists in props → use legacy mode). This avoids touching Progress.tsx.
-
-### 2. `src/pages/Onboarding.tsx` — Line ~400
-
-Replace `<HeatMapInteractive onNext={...} />` with `<FlowSilhouette>` usage. But the onboarding heat_map step needs interactive click + submit button. FlowSilhouette alone doesn't have a submit button. I'll wrap it: use FlowSilhouette with `onAreaClick` for toggling, plus the existing submit button logic inline in Onboarding.tsx.
+Already imports and uses `<FlowSilhouette>` — no changes needed since FlowSilhouette keeps the same props interface.
 
 ### 3. `src/pages/Profile.tsx`
 
-Add FlowSilhouette with `showHydrationWave={true}` and `hydrationLevel` from profile/hydration data. Need to find where to place it — likely in the stats section.
+Already uses `<FlowSilhouette showHydrationWave={true}>` — no changes needed.
 
-### 4. `src/components/journey/HeatMapInteractive.tsx`
+### 4. `src/pages/Onboarding.tsx`
 
-Replace the internal SVG with `<FlowSilhouette>`, passing through `painAreas`, `onAreaClick`, and `showHydrationWave={showHydrationAura}`. Keep all the surrounding UI (title, instructions, legend, submit button).
+Already renders via HeatMapInteractive which uses FlowSilhouette — no changes needed.
 
-## File-level summary
-
-| File | Change |
-|------|--------|
-| `src/components/FlowSilhouette.tsx` | Full rewrite with new props + legacy compatibility |
-| `src/pages/Onboarding.tsx` | Replace HeatMapInteractive with FlowSilhouette in heat_map step |
-| `src/pages/Profile.tsx` | Add FlowSilhouette with hydration wave |
-| `src/components/journey/HeatMapInteractive.tsx` | Replace internal SVG with FlowSilhouette |
+## Files modified
+- `public/assets/flow_silhouette_base.png` — new (uploaded image)
+- `public/assets/flow_silhouette_full.png` — new (uploaded image)
+- `src/components/FlowSilhouette.tsx` — full rewrite (image-based)
 
