@@ -62,6 +62,20 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
     ? "/assets/flow_silhouette_full.png"
     : "/assets/flow_silhouette_base.png";
 
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (!imgRef.current) return;
+    const img = imgRef.current;
+    const onLoad = () => {
+      console.log("📐 Imagem natural:", img.naturalWidth, "x", img.naturalHeight);
+      console.log("📐 Imagem renderizada:", img.clientWidth, "x", img.clientHeight);
+      console.log("📐 Container:", img.parentElement?.clientWidth, "x", img.parentElement?.clientHeight);
+    };
+    if (img.complete) onLoad();
+    else img.addEventListener("load", onLoad);
+  }, []);
+
   return (
     <div
       className={`relative mx-auto w-full max-w-[450px] ${className}`}
