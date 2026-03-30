@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import { useChallengeData } from "@/hooks/useChallengeData";
-import { selectExercisesForDay, type DbExercise } from "@/lib/profileEngine";
+import type { DbExercise } from "@/lib/profileEngine";
 
 function toExerciseView(ex: DbExercise) {
   return {
@@ -27,25 +27,36 @@ function toExerciseView(ex: DbExercise) {
 
 const HistoryExercises = () => {
   const navigate = useNavigate();
-  const { currentDay, allExercises, profile } = useChallengeData();
+  const { currentDay, allExercises, challengeProgress } = useChallengeData();
   const [selectedExercise, setSelectedExercise] = useState<DbExercise | null>(null);
 
-  const unlockedExercises = useMemo(() => {
-    const seen = new Set<string>();
+  const servedExercises = useMemo(() => {
     const items: { exercise: DbExercise; day: number }[] = [];
+    const seen = new Set<string>();
 
-    for (let day = 1; day <= currentDay; day++) {
-      const dayExercises = selectExercisesForDay(allExercises, profile, day, 2);
-      for (const ex of dayExercises) {
-        if (!seen.has(ex.id)) {
-          seen.add(ex.id);
-          items.push({ exercise: ex, day });
-        }
+    for (let day = currentDay; day >= 1; day--) {
+      const dayTp = (challengeProgress as any)?.touchpoints?.[`day${day}`];
+      if (!dayTp) continue;
+
+      const morning = dayTp.morning;
+      if (!morning?.done) continue;
+
+      // Backward compat: check both top-level and .diary (old format)
+      const exerciseId =
+        morning.exercise_id ??
+        (morning.diary as any)?.exercise_id;
+
+      if (!exerciseId || seen.has(exerciseId)) continue;
+      seen.add(exerciseId);
+
+      const exercise = allExercises.find((e) => e.id === exerciseId);
+      if (exercise) {
+        items.push({ exercise, day });
       }
     }
 
     return items;
-  }, [currentDay, allExercises, profile]);
+  }, [currentDay, challengeProgress, allExercises]);
 
   if (selectedExercise) {
     return (
@@ -58,43 +69,44 @@ const HistoryExercises = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <header className="gradient-page px-6 pt-10 pb-6 rounded-b-3xl">
+      <div className="px-4 pt-6">
         <button onClick={() => navigate("/history")} className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-          <ArrowLeft size={18} strokeWidth={1.5} />
+          <ArrowLeft className="w-4 h-4" />
           Voltar
         </button>
-        <h1 className="text-2xl font-light text-foreground">🌊 Exercícios</h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          {unlockedExercises.length} práticas desbloqueadas
+        <h1 className="text-xl font-heading font-bold text-foreground">💪 Exercícios que fiz</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {servedExercises.length} exercício{servedExercises.length !== 1 ? "s" : ""} realizado{servedExercises.length !== 1 ? "s" : ""}
         </p>
-      </header>
+      </div>
 
-      <main className="px-5 mt-6 space-y-3">
-        {unlockedExercises.length === 0 ? (
-          <div className="glass-card p-6 text-center">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Ainda não há exercícios desbloqueados. Complete os dias da sua jornada para construir seu histórico.
+      <div className="px-4 mt-4 space-y-3">
+        {servedExercises.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-sm">
+              Os exercícios que você realizar aparecerão aqui, com o dia da jornada em que foram feitos.
             </p>
           </div>
         ) : (
-          unlockedExercises.map(({ exercise, day }, i) => (
+          servedExercises.map(({ exercise, day }, i) => (
             <motion.button
-              key={exercise.id}
-              initial={{ opacity: 0, y: 12 }}
+              key={`${exercise.id}-${day}-${i}`}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
               onClick={() => setSelectedExercise(exercise)}
               className="glass-card p-4 w-full text-left flex items-center gap-3 transition-all hover:border-secondary/30 active:scale-[0.98]"
             >
-              <span className="text-2xl">🌊</span>
+              <span className="text-2xl">💪</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{exercise.title}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Dia {day} da jornada • {exercise.category}</p>
+                <p className="font-heading font-semibold text-foreground text-sm truncate">{exercise.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Dia {day} da jornada</p>
               </div>
+              <span className="text-xs text-muted-foreground">Ver →</span>
             </motion.button>
           ))
         )}
-      </main>
+      </div>
 
       <BottomNav />
     </div>
