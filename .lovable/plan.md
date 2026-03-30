@@ -1,28 +1,42 @@
 
 
-# Fix SVG Overlay Alignment in FlowSilhouette
+# FlowSilhouette: Blur Filter, Arm Rotation, Updated Coordinates & Z-Index
 
 ## Changes in `src/components/FlowSilhouette.tsx`
 
-### 1. Add imports and state for image sizing
-Add `useRef` and `useReducer` imports. Create `imgRef` and `forceUpdate` inside `FlowSilhouetteCore`.
+### 1. Add blur filter in `<defs>` (after line 86)
+Add a `<filter>` element for the heat aura blur:
+```xml
+<filter id="heatBlur" x="-50%" y="-50%" width="200%" height="200%">
+  <feGaussianBlur stdDeviation="5" />
+</filter>
+```
 
-### 2. Fix container structure
-- Add `ref={imgRef}` and `onLoad={() => forceUpdate()}` to `<img>`
-- Change SVG from `className="absolute inset-0 w-full h-full"` to inline `style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}`
-- Set `preserveAspectRatio="none"` on SVG so it stretches to match the image exactly
+### 2. Replace `AREA_ELLIPSES` array (lines 28–38)
+New coordinates with `rotate` field for arm inclination:
+```ts
+const AREA_ELLIPSES = [
+  { id: "braco_esq",        cx: 26,  cy: 78,  rx: 9,  ry: 28, rotate: 12  },
+  { id: "braco_dir",        cx: 74,  cy: 78,  rx: 9,  ry: 28, rotate: -12 },
+  { id: "abdomen",          cx: 50,  cy: 52,  rx: 15, ry: 20, rotate: 0   },
+  { id: "quadril_esq",      cx: 39,  cy: 97,  rx: 12, ry: 10, rotate: 0   },
+  { id: "quadril_dir",      cx: 61,  cy: 97,  rx: 12, ry: 10, rotate: 0   },
+  { id: "coxa_esq",         cx: 38,  cy: 120, rx: 10, ry: 16, rotate: 0   },
+  { id: "coxa_dir",         cx: 62,  cy: 120, rx: 10, ry: 16, rotate: 0   },
+  { id: "panturrilha_esq",  cx: 38,  cy: 147, rx: 8,  ry: 12, rotate: 0   },
+  { id: "panturrilha_dir",  cx: 62,  cy: 147, rx: 8,  ry: 12, rotate: 0   },
+];
+```
 
-### 3. Make zones invisible before interaction
-Replace ellipse styling:
-- `fill`: transparent when no intensity (instead of `rgba(46,134,171,0.04)`)
-- `stroke`: always transparent
-- `strokeWidth`: 0
-- `strokeDasharray`: "0"
+### 3. Update ellipse rendering (lines 89–109)
+- Destructure `rotate` from each area
+- Add `transform={`rotate(${rotate}, ${cx}, ${cy})`}` to each ellipse
+- Add `filter="url(#heatBlur)"` when `intensity > 0`
+- Remove `strokeWidth` and `strokeDasharray` props (keep `stroke="transparent"`)
 
-Zones only become visible with heat gradient when tapped.
-
-### 4. Update AREA_ELLIPSES coordinates
-Replace entire array with recalibrated values matching the actual PNG silhouette.
+### 4. Fix z-index on container elements (lines 53–72)
+- Add `style={{ position: "relative", zIndex: 0 }}` to the `<img>`
+- Add `zIndex: 1` to the SVG's existing inline style object
 
 ## Files modified
 - `src/components/FlowSilhouette.tsx`
