@@ -27,27 +27,27 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 
 // ─── Zone configuration (percentage-based) ───
 const ZONE_CONFIG = [
-  { id: "braco_esq",       top: "28%", left: "18%", width: "12%", height: "25%", rotate: "15deg" },
-  { id: "braco_dir",       top: "28%", left: "70%", width: "12%", height: "25%", rotate: "-15deg" },
-  { id: "abdomen",         top: "30%", left: "38%", width: "24%", height: "20%", rotate: "0deg" },
-  { id: "quadril_esq",     top: "48%", left: "30%", width: "15%", height: "10%", rotate: "0deg" },
-  { id: "quadril_dir",     top: "48%", left: "55%", width: "15%", height: "10%", rotate: "0deg" },
-  { id: "coxa_esq",        top: "55%", left: "28%", width: "15%", height: "25%", rotate: "5deg" },
-  { id: "coxa_dir",        top: "55%", left: "57%", width: "15%", height: "25%", rotate: "-5deg" },
-  { id: "panturrilha_esq", top: "78%", left: "30%", width: "12%", height: "15%", rotate: "2deg" },
-  { id: "panturrilha_dir", top: "78%", left: "58%", width: "12%", height: "15%", rotate: "-2deg" },
+  { id: "braco_esq",       top: "30%", left: "20%", width: "8%",  height: "20%", rotate: "15deg" },
+  { id: "braco_dir",       top: "30%", left: "72%", width: "8%",  height: "20%", rotate: "-15deg" },
+  { id: "abdomen",         top: "35%", left: "40%", width: "20%", height: "15%", rotate: "0deg" },
+  { id: "quadril_esq",     top: "50%", left: "35%", width: "10%", height: "8%",  rotate: "0deg" },
+  { id: "quadril_dir",     top: "50%", left: "55%", width: "10%", height: "8%",  rotate: "0deg" },
+  { id: "coxa_esq",        top: "58%", left: "33%", width: "10%", height: "20%", rotate: "5deg" },
+  { id: "coxa_dir",        top: "58%", left: "57%", width: "10%", height: "20%", rotate: "-5deg" },
+  { id: "panturrilha_esq", top: "80%", left: "35%", width: "8%",  height: "12%", rotate: "2deg" },
+  { id: "panturrilha_dir", top: "80%", left: "57%", width: "8%",  height: "12%", rotate: "-2deg" },
 ];
 
 const GLOW_BACKGROUNDS: Record<number, string> = {
-  1: "rgba(253, 230, 138, 0.35)",
-  2: "rgba(253, 186, 116, 0.45)",
-  3: "rgba(252, 165, 165, 0.55)",
+  1: "rgba(253, 230, 138, 0.5)",
+  2: "rgba(253, 186, 116, 0.6)",
+  3: "rgba(252, 165, 165, 0.7)",
 };
 
 const GLOW_SHADOWS: Record<number, string> = {
-  1: "0 0 15px rgba(245, 158, 11, 0.5), 0 0 30px rgba(245, 158, 11, 0.2)",
-  2: "0 0 15px rgba(234, 88, 12, 0.6), 0 0 30px rgba(234, 88, 12, 0.3)",
-  3: "0 0 15px rgba(220, 38, 38, 0.7), 0 0 30px rgba(220, 38, 38, 0.3)",
+  1: "0 0 20px rgba(245, 158, 11, 0.5), 0 0 40px rgba(245, 158, 11, 0.2)",
+  2: "0 0 20px rgba(234, 88, 12, 0.6), 0 0 40px rgba(234, 88, 12, 0.3)",
+  3: "0 0 20px rgba(220, 38, 38, 0.7), 0 0 40px rgba(220, 38, 38, 0.3)",
 };
 
 // ─── Core renderer ───
@@ -64,7 +64,8 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
 
   return (
     <div
-      className={`relative mx-auto w-full max-w-[280px] aspect-[3/4] ${className}`}
+      className={`relative mx-auto w-full max-w-[400px] max-h-[500px] ${className}`}
+      style={{ aspectRatio: "3 / 4" }}
     >
       {/* Base image */}
       <img
@@ -95,8 +96,9 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
                 borderRadius: "40%",
                 background: isActive ? GLOW_BACKGROUNDS[intensity] : "transparent",
                 boxShadow: isActive ? GLOW_SHADOWS[intensity] : "none",
+                filter: isActive ? "blur(20px)" : "none",
                 border: !isActive && interactive
-                  ? "1px dashed rgba(255,255,255,0.2)"
+                  ? "1px dashed #60A5FA"
                   : "none",
                 transition: "background 0.3s ease, box-shadow 0.3s ease",
               }}
