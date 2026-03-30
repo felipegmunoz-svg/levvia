@@ -1,3 +1,5 @@
+import { useRef, useReducer } from "react";
+
 // ─── New interface ───
 interface FlowSilhouetteProps {
   painAreas?: Record<string, 0 | 1 | 2 | 3>;
@@ -24,15 +26,15 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 }
 
 const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 18,  cy: 80,  rx: 10, ry: 32, label: "Braço esq." },
-  { id: "braco_dir",        cx: 78,  cy: 80,  rx: 9,  ry: 32, label: "Braço dir." },
-  { id: "abdomen",          cx: 50,  cy: 55,  rx: 17, ry: 24, label: "Torso" },
-  { id: "quadril_esq",      cx: 37,  cy: 100, rx: 13, ry: 11, label: "Quadril esq." },
-  { id: "quadril_dir",      cx: 63,  cy: 100, rx: 13, ry: 11, label: "Quadril dir." },
-  { id: "coxa_esq",         cx: 36,  cy: 124, rx: 12, ry: 17, label: "Coxa esq." },
-  { id: "coxa_dir",         cx: 64,  cy: 124, rx: 12, ry: 17, label: "Coxa dir." },
-  { id: "panturrilha_esq",  cx: 35,  cy: 150, rx: 10, ry: 13, label: "Panturrilha esq." },
-  { id: "panturrilha_dir",  cx: 65,  cy: 150, rx: 10, ry: 13, label: "Panturrilha dir." },
+  { id: "braco_esq",        cx: 22,  cy: 75,  rx: 11, ry: 30 },
+  { id: "braco_dir",        cx: 78,  cy: 75,  rx: 11, ry: 30 },
+  { id: "abdomen",          cx: 50,  cy: 52,  rx: 16, ry: 22 },
+  { id: "quadril_esq",      cx: 38,  cy: 97,  rx: 13, ry: 10 },
+  { id: "quadril_dir",      cx: 62,  cy: 97,  rx: 13, ry: 10 },
+  { id: "coxa_esq",         cx: 37,  cy: 120, rx: 11, ry: 17 },
+  { id: "coxa_dir",         cx: 63,  cy: 120, rx: 11, ry: 17 },
+  { id: "panturrilha_esq",  cx: 36,  cy: 147, rx: 9,  ry: 13 },
+  { id: "panturrilha_dir",  cx: 64,  cy: 147, rx: 9,  ry: 13 },
 ];
 
 // ─── Core renderer ───
@@ -43,23 +45,31 @@ const FlowSilhouetteCore = ({
   className = "",
 }: FlowSilhouetteProps) => {
   const interactive = !!onAreaClick;
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
   return (
-    <div className={`relative mx-auto w-full max-w-[260px] ${className}`}>
-      {/* Visual base layer */}
+    <div className={`relative mx-auto w-full max-w-[260px] ${className ?? ""}`}>
       <img
+        ref={imgRef}
         src={showHydrationWave
           ? "/assets/flow_silhouette_full.png"
           : "/assets/flow_silhouette_base.png"}
         alt="Silhueta corporal"
-        className="w-full h-auto pointer-events-none select-none"
+        className="w-full h-auto block pointer-events-none select-none"
+        onLoad={() => forceUpdate()}
       />
 
-      {/* Interactive SVG overlay */}
       <svg
         viewBox="0 0 100 180"
-        className="absolute inset-0 w-full h-full"
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="none"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
       >
         <defs>
           <radialGradient id="heat-leve" cx="50%" cy="50%" r="50%">
@@ -87,13 +97,13 @@ const FlowSilhouetteCore = ({
             <ellipse
               key={id}
               cx={cx} cy={cy} rx={rx} ry={ry}
-      fill={gradientId ? `url(#${gradientId})` : "rgba(46,134,171,0.04)"}
-      stroke={intensity > 0 ? "transparent" : "rgba(46,134,171,0.25)"}
-              strokeWidth={0.6}
-              strokeDasharray={intensity > 0 ? "0" : "2,2"}
+              fill={gradientId ? `url(#${gradientId})` : "transparent"}
+              stroke="transparent"
+              strokeWidth={0}
+              strokeDasharray="0"
               className={interactive ? "cursor-pointer" : ""}
               onClick={interactive ? () => onAreaClick!(id) : undefined}
-              style={{ transition: "fill 0.3s ease, stroke 0.3s ease" }}
+              style={{ transition: "fill 0.3s ease" }}
             />
           );
         })}
@@ -101,7 +111,6 @@ const FlowSilhouetteCore = ({
     </div>
   );
 };
-
 // ─── Legacy-compatible default export ───
 const FlowSilhouette = (props: FlowSilhouetteProps | LegacyFlowSilhouetteProps) => {
   if ("heatMapData" in props) {
