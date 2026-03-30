@@ -87,8 +87,8 @@ const FlowSilhouetteCore = ({
             <ellipse
               key={id}
               cx={cx} cy={cy} rx={rx} ry={ry}
-              fill={gradientId ? `url(#${gradientId})` : "rgba(255,255,255,0.06)"}
-              stroke={intensity > 0 ? "transparent" : "rgba(255,255,255,0.30)"}
+      fill={gradientId ? `url(#${gradientId})` : "rgba(46,134,171,0.04)"}
+      stroke={intensity > 0 ? "transparent" : "rgba(46,134,171,0.25)"}
               strokeWidth={0.6}
               strokeDasharray={intensity > 0 ? "0" : "2,2"}
               className={interactive ? "cursor-pointer" : ""}
