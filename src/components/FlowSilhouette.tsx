@@ -24,15 +24,15 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 }
 
 const AREA_ELLIPSES = [
-  { id: "abdomen",          cx: 50, cy: 58,  rx: 15, ry: 14 },
-  { id: "quadril_esq",      cx: 42, cy: 86,  rx: 10, ry: 8  },
-  { id: "quadril_dir",      cx: 58, cy: 86,  rx: 10, ry: 8  },
-  { id: "braco_esq",        cx: 25, cy: 68,  rx: 7,  ry: 18 },
-  { id: "braco_dir",        cx: 75, cy: 68,  rx: 7,  ry: 18 },
-  { id: "coxa_esq",         cx: 39, cy: 112, rx: 9,  ry: 16 },
-  { id: "coxa_dir",         cx: 61, cy: 112, rx: 9,  ry: 16 },
-  { id: "panturrilha_esq",  cx: 38, cy: 142, rx: 7,  ry: 14 },
-  { id: "panturrilha_dir",  cx: 62, cy: 142, rx: 7,  ry: 14 },
+  { id: "braco_esq",        cx: 22,  cy: 62,  rx: 10, ry: 22 },
+  { id: "braco_dir",        cx: 78,  cy: 62,  rx: 10, ry: 22 },
+  { id: "abdomen",          cx: 50,  cy: 52,  rx: 18, ry: 20 },
+  { id: "quadril_esq",      cx: 38,  cy: 78,  rx: 13, ry: 11 },
+  { id: "quadril_dir",      cx: 62,  cy: 78,  rx: 13, ry: 11 },
+  { id: "coxa_esq",         cx: 38,  cy: 105, rx: 12, ry: 18 },
+  { id: "coxa_dir",         cx: 62,  cy: 105, rx: 12, ry: 18 },
+  { id: "panturrilha_esq",  cx: 37,  cy: 138, rx: 9,  ry: 16 },
+  { id: "panturrilha_dir",  cx: 63,  cy: 138, rx: 9,  ry: 16 },
 ];
 
 // ─── Core renderer ───
