@@ -1,10 +1,7 @@
-import { motion } from "framer-motion";
-
 // ─── New interface ───
 interface FlowSilhouetteProps {
-  painAreas: Record<string, 0 | 1 | 2 | 3>;
+  painAreas?: Record<string, 0 | 1 | 2 | 3>;
   onAreaClick?: (area: string) => void;
-  hydrationLevel?: number; // 0–100
   showHydrationWave?: boolean;
   className?: string;
 }
@@ -26,120 +23,88 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
   return Math.round((1 - total / 27) * 100);
 }
 
-const PAIN_COLORS: Record<number, string> = {
-  0: "transparent",
-  1: "rgba(251, 191, 36, 0.4)",
-  2: "rgba(245, 158, 11, 0.6)",
-  3: "rgba(239, 68, 68, 0.8)",
-};
+const AREA_ELLIPSES = [
+  { id: "abdomen",          cx: 50, cy: 58,  rx: 15, ry: 14 },
+  { id: "quadril_esq",      cx: 42, cy: 86,  rx: 10, ry: 8  },
+  { id: "quadril_dir",      cx: 58, cy: 86,  rx: 10, ry: 8  },
+  { id: "braco_esq",        cx: 25, cy: 68,  rx: 7,  ry: 18 },
+  { id: "braco_dir",        cx: 75, cy: 68,  rx: 7,  ry: 18 },
+  { id: "coxa_esq",         cx: 39, cy: 112, rx: 9,  ry: 16 },
+  { id: "coxa_dir",         cx: 61, cy: 112, rx: 9,  ry: 16 },
+  { id: "panturrilha_esq",  cx: 38, cy: 142, rx: 7,  ry: 14 },
+  { id: "panturrilha_dir",  cx: 62, cy: 142, rx: 7,  ry: 14 },
+];
 
-const DECO_FILL = "rgba(255,255,255,0.85)";
-const DECO_STROKE = "rgba(255,255,255,0.4)";
-
-// ─── Core silhouette renderer ───
+// ─── Core renderer ───
 const FlowSilhouetteCore = ({
-  painAreas,
+  painAreas = {},
   onAreaClick,
-  hydrationLevel = 0,
   showHydrationWave = false,
   className = "",
 }: FlowSilhouetteProps) => {
-  const getColor = (area: string) => PAIN_COLORS[painAreas[area] ?? 0];
-  const intensity = (area: string) => painAreas[area] ?? 0;
   const interactive = !!onAreaClick;
 
-  const areaProps = (area: string) => ({
-    fill: getColor(area),
-    className: `transition-colors duration-300 ${interactive ? "cursor-pointer" : ""}`,
-    onClick: interactive ? () => onAreaClick!(area) : undefined,
-    style: intensity(area) > 0 ? { filter: "blur(6px)" } : undefined,
-  });
-
-  // Wave Y: hydrationLevel 0 → bottom (480), 100 → top (60)
-  const waveY = 480 - (hydrationLevel / 100) * 420;
-  const waveA = `M30 ${waveY} Q100 ${waveY - 15} 170 ${waveY} Q240 ${waveY + 15} 280 ${waveY}`;
-  const waveB = `M30 ${waveY} Q100 ${waveY + 15} 170 ${waveY} Q240 ${waveY - 15} 280 ${waveY}`;
-
   return (
-    <div className={`relative w-full max-w-[280px] mx-auto backdrop-blur-md bg-white/10 border border-white/20 rounded-3xl ${className}`}>
-      <div className="flex justify-center items-center w-full">
-        <svg
-          viewBox="0 0 280 520"
-          className="w-full max-w-[260px] h-auto"
-          preserveAspectRatio="xMidYMid meet"
-          style={{ filter: "drop-shadow(0 4px 32px rgba(59, 130, 246, 0.12))" }}
-        >
-          <defs>
-            <filter id="fs-heat-glow">
-              <feGaussianBlur stdDeviation="6" />
-            </filter>
-            <filter id="fs-wave-blur">
-              <feGaussianBlur stdDeviation="6" />
-            </filter>
-          </defs>
+    <div className={`relative mx-auto w-full max-w-[260px] ${className}`}>
+      {/* Visual base layer */}
+      <img
+        src={showHydrationWave
+          ? "/assets/flow_silhouette_full.png"
+          : "/assets/flow_silhouette_base.png"}
+        alt="Silhueta corporal"
+        className="w-full h-auto pointer-events-none select-none"
+      />
 
-          {/* ── Decorative: head, neck, hands, feet ── */}
-          <ellipse cx="140" cy="48" rx="25" ry="32" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <rect x="130" y="74" width="20" height="22" rx="5" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <ellipse cx="48" cy="285" rx="10" ry="13" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <ellipse cx="232" cy="285" rx="10" ry="13" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <path d="M86 493 Q84 503 82 509 Q80 516 84 518 L114 518 Q118 516 118 509 Q118 503 116 493 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <path d="M164 493 Q162 503 162 509 Q162 516 166 518 L196 518 Q200 516 198 509 Q198 503 194 493 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
+      {/* Interactive SVG overlay */}
+      <svg
+        viewBox="0 0 100 180"
+        className="absolute inset-0 w-full h-full"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <defs>
+          <radialGradient id="heat-leve" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FDE68A" stopOpacity={0.85} />
+            <stop offset="100%" stopColor="#FDE68A" stopOpacity={0} />
+          </radialGradient>
+          <radialGradient id="heat-moderado" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FDBA74" stopOpacity={0.9} />
+            <stop offset="100%" stopColor="#FDBA74" stopOpacity={0} />
+          </radialGradient>
+          <radialGradient id="heat-intenso" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FCA5A5" stopOpacity={0.95} />
+            <stop offset="100%" stopColor="#FCA5A5" stopOpacity={0} />
+          </radialGradient>
+        </defs>
 
-          {/* ── Base body silhouette (white) ── */}
-          {/* Arms */}
-          <path d="M86 98 Q72 106 62 126 Q54 148 48 178 Q42 210 42 240 Q41 260 44 272 L64 272 Q66 260 66 240 Q66 210 72 178 Q78 148 84 126 Q88 114 98 104 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <path d="M194 98 Q208 106 218 126 Q226 148 232 178 Q238 210 238 240 Q239 260 236 272 L216 272 Q214 260 214 240 Q214 210 208 178 Q202 148 196 126 Q192 114 182 104 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          {/* Torso */}
-          <path d="M98 96 Q114 94 140 94 Q166 94 182 96 Q192 100 196 114 Q200 128 200 140 Q198 164 192 182 Q188 200 180 216 Q172 226 166 228 L114 228 Q108 226 100 216 Q92 200 86 182 Q80 164 78 140 Q78 128 82 114 Q88 100 98 96 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          {/* Hips */}
-          <path d="M114 228 Q108 230 100 236 Q90 244 84 254 Q78 264 76 274 L132 274 L132 254 Q130 244 124 236 Q122 230 114 228 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <path d="M166 228 Q172 230 180 236 Q190 244 196 254 Q202 264 204 274 L148 274 L148 254 Q150 244 156 236 Q158 230 166 228 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          {/* Thighs */}
-          <path d="M76 274 L132 274 L128 392 Q126 400 120 402 L88 402 Q82 400 80 392 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <path d="M148 274 L204 274 L200 392 Q198 400 192 402 L160 402 Q154 400 152 392 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          {/* Calves */}
-          <path d="M88 402 L120 402 Q122 428 122 448 Q122 468 120 480 Q118 490 116 493 L88 493 Q86 490 84 480 Q82 468 82 448 Q82 428 84 402 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-          <path d="M160 402 L192 402 Q194 428 198 448 Q198 468 196 480 Q194 490 192 493 L164 493 Q162 490 160 480 Q158 468 158 448 Q158 428 160 402 Z" fill={DECO_FILL} stroke={DECO_STROKE} strokeWidth={1} />
-
-          {/* ── Heat overlay ── */}
-          <g>
-            <path d="M86 98 Q72 106 62 126 Q54 148 48 178 Q42 210 42 240 Q41 260 44 272 L64 272 Q66 260 66 240 Q66 210 72 178 Q78 148 84 126 Q88 114 98 104 Z" {...areaProps("braco_esq")} />
-            <path d="M194 98 Q208 106 218 126 Q226 148 232 178 Q238 210 238 240 Q239 260 236 272 L216 272 Q214 260 214 240 Q214 210 208 178 Q202 148 196 126 Q192 114 182 104 Z" {...areaProps("braco_dir")} />
-            <path d="M98 96 Q114 94 140 94 Q166 94 182 96 Q192 100 196 114 Q200 128 200 140 Q198 164 192 182 Q188 200 180 216 Q172 226 166 228 L114 228 Q108 226 100 216 Q92 200 86 182 Q80 164 78 140 Q78 128 82 114 Q88 100 98 96 Z" {...areaProps("abdomen")} />
-            <path d="M114 228 Q108 230 100 236 Q90 244 84 254 Q78 264 76 274 L132 274 L132 254 Q130 244 124 236 Q122 230 114 228 Z" {...areaProps("quadril_esq")} />
-            <path d="M166 228 Q172 230 180 236 Q190 244 196 254 Q202 264 204 274 L148 274 L148 254 Q150 244 156 236 Q158 230 166 228 Z" {...areaProps("quadril_dir")} />
-            <path d="M76 274 L132 274 L128 392 Q126 400 120 402 L88 402 Q82 400 80 392 Z" {...areaProps("coxa_esq")} />
-            <path d="M148 274 L204 274 L200 392 Q198 400 192 402 L160 402 Q154 400 152 392 Z" {...areaProps("coxa_dir")} />
-            <path d="M88 402 L120 402 Q122 428 122 448 Q122 468 120 480 Q118 490 116 493 L88 493 Q86 490 84 480 Q82 468 82 448 Q82 428 84 402 Z" {...areaProps("panturrilha_esq")} />
-            <path d="M160 402 L192 402 Q194 428 198 448 Q198 468 196 480 Q194 490 192 493 L164 493 Q162 490 160 480 Q158 468 158 448 Q158 428 160 402 Z" {...areaProps("panturrilha_dir")} />
-          </g>
-
-          {/* ── Hydration wave (animated) ── */}
-          {showHydrationWave && (
-            <motion.path
-              d={waveA}
-              fill="none"
-              stroke="#3B82F6"
-              strokeWidth={16}
-              strokeLinecap="round"
-              opacity={0.5}
-              style={{ filter: "drop-shadow(0 0 8px #3B82F6)" }}
-              animate={{ d: [waveA, waveB, waveA] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry }) => {
+          const intensity = painAreas[id] ?? 0;
+          const gradientId =
+            intensity === 1 ? "heat-leve"
+            : intensity === 2 ? "heat-moderado"
+            : intensity === 3 ? "heat-intenso"
+            : null;
+          return (
+            <ellipse
+              key={id}
+              cx={cx}
+              cy={cy}
+              rx={rx}
+              ry={ry}
+              fill={gradientId ? `url(#${gradientId})` : "transparent"}
+              className={interactive ? "cursor-pointer" : ""}
+              onClick={interactive ? () => onAreaClick!(id) : undefined}
+              style={{ transition: "fill 0.3s ease" }}
             />
-          )}
-        </svg>
-      </div>
+          );
+        })}
+      </svg>
     </div>
   );
 };
 
 // ─── Legacy-compatible default export ───
-// Detects old props shape (heatMapData) vs new (painAreas)
 const FlowSilhouette = (props: FlowSilhouetteProps | LegacyFlowSilhouetteProps) => {
   if ("heatMapData" in props) {
-    // Legacy mode for Progress.tsx
     const { heatMapData, waterIntakeMl, waterGoalMl, size = "large", animated = true } = props as LegacyFlowSilhouetteProps;
     const safeHeatMap = heatMapData || {};
     const hydrationPercent = waterGoalMl > 0 ? Math.min(waterIntakeMl / waterGoalMl, 1) : 0;
@@ -156,7 +121,6 @@ const FlowSilhouette = (props: FlowSilhouetteProps | LegacyFlowSilhouetteProps) 
       <div className="flex flex-col items-center">
         <FlowSilhouetteCore
           painAreas={painAreas}
-          hydrationLevel={Math.round(hydrationPercent * 100)}
           showHydrationWave={hydrationPercent > 0}
           className={isLarge ? "" : "max-w-[140px]"}
         />
@@ -183,7 +147,6 @@ const FlowSilhouette = (props: FlowSilhouetteProps | LegacyFlowSilhouetteProps) 
     return content;
   }
 
-  // New mode
   return <FlowSilhouetteCore {...(props as FlowSilhouetteProps)} />;
 };
 
