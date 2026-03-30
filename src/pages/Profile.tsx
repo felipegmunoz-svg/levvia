@@ -504,7 +504,6 @@ const Profile = () => {
                 })()}
                 waterIntakeMl={(profile as any)?.water_intake_ml ?? 0}
                 waterGoalMl={(profile as any)?.water_goal_ml ?? 2000}
-                interactive={false}
               />
             </motion.div>
 
