@@ -133,7 +133,7 @@ const DayTouchpointView = ({
             className="w-full levvia-card p-4 flex items-center gap-4 text-left active:opacity-80 transition-opacity"
           >
             <div className="w-[60px] shrink-0">
-              <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={0} waterGoalMl={1} size="small" animated={false} />
+              <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={hydration?.currentIntakeMl ?? 0} waterGoalMl={hydration?.dailyGoalMl ?? 2000} size="small" animated={false} />
             </div>
             <div>
               <p className="text-sm font-heading font-semibold text-levvia-fg">Seu Fogo Interno</p>
