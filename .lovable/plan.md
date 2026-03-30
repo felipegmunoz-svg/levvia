@@ -1,23 +1,64 @@
 
 
-# Full Rewrite of FlowSilhouette.tsx
+# Full SVG Rewrite of FlowSilhouette — Pure Organic Paths
 
-## Key decisions
+## Strategy
 
-The user's provided code uses **different image paths** (`/flow_silhouette_full_v3.png`, `/flow_silhouette_base_white_bg.png`) that don't exist in `public/`. The actual images are at `/assets/flow_silhouette_base.png` and `/assets/flow_silhouette_full.png`. I'll use the real paths.
+Replace the PNG-based silhouette with a **pure SVG** feminine body drawn using organic `<path>` curves. No images, no geometric primitives. The silhouette will use glassmorphism aesthetics, and heat zones will be internal paths that glow **inside** the body.
 
-The user's code also **removes** `calculateFlowScore` and the **legacy wrapper** used by `Progress.tsx`. These must be preserved to avoid breaking that page.
+## Architecture
+
+The component keeps the same props interface (`painAreas`, `onAreaClick`, `showHydrationWave`, `className`) and the legacy wrapper for `Progress.tsx`. Only the rendering changes.
+
+```text
+┌──────────────────────────────┐
+│  SVG viewBox="0 0 200 500"   │
+│                              │
+│  1. Body outline path        │
+│     fill: white/0.1          │
+│     stroke: white/0.3        │
+│                              │
+│  2. Heat zone paths (×9)     │
+│     Clipped inside body      │
+│     Glow via radialGradient  │
+│     Pulsing via motion.path  │
+│                              │
+│  3. Dashed zone outlines     │
+│     Visible affordance       │
+│                              │
+│  4. Optional hydration wave  │
+│     Animated gradient fill   │
+└──────────────────────────────┘
+```
 
 ## Changes — `src/components/FlowSilhouette.tsx`
 
-Full rewrite incorporating:
+Full rewrite:
 
-1. **User's exact `AREA_CONFIG`** with percentage-based coordinates, 15° arm rotations, and leg rotations
-2. **User's exact rendering logic** — `motion.ellipse` with pulsing animation for active areas, dashed stroke affordance for all areas, `<g>` grouping with transform
-3. **User's `PAIN_COLORS` map** and `aspect-[3/4]` container with `object-contain`
-4. **Corrected image paths** → `/assets/flow_silhouette_base.png` and `/assets/flow_silhouette_full.png`
-5. **Preserved `calculateFlowScore` export** (unchanged)
-6. **Preserved legacy wrapper** at the bottom for `Progress.tsx` compatibility (converts `heatMapData`/`waterIntakeMl`/`waterGoalMl` props into the new interface)
+1. **Body outline**: A single `<path>` with organic cubic Bézier curves forming a feminine silhouette (head, neck, shoulders, arms, torso with waist curve, hips, legs, calves, feet). `viewBox="0 0 200 500"`. Filled `white` at `0.1` opacity, stroked `white` at `0.3` opacity.
+
+2. **clipPath**: The body outline doubles as a `<clipPath>` so all heat effects are confined inside the silhouette — glowing "inside the glass."
+
+3. **9 heat zone paths**: Each area (`braco_esq`, `braco_dir`, `abdomen`, `quadril_esq/dir`, `coxa_esq/dir`, `panturrilha_esq/dir`) is an organic `<path>` that follows the body contour in that region. When `intensity > 0`:
+   - Filled with a `<radialGradient>` (yellow → orange → red based on intensity)
+   - Blurred via `<feGaussianBlur stdDeviation="6">`
+   - Pulsing opacity via `motion.path`
+   - All clipped to stay inside the body
+
+4. **Zone affordance**: Each zone has a subtle dashed outline (`stroke: rgba(200,200,200,0.25)`) so users know where to tap.
+
+5. **Glassmorphism**: The container `<div>` gets `backdrop-filter: blur(10px)` and a subtle background. The SVG body itself has the frosted-glass appearance via low-opacity white fill.
+
+6. **Hydration wave** (when `showHydrationWave=true`): A horizontal animated gradient that rises from the feet upward inside the body clipPath, simulating water filling.
+
+7. **Legacy wrapper** and `calculateFlowScore` preserved exactly as-is.
+
+## Why this fixes scaling
+
+Since everything is pure SVG with a fixed `viewBox`, it scales perfectly to any container size. No image loading, no alignment issues, no `preserveAspectRatio` hacks.
+
+## Files modified
+- `src/components/FlowSilhouette.tsx` — full rewrite (pure SVG)
 
 No other files modified.
 
