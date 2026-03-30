@@ -27,8 +27,8 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 
 // ─── Zone configuration (percentage-based) ───
 const ZONE_CONFIG = [
-  { id: "braco_esq",       top: "30%", left: "20%", width: "8%",  height: "20%", rotate: "15deg" },
-  { id: "braco_dir",       top: "30%", left: "72%", width: "8%",  height: "20%", rotate: "-15deg" },
+  { id: "braco_esq",       top: "30%", left: "28%", width: "8%",  height: "20%", rotate: "15deg" },
+  { id: "braco_dir",       top: "30%", left: "64%", width: "8%",  height: "20%", rotate: "-15deg" },
   { id: "abdomen",         top: "35%", left: "40%", width: "20%", height: "15%", rotate: "0deg" },
   { id: "quadril_esq",     top: "50%", left: "35%", width: "10%", height: "8%",  rotate: "0deg" },
   { id: "quadril_dir",     top: "50%", left: "55%", width: "10%", height: "8%",  rotate: "0deg" },
