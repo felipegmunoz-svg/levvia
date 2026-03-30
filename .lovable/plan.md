@@ -1,22 +1,14 @@
 
+# Fix hydration system: Supabase restore + heat map card hydration
 
-# Update dietary filtering in profileEngine.ts
+## Changes
 
-## Summary
-Replace the dietary restrictions filter block (lines 389–432) in `filterRecipesForProfile` with updated logic that uses `.includes()` substring matching on `diet_profile`, `allergen_free`, and `tags` arrays instead of exact string equality. Also adds the soja/soy ingredient filter.
+### 1. `src/hooks/useHydration.ts` (after line 39)
+Add a new `useEffect` that restores hydration from Supabase when localStorage is empty (currentIntakeMl === 0). Reads `challenge_progress.touchpoints.day{N}.water_intake_ml` and syncs back to localStorage.
 
-## Changes — `src/lib/profileEngine.ts` (lines 389–432)
-
-Replace the block from `// Dietary restrictions` through the oleaginosas filter (and add soja after) with the user's exact code:
-
-- **Vegan/Vegetarian**: now uses `dp.some(d => d.includes("vegan"))` + `tags.some(t => t.includes("vegan"))` instead of `dp.includes("vegana")`
-- **Gluten**: uses `af.some(a => a.includes("glut"))` + tags check instead of exact `af.includes("gluten")`
-- **Lactose**: uses `af.some(a => a.includes("lactos"))` + tags check instead of exact matches
-- **Frutos do mar, amendoim, oleaginosas**: unchanged logic
-- **Soja/soy**: already present, kept as-is
-
-No other lines in the file are modified.
+### 2. `src/components/journey/DayTouchpointView.tsx` (line 136)
+In the "Seu Fogo Interno" card, replace `waterIntakeMl={0} waterGoalMl={1}` with `waterIntakeMl={hydration?.currentIntakeMl ?? 0} waterGoalMl={hydration?.dailyGoalMl ?? 2000}` so the miniature silhouette reflects actual hydration progress.
 
 ## Files modified
-- `src/lib/profileEngine.ts`
-
+- `src/hooks/useHydration.ts`
+- `src/components/journey/DayTouchpointView.tsx`
