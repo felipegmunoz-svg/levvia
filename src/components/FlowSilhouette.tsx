@@ -1,8 +1,9 @@
-import { useRef, useReducer } from "react";
+import React from "react";
+import { motion } from "framer-motion";
 
 // ─── New interface ───
 interface FlowSilhouetteProps {
-  painAreas?: Record<string, 0 | 1 | 2 | 3>;
+  painAreas?: Record<string, number>;
   onAreaClick?: (area: string) => void;
   showHydrationWave?: boolean;
   className?: string;
@@ -25,97 +26,86 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
   return Math.round((1 - total / 27) * 100);
 }
 
-const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 26,  cy: 78,  rx: 9,  ry: 28, rotate: 12  },
-  { id: "braco_dir",        cx: 74,  cy: 78,  rx: 9,  ry: 28, rotate: -12 },
-  { id: "abdomen",          cx: 50,  cy: 52,  rx: 15, ry: 20, rotate: 0   },
-  { id: "quadril_esq",      cx: 39,  cy: 97,  rx: 12, ry: 10, rotate: 0   },
-  { id: "quadril_dir",      cx: 61,  cy: 97,  rx: 12, ry: 10, rotate: 0   },
-  { id: "coxa_esq",         cx: 38,  cy: 120, rx: 10, ry: 16, rotate: 0   },
-  { id: "coxa_dir",         cx: 62,  cy: 120, rx: 10, ry: 16, rotate: 0   },
-  { id: "panturrilha_esq",  cx: 38,  cy: 147, rx: 8,  ry: 12, rotate: 0   },
-  { id: "panturrilha_dir",  cx: 62,  cy: 147, rx: 8,  ry: 12, rotate: 0   },
+const AREA_CONFIG = [
+  { id: "braco_esq",        cx: 28,  cy: 35, rx: 6,  ry: 12, rotate: 15  },
+  { id: "braco_dir",        cx: 72,  cy: 35, rx: 6,  ry: 12, rotate: -15 },
+  { id: "abdomen",          cx: 50,  cy: 38, rx: 12, ry: 15, rotate: 0   },
+  { id: "quadril_esq",      cx: 42,  cy: 52, rx: 8,  ry: 8,  rotate: 0   },
+  { id: "quadril_dir",      cx: 58,  cy: 52, rx: 8,  ry: 8,  rotate: 0   },
+  { id: "coxa_esq",         cx: 42,  cy: 68, rx: 7,  ry: 12, rotate: 5   },
+  { id: "coxa_dir",         cx: 58,  cy: 68, rx: 7,  ry: 12, rotate: -5  },
+  { id: "panturrilha_esq",  cx: 43,  cy: 85, rx: 6,  ry: 10, rotate: 2   },
+  { id: "panturrilha_dir",  cx: 57,  cy: 85, rx: 6,  ry: 10, rotate: -2  },
 ];
 
+const PAIN_COLORS: Record<number, string> = {
+  0: "transparent",
+  1: "#FDE68A",
+  2: "#FDBA74",
+  3: "#FCA5A5",
+};
+
 // ─── Core renderer ───
-const FlowSilhouetteCore = ({
+const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
   painAreas = {},
   onAreaClick,
   showHydrationWave = false,
   className = "",
-}: FlowSilhouetteProps) => {
-  const interactive = !!onAreaClick;
-  const imgRef = useRef<HTMLImageElement>(null);
-  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+}) => {
+  const imageSrc = showHydrationWave
+    ? "/assets/flow_silhouette_full.png"
+    : "/assets/flow_silhouette_base.png";
 
   return (
-    <div className={`relative mx-auto w-full max-w-[260px] ${className ?? ""}`}>
+    <div className={`relative w-full max-w-[400px] mx-auto aspect-[3/4] ${className}`}>
       <img
-        ref={imgRef}
-        src={showHydrationWave
-          ? "/assets/flow_silhouette_full.png"
-          : "/assets/flow_silhouette_base.png"}
+        src={imageSrc}
         alt="Silhueta corporal"
-        className="w-full h-auto block pointer-events-none select-none"
-        style={{ position: "relative", zIndex: 0 }}
-        onLoad={() => forceUpdate()}
+        className="absolute inset-0 w-full h-full object-contain z-0"
       />
-
       <svg
-        viewBox="0 0 100 180"
-        preserveAspectRatio="none"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 1,
-        }}
+        viewBox="0 0 100 133.3"
+        className="absolute inset-0 w-full h-full z-10 select-none"
       >
         <defs>
-          <radialGradient id="heat-leve" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#FDE68A" stopOpacity={0.85} />
-            <stop offset="100%" stopColor="#FDE68A" stopOpacity={0} />
-          </radialGradient>
-          <radialGradient id="heat-moderado" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#FDBA74" stopOpacity={0.9} />
-            <stop offset="100%" stopColor="#FDBA74" stopOpacity={0} />
-          </radialGradient>
-          <radialGradient id="heat-intenso" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#FCA5A5" stopOpacity={0.95} />
-            <stop offset="100%" stopColor="#FCA5A5" stopOpacity={0} />
-          </radialGradient>
-          <filter id="heatBlur" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="5" />
+          <filter id="heatBlur">
+            <feGaussianBlur stdDeviation="2.5" />
           </filter>
         </defs>
-
-        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry, rotate }) => {
-          const intensity = (painAreas[id] ?? 0) as 0 | 1 | 2 | 3;
-          const gradientId =
-            intensity === 1 ? "heat-leve"
-            : intensity === 2 ? "heat-moderado"
-            : intensity === 3 ? "heat-intenso"
-            : null;
+        {AREA_CONFIG.map((area) => {
+          const intensity = painAreas[area.id] || 0;
           return (
-            <ellipse
-              key={id}
-              cx={cx} cy={cy} rx={rx} ry={ry}
-              transform={`rotate(${rotate}, ${cx}, ${cy})`}
-              fill={gradientId ? `url(#${gradientId})` : "transparent"}
-              filter={intensity > 0 ? "url(#heatBlur)" : undefined}
-              stroke="transparent"
-              className={interactive ? "cursor-pointer" : ""}
-              onClick={interactive ? () => onAreaClick!(id) : undefined}
-              style={{ transition: "fill 0.3s ease" }}
-            />
+            <g
+              key={area.id}
+              onClick={() => onAreaClick?.(area.id)}
+              className={onAreaClick ? "cursor-pointer" : ""}
+              transform={`rotate(${area.rotate}, ${area.cx}, ${area.cy})`}
+            >
+              {intensity > 0 && (
+                <motion.ellipse
+                  cx={area.cx} cy={area.cy} rx={area.rx} ry={area.ry}
+                  fill={PAIN_COLORS[intensity] || "transparent"}
+                  fillOpacity={0.6}
+                  filter="url(#heatBlur)"
+                  animate={{ opacity: [0.4, 0.7, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              )}
+              <ellipse
+                cx={area.cx} cy={area.cy} rx={area.rx} ry={area.ry}
+                fill="transparent"
+                stroke="rgba(200,200,200,0.3)"
+                strokeWidth="0.5"
+                strokeDasharray="2 1"
+              />
+            </g>
           );
         })}
       </svg>
     </div>
   );
 };
+
 // ─── Legacy-compatible default export ───
 const FlowSilhouette = (props: FlowSilhouetteProps | LegacyFlowSilhouetteProps) => {
   if ("heatMapData" in props) {
@@ -126,9 +116,9 @@ const FlowSilhouette = (props: FlowSilhouetteProps | LegacyFlowSilhouetteProps) 
     const scoreColor = score <= 40 ? "text-destructive" : score <= 70 ? "text-warning" : "text-primary";
     const isLarge = size === "large";
 
-    const painAreas: Record<string, 0 | 1 | 2 | 3> = {};
+    const painAreas: Record<string, number> = {};
     for (const [k, v] of Object.entries(safeHeatMap)) {
-      painAreas[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0)) as 0 | 1 | 2 | 3;
+      painAreas[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0));
     }
 
     const content = (
