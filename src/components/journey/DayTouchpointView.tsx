@@ -72,7 +72,9 @@ const DayTouchpointView = ({
   hydration,
   rescueMode,
   onSlotComplete,
+  heatMapDay1,
 }: DayTouchpointViewProps) => {
+  const navigate = useNavigate();
   const config = getTouchpointConfig(dayNumber);
 
   // Compute active slot (first undone)
