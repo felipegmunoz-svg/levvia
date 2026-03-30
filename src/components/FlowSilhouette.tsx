@@ -27,15 +27,15 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 
 // ─── Zone configuration (percentage-based) ───
 const ZONE_CONFIG = [
-  { id: "braco_esq",       top: "30%", left: "32%", width: "8%",  height: "20%", rotate: "18deg" },
-  { id: "braco_dir",       top: "30%", left: "60%", width: "8%",  height: "20%", rotate: "-18deg" },
+  { id: "braco_esq",       top: "30%", left: "34%", width: "8%",  height: "20%", rotate: "18deg" },
+  { id: "braco_dir",       top: "30%", left: "58%", width: "8%",  height: "20%", rotate: "-18deg" },
   { id: "abdomen",         top: "35%", left: "40%", width: "20%", height: "15%", rotate: "0deg" },
-  { id: "quadril_esq",     top: "50%", left: "37%", width: "10%", height: "8%",  rotate: "0deg" },
-  { id: "quadril_dir",     top: "50%", left: "53%", width: "10%", height: "8%",  rotate: "0deg" },
-  { id: "coxa_esq",        top: "58%", left: "35%", width: "10%", height: "20%", rotate: "5deg" },
-  { id: "coxa_dir",        top: "58%", left: "55%", width: "10%", height: "20%", rotate: "-5deg" },
-  { id: "panturrilha_esq", top: "80%", left: "37%", width: "8%",  height: "12%", rotate: "2deg" },
-  { id: "panturrilha_dir", top: "80%", left: "55%", width: "8%",  height: "12%", rotate: "-2deg" },
+  { id: "quadril_esq",     top: "50%", left: "40%", width: "10%", height: "8%",  rotate: "0deg" },
+  { id: "quadril_dir",     top: "50%", left: "50%", width: "10%", height: "8%",  rotate: "0deg" },
+  { id: "coxa_esq",        top: "58%", left: "38%", width: "10%", height: "20%", rotate: "5deg" },
+  { id: "coxa_dir",        top: "58%", left: "52%", width: "10%", height: "20%", rotate: "-5deg" },
+  { id: "panturrilha_esq", top: "75%", left: "40%", width: "8%",  height: "12%", rotate: "2deg" },
+  { id: "panturrilha_dir", top: "75%", left: "52%", width: "8%",  height: "12%", rotate: "-2deg" },
 ];
 
 const GLOW_BACKGROUNDS: Record<number, string> = {
@@ -64,7 +64,7 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
 
   return (
     <div
-      className={`relative mx-auto w-full max-w-[800px] ${className}`}
+      className={`relative mx-auto w-full max-w-[450px] ${className}`}
       style={{ aspectRatio: "3 / 4" }}
     >
       {/* Base image */}
