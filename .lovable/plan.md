@@ -1,28 +1,15 @@
 
 
-# FlowSilhouette: Update AREA_ELLIPSES coordinates
+# FlowSilhouette: Add Calibration Labels
 
-## Changes — `src/components/FlowSilhouette.tsx`
+## Changes — `src/components/FlowSilhouette.tsx` (lines 100–125)
 
-Replace lines 35–45 (the `AREA_ELLIPSES` array) with the user's exact coordinates:
+Replace the current `AREA_ELLIPSES.map()` block with user's exact code that wraps each zone in a `<g>` element containing:
+1. The existing `<ellipse>` (simplified to static, with `rgba(96,165,250,0.15)` fill and dashed blue stroke)
+2. A `<text>` showing the zone `id` at `(cx, cy)` in dark blue, font-size 6
+3. A `<text>` showing `cx,cy` coordinates at `(cx, cy+9)` in lighter blue, font-size 5
 
-```ts
-const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 45,  cy: 180, rx: 15, ry: 65, rotate: -8 },
-  { id: "braco_dir",        cx: 155, cy: 180, rx: 15, ry: 65, rotate:  8 },
-  { id: "abdomen",          cx: 100, cy: 150, rx: 28, ry: 70, rotate:  0 },
-  { id: "quadril_esq",      cx: 85,  cy: 248, rx: 15, ry: 20, rotate:  0 },
-  { id: "quadril_dir",      cx: 115, cy: 248, rx: 15, ry: 20, rotate:  0 },
-  { id: "coxa_esq",         cx: 83,  cy: 325, rx: 14, ry: 46, rotate:  0 },
-  { id: "coxa_dir",         cx: 117, cy: 325, rx: 14, ry: 46, rotate:  0 },
-  { id: "panturrilha_esq",  cx: 82,  cy: 425, rx: 11, ry: 36, rotate:  0 },
-  { id: "panturrilha_dir",  cx: 118, cy: 425, rx: 11, ry: 36, rotate:  0 },
-];
-```
-
-Key differences from current values: arms moved outward (cx 60→45 / 140→155), wider rx on arms (10→15), abdomen ry slightly reduced (72→70), legs slightly adjusted toward center.
-
-No other files modified.
+This temporarily replaces the `motion.ellipse` with static ellipses + labels for visual calibration. The active glow/animation logic is paused during this debug phase.
 
 ## Files modified
 - `src/components/FlowSilhouette.tsx`
