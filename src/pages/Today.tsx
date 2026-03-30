@@ -163,6 +163,7 @@ const Today = () => {
         hydration={hydration}
         rescueMode={rescueMode}
         onSlotComplete={handleSlotComplete}
+        heatMapDay1={(profile?.heat_map_day1 as Record<string, number>) ?? null}
       />
     );
   }

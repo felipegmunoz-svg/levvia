@@ -30,6 +30,7 @@ interface DayTouchpointViewProps {
   hydration?: HydrationProps;
   rescueMode?: string;
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
+  heatMapDay1?: Record<string, number> | null;
 }
 
 const SLOTS: { slot: TouchpointSlot; label: string; emoji: string; time: string }[] = [
