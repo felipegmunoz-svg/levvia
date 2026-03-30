@@ -24,15 +24,15 @@ export function calculateFlowScore(heatMapData: Record<string, number> | null | 
 }
 
 const AREA_ELLIPSES = [
-  { id: "braco_esq",        cx: 22,  cy: 62,  rx: 10, ry: 22 },
-  { id: "braco_dir",        cx: 78,  cy: 62,  rx: 10, ry: 22 },
-  { id: "abdomen",          cx: 50,  cy: 52,  rx: 18, ry: 20 },
-  { id: "quadril_esq",      cx: 38,  cy: 78,  rx: 13, ry: 11 },
-  { id: "quadril_dir",      cx: 62,  cy: 78,  rx: 13, ry: 11 },
-  { id: "coxa_esq",         cx: 38,  cy: 105, rx: 12, ry: 18 },
-  { id: "coxa_dir",         cx: 62,  cy: 105, rx: 12, ry: 18 },
-  { id: "panturrilha_esq",  cx: 37,  cy: 138, rx: 9,  ry: 16 },
-  { id: "panturrilha_dir",  cx: 63,  cy: 138, rx: 9,  ry: 16 },
+  { id: "braco_esq",        cx: 18,  cy: 80,  rx: 10, ry: 32, label: "Braço esq." },
+  { id: "braco_dir",        cx: 82,  cy: 80,  rx: 10, ry: 32, label: "Braço dir." },
+  { id: "abdomen",          cx: 50,  cy: 55,  rx: 17, ry: 24, label: "Torso" },
+  { id: "quadril_esq",      cx: 37,  cy: 100, rx: 13, ry: 11, label: "Quadril esq." },
+  { id: "quadril_dir",      cx: 63,  cy: 100, rx: 13, ry: 11, label: "Quadril dir." },
+  { id: "coxa_esq",         cx: 36,  cy: 124, rx: 12, ry: 17, label: "Coxa esq." },
+  { id: "coxa_dir",         cx: 64,  cy: 124, rx: 12, ry: 17, label: "Coxa dir." },
+  { id: "panturrilha_esq",  cx: 35,  cy: 150, rx: 10, ry: 13, label: "Panturrilha esq." },
+  { id: "panturrilha_dir",  cx: 65,  cy: 150, rx: 10, ry: 13, label: "Panturrilha dir." },
 ];
 
 // ─── Core renderer ───
@@ -77,7 +77,7 @@ const FlowSilhouetteCore = ({
         </defs>
 
         {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry }) => {
-          const intensity = painAreas[id] ?? 0;
+          const intensity = (painAreas[id] ?? 0) as 0 | 1 | 2 | 3;
           const gradientId =
             intensity === 1 ? "heat-leve"
             : intensity === 2 ? "heat-moderado"
@@ -86,14 +86,14 @@ const FlowSilhouetteCore = ({
           return (
             <ellipse
               key={id}
-              cx={cx}
-              cy={cy}
-              rx={rx}
-              ry={ry}
-              fill={gradientId ? `url(#${gradientId})` : "transparent"}
+              cx={cx} cy={cy} rx={rx} ry={ry}
+              fill={gradientId ? `url(#${gradientId})` : "rgba(255,255,255,0.06)"}
+              stroke={intensity > 0 ? "transparent" : "rgba(255,255,255,0.30)"}
+              strokeWidth={0.6}
+              strokeDasharray={intensity > 0 ? "0" : "2,2"}
               className={interactive ? "cursor-pointer" : ""}
               onClick={interactive ? () => onAreaClick!(id) : undefined}
-              style={{ transition: "fill 0.3s ease" }}
+              style={{ transition: "fill 0.3s ease, stroke 0.3s ease" }}
             />
           );
         })}
