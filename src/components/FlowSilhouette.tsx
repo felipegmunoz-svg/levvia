@@ -87,41 +87,17 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
         {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry, rotate }) => {
           const intensity = (painAreas?.[id] ?? 0) as 0 | 1 | 2 | 3;
           return (
-            <g key={id}>
-              <ellipse
-                cx={cx} cy={cy} rx={rx} ry={ry}
-                transform={`rotate(${rotate}, ${cx}, ${cy})`}
-                fill="rgba(96,165,250,0.15)"
-                stroke="#60A5FA"
-                strokeWidth={1.5}
-                strokeDasharray="4 3"
-                className={onAreaClick ? "cursor-pointer" : ""}
-                onClick={() => onAreaClick?.(id)}
-              />
-              <text
-                x={cx}
-                y={cy}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="6"
-                fill="#1e40af"
-                fontWeight="bold"
-                pointerEvents="none"
-              >
-                {id}
-              </text>
-              <text
-                x={cx}
-                y={cy + 9}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="5"
-                fill="#3b82f6"
-                pointerEvents="none"
-              >
-                {cx},{cy}
-              </text>
-            </g>
+            <ellipse
+              key={id}
+              cx={cx} cy={cy} rx={rx} ry={ry}
+              transform={`rotate(${rotate}, ${cx}, ${cy})`}
+              fill="rgba(96,165,250,0.15)"
+              stroke="#60A5FA"
+              strokeWidth={1.5}
+              strokeDasharray="4 3"
+              className={onAreaClick ? "cursor-pointer" : ""}
+              onClick={() => onAreaClick?.(id)}
+            />
           );
         })}
       </svg>
