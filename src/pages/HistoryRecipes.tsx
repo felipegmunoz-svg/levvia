@@ -4,8 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import RecipeDetail from "@/components/RecipeDetail";
-import { useChallengeData, mealSlots } from "@/hooks/useChallengeData";
-import { filterRecipesForProfile, type DbRecipe } from "@/lib/profileEngine";
+import { useChallengeData } from "@/hooks/useChallengeData";
+import type { DbRecipe } from "@/lib/profileEngine";
 
 function toRecipeView(rec: DbRecipe) {
   return {
@@ -25,42 +25,52 @@ function toRecipeView(rec: DbRecipe) {
   };
 }
 
+const SLOT_LABELS: Record<string, string> = {
+  morning: "Manhã",
+  lunch: "Almoço",
+  afternoon: "Lanche",
+  night: "Jantar",
+};
+
 const HistoryRecipes = () => {
   const navigate = useNavigate();
-  const { currentDay, filteredRecipes } = useChallengeData();
+  const { currentDay, filteredRecipes, challengeProgress } = useChallengeData();
   const [selectedRecipe, setSelectedRecipe] = useState<DbRecipe | null>(null);
 
-  // Collect unique recipes from all unlocked days
-  const unlockedRecipes = useMemo(() => {
+  const servedRecipes = useMemo(() => {
+    const items: { recipe: DbRecipe; day: number; slotLabel: string }[] = [];
     const seen = new Set<string>();
-    const items: { recipe: DbRecipe; day: number }[] = [];
 
-    for (let day = 1; day <= currentDay; day++) {
-      for (const slot of mealSlots) {
-        const slotMapping: Record<string, string[]> = {
-          "Café da Manhã": ["Café da Manhã"],
-          "Lanche da Manhã": ["Lanche da Manhã", "Lanche"],
-          "Almoço": ["Almoço"],
-          "Lanche da Tarde": ["Lanche da Tarde", "Lanche"],
-          "Jantar": ["Jantar"],
-        };
-        const types = slotMapping[slot];
-        const available = filteredRecipes.filter((r) =>
-          r.tipo_refeicao?.some((t) => types.some((st) => t === st))
-        );
-        if (available.length > 0) {
-          const idx = (day - 1) % available.length;
-          const recipe = available[idx];
-          if (!seen.has(recipe.id)) {
-            seen.add(recipe.id);
-            items.push({ recipe, day });
-          }
+    for (let day = currentDay; day >= 1; day--) {
+      const dayTp = (challengeProgress as any)?.touchpoints?.[`day${day}`];
+      if (!dayTp) continue;
+
+      for (const slotKey of ["morning", "lunch", "afternoon", "night"] as const) {
+        const slot = dayTp[slotKey];
+        if (!slot?.done) continue;
+
+        // Backward compat: check both top-level and .diary (old format)
+        const recipeId =
+          slot.recipe_choice_id ??
+          slot.snack_id ??
+          (slot.diary as any)?.recipe_choice_id ??
+          (slot.diary as any)?.snack_id;
+
+        if (!recipeId) continue;
+
+        const uniqueKey = `${day}-${slotKey}-${recipeId}`;
+        if (seen.has(uniqueKey)) continue;
+        seen.add(uniqueKey);
+
+        const recipe = filteredRecipes.find((r) => r.id === recipeId);
+        if (recipe) {
+          items.push({ recipe, day, slotLabel: SLOT_LABELS[slotKey] ?? slotKey });
         }
       }
     }
 
     return items;
-  }, [currentDay, filteredRecipes]);
+  }, [currentDay, challengeProgress, filteredRecipes]);
 
   if (selectedRecipe) {
     return (
@@ -73,29 +83,29 @@ const HistoryRecipes = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <header className="gradient-page px-6 pt-10 pb-6 rounded-b-3xl">
+      <div className="px-4 pt-6">
         <button onClick={() => navigate("/history")} className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-          <ArrowLeft size={18} strokeWidth={1.5} />
+          <ArrowLeft className="w-4 h-4" />
           Voltar
         </button>
-        <h1 className="text-2xl font-light text-foreground">🍃 Receitas</h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          {unlockedRecipes.length} receitas desbloqueadas
+        <h1 className="text-xl font-heading font-bold text-foreground">🍃 Receitas que fiz</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {servedRecipes.length} receita{servedRecipes.length !== 1 ? "s" : ""} registrada{servedRecipes.length !== 1 ? "s" : ""}
         </p>
-      </header>
+      </div>
 
-      <main className="px-5 mt-6 space-y-3">
-        {unlockedRecipes.length === 0 ? (
-          <div className="glass-card p-6 text-center">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Ainda não há receitas desbloqueadas. Complete os dias da sua jornada para construir seu histórico.
+      <div className="px-4 mt-4 space-y-3">
+        {servedRecipes.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-sm">
+              As receitas que você preparar aparecerão aqui, com o dia da jornada em que foram feitas.
             </p>
           </div>
         ) : (
-          unlockedRecipes.map(({ recipe, day }, i) => (
+          servedRecipes.map(({ recipe, day, slotLabel }, i) => (
             <motion.button
-              key={recipe.id}
-              initial={{ opacity: 0, y: 12 }}
+              key={`${recipe.id}-${day}-${i}`}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
               onClick={() => setSelectedRecipe(recipe)}
@@ -103,13 +113,16 @@ const HistoryRecipes = () => {
             >
               <span className="text-2xl">🍃</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{recipe.title}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Dia {day} da jornada</p>
+                <p className="font-heading font-semibold text-foreground text-sm truncate">{recipe.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Dia {day} · {slotLabel}
+                </p>
               </div>
+              <span className="text-xs text-muted-foreground">Ver →</span>
             </motion.button>
           ))
         )}
-      </main>
+      </div>
 
       <BottomNav />
     </div>
