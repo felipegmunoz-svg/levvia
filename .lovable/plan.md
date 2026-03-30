@@ -1,55 +1,48 @@
 
 
-# FlowSilhouette: Full replacement + caller updates
+# Add "Seu Fogo Interno" card to Today screen
 
-## 1. Replace `src/components/FlowSilhouette.tsx` entirely
+## Overview
+Add a compact card below the header in DayTouchpointView showing a miniature heat map silhouette. Tapping it navigates to `/progress`.
 
-Overwrite with the user's exact code: pure SVG body path approach (`BODY_PATH`), `ZONES` array, `HEAT_COLORS`, hydration wave clipped to body, glassmorphism fill. No PNG images. Single interface with `heatMapData`, `waterIntakeMl`, `waterGoalMl`, `size`, `animated`, `onZoneClick`, `interactive`.
+## Changes
 
-## 2. Update `src/pages/Profile.tsx` — two call sites
+### 1. `src/components/journey/DayTouchpointView.tsx`
 
-**Lines 396–407** (first occurrence):
-```tsx
-<FlowSilhouette
-  heatMapData={(() => {
-    const hm = (profile as any).heatMapDay1;
-    if (!hm || typeof hm !== "object") return {};
-    const mapped: Record<string, number> = {};
-    for (const [k, v] of Object.entries(hm)) {
-      mapped[k] = Math.min(3, Math.max(0, typeof v === "number" ? v : 0));
-    }
-    return mapped;
-  })()}
-  waterIntakeMl={profile?.water_intake_ml ?? 0}
-  waterGoalMl={profile?.water_goal_ml ?? 2000}
-  interactive={false}
-/>
-```
-
-**Lines 494–505** (second occurrence): same transformation.
-
-Changes: `painAreas` → `heatMapData`, remove `showHydrationWave`, add `waterIntakeMl`/`waterGoalMl`/`interactive`.
-
-## 3. Update `src/components/journey/HeatMapInteractive.tsx` — lines 129–133
+- Add imports: `useNavigate` from react-router-dom, `FlowSilhouette` from `@/components/FlowSilhouette`
+- Add `heatMapDay1?: Record<string, number> | null` to `DayTouchpointViewProps`
+- Destructure `heatMapDay1` in component props
+- Add `const navigate = useNavigate()` inside the component
+- After the Header `div` (line 122), before the Progress Bar, insert the "Seu Fogo Interno" card:
 
 ```tsx
-<FlowSilhouette
-  heatMapData={areas as Record<string, number>}
-  interactive={!readOnly}
-  onZoneClick={(zone, level) => setAreas(prev => ({ ...prev, [zone]: level }))}
-  waterIntakeMl={0}
-  waterGoalMl={1}
-/>
+{heatMapDay1 && Object.keys(heatMapDay1).length > 0 && (
+  <div className="px-6 pb-2">
+    <button
+      onClick={() => navigate("/progress")}
+      className="w-full levvia-card p-4 flex items-center gap-4 text-left active:opacity-80 transition-opacity"
+    >
+      <div className="w-[60px] shrink-0">
+        <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={0} waterGoalMl={1} size="small" animated={false} />
+      </div>
+      <div>
+        <p className="text-sm font-heading font-semibold text-levvia-fg">Seu Fogo Interno</p>
+        <p className="text-xs text-levvia-muted font-body mt-0.5">Toque para ver sua evolução →</p>
+      </div>
+    </button>
+  </div>
+)}
 ```
 
-Remove `painAreas`, `onAreaClick`, `showHydrationWave`. The internal `toggleArea` function becomes unnecessary for the FlowSilhouette call since the new component handles cycling internally via `onZoneClick(zone, newLevel)`.
+### 2. `src/pages/Today.tsx` (lines 159–166)
 
-## 4. No other files affected
+Add `heatMapDay1` prop to the `<DayTouchpointView>` call:
 
-`Progress.tsx` already uses the new interface (`heatMapData`, `waterIntakeMl`, `waterGoalMl`).
+```tsx
+heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
+```
 
 ## Files modified
-- `src/components/FlowSilhouette.tsx` — full replacement
-- `src/pages/Profile.tsx` — 2 call sites updated
-- `src/components/journey/HeatMapInteractive.tsx` — 1 call site updated
+- `src/components/journey/DayTouchpointView.tsx`
+- `src/pages/Today.tsx`
 
