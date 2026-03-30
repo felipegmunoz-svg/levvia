@@ -404,7 +404,6 @@ const Profile = () => {
                   return mapped;
                 })()}
                 showHydrationWave={true}
-                hydrationLevel={50}
               />
             </section>
 
