@@ -1,33 +1,34 @@
 
 
-# FlowSilhouette: Lateral Expansion of Zones
+# Add Debug useEffect to FlowSilhouette
 
-## Changes — `src/components/FlowSilhouette.tsx` (lines 29–39)
+## Changes — `src/components/FlowSilhouette.tsx`
 
-Replace `ZONE_CONFIG` with the user's exact coordinates:
+### 1. Add `useRef` and `useEffect` imports
+- Line 1: add `useRef, useEffect` to the React import
 
+### 2. Add `imgRef` and debug `useEffect` inside `FlowSilhouetteCore`
+- After line 63 (before `return`), add:
 ```ts
-const ZONE_CONFIG = [
-  { id: "braco_esq",       top: "30%", left: "22%", width: "8%",  height: "20%", rotate: "18deg" },
-  { id: "braco_dir",       top: "30%", left: "70%", width: "8%",  height: "20%", rotate: "-18deg" },
-  { id: "abdomen",         top: "30%", left: "40%", width: "20%", height: "15%", rotate: "0deg" },
-  { id: "quadril_esq",     top: "48%", left: "30%", width: "8%",  height: "8%",  rotate: "0deg" },
-  { id: "quadril_dir",     top: "48%", left: "62%", width: "8%",  height: "8%",  rotate: "0deg" },
-  { id: "coxa_esq",        top: "58%", left: "30%", width: "8%",  height: "20%", rotate: "5deg" },
-  { id: "coxa_dir",        top: "58%", left: "62%", width: "8%",  height: "20%", rotate: "-5deg" },
-  { id: "panturrilha_esq", top: "75%", left: "30%", width: "6%",  height: "12%", rotate: "2deg" },
-  { id: "panturrilha_dir", top: "75%", left: "62%", width: "6%",  height: "12%", rotate: "-2deg" },
-];
+const imgRef = useRef<HTMLImageElement>(null);
+
+useEffect(() => {
+  if (!imgRef.current) return;
+  const img = imgRef.current;
+  const onLoad = () => {
+    console.log("📐 Imagem natural:", img.naturalWidth, "x", img.naturalHeight);
+    console.log("📐 Imagem renderizada:", img.clientWidth, "x", img.clientHeight);
+    console.log("📐 Container:", img.parentElement?.clientWidth, "x", img.parentElement?.clientHeight);
+  };
+  if (img.complete) onLoad();
+  else img.addEventListener("load", onLoad);
+}, []);
 ```
 
-### Summary of changes
-- **Arms**: expanded outward (36→22% esq, 56→70% dir)
-- **Abdomen**: raised (32→30%)
-- **Hips**: raised (50→48%) + expanded (38→30% esq, 52→62% dir) + narrowed (10→8%)
-- **Thighs**: expanded (36→30% esq, 54→62% dir) + narrowed (10→8%)
-- **Calves**: expanded (38→30% esq, 54→62% dir)
+### 3. Attach ref to `<img>`
+- Line 71–76: add `ref={imgRef}` to the `<img>` element
 
-No other changes. All visuals preserved.
+### 4. After implementation, navigate to the onboarding flow in the browser and capture console output
 
 ## Files modified
 - `src/components/FlowSilhouette.tsx`
