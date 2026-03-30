@@ -57,6 +57,7 @@ const FlowSilhouetteCore = ({
           : "/assets/flow_silhouette_base.png"}
         alt="Silhueta corporal"
         className="w-full h-auto block pointer-events-none select-none"
+        style={{ position: "relative", zIndex: 0 }}
         onLoad={() => forceUpdate()}
       />
 
