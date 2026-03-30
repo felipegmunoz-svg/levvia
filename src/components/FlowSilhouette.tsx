@@ -97,30 +97,44 @@ const FlowSilhouetteCore: React.FC<FlowSilhouetteProps> = ({
           </filter>
         </defs>
 
-        {AREA_ELLIPSES.map((zone) => {
-          const intensity = painAreas[zone.id] || 0;
-          const isActive = intensity > 0;
-
+        {AREA_ELLIPSES.map(({ id, cx, cy, rx, ry, rotate }) => {
+          const intensity = (painAreas?.[id] ?? 0) as 0 | 1 | 2 | 3;
           return (
-            <motion.ellipse
-              key={zone.id}
-              cx={zone.cx}
-              cy={zone.cy}
-              rx={zone.rx}
-              ry={zone.ry}
-              transform={zone.rotate !== 0 ? `rotate(${zone.rotate}, ${zone.cx}, ${zone.cy})` : undefined}
-              onClick={() => onAreaClick?.(zone.id)}
-              style={{
-                cursor: interactive ? "pointer" : "default",
-                fill: isActive ? GLOW_BACKGROUNDS[intensity] : "transparent",
-                filter: isActive ? "url(#glow)" : "none",
-                stroke: !isActive && interactive ? "#60A5FA" : "none",
-                strokeWidth: !isActive && interactive ? 1.5 : 0,
-                strokeDasharray: !isActive && interactive ? "4 3" : "none",
-              }}
-              animate={isActive ? { opacity: [0.5, 0.9, 0.5] } : { opacity: 1 }}
-              transition={isActive ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : {}}
-            />
+            <g key={id}>
+              <ellipse
+                cx={cx} cy={cy} rx={rx} ry={ry}
+                transform={`rotate(${rotate}, ${cx}, ${cy})`}
+                fill="rgba(96,165,250,0.15)"
+                stroke="#60A5FA"
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+                className={onAreaClick ? "cursor-pointer" : ""}
+                onClick={() => onAreaClick?.(id)}
+              />
+              <text
+                x={cx}
+                y={cy}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="6"
+                fill="#1e40af"
+                fontWeight="bold"
+                pointerEvents="none"
+              >
+                {id}
+              </text>
+              <text
+                x={cx}
+                y={cy + 9}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="5"
+                fill="#3b82f6"
+                pointerEvents="none"
+              >
+                {cx},{cy}
+              </text>
+            </g>
           );
         })}
       </svg>
