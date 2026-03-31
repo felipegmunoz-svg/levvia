@@ -57,15 +57,10 @@ const Progress = () => {
 
   const { currentIntakeMl, dailyGoalMl } = useHydration(profile?.weightKg ?? null, dayNumber);
 
+  const hasHeatMapData = Object.keys(currentHeatMap).length > 0;
   const flowScore = calculateFlowScore(currentHeatMap || {});
-  const scoreColor = flowScore <= 40 ? "#EF4444" : flowScore <= 70 ? "#F59E0B" : "#2EC4B6";
-  const scoreLabel = flowScore <= 40 ? "🔥 Fogo Ativo" : flowScore <= 70 ? "🌊 Em Transição" : "💧 Fluxo Ativo";
-  const scoreMessage =
-    flowScore <= 40
-      ? "Sua inflamação precisa de atenção. Continue a jornada, cada ação conta."
-      : flowScore <= 70
-      ? "Você está no caminho certo. O fogo está diminuindo."
-      : "Excelente! Seu fluxo está ativo e a inflamação controlada.";
+  const scoreColor = !hasHeatMapData ? "#9CA3AF" : flowScore <= 40 ? "#EF4444" : flowScore <= 70 ? "#F59E0B" : "#2EC4B6";
+  const scoreLabel = !hasHeatMapData ? "⏳ Aguardando dados" : flowScore <= 40 ? "🔥 Fogo Ativo" : flowScore <= 70 ? "🌊 Em Transição" : "💧 Fluxo Ativo";
 
   // Build evolution data from challenge_progress — only real completed days
   const evoData = useMemo(() => {
@@ -96,6 +91,22 @@ const Progress = () => {
 
     return days;
   }, [challengeProgress]);
+
+  // Score message — depends on whether the user has journey progress or not
+  const hasJourneyProgress = evoData.length > 0;
+  const scoreMessage = !hasHeatMapData
+    ? "Preencha o mapa de calor no Dia 1 para ver seu score de fluxo."
+    : !hasJourneyProgress
+    ? flowScore <= 40
+      ? "Seu score inicial indica atenção necessária. A jornada vai ajudar a resfriar o fogo."
+      : flowScore <= 70
+      ? "Seu score inicial está moderado. Complete a jornada para evoluir."
+      : "Este é seu score inicial — antes da jornada. Complete os dias para ver sua evolução real."
+    : flowScore <= 40
+    ? "Sua inflamação precisa de atenção. Continue a jornada, cada ação conta."
+    : flowScore <= 70
+    ? "Você está no caminho certo. O fogo está diminuindo."
+    : "Excelente! Seu fluxo está ativo e a inflamação controlada.";
 
   const hydrationPercent = dailyGoalMl > 0 ? Math.min(currentIntakeMl / dailyGoalMl, 1) : 0;
   const goalReached = currentIntakeMl >= dailyGoalMl && dailyGoalMl > 0;
