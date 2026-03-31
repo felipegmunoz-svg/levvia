@@ -104,9 +104,6 @@ const DayTouchpointView = ({
   }, [activeSlot, isReviewMode]);
 
   const toggleSlot = (slot: TouchpointSlot) => {
-    if (!isReviewMode && !progress[slot].done && !canExpandSlot(slot, progress)) {
-      return;
-    }
     setExpandedSlot((prev) => (prev === slot ? null : slot));
   };
 
@@ -184,12 +181,7 @@ const DayTouchpointView = ({
               {/* Card Header */}
               <button
                 onClick={() => toggleSlot(s.slot)}
-                disabled={!isReviewMode && !progress[s.slot].done && !canExpandSlot(s.slot, progress)}
-                className={`w-full p-4 flex items-center gap-3 ${
-                  !isReviewMode && !progress[s.slot].done && !canExpandSlot(s.slot, progress)
-                    ? "opacity-40 cursor-not-allowed"
-                    : ""
-                }`}
+                className="w-full p-4 flex items-center gap-3"
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
