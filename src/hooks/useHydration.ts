@@ -14,7 +14,8 @@ interface UseHydrationReturn {
 export function useHydration(weightKg: number | null, dayNumber: number): UseHydrationReturn {
   const { user } = useAuth();
 
-  const dailyGoalMl = useMemo(() => Math.round((weightKg || 60) * 35), [weightKg]);
+  // Fórmula de desinflamação: peso × 40ml (vs padrão 35ml)
+  const dailyGoalMl = useMemo(() => Math.round((weightKg || 60) * 40), [weightKg]);
   const subGoalMl = useMemo(() => Math.round(dailyGoalMl / 4), [dailyGoalMl]);
 
   const storageKey = `levvia_hydration_day_${dayNumber}`;

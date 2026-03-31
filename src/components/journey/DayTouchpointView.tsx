@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import FlowSilhouette from "@/components/FlowSilhouette";
 import { AnimatePresence, motion } from "framer-motion";
@@ -41,10 +41,10 @@ const SLOTS: { slot: TouchpointSlot; label: string; Icon: LucideIcon; time: stri
 ];
 
 const SLOT_LABELS: Record<TouchpointSlot, string> = {
-  morning: "da manhã",
-  lunch: "do almoço",
-  afternoon: "da tarde",
-  night: "da noite",
+  morning: "esta manhã",
+  lunch: "este almoço",
+  afternoon: "esta tarde",
+  night: "esta noite",
 };
 
 const SLOT_INDICES: Record<TouchpointSlot, number> = {
@@ -86,6 +86,28 @@ const DayTouchpointView = ({
 }: DayTouchpointViewProps) => {
   const navigate = useNavigate();
   const config = getTouchpointConfig(dayNumber);
+
+  // Hydration warning state
+  const [hydrationWarning, setHydrationWarning] = useState<{
+    slot: TouchpointSlot;
+    data: any;
+    percent: number;
+  } | null>(null);
+
+  // Intercept slot completion to check hydration before confirming
+  const handleSlotComplete = useCallback(
+    (slot: TouchpointSlot, data: any) => {
+      if (isReviewMode) { onSlotComplete(slot, data); return; }
+      const slotIdx = SLOT_INDICES[slot];
+      const pct = hydration?.slotPercent(slotIdx) ?? 1;
+      if (pct < 0.8) {
+        setHydrationWarning({ slot, data, percent: pct });
+      } else {
+        onSlotComplete(slot, data);
+      }
+    },
+    [hydration, isReviewMode, onSlotComplete]
+  );
 
   // Compute active slot (first undone)
   const activeSlot = useMemo<TouchpointSlot | null>(() => {
@@ -300,7 +322,7 @@ const DayTouchpointView = ({
                                 shotRecipe={touchpoints.morning.shotRecipe}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
-                                onComplete={(data) => onSlotComplete("morning", data)}
+                                onComplete={(data) => handleSlotComplete("morning", data)}
                               />
                             )}
                             {s.slot === "lunch" && (
@@ -310,7 +332,7 @@ const DayTouchpointView = ({
                                 tip={touchpoints.lunch.tip}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
-                                onComplete={(data) => onSlotComplete("lunch", data)}
+                                onComplete={(data) => handleSlotComplete("lunch", data)}
                               />
                             )}
                             {s.slot === "afternoon" && (
@@ -321,7 +343,7 @@ const DayTouchpointView = ({
                                 snackRecipe={touchpoints.afternoon.snackRecipe}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
-                                onComplete={(data) => onSlotComplete("afternoon", data)}
+                                onComplete={(data) => handleSlotComplete("afternoon", data)}
                               />
                             )}
                             {s.slot === "night" && (
@@ -333,7 +355,7 @@ const DayTouchpointView = ({
                                 hydration={hydrationProps}
                                 isCheckpointDay={CHECKPOINT_DAYS.includes(dayNumber)}
                                 heatMapDay1Data={touchpoints.night.heatMapDay1Data}
-                                onComplete={(data) => onSlotComplete("night", data)}
+                                onComplete={(data) => handleSlotComplete("night", data)}
                               />
                             )}
                           </>
@@ -359,6 +381,44 @@ const DayTouchpointView = ({
             <p className="text-sm text-levvia-muted font-body mt-2">
               Você cuidou de si mesma o dia inteiro. Descanse — você merece.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Hydration warning modal */}
+      {hydrationWarning && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center p-4">
+          <div className="w-full max-w-md bg-levvia-surface rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center gap-2 mb-3">
+              <Droplets size={18} className="text-primary" strokeWidth={1.5} />
+              <h3 className="font-heading font-semibold text-levvia-fg text-base">
+                Hidratação abaixo da meta
+              </h3>
+            </div>
+            <p className="text-sm text-levvia-muted font-body leading-relaxed mb-5">
+              Sua linfa precisa de água para fluir e desinflamar. Você atingiu{" "}
+              <span className="font-semibold text-levvia-fg">
+                {Math.round(hydrationWarning.percent * 100)}%
+              </span>{" "}
+              da meta deste período. Que tal beber mais um copo agora para ajudar seu corpo ou compensar no próximo bloco?
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  onSlotComplete(hydrationWarning.slot, hydrationWarning.data);
+                  setHydrationWarning(null);
+                }}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm font-body"
+              >
+                Continuar mesmo assim
+              </button>
+              <button
+                onClick={() => setHydrationWarning(null)}
+                className="w-full py-3 rounded-xl bg-muted text-levvia-muted font-medium text-sm font-body"
+              >
+                Beber mais água primeiro
+              </button>
+            </div>
           </div>
         </div>
       )}

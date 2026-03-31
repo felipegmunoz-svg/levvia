@@ -77,9 +77,11 @@ const HydrationModule = ({
         <p className="text-sm text-levvia-fg italic font-body leading-relaxed">
           {hydrationText}
         </p>
-        <p className="text-xs text-levvia-muted font-body mt-1">
-          Meta deste momento: {slotSubGoalMl}ml
-        </p>
+        <div className="mt-2 flex items-center justify-between">
+          <p className="text-xs text-levvia-muted font-body">
+            Sua meta para {slotLabel}: <span className="font-semibold text-primary">{slotSubGoalMl}ml</span>
+          </p>
+        </div>
       </div>
 
       {/* Tap Buttons or Goal Reached */}
