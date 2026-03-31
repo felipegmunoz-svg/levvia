@@ -132,12 +132,16 @@ const DayTouchpointView = ({
             onClick={() => navigate("/progress")}
             className="w-full levvia-card p-4 flex items-center gap-4 text-left active:opacity-80 transition-opacity"
           >
-            <div className="w-[70px] h-[105px] overflow-hidden shrink-0 flex justify-center">
+            <div className="w-[70px] h-[200px] overflow-hidden shrink-0 flex justify-center items-start">
               <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={hydration?.currentIntakeMl ?? 0} waterGoalMl={hydration?.dailyGoalMl ?? 2000} size="small" animated={false} />
             </div>
             <div>
               <p className="text-sm font-heading font-semibold text-levvia-fg">Seu Fogo Interno</p>
-              <p className="text-xs text-levvia-muted font-body mt-0.5">Toque para ver sua evolução →</p>
+              <p className="text-xs text-levvia-muted font-body mt-0.5">
+                {completedSlots === 0
+                  ? "Seu estado inicial registrado →"
+                  : "Toque para ver sua evolução →"}
+              </p>
             </div>
           </button>
         </div>
