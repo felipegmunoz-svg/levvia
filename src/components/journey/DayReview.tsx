@@ -230,9 +230,22 @@ const DayReview = () => {
     }, {} as Record<string, string[]>);
 
     const markedAreas = Object.entries(grouped).map(([area, types]) => ({ area, types }));
-    const notes = map.notes as string | undefined;
 
-    if (markedAreas.length === 0 && !notes) {
+    // notes can be:
+    // - Record<string, string> (old Day2InflammationMap: keyed by area)
+    // - string (some newer formats)
+    // - null/undefined
+    const rawNotes = map.notes;
+    const notesEntries: { area: string; text: string }[] =
+      rawNotes && typeof rawNotes === 'object' && !Array.isArray(rawNotes)
+        ? Object.entries(rawNotes as Record<string, string>)
+            .filter(([, v]) => !!v)
+            .map(([area, text]) => ({ area, text }))
+        : [];
+    const notesText = typeof rawNotes === 'string' ? rawNotes : null;
+    const hasNotes = notesEntries.length > 0 || !!notesText;
+
+    if (markedAreas.length === 0 && !hasNotes) {
       return <SectionCard icon="🔥" title="Mapa de Inflamação"><EmptyState msg="Nenhum dado de inflamação registrado." /></SectionCard>;
     }
 
@@ -260,9 +273,15 @@ const DayReview = () => {
             <EmptyState msg="Nenhuma área marcada." />
           )}
         </SectionCard>
-        {notes && (
+        {hasNotes && (
           <SectionCard icon="📝" title="Observações">
-            <p className="text-sm text-foreground">{notes}</p>
+            {notesText && <p className="text-sm text-foreground">{notesText}</p>}
+            {notesEntries.map(({ area, text }) => (
+              <div key={area} className="mb-2 last:mb-0">
+                <p className="text-xs font-medium text-muted-foreground">{areaNames[area] || area}</p>
+                <p className="text-sm text-foreground">{text}</p>
+              </div>
+            ))}
           </SectionCard>
         )}
       </div>
