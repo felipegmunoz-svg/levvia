@@ -176,18 +176,23 @@ const AfternoonSlot = ({
 
       {/* Complete Button */}
       {!isReviewMode && (
-        <button
-          onClick={() =>
-            onComplete({
-              hydration: hydrated,
-              micro_challenge_id: microMovement?.id,
-              snack_id: snackRecipe?.id,
-            })
-          }
-          className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm font-body"
-        >
-          Concluir Tarde →
-        </button>
+        <>
+          <button
+            onClick={() =>
+              onComplete({
+                hydration: hydrated,
+                micro_challenge_id: microMovement?.id,
+                snack_id: snackRecipe?.id,
+              })
+            }
+            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm font-body"
+          >
+            Concluir Tarde →
+          </button>
+          <p className="text-xs text-center text-gray-400 mt-2 italic px-4 font-body">
+            Conclua todas as etapas para validar seu progresso de hoje e garantir seus resultados em 14 dias. Lembre-se: seu corpo precisa de tempo para processar cada estímulo.
+          </p>
+        </>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Map, Wind, Activity, PersonStanding, BookOpen } from "lucide-react";
+import logoFull from "@/assets/logo_livvia_azul.png";
 import type { NightTechnique } from "@/data/touchpointConfig";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
@@ -42,6 +43,15 @@ const NightSlot = ({
 }: NightSlotProps) => {
   const [techniqueDone, setTechniqueDone] = useState(isReviewMode);
   const [diaryData, setDiaryData] = useState<DiaryData | null>(null);
+  const [showClosing, setShowClosing] = useState(false);
+
+  useEffect(() => {
+    if (!showClosing) return;
+    const timer = setTimeout(() => {
+      onComplete({ technique_done: true, journal: diaryData ?? undefined });
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [showClosing]);
 
   // Technique renderer
   const renderTechnique = () => {
@@ -231,19 +241,36 @@ const NightSlot = ({
         </div>
       )}
 
-      {/* Complete Button — after diary saved, hidden in review */}
-      {diaryData && !isReviewMode && (
-        <button
-          onClick={() =>
-            onComplete({
-              technique_done: true,
-              journal: diaryData,
-            })
-          }
-          className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm font-body"
-        >
-          Concluir Noite →
-        </button>
+      {/* Closing celebration — shown for 3s then fires onComplete */}
+      {showClosing && (
+        <div className="levvia-card p-6 text-center">
+          <img src={logoFull} alt="Levvia" className="h-6 mx-auto mb-4 opacity-60" />
+          <p className="text-2xl mb-3">✨</p>
+          <h3 className="font-heading font-semibold text-levvia-fg text-base mb-2">
+            Jornada de hoje concluída com sucesso!
+          </h3>
+          <p className="text-sm text-levvia-muted font-body leading-relaxed">
+            Agora, permita que seu corpo descanse e processe o alívio. Sua jornada continua amanhã cedo.
+          </p>
+          <div className="mt-4 flex justify-center">
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        </div>
+      )}
+
+      {/* Complete Button — after diary saved, hidden in review, hidden during closing */}
+      {diaryData && !isReviewMode && !showClosing && (
+        <>
+          <button
+            onClick={() => setShowClosing(true)}
+            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm font-body"
+          >
+            Concluir Noite →
+          </button>
+          <p className="text-xs text-center text-gray-400 mt-2 italic px-4 font-body">
+            Conclua todas as etapas para validar seu progresso de hoje e garantir seus resultados em 14 dias. Lembre-se: seu corpo precisa de tempo para processar cada estímulo.
+          </p>
+        </>
       )}
     </div>
   );

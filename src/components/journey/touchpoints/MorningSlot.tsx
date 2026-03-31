@@ -180,7 +180,7 @@ const MorningSlot = ({
           <>
             {!canComplete && (
               <p className="text-xs italic text-center text-levvia-muted font-body px-2">
-                Para desbloquear o próximo período e garantir seus resultados em 15 dias, certifique-se de concluir todas as etapas acima.
+                Para desbloquear o próximo período e garantir seus resultados em 14 dias, certifique-se de concluir todas as etapas acima.
               </p>
             )}
             <button
@@ -194,6 +194,11 @@ const MorningSlot = ({
             >
               Concluir Manhã →
             </button>
+            {canComplete && (
+              <p className="text-xs text-center text-gray-400 mt-2 italic px-4 font-body">
+                Conclua todas as etapas para validar seu progresso de hoje e garantir seus resultados em 14 dias. Lembre-se: seu corpo precisa de tempo para processar cada estímulo.
+              </p>
+            )}
           </>
         );
       })()}
