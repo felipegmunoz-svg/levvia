@@ -71,7 +71,7 @@ const SLOT_ORDER: TouchpointSlot[] = ["morning", "lunch", "afternoon", "night"];
 const canExpandSlot = (slot: TouchpointSlot, progress: DayTouchpointProgress): boolean => {
   const idx = SLOT_ORDER.indexOf(slot);
   if (idx === 0) return true;
-  return SLOT_ORDER.slice(0, idx).every((s) => progress[s].done);
+  return SLOT_ORDER.slice(0, idx).every((s) => progress[s]?.done === true);
 };
 
 const DayTouchpointView = ({

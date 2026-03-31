@@ -40,7 +40,14 @@ function localKey(day: number) {
 function loadLocal(day: number): DayTouchpointProgress | null {
   try {
     const raw = localStorage.getItem(localKey(day));
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      morning: parsed.morning ?? { done: false, doneAt: null },
+      lunch: parsed.lunch ?? { done: false, doneAt: null },
+      afternoon: parsed.afternoon ?? { done: false, doneAt: null },
+      night: parsed.night ?? { done: false, doneAt: null },
+    };
   } catch {
     return null;
   }
@@ -67,8 +74,8 @@ function mergeProgress(
   const merged = { ...emptyProgress } as DayTouchpointProgress;
 
   for (const slot of slots) {
-    const l = local[slot];
-    const r = remote[slot];
+    const l = local[slot] ?? { done: false, doneAt: null };
+    const r = remote[slot] ?? { done: false, doneAt: null };
 
     if (r.done && !l.done) {
       merged[slot] = r;
