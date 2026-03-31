@@ -13,19 +13,18 @@ async function importVapidKeys(publicKey: string, privateKey: string) {
 
   const pubKeyObj = await crypto.subtle.importKey(
     "raw",
-    pubBytes,
+    pubBytes.buffer as ArrayBuffer,
     { name: "ECDSA", namedCurve: "P-256" },
     true,
     ["verify"]
   );
 
   const pubJwk = await crypto.subtle.exportKey("jwk", pubKeyObj);
+  const { key_ops: _discard, ...pubJwkClean } = pubJwk;
   const privJwk = {
-    ...pubJwk,
+    ...pubJwkClean,
     d: uint8ArrayToBase64Url(privBytes),
-    key_ops: ["sign"],
   };
-  delete privJwk.key_ops;
 
   const privateKeyObj = await crypto.subtle.importKey(
     "jwk",
