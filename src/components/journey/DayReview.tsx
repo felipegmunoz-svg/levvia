@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -140,17 +140,35 @@ const DayReview = () => {
   const { user } = useAuth();
   const [data, setData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const loadingResolvedRef = useRef(false);
+
+  // Safety timeout: force loading off after 6s if Supabase never responds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!loadingResolvedRef.current) {
+        console.warn("⚠️ DayReview: safety timeout 6s atingido");
+        setLoading(false);
+      }
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
-      if (!user?.id || !dayNum) { setLoading(false); return; }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("heat_map_day1, day2_inflammation_map, day4_sleep_data, day5_movement_data, day6_spice_data, day1_completed_at, day2_completed_at, day3_completed_at, day4_completed_at, day5_completed_at, day6_completed_at, challenge_progress")
-        .eq("id", user.id)
-        .maybeSingle();
-      setData(profile as unknown as ProfileData);
-      setLoading(false);
+      if (!user?.id || !dayNum) { loadingResolvedRef.current = true; setLoading(false); return; }
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("heat_map_day1, day2_inflammation_map, day4_sleep_data, day5_movement_data, day6_spice_data, day1_completed_at, day2_completed_at, day3_completed_at, day4_completed_at, day5_completed_at, day6_completed_at, challenge_progress")
+          .eq("id", user.id)
+          .maybeSingle();
+        setData(profile as unknown as ProfileData);
+      } catch (err) {
+        console.error("DayReview: erro ao carregar dados", err);
+      } finally {
+        loadingResolvedRef.current = true;
+        setLoading(false);
+      }
     };
     load();
   }, [user?.id, dayNum]);
