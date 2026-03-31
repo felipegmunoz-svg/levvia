@@ -49,7 +49,7 @@ const NightSlot = ({
     if (!showClosing) return;
     const timer = setTimeout(() => {
       onComplete({ technique_done: true, journal: diaryData ?? undefined });
-    }, 3000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, [showClosing]);
 
