@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Sunrise, UtensilsCrossed, Droplets, Moon, Activity, GlassWater, type LucideIcon } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
@@ -27,11 +27,16 @@ interface MorningSlotProps {
   onComplete: (data: { exercise_id?: string; shot_id?: string }) => void;
 }
 
-const SLOT_EMOJIS: Record<string, string> = {
-  morning: "🌅",
-  lunch: "🥗",
-  afternoon: "💧",
-  night: "🌙",
+const SLOT_ICONS: Record<string, LucideIcon> = {
+  morning: Sunrise,
+  lunch: UtensilsCrossed,
+  afternoon: Droplets,
+  night: Moon,
+};
+
+const SlotIcon = ({ slot }: { slot: string }) => {
+  const Icon = SLOT_ICONS[slot];
+  return Icon ? <Icon size={14} className="text-levvia-muted shrink-0" strokeWidth={1.5} /> : null;
 };
 
 const MorningSlot = ({
@@ -109,7 +114,7 @@ const MorningSlot = ({
               <span className="text-xs text-levvia-muted w-12 font-body">
                 {item.time}
               </span>
-              <span>{SLOT_EMOJIS[item.slot] || "📌"}</span>
+              <SlotIcon slot={item.slot} />
               <span className="text-sm text-levvia-fg font-body">
                 {item.label}
               </span>
@@ -121,8 +126,9 @@ const MorningSlot = ({
       {/* Section 3 — Exercise */}
       {exercise && (
         <div className="levvia-card p-5">
-          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-            🏃 Exercício da Manhã
+          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+            <Activity size={14} className="text-levvia-muted" strokeWidth={1.5} />
+            Exercício da Manhã
           </h3>
           <p className="font-medium text-levvia-fg font-body text-sm">
             {exercise.label}
@@ -161,8 +167,9 @@ const MorningSlot = ({
       {/* Section 4 — Morning Shot */}
       {shotRecipe && (
         <div className="levvia-card p-5">
-          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-            🧃 Shot Matinal
+          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+            <GlassWater size={14} className="text-levvia-muted" strokeWidth={1.5} />
+            Shot Matinal
           </h3>
           <p className="font-medium text-levvia-fg font-body text-sm">
             {shotRecipe.label}

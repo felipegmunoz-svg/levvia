@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { HeartPulse, X, ArrowRight, ArrowLeft, Snowflake, Wind, AlertTriangle, RotateCcw, Sparkles } from "lucide-react";
+import { HeartPulse, X, ArrowRight, ArrowLeft, Snowflake, Wind, AlertTriangle, RotateCcw, Sparkles, Footprints, Activity, Dumbbell, PersonStanding, BedDouble, Briefcase, MoveHorizontal, type LucideIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -43,17 +43,21 @@ interface CheckIn {
 
 type Respostas = { intensidade: string; regiao: string; ambiente: string };
 
+type DotOption = { value: string; dotColor: string; label: string; desc: string; color: string };
+type IconOption = { value: string; icon: LucideIcon; label: string; desc: string; color: string };
+type QuestionOption = DotOption | IconOption;
+
 // ─── Questions data ───
 
-const questions = [
+const questions: { field: keyof Respostas; title: string; subtitle: string; options: QuestionOption[] }[] = [
   {
     field: "intensidade" as const,
     title: "Como você está hoje?",
     subtitle: "Escolha o que melhor descreve como suas pernas estão agora",
     options: [
-      { value: "crise", emoji: "🔴", label: "Pesadas e Doloridas", desc: "Crise", color: "border-destructive/30 hover:border-destructive/50 bg-destructive/5" },
-      { value: "cansada", emoji: "🟡", label: "Cansadas, mas suportáveis", desc: "Dia comum", color: "border-yellow-500/30 hover:border-yellow-500/50 bg-yellow-500/5" },
-      { value: "energia", emoji: "🟢", label: "Estou com energia hoje!", desc: "Dia bom", color: "border-success/30 hover:border-success/50 bg-success/5" },
+      { value: "crise",   dotColor: "#EF4444", label: "Pesadas e Doloridas",       desc: "Crise",    color: "border-destructive/30 hover:border-destructive/50 bg-destructive/5" },
+      { value: "cansada", dotColor: "#F59E0B", label: "Cansadas, mas suportáveis", desc: "Dia comum", color: "border-yellow-500/30 hover:border-yellow-500/50 bg-yellow-500/5" },
+      { value: "energia", dotColor: "#10B981", label: "Estou com energia hoje!",   desc: "Dia bom",   color: "border-success/30 hover:border-success/50 bg-success/5" },
     ],
   },
   {
@@ -61,10 +65,10 @@ const questions = [
     title: "Onde você quer focar o alívio?",
     subtitle: "Selecione a região do corpo para os exercícios",
     options: [
-      { value: "tornozelo", emoji: "🦶", label: "Tornozelos e Pés", desc: "Membros inferiores", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
-      { value: "coxas", emoji: "🦵", label: "Coxas e Glúteos", desc: "Região superior", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
-      { value: "bracos", emoji: "💪", label: "Braços e Tronco", desc: "Parte superior", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
-      { value: "corpo_todo", emoji: "🧘‍♀️", label: "Corpo Todo", desc: "Geral", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "tornozelo", icon: Footprints,     label: "Tornozelos e Pés",   desc: "Membros inferiores", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "coxas",     icon: Activity,       label: "Coxas e Glúteos",    desc: "Região superior",    color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "bracos",    icon: Dumbbell,       label: "Braços e Tronco",    desc: "Parte superior",     color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "corpo_todo",icon: PersonStanding, label: "Corpo Todo",          desc: "Geral",              color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
     ],
   },
   {
@@ -72,9 +76,9 @@ const questions = [
     title: "Onde você está agora?",
     subtitle: "Para sugerir exercícios que cabem no seu espaço",
     options: [
-      { value: "cama", emoji: "🛏️", label: "Na Cama ou Sofá", desc: "Deitada/reclinada", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
-      { value: "trabalho", emoji: "💼", label: "No Trabalho", desc: "Sentada", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
-      { value: "espaco", emoji: "🏃‍♀️", label: "Tenho espaço para me mover", desc: "Em pé / chão livre", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "cama",     icon: BedDouble,      label: "Na Cama ou Sofá",           desc: "Deitada/reclinada",  color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "trabalho", icon: Briefcase,      label: "No Trabalho",               desc: "Sentada",            color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
+      { value: "espaco",   icon: MoveHorizontal, label: "Tenho espaço para me mover",desc: "Em pé / chão livre", color: "border-secondary/30 hover:border-secondary/50 bg-secondary/5" },
     ],
   },
 ];
@@ -473,7 +477,10 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
                           onClick={() => handleAnswer(questions[etapa].field, opt.value)}
                           className={`w-full glass-card p-4 flex items-center gap-4 text-left transition-all ${opt.color}`}
                         >
-                          <span className="text-2xl">{opt.emoji}</span>
+                          {'dotColor' in opt
+                            ? <div className="w-5 h-5 rounded-full shrink-0" style={{ backgroundColor: opt.dotColor }} />
+                            : <opt.icon size={20} className="text-levvia-muted shrink-0" strokeWidth={1.5} />
+                          }
                           <div className="flex-1">
                             <h4 className="text-sm font-medium text-foreground">{opt.label}</h4>
                             <p className="text-[10px] text-muted-foreground mt-0.5">{opt.desc}</p>

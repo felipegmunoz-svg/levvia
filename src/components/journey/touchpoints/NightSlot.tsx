@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Map, Wind } from "lucide-react";
+import { Map, Wind, Activity, PersonStanding, BookOpen } from "lucide-react";
 import type { NightTechnique } from "@/data/touchpointConfig";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
@@ -129,8 +129,12 @@ const NightSlot = ({
               technique.type === "meditation" ? "bg-primary/5" : ""
             }`}
           >
-            <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-              {technique.type === "legs-elevation" ? "🦵" : technique.type === "meditation" ? "🧘" : "📖"}{" "}
+            <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+              {technique.type === "legs-elevation"
+                ? <Activity size={14} className="text-levvia-muted" strokeWidth={1.5} />
+                : technique.type === "meditation"
+                ? <PersonStanding size={14} className="text-levvia-muted" strokeWidth={1.5} />
+                : <BookOpen size={14} className="text-levvia-muted" strokeWidth={1.5} />}
               {technique.title}
             </h3>
             {technique.description && (

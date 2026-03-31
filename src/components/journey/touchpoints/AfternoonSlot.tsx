@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Droplets, Zap, Leaf } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
@@ -103,8 +104,9 @@ const AfternoonSlot = ({
         />
       ) : (
         <div className="levvia-card p-5">
-          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-            💧 Hidratação
+          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+            <Droplets size={14} className="text-primary" strokeWidth={1.5} />
+            Hidratação
           </h3>
           <p className="text-sm text-levvia-fg font-body leading-relaxed mb-3">
             {hydrationText}
@@ -120,8 +122,9 @@ const AfternoonSlot = ({
       {/* Micro-Movement */}
       {microMovement && (
         <div className="levvia-card p-5">
-          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-            ⚡ Micro-Movimento (2 min)
+          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+            <Zap size={14} className="text-levvia-muted" strokeWidth={1.5} />
+            Micro-Movimento (2 min)
           </h3>
           <p className="font-medium text-levvia-fg font-body text-sm">
             {microMovement.label}
@@ -150,8 +153,9 @@ const AfternoonSlot = ({
       {/* Snack */}
       {snackRecipe && (
         <div className="levvia-card p-5">
-          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-            🍵 Snack Anti-inflamatório
+          <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+            <Leaf size={14} className="text-levvia-muted" strokeWidth={1.5} />
+            Snack Anti-inflamatório
           </h3>
           <p className="font-medium text-levvia-fg font-body text-sm">
             {snackRecipe.label}

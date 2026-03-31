@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Timer } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface Day5LegsElevationProps {
@@ -7,9 +8,9 @@ interface Day5LegsElevationProps {
 }
 
 const DURATION_OPTIONS = [
-  { value: 5, label: "5 minutos", emoji: "⏱️" },
-  { value: 7, label: "7 minutos", emoji: "⏰" },
-  { value: 10, label: "10 minutos", emoji: "🕐" },
+  { value: 5, label: "5 minutos" },
+  { value: 7, label: "7 minutos" },
+  { value: 10, label: "10 minutos" },
 ];
 
 const STEPS = [
@@ -129,7 +130,7 @@ const Day5LegsElevation = ({ onContinue }: Day5LegsElevationProps) => {
                   onClick={() => setDuration(opt.value)}
                   className="levvia-card p-4 text-center hover:ring-1 hover:ring-secondary/40 transition-all"
                 >
-                  <span className="text-2xl block mb-1">{opt.emoji}</span>
+                  <Timer size={20} className="text-levvia-muted mx-auto mb-1" strokeWidth={1.5} />
                   <p className="text-foreground text-xs font-bold">
                     {opt.label}
                   </p>
@@ -145,8 +146,9 @@ const Day5LegsElevation = ({ onContinue }: Day5LegsElevationProps) => {
             animate={{ opacity: 1 }}
             className="text-center mb-6"
           >
-            <p className="text-foreground text-lg font-bold mb-2">
-              ⏱️ {duration} minutos
+            <p className="text-foreground text-lg font-bold mb-2 flex items-center justify-center gap-2">
+              <Timer size={18} className="text-levvia-muted" strokeWidth={1.5} />
+              {duration} minutos
             </p>
             <p
               className="text-foreground/60 text-sm mb-4"
