@@ -38,7 +38,7 @@ const LunchSlot = ({
   // Full-screen recipe overlay
   if (showRecipeIdx !== null && recipes[showRecipeIdx]?.recipe) {
     return (
-      <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <RecipeDetail
           recipe={recipes[showRecipeIdx].recipe as any}
           onBack={() => setShowRecipeIdx(null)}

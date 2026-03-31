@@ -43,7 +43,7 @@ const MorningSlot = ({
   // Full-screen overlays
   if (showExercise && exercise?.exercise) {
     return (
-      <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <ExerciseDetail
           exercise={exercise.exercise as any}
           onBack={() => setShowExercise(false)}
@@ -58,7 +58,7 @@ const MorningSlot = ({
 
   if (showRecipe && shotRecipe?.recipe) {
     return (
-      <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <RecipeDetail
           recipe={shotRecipe.recipe as any}
           onBack={() => setShowRecipe(false)}

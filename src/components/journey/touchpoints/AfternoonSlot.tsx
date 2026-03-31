@@ -43,7 +43,7 @@ const AfternoonSlot = ({
   // Exercise overlay
   if (showExercise && microMovement?.exercise) {
     return (
-      <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <ExerciseDetail
           exercise={microMovement.exercise as any}
           onBack={() => setShowExercise(false)}
@@ -59,7 +59,7 @@ const AfternoonSlot = ({
   // Recipe overlay
   if (showRecipe && snackRecipe?.recipe) {
     return (
-      <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <RecipeDetail
           recipe={snackRecipe.recipe as any}
           onBack={() => setShowRecipe(false)}
