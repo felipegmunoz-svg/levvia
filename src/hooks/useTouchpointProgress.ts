@@ -74,8 +74,8 @@ function mergeProgress(
   const merged = { ...emptyProgress } as DayTouchpointProgress;
 
   for (const slot of slots) {
-    const l = local[slot];
-    const r = remote[slot];
+    const l = local[slot] ?? { done: false, doneAt: null };
+    const r = remote[slot] ?? { done: false, doneAt: null };
 
     if (r.done && !l.done) {
       merged[slot] = r;
