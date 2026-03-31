@@ -132,7 +132,7 @@ const DayTouchpointView = ({
             onClick={() => navigate("/progress")}
             className="w-full levvia-card p-4 flex items-center gap-4 text-left active:opacity-80 transition-opacity"
           >
-            <div className="w-[60px] shrink-0">
+            <div className="w-[70px] h-[105px] overflow-hidden shrink-0 flex justify-center">
               <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={hydration?.currentIntakeMl ?? 0} waterGoalMl={hydration?.dailyGoalMl ?? 2000} size="small" animated={false} />
             </div>
             <div>

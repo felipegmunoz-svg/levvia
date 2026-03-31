@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import FlowSilhouette, { calculateFlowScore } from "@/components/FlowSilhouette";
 import { useHydration } from "@/hooks/useHydration";
@@ -11,6 +13,7 @@ const EMPTY_HEAT_MAP: Record<string, number> = {};
 
 const Progress = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { profile } = useProfile();
   const [challengeProgress, setChallengeProgress] = useState<any>(null);
 
@@ -64,47 +67,34 @@ const Progress = () => {
       ? "Você está no caminho certo. O fogo está diminuindo."
       : "Excelente! Seu fluxo está ativo e a inflamação controlada.";
 
-  // Build evolution data from challenge_progress
+  // Build evolution data from challenge_progress — only real completed days
   const evoData = useMemo(() => {
     const touchpoints = challengeProgress?.touchpoints;
-    if (!touchpoints) {
-      // Fallback static data
-      return [
-        { day: "Dia 1", value: 80, color: "#EF4444" },
-        { day: "Dia 2", value: 70, color: "#F59E0B" },
-        { day: "Dia 3", value: 65, color: "#F59E0B" },
-        { day: "Dia 4", value: 60, color: "#F59E0B" },
-        { day: "Dia 5", value: 55, color: "#2EC4B6" },
-      ];
-    }
+    if (!touchpoints) return [];
 
     const days: { day: string; value: number; color: string }[] = [];
     for (let d = 1; d <= 14; d++) {
       const dayData = touchpoints[`day${d}`];
-      if (!dayData) continue;
-      // Try to extract a heat map score from the day's data
+      if (!dayData?.night?.done) continue; // only fully completed days
+
+      // Try to extract a heat map score from the day's night data
       let heatMap: Record<string, number> | null = null;
       if (dayData.night?.heatMapToday) heatMap = dayData.night.heatMapToday;
       else if (dayData.night?.heatmap) heatMap = dayData.night.heatmap;
 
       let score: number;
       if (heatMap && Object.keys(heatMap).length > 0) {
-        score = calculateFlowScore(heatMap || {});
+        score = calculateFlowScore(heatMap);
       } else {
-        // Estimate from completion — simple heuristic
-        const completed = dayData.completed;
-        score = completed ? Math.min(50 + d * 4, 95) : 50;
+        // Completion milestone — heuristic (no heat map data saved for this day)
+        score = Math.min(55 + d * 3, 92);
       }
 
       const color = score > 70 ? "#2EC4B6" : score > 40 ? "#F59E0B" : "#EF4444";
       days.push({ day: `Dia ${d}`, value: score, color });
     }
 
-    return days.length > 0 ? days : [
-      { day: "Dia 1", value: 80, color: "#EF4444" },
-      { day: "Dia 2", value: 70, color: "#F59E0B" },
-      { day: "Dia 3", value: 65, color: "#F59E0B" },
-    ];
+    return days;
   }, [challengeProgress]);
 
   const hydrationPercent = dailyGoalMl > 0 ? Math.min(currentIntakeMl / dailyGoalMl, 1) : 0;
@@ -115,6 +105,12 @@ const Progress = () => {
       {/* Header */}
       <header className="px-6 pt-10 pb-6">
         <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
+          >
+            <ChevronLeft size={18} className="text-levvia-fg" />
+          </button>
           <img src={logoIcon} alt="Levvia" className="h-7" />
         </div>
         <h1 className="text-[26px] font-heading font-semibold text-levvia-fg tracking-tight">
@@ -172,32 +168,39 @@ const Progress = () => {
             📊 Evolução do Fluxo
           </h2>
 
-          <div className="space-y-3">
-            {evoData.map((item) => (
-              <div key={item.day} className="flex items-center gap-3">
-                <span className="text-[12px] font-medium text-levvia-fg font-body w-12 shrink-0">
-                  {item.day}:
-                </span>
-                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${item.value}%`, background: item.color }}
-                  />
-                </div>
-                <span className="text-[11px] text-levvia-muted font-body w-8 text-right">
-                  {item.value}%
-                </span>
+          {evoData.length === 0 ? (
+            <p className="text-[13px] text-levvia-muted font-body text-center py-4">
+              Complete os dias da sua jornada para ver sua evolução aqui. 🌊
+            </p>
+          ) : (
+            <>
+              <div className="space-y-3">
+                {evoData.map((item) => (
+                  <div key={item.day} className="flex items-center gap-3">
+                    <span className="text-[12px] font-medium text-levvia-fg font-body w-12 shrink-0">
+                      {item.day}:
+                    </span>
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${item.value}%`, background: item.color }}
+                      />
+                    </div>
+                    <span className="text-[11px] text-levvia-muted font-body w-8 text-right">
+                      {item.value}%
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-center gap-2 mt-5 text-[11px] text-levvia-muted font-body">
-            <span>🔥</span>
-            <span>Fogo diminuindo</span>
-            <span>→</span>
-            <span>Fluxo aumentando</span>
-            <span>💧</span>
-          </div>
+              <div className="flex items-center justify-center gap-2 mt-5 text-[11px] text-levvia-muted font-body">
+                <span>🔥</span>
+                <span>Fogo diminuindo</span>
+                <span>→</span>
+                <span>Fluxo aumentando</span>
+                <span>💧</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Hydration Summary */}
