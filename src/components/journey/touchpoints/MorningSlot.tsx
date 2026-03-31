@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calendar } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
@@ -85,7 +85,7 @@ const MorningSlot = ({
       {/* Section 1 — Affirmation */}
       <div className="levvia-card p-5 text-center">
         <span className="text-xs uppercase tracking-widest text-levvia-muted font-body">
-          ✨ Afirmação do Dia
+          Afirmação do Dia
         </span>
         <p className="mt-3 text-sm italic text-levvia-fg font-body leading-relaxed">
           "{affirmation}"
@@ -94,8 +94,9 @@ const MorningSlot = ({
 
       {/* Section 2 — Day Schedule */}
       <div className="levvia-card p-5">
-        <h3 className="font-semibold text-levvia-fg font-body text-sm mb-4">
-          📅 Seu Mapa do Dia
+        <h3 className="font-semibold text-levvia-fg font-body text-sm mb-4 flex items-center gap-2">
+          <Calendar size={14} className="text-levvia-muted" strokeWidth={1.5} />
+          Seu Mapa do Dia
         </h3>
         <div className="space-y-0">
           {schedule.map((item, i) => (

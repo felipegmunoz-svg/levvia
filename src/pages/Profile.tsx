@@ -30,6 +30,8 @@ import {
   Star,
   Zap,
   Pencil,
+  ShoppingCart,
+  Map,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
@@ -391,7 +393,8 @@ const Profile = () => {
             {/* Flow Silhouette with hydration */}
             <section className="glass-card p-5 flex flex-col items-center">
               <h2 className="text-sm font-medium text-foreground flex items-center gap-2 mb-4 self-start">
-                💧 Meu Mapa de Fluxo
+                <Map size={14} strokeWidth={1.5} className="text-muted-foreground" />
+                Meu Mapa de Fluxo
               </h2>
               <FlowSilhouette
                 heatMapData={(() => {
@@ -412,7 +415,8 @@ const Profile = () => {
             <section className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
                 <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
-                  🛒 Minha Despensa
+                  <ShoppingCart size={14} strokeWidth={1.5} className="text-muted-foreground" />
+                  Minha Despensa
                 </h2>
                 <button
                   onClick={() => setEditOpen(true)}

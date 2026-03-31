@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Utensils } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import RecipeDetail from "@/components/RecipeDetail";
 import HydrationModule from "./HydrationModule";
@@ -54,8 +55,9 @@ const LunchSlot = ({
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h3 className="font-semibold text-levvia-fg font-body text-sm">
-          🍽️ Sua Refeição Anti-inflamatória
+        <h3 className="font-semibold text-levvia-fg font-body text-sm flex items-center gap-2">
+          <Utensils size={14} className="text-levvia-muted" strokeWidth={1.5} />
+          Sua Refeição Anti-inflamatória
         </h3>
         <p className="text-sm text-levvia-muted font-body mt-1">
           Escolha a receita que mais combina com você hoje.

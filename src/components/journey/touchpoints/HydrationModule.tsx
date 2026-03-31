@@ -41,7 +41,8 @@ const HydrationModule = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-levvia-fg font-body text-sm flex items-center gap-1.5">
-          💧 Hidratação
+          <Droplets size={14} className="text-primary" strokeWidth={1.5} />
+          Hidratação
         </h3>
         <span className="text-xs bg-muted px-2 py-1 rounded-full text-levvia-muted font-body">
           {currentIntakeMl}ml / {dailyGoalMl}ml

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Leaf, Activity, BookOpen, type LucideIcon } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { useChallengeData } from "@/hooks/useChallengeData";
 import logoIcon from "@/assets/logo_livvia_azul_icone.png";
@@ -33,21 +34,21 @@ const History = () => {
     };
   }, [currentDay, challengeProgress, allExercises, filteredRecipes]);
 
-  const cards = [
+  const cards: { Icon: LucideIcon; title: string; subtitle: string; path: string }[] = [
     {
-      emoji: "🍃",
+      Icon: Leaf,
       title: "Receitas",
       subtitle: `${unlockedCounts.recipes} receitas desbloqueadas`,
       path: "/history/recipes",
     },
     {
-      emoji: "🌊",
+      Icon: Activity,
       title: "Exercícios",
       subtitle: `${unlockedCounts.exercises} práticas desbloqueadas`,
       path: "/history/exercises",
     },
     {
-      emoji: "📚",
+      Icon: BookOpen,
       title: "Conhecimento",
       subtitle: `${unlockedCounts.knowledge} pílulas desbloqueadas`,
       path: "/history/knowledge",
@@ -77,7 +78,9 @@ const History = () => {
             onClick={() => navigate(card.path)}
             className="glass-card p-5 w-full text-left flex items-center gap-4 transition-all hover:border-secondary/30 active:scale-[0.98]"
           >
-            <span className="text-3xl">{card.emoji}</span>
+            <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+              <card.Icon size={18} className="text-secondary" strokeWidth={1.5} />
+            </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-base font-medium text-foreground">{card.title}</h2>
               <p className="text-xs text-muted-foreground mt-0.5">{card.subtitle}</p>

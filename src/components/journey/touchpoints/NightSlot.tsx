@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Map, Wind } from "lucide-react";
 import type { NightTechnique } from "@/data/touchpointConfig";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
@@ -50,7 +51,7 @@ const NightSlot = ({
           return (
             <div className="levvia-card p-5">
               <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-                🗺️ {technique.title}
+                <Map size={14} className="text-levvia-muted inline mr-1.5" strokeWidth={1.5} />{technique.title}
               </h3>
               <HeatMapInteractive onNext={() => {}} />
               <p className="mt-2 text-xs text-levvia-muted font-body">
@@ -63,7 +64,7 @@ const NightSlot = ({
           <div className="space-y-4">
             <div className="levvia-card p-5 overflow-visible">
               <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-                🗺️ {technique.title}
+                <Map size={14} className="text-levvia-muted inline mr-1.5" strokeWidth={1.5} />{technique.title}
               </h3>
               {technique.description && (
                 <p className="text-sm text-levvia-muted font-body mb-4">
@@ -91,7 +92,7 @@ const NightSlot = ({
         return (
           <div className="levvia-card p-5">
             <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3">
-              🫁 {technique.title}
+              <Wind size={14} className="text-levvia-muted inline mr-1.5" strokeWidth={1.5} />{technique.title}
             </h3>
             <BreathingCircle onContinue={() => setTechniqueDone(true)} />
           </div>

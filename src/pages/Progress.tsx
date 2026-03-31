@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, TrendingUp, Droplets, Flame, Waves } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import FlowSilhouette, { calculateFlowScore } from "@/components/FlowSilhouette";
 import { useHydration } from "@/hooks/useHydration";
@@ -175,8 +175,9 @@ const Progress = () => {
 
         {/* Evolução Mapa de Calor */}
         <div className="levvia-card p-6">
-          <h2 className="text-[14px] font-heading font-semibold text-levvia-fg mb-5">
-            📊 Evolução do Fluxo
+          <h2 className="text-[14px] font-heading font-semibold text-levvia-fg mb-5 flex items-center gap-2">
+            <TrendingUp size={15} className="text-levvia-muted" strokeWidth={1.5} />
+            Evolução do Fluxo
           </h2>
 
           {evoData.length === 0 ? (
@@ -204,11 +205,11 @@ const Progress = () => {
                 ))}
               </div>
               <div className="flex items-center justify-center gap-2 mt-5 text-[11px] text-levvia-muted font-body">
-                <span>🔥</span>
+                <Flame size={12} className="text-orange-400" strokeWidth={1.5} />
                 <span>Fogo diminuindo</span>
                 <span>→</span>
                 <span>Fluxo aumentando</span>
-                <span>💧</span>
+                <Droplets size={12} className="text-primary" strokeWidth={1.5} />
               </div>
             </>
           )}
@@ -216,8 +217,9 @@ const Progress = () => {
 
         {/* Hydration Summary */}
         <div className="levvia-card p-5">
-          <h2 className="text-[14px] font-heading font-semibold text-levvia-fg mb-4">
-            💧 Hidratação Hoje
+          <h2 className="text-[14px] font-heading font-semibold text-levvia-fg mb-4 flex items-center gap-2">
+            <Droplets size={15} className="text-primary" strokeWidth={1.5} />
+            Hidratação Hoje
           </h2>
           <div className="flex items-center gap-3">
             <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">

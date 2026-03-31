@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import FlowSilhouette from "@/components/FlowSilhouette";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Sunrise, UtensilsCrossed, Droplets, Moon, type LucideIcon } from "lucide-react";
 import { getTouchpointConfig, type TouchpointSlot } from "@/data/touchpointConfig";
 import type { TouchpointData } from "@/hooks/useChallengeData";
 import type { DayTouchpointProgress } from "@/hooks/useTouchpointProgress";
@@ -33,11 +33,11 @@ interface DayTouchpointViewProps {
   heatMapDay1?: Record<string, number> | null;
 }
 
-const SLOTS: { slot: TouchpointSlot; label: string; emoji: string; time: string }[] = [
-  { slot: "morning", label: "Manhã", emoji: "🌅", time: "08:00" },
-  { slot: "lunch", label: "Almoço", emoji: "🥗", time: "12:00" },
-  { slot: "afternoon", label: "Tarde", emoji: "💧", time: "15:00" },
-  { slot: "night", label: "Noite", emoji: "🌙", time: "21:00" },
+const SLOTS: { slot: TouchpointSlot; label: string; Icon: LucideIcon; time: string }[] = [
+  { slot: "morning", label: "Manhã", Icon: Sunrise, time: "08:00" },
+  { slot: "lunch", label: "Almoço", Icon: UtensilsCrossed, time: "12:00" },
+  { slot: "afternoon", label: "Tarde", Icon: Droplets, time: "15:00" },
+  { slot: "night", label: "Noite", Icon: Moon, time: "21:00" },
 ];
 
 const SLOT_LABELS: Record<TouchpointSlot, string> = {
@@ -184,7 +184,7 @@ const DayTouchpointView = ({
                 className="w-full p-4 flex items-center gap-3"
               >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     isDone
                       ? "bg-primary/10"
                       : isActive
@@ -192,7 +192,11 @@ const DayTouchpointView = ({
                       : "bg-muted"
                   }`}
                 >
-                  {s.emoji}
+                  <s.Icon
+                    size={18}
+                    className={isDone ? "text-primary" : isActive ? "text-secondary" : "text-levvia-muted"}
+                    strokeWidth={1.5}
+                  />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="font-medium text-levvia-fg font-body text-sm">
