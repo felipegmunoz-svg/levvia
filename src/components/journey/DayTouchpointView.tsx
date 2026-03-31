@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import FlowSilhouette from "@/components/FlowSilhouette";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, Sunrise, UtensilsCrossed, Droplets, Moon, type LucideIcon } from "lucide-react";
+import { Check, ChevronDown, Sunrise, UtensilsCrossed, Droplets, Moon, Calendar, type LucideIcon } from "lucide-react";
 import { getTouchpointConfig, type TouchpointSlot } from "@/data/touchpointConfig";
 import type { TouchpointData } from "@/hooks/useChallengeData";
 import type { DayTouchpointProgress } from "@/hooks/useTouchpointProgress";
@@ -55,6 +55,16 @@ const SLOT_INDICES: Record<TouchpointSlot, number> = {
 };
 
 const CHECKPOINT_DAYS = [3, 6, 7, 10, 14];
+
+// Engagement micro-descriptions per day per slot
+const SLOT_DESCRIPTIONS: Partial<Record<number, Record<TouchpointSlot, string>>> = {
+  1: {
+    morning: "Ative sua bomba linfática e prepare seu shot anti-inflamatório base.",
+    lunch: "Nutrição consciente: Bowl de coco ou Crepioca? Escolha seu fluxo.",
+    afternoon: "Momento crítico do inchaço: micro-movimento e hidratação estratégica.",
+    night: "Restauração profunda: mapeie seu fogo interno e limpe o sistema.",
+  },
+};
 
 const SLOT_ORDER: TouchpointSlot[] = ["morning", "lunch", "afternoon", "night"];
 
@@ -144,6 +154,38 @@ const DayTouchpointView = ({
         </div>
       )}
 
+      {/* Jornada de Alívio hoje — schedule external to MorningSlot */}
+      {touchpoints.morning.schedule.length > 0 && (
+        <div className="px-6 pb-2">
+          <div className="levvia-card p-4">
+            <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
+              <Calendar size={14} className="text-levvia-muted" strokeWidth={1.5} />
+              Sua Jornada de Alívio hoje
+            </h3>
+            <div className="space-y-0">
+              {touchpoints.morning.schedule.map((item, i) => {
+                const slotDef = SLOTS.find((s) => s.slot === item.slot);
+                const Icon = slotDef?.Icon;
+                return (
+                  <div
+                    key={item.slot}
+                    className={`flex items-center gap-3 py-2 ${
+                      i < touchpoints.morning.schedule.length - 1 ? "border-b border-border" : ""
+                    }`}
+                  >
+                    <span className="text-xs text-levvia-muted w-12 font-body shrink-0">
+                      {item.time}
+                    </span>
+                    {Icon && <Icon size={14} className="text-levvia-muted shrink-0" strokeWidth={1.5} />}
+                    <span className="text-sm text-levvia-fg font-body">{item.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress Bar */}
       <div className="px-6 pb-4">
         <div className="flex items-center gap-2">
@@ -203,6 +245,11 @@ const DayTouchpointView = ({
                     {s.label}
                   </p>
                   <p className="text-xs text-levvia-muted font-body">{s.time}</p>
+                  {SLOT_DESCRIPTIONS[dayNumber]?.[s.slot] && !isDone && (
+                    <p className="text-[11px] text-gray-400 font-body mt-0.5 leading-snug pr-2">
+                      {SLOT_DESCRIPTIONS[dayNumber]![s.slot]}
+                    </p>
+                  )}
                 </div>
                 {isDone ? (
                   <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
@@ -249,7 +296,6 @@ const DayTouchpointView = ({
                               <MorningSlot
                                 dayNumber={dayNumber}
                                 affirmation={touchpoints.morning.affirmation}
-                                schedule={touchpoints.morning.schedule}
                                 exercise={touchpoints.morning.exercise}
                                 shotRecipe={touchpoints.morning.shotRecipe}
                                 isReviewMode={isReviewMode || isDone}

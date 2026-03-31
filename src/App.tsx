@@ -36,6 +36,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
 import Day1Journey from "./pages/Day1Journey";
 import Celebration from "./pages/Celebration";
+import Diary from "./pages/Diary";
 import NotFound from "./pages/NotFound";
 
 // build v6 – review mode + SW fix
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
             <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
+            <Route path="/diary" element={<ProtectedRoute><Diary /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
             <Route path="/history/recipes" element={<ProtectedRoute><HistoryRecipes /></ProtectedRoute>} />

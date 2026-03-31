@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Calendar, Sunrise, UtensilsCrossed, Droplets, Moon, Activity, GlassWater, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Activity, GlassWater } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
@@ -19,7 +19,6 @@ interface HydrationSlotProps {
 interface MorningSlotProps {
   dayNumber: number;
   affirmation: string;
-  schedule: { slot: string; time: string; label: string }[];
   exercise: ChallengeActivity | null;
   shotRecipe: ChallengeActivity | null;
   isReviewMode: boolean;
@@ -27,22 +26,9 @@ interface MorningSlotProps {
   onComplete: (data: { exercise_id?: string; shot_id?: string }) => void;
 }
 
-const SLOT_ICONS: Record<string, LucideIcon> = {
-  morning: Sunrise,
-  lunch: UtensilsCrossed,
-  afternoon: Droplets,
-  night: Moon,
-};
-
-const SlotIcon = ({ slot }: { slot: string }) => {
-  const Icon = SLOT_ICONS[slot];
-  return Icon ? <Icon size={14} className="text-levvia-muted shrink-0" strokeWidth={1.5} /> : null;
-};
-
 const MorningSlot = ({
   dayNumber,
   affirmation,
-  schedule,
   exercise,
   shotRecipe,
   isReviewMode,
@@ -97,33 +83,7 @@ const MorningSlot = ({
         </p>
       </div>
 
-      {/* Section 2 — Day Schedule */}
-      <div className="levvia-card p-5">
-        <h3 className="font-semibold text-levvia-fg font-body text-sm mb-4 flex items-center gap-2">
-          <Calendar size={14} className="text-levvia-muted" strokeWidth={1.5} />
-          Seu Mapa do Dia
-        </h3>
-        <div className="space-y-0">
-          {schedule.map((item, i) => (
-            <div
-              key={item.slot}
-              className={`flex items-center gap-3 py-2 ${
-                i < schedule.length - 1 ? "border-b border-border" : ""
-              }`}
-            >
-              <span className="text-xs text-levvia-muted w-12 font-body">
-                {item.time}
-              </span>
-              <SlotIcon slot={item.slot} />
-              <span className="text-sm text-levvia-fg font-body">
-                {item.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Section 3 — Exercise */}
+      {/* Section 2 — Exercise */}
       {exercise && (
         <div className="levvia-card p-5">
           <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
@@ -185,6 +145,23 @@ const MorningSlot = ({
           >
             Ver Receita →
           </button>
+          {!isReviewMode && (
+            <label className="flex items-center gap-3 mt-3 cursor-pointer">
+              <div
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                  shotDone ? "bg-primary border-primary" : "border-border"
+                }`}
+                onClick={() => setShotDone(!shotDone)}
+              >
+                {shotDone && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              <span className="text-sm text-levvia-fg font-body">Marcar como Tomado</span>
+            </label>
+          )}
         </div>
       )}
 
@@ -197,19 +174,29 @@ const MorningSlot = ({
       )}
 
       {/* Section 6 — Complete Button */}
-      {!isReviewMode && (
-        <button
-          onClick={() =>
-            onComplete({
-              exercise_id: exercise?.id,
-              shot_id: shotRecipe?.id,
-            })
-          }
-          className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm font-body"
-        >
-          Concluir Manhã →
-        </button>
-      )}
+      {!isReviewMode && (() => {
+        const canComplete = (!exercise || exerciseDone) && (!shotRecipe || shotDone);
+        return (
+          <>
+            {!canComplete && (
+              <p className="text-xs italic text-center text-levvia-muted font-body px-2">
+                Para desbloquear o próximo período e garantir seus resultados em 15 dias, certifique-se de concluir todas as etapas acima.
+              </p>
+            )}
+            <button
+              onClick={() => onComplete({ exercise_id: exercise?.id, shot_id: shotRecipe?.id })}
+              disabled={!canComplete}
+              className={`w-full py-3 rounded-xl font-medium text-sm font-body transition-all ${
+                canComplete
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-levvia-muted cursor-not-allowed"
+              }`}
+            >
+              Concluir Manhã →
+            </button>
+          </>
+        );
+      })()}
     </div>
   );
 };

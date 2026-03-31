@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Book, BarChart3, User } from "lucide-react";
+import { Home, Book, BarChart3, PenLine, User } from "lucide-react";
 
 const tabs = [
   { path: "/today", label: "Hoje", icon: Home },
   { path: "/journey", label: "Jornada", icon: Book },
   { path: "/progress", label: "Progresso", icon: BarChart3 },
+  { path: "/diary", label: "Diário", icon: PenLine },
   { path: "/profile", label: "Perfil", icon: User },
 ];
 
