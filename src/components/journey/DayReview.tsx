@@ -215,7 +215,21 @@ const DayReview = () => {
     const map = data?.day2_inflammation_map as Record<string, unknown> | null;
     if (!map) return <SectionCard icon="🔥" title="Mapa de Inflamação"><EmptyState msg="Nenhum dado de inflamação registrado." /></SectionCard>;
 
-    const markedAreas = (map.markedAreas as Array<{ area: string; types: string[] }>) || [];
+    // Handle both data formats:
+    // Old format (Day2InflammationMap): each entry = { area, type: string }  (one type per entry)
+    // New format (expected by review): each entry = { area, types: string[] } (array of types)
+    const rawAreas = (map.markedAreas as Array<{ area: string; type?: string; types?: string[] }>) || [];
+
+    // Group by area, collecting all types per area
+    const grouped = rawAreas.reduce((acc, item) => {
+      const area = item.area;
+      if (!acc[area]) acc[area] = [];
+      if (Array.isArray(item.types)) acc[area].push(...item.types);
+      else if (item.type) acc[area].push(item.type);
+      return acc;
+    }, {} as Record<string, string[]>);
+
+    const markedAreas = Object.entries(grouped).map(([area, types]) => ({ area, types }));
     const notes = map.notes as string | undefined;
 
     if (markedAreas.length === 0 && !notes) {
