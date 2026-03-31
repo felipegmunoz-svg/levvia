@@ -9,13 +9,17 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, authLoading } = useAuth();
+
+  // For non-admin routes, only block on authLoading (identity check).
+  // roleLoading (admin role query) is not needed to show regular content.
+  const blockingLoading = requireAdmin ? loading : authLoading;
 
   // Defensive: remember if we ever rendered children successfully.
   // Once authenticated, don't fall back to spinner on transient loading flickers.
   const wasAuthenticatedRef = useRef(false);
 
-  if (user && !loading) {
+  if (user && !blockingLoading) {
     wasAuthenticatedRef.current = true;
   }
 
@@ -25,11 +29,11 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
   }, []);
 
   // If loading but we already had a valid user, keep rendering children (no spinner).
-  const skipSpinner = loading && wasAuthenticatedRef.current && !!user;
+  const skipSpinner = blockingLoading && wasAuthenticatedRef.current && !!user;
 
   const decision = skipSpinner
     ? "RENDER_CHILDREN_SKIP_SPINNER"
-    : loading
+    : blockingLoading
       ? "SPINNER"
       : !user
         ? "REDIRECT_AUTH"
@@ -37,7 +41,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
           ? "REDIRECT_TODAY"
           : "RENDER_CHILDREN";
 
-  debugRender("ProtectedRoute", { loading, hasUser: !!user, isAdmin, requireAdmin, decision, wasAuthenticated: wasAuthenticatedRef.current });
+  debugRender("ProtectedRoute", { loading, blockingLoading, hasUser: !!user, isAdmin, requireAdmin, decision, wasAuthenticated: wasAuthenticatedRef.current });
 
   if (decision === "SPINNER") {
     return (
