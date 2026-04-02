@@ -18,7 +18,7 @@ function toExerciseView(ex: DbExercise) {
     description: ex.description,
     startPosition: ex.start_position || "",
     steps: ex.steps || [],
-    benefits: ex.benefits || "",
+    benefits: ex.benefits || ex.clinical_benefit || "",
     safety: ex.safety || undefined,
     variations: ex.variations || undefined,
     icon: ex.icon || "dumbbell",
