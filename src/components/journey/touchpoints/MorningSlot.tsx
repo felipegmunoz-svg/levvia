@@ -113,6 +113,12 @@ const MorningSlot = ({
           >
             Ver Exercício Completo →
           </button>
+          {isReviewMode && (
+            <div className="flex items-center gap-2 mt-3">
+              <CheckSquare size={14} className="text-primary" strokeWidth={1.5} />
+              <span className="text-sm text-primary font-body">Exercício concluído</span>
+            </div>
+          )}
           {!isReviewMode && (
             <label className="flex items-center gap-3 mt-3 cursor-pointer">
               <div
