@@ -1,45 +1,50 @@
 
 
-# Standardize slot completion indicators in DayTouchpointView
+# Three fixes: AfternoonSlot snack label, hollow check icon, M-A-T-N legend
 
-## Changes — `src/components/journey/DayTouchpointView.tsx`
+## 1. AfternoonSlot — show snack name after completion
 
-### 1. Replace green circle with thin check icon (lines 297-301)
+**File:** `src/components/journey/DayTouchpointView.tsx` (line 291)
 
-Remove:
-```tsx
-{isDone ? (
-  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-    <Check size={14} className="text-primary-foreground" />
-  </div>
-) : (
-```
-
-Replace with:
-```tsx
-{isDone ? (
-  <Check size={16} strokeWidth={1.5} className="text-primary" />
-) : (
-```
-
-### 2. Add per-slot completion summary text (lines 286-290)
-
-Replace the current `completedItemLabel` block with logic that shows a summary for **every** slot when done — not just when a recipe label is found:
+The `completedItemLabel` already reads `snack_id` from progress (line 247). The only issue is line 291 ignores it. Change:
 
 ```tsx
-{isDone && (
-  <p className="text-xs text-primary font-body mt-0.5 flex items-center gap-1">
-    <Check size={10} />
-    {s.slot === "morning" && "Exercício + shot concluídos"}
-    {s.slot === "lunch" && (completedItemLabel || "Almoço concluído")}
-    {s.slot === "afternoon" && "Lanche concluído"}
-    {s.slot === "night" && "Rotina noturna concluída"}
-  </p>
-)}
+{s.slot === "afternoon" && "Lanche concluído"}
+```
+to:
+```tsx
+{s.slot === "afternoon" && (completedItemLabel || "Lanche concluído")}
 ```
 
-The lunch slot keeps reading `recipe_choice_id` to show the recipe name when available, falling back to generic text.
+The `onMarkDone` in `AfternoonSlot.tsx` already calls `onComplete({ hydration: true, snack_id: snackRecipe.id })` (lines 70-72), so saving works. This change makes the label display match the lunch pattern.
+
+## 2. Replace check icon with hollow circle
+
+**File:** `src/components/journey/DayTouchpointView.tsx` (lines 301-302)
+
+Replace:
+```tsx
+<Check size={16} strokeWidth={1.5} className="text-primary" />
+```
+with:
+```tsx
+<div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center">
+  <Check size={12} strokeWidth={2} className="text-primary" />
+</div>
+```
+
+## 3. M-A-T-N legend in HydrationModule
+
+**File:** `src/components/journey/touchpoints/HydrationModule.tsx` (after line 72)
+
+Add a legend line below the tick marks:
+```tsx
+<p className="text-[10px] text-center text-muted-foreground font-body mt-0.5">
+  Manhã · Almoço · Tarde · Noite
+</p>
+```
 
 ## Files modified
-- `src/components/journey/DayTouchpointView.tsx` (lines 286-300)
+- `src/components/journey/DayTouchpointView.tsx` (lines 291, 301-302)
+- `src/components/journey/touchpoints/HydrationModule.tsx` (after line 72)
 
