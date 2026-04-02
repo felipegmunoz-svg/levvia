@@ -80,12 +80,12 @@ const LunchSlot = ({
           return (
             <div
               key={recipe.id}
-              onClick={isAlreadyCompleted ? undefined : () => setSelectedRecipeId(recipe.id)}
+              onClick={isNotChosen ? () => setShowRecipeIdx(i) : isAlreadyCompleted ? undefined : () => setSelectedRecipeId(recipe.id)}
               className={`levvia-card p-4 transition-all ${
                 isThisCompleted
                   ? "bg-primary/10 border-primary/20"
                   : isNotChosen
-                  ? "opacity-40 border-border"
+                  ? "opacity-40 border-border cursor-pointer"
                   : isSelected
                   ? "border-primary border-2 ring-1 ring-primary/20 cursor-pointer"
                   : "border-border cursor-pointer"
@@ -95,9 +95,17 @@ const LunchSlot = ({
                 {recipe.label}
               </p>
               {isThisCompleted && (
-                <div className="flex items-center gap-2 mt-2">
-                  <CheckSquare size={16} className="text-primary" />
-                  <span className="text-sm text-primary font-medium font-body">Receita preparada</span>
+                <div className="flex flex-col gap-1 mt-2">
+                  <div className="flex items-center gap-2">
+                    <CheckSquare size={16} className="text-primary" />
+                    <span className="text-sm text-primary font-medium font-body">Receita preparada</span>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setSelectedRecipeId(null); onReset?.(); }}
+                    className="text-xs text-primary underline mt-1 font-body text-left"
+                  >
+                    Trocar receita
+                  </button>
                 </div>
               )}
               {(recipe.recipe as any)?.por_que_resfria && (

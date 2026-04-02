@@ -198,6 +198,41 @@ export function useTouchpointProgress(dayNumber: number) {
     [progress, dayNumber, user?.id]
   );
 
+  const resetSlot = useCallback(
+    async (slot: TouchpointSlot) => {
+      const updated: DayTouchpointProgress = {
+        ...progress,
+        [slot]: { done: false, doneAt: null },
+      };
+      setProgress(updated);
+      saveLocal(dayNumber, updated);
+
+      if (!user?.id) return;
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("challenge_progress")
+          .eq("id", user.id)
+          .maybeSingle();
+        const existing = (data?.challenge_progress as Record<string, any>) ?? {};
+        const touchpoints = existing.touchpoints ?? {};
+        await saveWithRetry({
+          table: "profiles",
+          userId: user.id,
+          data: {
+            challenge_progress: {
+              ...existing,
+              touchpoints: { ...touchpoints, [`day${dayNumber}`]: updated },
+            },
+          },
+        });
+      } catch {
+        // silent — local state already updated
+      }
+    },
+    [progress, dayNumber, user?.id]
+  );
+
   const activeSlot = useMemo<TouchpointSlot>(() => {
     if (!progress.morning.done) return "morning";
     if (!progress.lunch.done) return "lunch";
@@ -221,6 +256,7 @@ export function useTouchpointProgress(dayNumber: number) {
     isDayComplete,
     completedSlots,
     markSlotDone,
+    resetSlot,
     loading,
   };
 }

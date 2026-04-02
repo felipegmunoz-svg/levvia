@@ -356,6 +356,7 @@ const DayTouchpointView = ({
                                 hydration={hydrationProps}
                                 completedRecipeId={(progress?.lunch as any)?.recipe_choice_id}
                                 onComplete={(data) => handleSlotComplete("lunch", data)}
+                                onReset={() => onResetSlot?.("lunch")}
                               />
                             )}
                             {s.slot === "afternoon" && (
