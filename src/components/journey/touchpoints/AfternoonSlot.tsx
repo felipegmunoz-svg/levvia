@@ -40,7 +40,7 @@ const AfternoonSlot = ({
   onComplete,
 }: AfternoonSlotProps) => {
   const [hydrated, setHydrated] = useState(false);
-  const [microDone, setMicroDone] = useState(false);
+  const [microDone, setMicroDone] = useState(initialMicroDone ?? false);
   const [showExercise, setShowExercise] = useState(false);
   const [showRecipe, setShowRecipe] = useState(false);
 
