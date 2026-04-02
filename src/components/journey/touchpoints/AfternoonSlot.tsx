@@ -24,6 +24,7 @@ interface AfternoonSlotProps {
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
   completedSnackId?: string;
+  initialMicroDone?: boolean;
   onComplete: (data: { hydration: boolean; micro_challenge_id?: string; snack_id?: string }) => void;
 }
 
