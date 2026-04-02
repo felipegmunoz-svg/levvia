@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Lock, Moon, Bell, ChevronLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DEV_BYPASS_DAY_LOCK } from "@/lib/config";
 
 interface DayLockedScreenProps {
   dayNumber: number;
