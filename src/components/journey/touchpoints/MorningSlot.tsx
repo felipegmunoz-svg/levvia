@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Activity, GlassWater } from "lucide-react";
+import { ArrowLeft, Activity, GlassWater, CheckSquare } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import ExerciseDetail from "@/components/ExerciseDetail";
 import RecipeDetail from "@/components/RecipeDetail";
