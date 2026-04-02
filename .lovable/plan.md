@@ -1,34 +1,51 @@
 
 
-# Fix hydration modal: buttons hidden behind bottom nav
+# Fix recipe completion feedback across slots
 
 ## Problem
-The overlay already uses `items-end`, so the modal sits at the bottom. The `paddingBottom` style on the card's inner container doesn't help — the card itself needs to be pushed above the BottomNav (68px height).
+1. **RecipeDetail button** doesn't change state after completing — always shows "Preparei esta refeição! ✨"
+2. **LunchSlot** doesn't read `recipe_choice_id` from progress to pre-select the completed recipe
+3. **Card headers** on /today don't show which recipe was completed
 
-## Changes — `src/components/journey/DayTouchpointView.tsx`
+## Approach
 
-### Line 390 — Add `pb-20` to overlay
-Change:
-```tsx
-<div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center p-4">
-```
-To:
-```tsx
-<div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center p-4 pb-20">
-```
+The `recipe_choice_id` is already persisted in the slot progress object (via `...meta` spread in `markSlotDone`). The fix is about reading it back.
 
-### Line 391 — Remove the inline `paddingBottom` style
-Change:
-```tsx
-<div className="w-full max-w-md bg-levvia-surface rounded-2xl p-6 shadow-xl" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 64px))' }}>
-```
-To:
-```tsx
-<div className="w-full max-w-md bg-levvia-surface rounded-2xl p-6 shadow-xl">
-```
+## Changes
 
-`pb-20` (80px) on the overlay ensures the modal card clears the BottomNav (68px) plus safe-area on all devices.
+### 1. `src/components/journey/touchpoints/LunchSlot.tsx`
+- Add `completedRecipeId?: string` prop (read from `progress[slot].recipe_choice_id`)
+- Initialize `selectedRecipeId` state with `completedRecipeId` if present
+- When `completedRecipeId` is set: show "Concluir Almoço" button as disabled with text "Refeição concluída ✓" and muted styling
+- In RecipeDetail overlay: if `recipe.id === completedRecipeId`, pass no `onMarkDone` (hides the button) or show disabled "Receita concluída ✓"
+
+### 2. `src/components/RecipeDetail.tsx`
+- Add optional `isCompleted?: boolean` prop
+- When `isCompleted` is true, show button as disabled with text "Receita concluída ✓" and green/muted styling instead of "Preparei esta refeição! ✨"
+
+### 3. `src/components/journey/DayTouchpointView.tsx`
+- **Pass `completedRecipeId` to LunchSlot**: read `(progress?.lunch as any)?.recipe_choice_id` and pass it
+- **Card header feedback**: When a slot is done and has `recipe_choice_id`, show the recipe label under the slot title. Find the recipe label from `touchpoints.lunch.recipes` by matching ID.
+- Apply same pattern generically: for any slot that has `recipe_choice_id`, `snack_id`, or `shot_id` in progress, show "✓ {recipe_label}" under the slot label in the card header.
+
+### 4. `src/components/journey/touchpoints/MorningSlot.tsx`
+- Add `completedShotId?: string` prop
+- Pass `isCompleted` to RecipeDetail when showing the shot recipe
+
+### 5. `src/components/journey/touchpoints/AfternoonSlot.tsx`
+- Add `completedSnackId?: string` prop
+- Pass `isCompleted` to RecipeDetail when showing the snack recipe
+
+## Technical detail
+
+The slot progress object already stores `recipe_choice_id`, `snack_id`, `shot_id` at the root level (e.g. `progress.lunch.recipe_choice_id`). We just need to read these values back and pass them down as props.
+
+For the card header recipe label lookup, we match the stored ID against the recipes/activities in `touchpoints` to find the human-readable title.
 
 ## Files modified
-- `src/components/journey/DayTouchpointView.tsx` (lines 390–391)
+- `src/components/RecipeDetail.tsx`
+- `src/components/journey/touchpoints/LunchSlot.tsx`
+- `src/components/journey/touchpoints/MorningSlot.tsx`
+- `src/components/journey/touchpoints/AfternoonSlot.tsx`
+- `src/components/journey/DayTouchpointView.tsx`
 
