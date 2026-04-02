@@ -374,6 +374,7 @@ const DayTouchpointView = ({
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
                                 completedSnackId={(progress?.afternoon as any)?.snack_id}
+                                initialMicroDone={isDone || !!(progress?.afternoon as any)?.micro_challenge_id}
                                 onComplete={(data) => handleSlotComplete("afternoon", data)}
                               />
                             )}

@@ -150,13 +150,15 @@ const AfternoonSlot = ({
           >
             Ver Exercício →
           </button>
-          <div className="mt-3">
-            <CheckBox
-              checked={microDone}
-              onChange={() => setMicroDone(!microDone)}
-              label="Completei o micro-movimento"
-            />
-          </div>
+          {!isReviewMode && (
+            <div className="mt-3">
+              <CheckBox
+                checked={microDone}
+                onChange={() => setMicroDone(!microDone)}
+                label="Completei o micro-movimento"
+              />
+            </div>
+          )}
         </div>
       )}
 
