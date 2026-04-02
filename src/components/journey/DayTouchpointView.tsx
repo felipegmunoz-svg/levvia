@@ -364,6 +364,7 @@ const DayTouchpointView = ({
                                 snackRecipe={touchpoints.afternoon.snackRecipe}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
+                                completedSnackId={(progress?.afternoon as any)?.snack_id}
                                 onComplete={(data) => handleSlotComplete("afternoon", data)}
                               />
                             )}
