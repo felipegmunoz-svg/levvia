@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface HeatMapInteractiveProps {
   onNext?: (heatMap: Record<string, number | string>) => void;
   initialData?: Partial<Record<AreaId, number>> | null;
   readOnly?: boolean;
   size?: "small" | "normal";
+  title?: string;
+  subtitle?: string;
 }
 
 type AreaId =
@@ -50,33 +52,60 @@ const defaultAreas: Record<AreaId, number> = {
   braco_dir: 0,
 };
 
+// Approximate center positions for each area in the SVG viewBox (220x440)
+const areaCenters: Record<AreaId, { x: number; y: number }> = {
+  braco_esq: { x: 46, y: 148 },
+  braco_dir: { x: 174, y: 148 },
+  abdomen: { x: 110, y: 128 },
+  quadril_esq: { x: 82, y: 198 },
+  quadril_dir: { x: 138, y: 198 },
+  coxa_esq: { x: 82, y: 267 },
+  coxa_dir: { x: 138, y: 267 },
+  panturrilha_esq: { x: 80, y: 354 },
+  panturrilha_dir: { x: 140, y: 354 },
+};
+
 const HeatMapInteractive = ({
   onNext,
   initialData,
   readOnly = false,
   size = "normal",
+  title,
+  subtitle,
 }: HeatMapInteractiveProps) => {
   const [areas, setAreas] = useState<Record<AreaId, number>>({
     ...defaultAreas,
     ...(initialData || {}),
   });
+  const [relievedArea, setRelievedArea] = useState<AreaId | null>(null);
+  const [showReliefToast, setShowReliefToast] = useState(false);
 
   const hasSelection = Object.values(areas).some((value) => value > 0);
   const silhouetteWidth = size === "small" ? "w-[160px]" : "w-[200px]";
   const silhouetteHeight = size === "small" ? "300px" : "380px";
 
-  const toggleArea = (id: AreaId) => {
+  const toggleArea = useCallback((id: AreaId) => {
     if (readOnly) return;
-    setAreas((prev) => ({
-      ...prev,
-      [id]: (prev[id] + 1) % 4,
-    }));
-  };
+    setAreas((prev) => {
+      const newValue = (prev[id] + 1) % 4;
+      // Relief effect: intensity decreased (wrapping from 3→0 counts as relief too)
+      if (newValue < prev[id]) {
+        setRelievedArea(id);
+        setShowReliefToast(true);
+        setTimeout(() => setRelievedArea(null), 800);
+        setTimeout(() => setShowReliefToast(false), 2000);
+      }
+      return { ...prev, [id]: newValue };
+    });
+  }, [readOnly]);
 
   const handleSubmit = () => {
     if (!onNext || !hasSelection || readOnly) return;
     onNext({ ...areas, created_at: new Date().toISOString() });
   };
+
+  const displayTitle = title || "Onde está o seu fogo interno?";
+  const displaySubtitle = subtitle || "Toque nas áreas onde você sente mais dor, inchaço ou desconforto. Toque novamente para aumentar a intensidade.";
 
   return (
     <div className={`w-full flex flex-col items-center px-6 ${readOnly ? "py-6" : "py-6"}`}>
@@ -88,7 +117,7 @@ const HeatMapInteractive = ({
             className="text-foreground text-center mb-2"
             style={{ fontWeight: 500, fontSize: "1.1rem" }}
           >
-            Onde está o seu fogo interno?
+            {displayTitle}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -97,7 +126,7 @@ const HeatMapInteractive = ({
             className="text-foreground/60 text-center mb-8 max-w-sm"
             style={{ fontWeight: 300, fontSize: "0.9rem" }}
           >
-            Toque nas áreas onde você sente mais dor, inchaço ou desconforto. Toque novamente para aumentar a intensidade.
+            {displaySubtitle}
           </motion.p>
         </>
       )}
@@ -125,8 +154,36 @@ const HeatMapInteractive = ({
           <path d="M116 216 L160 216 L156 310 Q154 316 150 318 L126 318 Q122 316 120 310 Z" fill={intensityColors[areas.coxa_dir]} stroke="rgba(140,160,180,0.4)" strokeWidth="1" onClick={() => toggleArea("coxa_dir")} className={readOnly ? "transition-all duration-200" : "cursor-pointer transition-all duration-200"} />
           <path d="M70 318 L94 318 Q96 340 96 355 Q96 370 94 380 Q92 388 90 390 L70 390 Q68 388 66 380 Q64 370 64 355 Q64 340 66 318 Z" fill={intensityColors[areas.panturrilha_esq]} stroke="rgba(140,160,180,0.4)" strokeWidth="1" onClick={() => toggleArea("panturrilha_esq")} className={readOnly ? "transition-all duration-200" : "cursor-pointer transition-all duration-200"} />
           <path d="M126 318 L150 318 Q152 340 156 355 Q156 370 154 380 Q152 388 150 390 L130 390 Q128 388 126 380 Q124 370 124 355 Q124 340 126 318 Z" fill={intensityColors[areas.panturrilha_dir]} stroke="rgba(140,160,180,0.4)" strokeWidth="1" onClick={() => toggleArea("panturrilha_dir")} className={readOnly ? "transition-all duration-200" : "cursor-pointer transition-all duration-200"} />
+
+          {/* Sparkle effect on relieved area */}
+          {relievedArea && areaCenters[relievedArea] && (
+            <circle
+              cx={areaCenters[relievedArea].x}
+              cy={areaCenters[relievedArea].y}
+              r="12"
+              fill="none"
+              stroke="hsl(var(--primary))"
+              strokeWidth="2"
+              className="animate-ping"
+              opacity="0.7"
+            />
+          )}
         </svg>
       </motion.div>
+
+      {/* Relief toast */}
+      <AnimatePresence>
+        {showReliefToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-full text-sm font-medium shadow-lg"
+          >
+            Que vitória! 🌟
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {!readOnly && (
         <>
