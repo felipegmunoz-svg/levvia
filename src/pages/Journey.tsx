@@ -101,6 +101,7 @@ const Journey = () => {
   const isDayCompleted = (day: number) => completedDays.includes(day);
 
   const isDayUnlocked = (day: number) => {
+    if (DEV_BYPASS_DAY_LOCK) return true;
     if (day === 1) return true;
     return isDayCompleted(day - 1);
   };
