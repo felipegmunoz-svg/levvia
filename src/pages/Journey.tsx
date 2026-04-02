@@ -239,6 +239,20 @@ const Journey = () => {
         })}
       </main>
 
+      {lockedDay !== null && (
+        <DayLockedScreen
+          dayNumber={lockedDay}
+          theme={getTouchpointConfig(lockedDay).theme}
+          preview={DAY_PREVIEWS[lockedDay] ?? ["Exercício guiado", "Receita anti-inflamatória", "Técnica noturna"]}
+          isPreviousDayComplete={isDayCompleted(lockedDay - 1)}
+          onUnlock={() => {
+            setLockedDay(null);
+            navigate("/today");
+          }}
+          onGoBack={() => setLockedDay(null)}
+        />
+      )}
+
       <BottomNav />
     </div>
   );
