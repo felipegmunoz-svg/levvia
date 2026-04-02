@@ -236,9 +236,23 @@ const DayTouchpointView = ({
       {/* Touchpoint Cards */}
       <div className="px-6 space-y-3">
         {SLOTS.map((s) => {
-          const isDone = progress[s.slot].done;
+          const slotProgress = progress?.[s.slot] as any;
+          const isDone = slotProgress?.done === true;
           const isActive = activeSlot === s.slot;
           const isExpanded = expandedSlot === s.slot;
+
+          // Find completed recipe/item label
+          const completedItemId = slotProgress?.recipe_choice_id || slotProgress?.snack_id || slotProgress?.shot_id;
+          let completedItemLabel: string | null = null;
+          if (isDone && completedItemId) {
+            const allActivities = [
+              ...(touchpoints.morning?.shotRecipe ? [touchpoints.morning.shotRecipe] : []),
+              ...(touchpoints.lunch?.recipes || []),
+              ...(touchpoints.afternoon?.snackRecipe ? [touchpoints.afternoon.snackRecipe] : []),
+            ];
+            const found = allActivities.find((a) => a.id === completedItemId);
+            if (found) completedItemLabel = found.label;
+          }
 
           return (
             <div key={s.slot} className="levvia-card overflow-hidden transition-all duration-300">
