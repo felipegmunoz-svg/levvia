@@ -4,10 +4,28 @@ import { Check, Lock, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ProgressCircle from "@/components/ui/ProgressCircle";
+import DayLockedScreen from "@/components/journey/DayLockedScreen";
 import logoFull from "@/assets/logo_livvia_azul.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { getTouchpointConfig } from "@/data/touchpointConfig";
+
+const DAY_PREVIEWS: Record<number, string[]> = {
+  1: ["Respiração diafragmática", "Refeição anti-inflamatória", "Mapa do Fogo Interno"],
+  2: ["Exercício de drenagem linfática", "Refeição anti-inflamatória especial", "Técnica de drenagem noturna"],
+  3: ["Movimento articular suave", "Cardápio personalizado", "Semáforo alimentar"],
+  4: ["Bombeamento de panturrilha", "Cardápio noturno", "Higiene do sono"],
+  5: ["Exercício de mobilidade", "Almoço especial", "Elevação de pernas"],
+  6: ["Movimento circular", "Especiarias medicinais", "Técnica de relaxamento"],
+  7: ["Exercício de fortalecimento", "Receita especial", "Técnica de respiração"],
+  8: ["Movimento intestinal", "Receita probiótica", "Automassagem abdominal"],
+  9: ["Exercício de resistência", "Receita energizante", "Meditação guiada"],
+  10: ["Exercício funcional", "Receita com suplementos", "Diário de evolução"],
+  11: ["Automassagem terapêutica", "Receita reconfortante", "Técnica de compressão"],
+  12: ["Exercício integrado", "Receita celebratória", "Visualização guiada"],
+  13: ["Planejamento de rotina", "Receita do futuro", "Metas de longo prazo"],
+  14: ["Exercício completo", "Receita especial final", "Mapa comparativo"],
+};
 
 const daySubtitles: Record<number, string> = {
   1: "Mapeou seu Fogo Interno",
@@ -33,6 +51,7 @@ const Journey = () => {
   const navigate = useNavigate();
   const [completedDays, setCompletedDays] = useState<number[]>([]);
   const [touchpointData, setTouchpointData] = useState<Record<number, SlotStatus>>({});
+  const [lockedDay, setLockedDay] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -87,7 +106,7 @@ const Journey = () => {
 
   const handleDayClick = (day: number) => {
     if (!isDayUnlocked(day)) {
-      toast("Complete o dia anterior primeiro");
+      setLockedDay(day);
       return;
     }
     if (isDayCompleted(day)) {
@@ -219,6 +238,20 @@ const Journey = () => {
           );
         })}
       </main>
+
+      {lockedDay !== null && (
+        <DayLockedScreen
+          dayNumber={lockedDay}
+          theme={getTouchpointConfig(lockedDay).theme}
+          preview={DAY_PREVIEWS[lockedDay] ?? ["Exercício guiado", "Receita anti-inflamatória", "Técnica noturna"]}
+          isPreviousDayComplete={isDayCompleted(lockedDay - 1)}
+          onUnlock={() => {
+            setLockedDay(null);
+            navigate("/today");
+          }}
+          onGoBack={() => setLockedDay(null)}
+        />
+      )}
 
       <BottomNav />
     </div>
