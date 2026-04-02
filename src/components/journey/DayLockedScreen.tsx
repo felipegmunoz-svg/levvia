@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Lock, Moon, Bell, ChevronLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DEV_BYPASS_DAY_LOCK } from "@/lib/config";
 
 interface DayLockedScreenProps {
   dayNumber: number;
@@ -37,6 +38,7 @@ const DayLockedScreen = ({
   });
 
   useEffect(() => {
+    if (DEV_BYPASS_DAY_LOCK) { onUnlock(); return; }
     if (!isPreviousDayComplete) return;
     const timer = setInterval(() => {
       const midnight = new Date();
