@@ -299,7 +299,9 @@ const DayTouchpointView = ({
                   )}
                 </div>
                 {isDone ? (
-                  <Check size={16} strokeWidth={1.5} className="text-primary" />
+                  <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center">
+                    <Check size={12} strokeWidth={2} className="text-primary" />
+                  </div>
                 ) : (
                   <ChevronDown
                     size={18}
