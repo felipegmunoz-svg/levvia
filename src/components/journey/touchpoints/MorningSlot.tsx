@@ -23,6 +23,7 @@ interface MorningSlotProps {
   shotRecipe: ChallengeActivity | null;
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
+  completedShotId?: string;
   onComplete: (data: { exercise_id?: string; shot_id?: string }) => void;
 }
 
