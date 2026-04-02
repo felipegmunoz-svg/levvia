@@ -1,28 +1,45 @@
 
 
-# Implement "Trocar receita" in LunchSlot
+# Standardize slot completion indicators in DayTouchpointView
 
-## Changes
+## Changes — `src/components/journey/DayTouchpointView.tsx`
 
-### 1. `src/hooks/useTouchpointProgress.ts`
-- Add `resetSlot` callback (after `markSlotDone`, ~line 199) that resets a slot to `{ done: false, doneAt: null }`, persists to localStorage and Supabase
-- Export `resetSlot` in the return object (line 218)
+### 1. Replace green circle with thin check icon (lines 297-301)
 
-### 2. `src/components/journey/DayTouchpointView.tsx`
-- Add `onResetSlot` prop to `DayTouchpointViewProps` (line 32)
-- Pass `onReset={() => onResetSlot?.("lunch")}` to `LunchSlot` (line 356)
+Remove:
+```tsx
+{isDone ? (
+  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+    <Check size={14} className="text-primary-foreground" />
+  </div>
+) : (
+```
 
-### 3. `src/components/journey/touchpoints/LunchSlot.tsx`
-- Add `onReset?: () => void` to `LunchSlotProps`
-- When `isAlreadyCompleted` and recipe is the completed one: show "Receita preparada" badge + "Trocar receita" underline button that calls `setSelectedRecipeId(null); onReset?.()`
-- Non-selected recipe cards when completed: clickable to open RecipeDetail for reading (with `onMarkDone={undefined}`)
+Replace with:
+```tsx
+{isDone ? (
+  <Check size={16} strokeWidth={1.5} className="text-primary" />
+) : (
+```
 
-### 4. Caller of `DayTouchpointView` (Today.tsx or DayTemplate.tsx)
-- Pass `resetSlot` from the hook as `onResetSlot` prop
+### 2. Add per-slot completion summary text (lines 286-290)
+
+Replace the current `completedItemLabel` block with logic that shows a summary for **every** slot when done — not just when a recipe label is found:
+
+```tsx
+{isDone && (
+  <p className="text-xs text-primary font-body mt-0.5 flex items-center gap-1">
+    <Check size={10} />
+    {s.slot === "morning" && "Exercício + shot concluídos"}
+    {s.slot === "lunch" && (completedItemLabel || "Almoço concluído")}
+    {s.slot === "afternoon" && "Lanche concluído"}
+    {s.slot === "night" && "Rotina noturna concluída"}
+  </p>
+)}
+```
+
+The lunch slot keeps reading `recipe_choice_id` to show the recipe name when available, falling back to generic text.
 
 ## Files modified
-- `src/hooks/useTouchpointProgress.ts`
-- `src/components/journey/DayTouchpointView.tsx`
-- `src/components/journey/touchpoints/LunchSlot.tsx`
-- Caller component that uses `useTouchpointProgress` + `DayTouchpointView`
+- `src/components/journey/DayTouchpointView.tsx` (lines 286-300)
 
