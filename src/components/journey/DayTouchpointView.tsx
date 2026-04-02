@@ -415,6 +415,26 @@ const DayTouchpointView = ({
               Você cuidou de si mesma o dia inteiro. Descanse — você merece.
             </p>
           </div>
+
+          {dayNumber < 14 && (() => {
+            const nextDay = dayNumber + 1;
+            const nextConfig = getTouchpointConfig(nextDay);
+            const defaultPreview = [
+              nextConfig.morningExerciseLabel.split(" - ")[0],
+              nextConfig.afternoonSnackLabel,
+              nextConfig.nightTechnique.title,
+            ];
+            return (
+              <DayLockedScreen
+                dayNumber={nextDay}
+                theme={nextConfig.theme}
+                preview={defaultPreview}
+                isPreviousDayComplete={true}
+                compact={true}
+                onUnlock={() => window.location.reload()}
+              />
+            );
+          })()}
         </div>
       )}
 
