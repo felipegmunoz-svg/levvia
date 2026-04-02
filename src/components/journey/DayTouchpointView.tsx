@@ -83,6 +83,7 @@ const DayTouchpointView = ({
   hydration,
   rescueMode,
   onSlotComplete,
+  onResetSlot,
   heatMapDay1,
 }: DayTouchpointViewProps) => {
   const navigate = useNavigate();
