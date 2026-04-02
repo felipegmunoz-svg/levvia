@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Utensils } from "lucide-react";
+import { Utensils, CheckSquare } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import RecipeDetail from "@/components/RecipeDetail";
 import HydrationModule from "./HydrationModule";
