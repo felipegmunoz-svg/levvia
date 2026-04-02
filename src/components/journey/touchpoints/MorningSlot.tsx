@@ -24,6 +24,8 @@ interface MorningSlotProps {
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
   completedShotId?: string;
+  initialExerciseDone?: boolean;
+  initialShotDone?: boolean;
   onComplete: (data: { exercise_id?: string; shot_id?: string }) => void;
 }
 
