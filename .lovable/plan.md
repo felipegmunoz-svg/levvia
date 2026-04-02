@@ -1,36 +1,32 @@
 
 
-# Tela "Dia Bloqueado" — DayLockedScreen
+# Add dev bypass for day lock
 
-## 1. Novo componente `src/components/journey/DayLockedScreen.tsx`
+## Changes
 
-Props: `dayNumber`, `theme`, `preview: string[]`, `isPreviousDayComplete`, `onUnlock`, `onGoBack?: () => void`.
+### 1. Create `src/lib/config.ts`
+```ts
+// REMOVER ANTES DO BETA — apenas para testes internos
+export const DEV_BYPASS_DAY_LOCK = true;
+```
 
-Layout:
-- Ícone Lock (lucide) centralizado + "Dia {N} · {theme}"
-- Se `isPreviousDayComplete`: mensagem de descanso + countdown HH:MM:SS até meia-noite, chamando `onUnlock()` ao zerar
-- Se `!isPreviousDayComplete`: mensagem "Conclua o Dia {N-1}" + botão "Voltar ao Dia {N-1}" que chama `onGoBack`
-- Bloco "O que vem no Dia {N}:" com bullets do array `preview`
-- Botão secundário "Lembrar-me à meia-noite" (apenas visual, sem ação real)
-- Countdown via `useEffect` + `setInterval(1000)`, calcula `new Date().setHours(24,0,0,0) - Date.now()`
+### 2. `src/pages/Journey.tsx`
+Import the flag and add early return in `isDayUnlocked`:
+```tsx
+import { DEV_BYPASS_DAY_LOCK } from "@/lib/config";
 
-## 2. Integrar em `src/pages/Journey.tsx`
+const isDayUnlocked = (day: number) => {
+  if (DEV_BYPASS_DAY_LOCK) return true;
+  if (day === 1) return true;
+  return isDayCompleted(day - 1);
+};
+```
 
-- Adicionar state `lockedDay: number | null`
-- No `handleDayClick`: se dia bloqueado (`!isDayUnlocked(day)`), setar `lockedDay = day` em vez do toast atual; se dia é o próximo (unlocked mas não completo e `currentDay + 1`), também mostrar DayLockedScreen com `isPreviousDayComplete = true`
-- Quando `lockedDay !== null`, renderizar `<DayLockedScreen>` como overlay/tela sobre a lista
-- `isPreviousDayComplete`: `isDayCompleted(lockedDay - 1)`
-- `preview`: array estático de 3 bullets por dia (usar `getTouchpointConfig(day)` para extrair theme; bullets estáticos genéricos por ora)
-- `theme`: `getTouchpointConfig(lockedDay).theme`
-- `onUnlock`: `setLockedDay(null)` + reload/navigate
-- `onGoBack`: `setLockedDay(null)` (volta à lista)
+### 3. `src/components/journey/DayLockedScreen.tsx`
+Import the flag. In the countdown `useEffect`, skip the timer when bypass is active — and call `onUnlock()` immediately if `DEV_BYPASS_DAY_LOCK` is true.
 
-## 3. Preview compacto após completar dia (NightSlot closing)
-
-Em `DayTouchpointView.tsx`, quando `isDayComplete` e `dayNumber < 14`, renderizar uma versão compacta do DayLockedScreen (sem bloco de bloqueio, apenas countdown + preview do dia seguinte). Passará `isPreviousDayComplete={true}` e `onUnlock` para navegar ao próximo dia.
-
-## Arquivos modificados
-- `src/components/journey/DayLockedScreen.tsx` (novo)
+## Files modified
+- `src/lib/config.ts` (new)
 - `src/pages/Journey.tsx`
-- `src/components/journey/DayTouchpointView.tsx`
+- `src/components/journey/DayLockedScreen.tsx`
 
