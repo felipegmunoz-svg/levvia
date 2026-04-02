@@ -215,13 +215,13 @@ const DayTouchpointView = ({
             <div key={s.slot} className="flex items-center gap-2 flex-1 last:flex-none">
               <div
                 className={`w-3 h-3 rounded-full shrink-0 ${
-                  progress[s.slot].done ? "bg-primary" : "bg-muted"
+                  progress?.[s.slot]?.done ? "bg-primary" : "bg-muted"
                 }`}
               />
               {i < SLOTS.length - 1 && (
                 <div
                   className={`flex-1 h-0.5 ${
-                    progress[s.slot].done ? "bg-primary" : "bg-muted"
+                    progress?.[s.slot]?.done ? "bg-primary" : "bg-muted"
                   }`}
                 />
               )}
