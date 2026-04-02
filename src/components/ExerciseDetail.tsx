@@ -11,6 +11,7 @@ interface ExerciseDetailProps {
 const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) => {
   const videoUrl = (exercise as any).video_url;
   const imageUrls: string[] = (exercise as any).image_urls || [];
+  const benefitsText = exercise.benefits || (exercise as any).clinical_benefit;
   const [currentImage, setCurrentImage] = useState(0);
 
   return (
