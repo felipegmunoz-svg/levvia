@@ -38,7 +38,7 @@ const DayLockedScreen = ({
   });
 
   useEffect(() => {
-    if (DEV_BYPASS_DAY_LOCK) { onUnlock(); return; }
+    if (DEV_BYPASS_DAY_LOCK && !compact) { onUnlock(); return; }
     if (!isPreviousDayComplete) return;
     const timer = setInterval(() => {
       const midnight = new Date();
