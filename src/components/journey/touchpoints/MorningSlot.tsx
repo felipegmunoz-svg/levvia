@@ -24,6 +24,8 @@ interface MorningSlotProps {
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
   completedShotId?: string;
+  initialExerciseDone?: boolean;
+  initialShotDone?: boolean;
   onComplete: (data: { exercise_id?: string; shot_id?: string }) => void;
 }
 
@@ -35,12 +37,14 @@ const MorningSlot = ({
   isReviewMode,
   hydration,
   completedShotId,
+  initialExerciseDone,
+  initialShotDone,
   onComplete,
 }: MorningSlotProps) => {
   const [showExercise, setShowExercise] = useState(false);
   const [showRecipe, setShowRecipe] = useState(false);
-  const [exerciseDone, setExerciseDone] = useState(false);
-  const [shotDone, setShotDone] = useState(false);
+  const [exerciseDone, setExerciseDone] = useState(initialExerciseDone ?? false);
+  const [shotDone, setShotDone] = useState(initialShotDone ?? false);
 
   // Full-screen overlays
   if (showExercise && exercise?.exercise) {
@@ -109,23 +113,25 @@ const MorningSlot = ({
           >
             Ver Exercício Completo →
           </button>
-          <label className="flex items-center gap-3 mt-3 cursor-pointer">
-            <div
-              className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                exerciseDone
-                  ? "bg-primary border-primary"
-                  : "border-border"
-              }`}
-              onClick={() => setExerciseDone(!exerciseDone)}
-            >
-              {exerciseDone && (
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </div>
-            <span className="text-sm text-levvia-fg font-body">Completei o exercício</span>
-          </label>
+          {!isReviewMode && (
+            <label className="flex items-center gap-3 mt-3 cursor-pointer">
+              <div
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                  exerciseDone
+                    ? "bg-primary border-primary"
+                    : "border-border"
+                }`}
+                onClick={() => setExerciseDone(!exerciseDone)}
+              >
+                {exerciseDone && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              <span className="text-sm text-levvia-fg font-body">Completei o exercício</span>
+            </label>
+          )}
         </div>
       )}
 
