@@ -106,7 +106,7 @@ const Journey = () => {
 
   const handleDayClick = (day: number) => {
     if (!isDayUnlocked(day)) {
-      toast("Complete o dia anterior primeiro");
+      setLockedDay(day);
       return;
     }
     if (isDayCompleted(day)) {
