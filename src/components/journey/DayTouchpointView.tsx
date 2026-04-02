@@ -352,6 +352,7 @@ const DayTouchpointView = ({
                                 tip={touchpoints.lunch.tip}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
+                                completedRecipeId={(progress?.lunch as any)?.recipe_choice_id}
                                 onComplete={(data) => handleSlotComplete("lunch", data)}
                               />
                             )}
