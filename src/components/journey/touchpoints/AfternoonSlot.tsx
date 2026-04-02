@@ -24,6 +24,7 @@ interface AfternoonSlotProps {
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
   completedSnackId?: string;
+  initialMicroDone?: boolean;
   onComplete: (data: { hydration: boolean; micro_challenge_id?: string; snack_id?: string }) => void;
 }
 
@@ -35,10 +36,11 @@ const AfternoonSlot = ({
   isReviewMode,
   hydration,
   completedSnackId,
+  initialMicroDone,
   onComplete,
 }: AfternoonSlotProps) => {
   const [hydrated, setHydrated] = useState(false);
-  const [microDone, setMicroDone] = useState(false);
+  const [microDone, setMicroDone] = useState(initialMicroDone ?? false);
   const [showExercise, setShowExercise] = useState(false);
   const [showRecipe, setShowRecipe] = useState(false);
 
@@ -148,13 +150,15 @@ const AfternoonSlot = ({
           >
             Ver Exercício →
           </button>
-          <div className="mt-3">
-            <CheckBox
-              checked={microDone}
-              onChange={() => setMicroDone(!microDone)}
-              label="Completei o micro-movimento"
-            />
-          </div>
+          {!isReviewMode && (
+            <div className="mt-3">
+              <CheckBox
+                checked={microDone}
+                onChange={() => setMicroDone(!microDone)}
+                label="Completei o micro-movimento"
+              />
+            </div>
+          )}
         </div>
       )}
 
