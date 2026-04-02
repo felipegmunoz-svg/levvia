@@ -34,6 +34,7 @@ const LunchSlot = ({
   hydration,
   completedRecipeId,
   onComplete,
+  onReset,
 }: LunchSlotProps) => {
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(completedRecipeId || null);
   const isAlreadyCompleted = !!completedRecipeId;
