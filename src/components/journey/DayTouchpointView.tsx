@@ -215,13 +215,13 @@ const DayTouchpointView = ({
             <div key={s.slot} className="flex items-center gap-2 flex-1 last:flex-none">
               <div
                 className={`w-3 h-3 rounded-full shrink-0 ${
-                  progress[s.slot].done ? "bg-primary" : "bg-muted"
+                  progress?.[s.slot]?.done ? "bg-primary" : "bg-muted"
                 }`}
               />
               {i < SLOTS.length - 1 && (
                 <div
                   className={`flex-1 h-0.5 ${
-                    progress[s.slot].done ? "bg-primary" : "bg-muted"
+                    progress?.[s.slot]?.done ? "bg-primary" : "bg-muted"
                   }`}
                 />
               )}
@@ -236,9 +236,23 @@ const DayTouchpointView = ({
       {/* Touchpoint Cards */}
       <div className="px-6 space-y-3">
         {SLOTS.map((s) => {
-          const isDone = progress[s.slot].done;
+          const slotProgress = progress?.[s.slot] as any;
+          const isDone = slotProgress?.done === true;
           const isActive = activeSlot === s.slot;
           const isExpanded = expandedSlot === s.slot;
+
+          // Find completed recipe/item label
+          const completedItemId = slotProgress?.recipe_choice_id || slotProgress?.snack_id || slotProgress?.shot_id;
+          let completedItemLabel: string | null = null;
+          if (isDone && completedItemId) {
+            const allActivities = [
+              ...(touchpoints.morning?.shotRecipe ? [touchpoints.morning.shotRecipe] : []),
+              ...(touchpoints.lunch?.recipes || []),
+              ...(touchpoints.afternoon?.snackRecipe ? [touchpoints.afternoon.snackRecipe] : []),
+            ];
+            const found = allActivities.find((a) => a.id === completedItemId);
+            if (found) completedItemLabel = found.label;
+          }
 
           return (
             <div key={s.slot} className="levvia-card overflow-hidden transition-all duration-300">
@@ -267,6 +281,11 @@ const DayTouchpointView = ({
                     {s.label}
                   </p>
                   <p className="text-xs text-levvia-muted font-body">{s.time}</p>
+                  {isDone && completedItemLabel && (
+                    <p className="text-[11px] text-primary font-body mt-0.5 flex items-center gap-1">
+                      <Check size={10} /> {completedItemLabel}
+                    </p>
+                  )}
                   {SLOT_DESCRIPTIONS[dayNumber]?.[s.slot] && !isDone && (
                     <p className="text-[11px] text-gray-400 font-body mt-0.5 leading-snug pr-2">
                       {SLOT_DESCRIPTIONS[dayNumber]![s.slot]}
@@ -322,6 +341,7 @@ const DayTouchpointView = ({
                                 shotRecipe={touchpoints.morning.shotRecipe}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
+                                completedShotId={(progress?.morning as any)?.shot_id}
                                 onComplete={(data) => handleSlotComplete("morning", data)}
                               />
                             )}
@@ -332,6 +352,7 @@ const DayTouchpointView = ({
                                 tip={touchpoints.lunch.tip}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
+                                completedRecipeId={(progress?.lunch as any)?.recipe_choice_id}
                                 onComplete={(data) => handleSlotComplete("lunch", data)}
                               />
                             )}
@@ -343,6 +364,7 @@ const DayTouchpointView = ({
                                 snackRecipe={touchpoints.afternoon.snackRecipe}
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
+                                completedSnackId={(progress?.afternoon as any)?.snack_id}
                                 onComplete={(data) => handleSlotComplete("afternoon", data)}
                               />
                             )}

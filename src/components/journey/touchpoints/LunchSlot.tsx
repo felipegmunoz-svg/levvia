@@ -21,6 +21,7 @@ interface LunchSlotProps {
   tip: string;
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
+  completedRecipeId?: string;
   onComplete: (data: { recipe_choice_id?: string }) => void;
 }
 
@@ -30,9 +31,11 @@ const LunchSlot = ({
   tip,
   isReviewMode,
   hydration,
+  completedRecipeId,
   onComplete,
 }: LunchSlotProps) => {
-  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(completedRecipeId || null);
+  const isAlreadyCompleted = !!completedRecipeId;
   const [showRecipeIdx, setShowRecipeIdx] = useState<number | null>(null);
 
   // Full-screen recipe overlay
@@ -42,7 +45,8 @@ const LunchSlot = ({
         <RecipeDetail
           recipe={recipes[showRecipeIdx].recipe as any}
           onBack={() => setShowRecipeIdx(null)}
-          onMarkDone={() => {
+          isCompleted={completedRecipeId === recipes[showRecipeIdx].id}
+          onMarkDone={completedRecipeId === recipes[showRecipeIdx].id ? undefined : () => {
             setSelectedRecipeId(recipes[showRecipeIdx].id);
             setShowRecipeIdx(null);
           }}
@@ -133,7 +137,7 @@ const LunchSlot = ({
       )}
 
       {/* Complete Button */}
-      {!isReviewMode && (
+      {!isReviewMode && !isAlreadyCompleted && (
         <>
           <button
             onClick={() => onComplete({ recipe_choice_id: selectedRecipeId || undefined })}

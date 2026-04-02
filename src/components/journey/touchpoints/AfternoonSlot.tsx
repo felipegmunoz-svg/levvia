@@ -23,6 +23,7 @@ interface AfternoonSlotProps {
   snackRecipe: ChallengeActivity | null;
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
+  completedSnackId?: string;
   onComplete: (data: { hydration: boolean; micro_challenge_id?: string; snack_id?: string }) => void;
 }
 
@@ -33,6 +34,7 @@ const AfternoonSlot = ({
   snackRecipe,
   isReviewMode,
   hydration,
+  completedSnackId,
   onComplete,
 }: AfternoonSlotProps) => {
   const [hydrated, setHydrated] = useState(false);
@@ -58,11 +60,14 @@ const AfternoonSlot = ({
 
   // Recipe overlay
   if (showRecipe && snackRecipe?.recipe) {
+    const isSnackCompleted = completedSnackId === snackRecipe.id;
     return (
       <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <RecipeDetail
           recipe={snackRecipe.recipe as any}
           onBack={() => setShowRecipe(false)}
+          isCompleted={isSnackCompleted}
+          onMarkDone={isSnackCompleted ? undefined : undefined}
         />
       </div>
     );

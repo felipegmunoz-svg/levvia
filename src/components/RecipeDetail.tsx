@@ -5,9 +5,10 @@ interface RecipeDetailProps {
   recipe: Recipe;
   onBack: () => void;
   onMarkDone?: () => void;
+  isCompleted?: boolean;
 }
 
-const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
+const RecipeDetail = ({ recipe, onBack, onMarkDone, isCompleted = false }: RecipeDetailProps) => {
   const imageUrl = (recipe as any).image_url;
 
   return (
@@ -145,17 +146,24 @@ const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
         </section>
       </main>
 
-      {onMarkDone && (
+      {(onMarkDone || isCompleted) && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-sm border-t border-border">
           <button
-            onClick={onMarkDone}
-            className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-semibold text-base tracking-wide shadow-lg active:scale-[0.98] transition-transform"
+            onClick={isCompleted ? undefined : onMarkDone}
+            disabled={isCompleted}
+            className={`w-full py-4 rounded-2xl font-semibold text-base tracking-wide shadow-lg transition-transform ${
+              isCompleted
+                ? "bg-muted text-muted-foreground cursor-default"
+                : "bg-primary text-primary-foreground active:scale-[0.98]"
+            }`}
           >
-            Preparei esta refeição! ✨
+            {isCompleted ? "Receita concluída ✓" : "Preparei esta refeição! ✨"}
           </button>
-          <p className="text-[11px] text-center text-muted-foreground mt-2 font-body">
-            Isso marcará esta receita como concluída no seu dia.
-          </p>
+          {!isCompleted && (
+            <p className="text-[11px] text-center text-muted-foreground mt-2 font-body">
+              Isso marcará esta receita como concluída no seu dia.
+            </p>
+          )}
         </div>
       )}
     </div>
