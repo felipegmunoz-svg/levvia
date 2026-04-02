@@ -51,6 +51,7 @@ const Journey = () => {
   const navigate = useNavigate();
   const [completedDays, setCompletedDays] = useState<number[]>([]);
   const [touchpointData, setTouchpointData] = useState<Record<number, SlotStatus>>({});
+  const [lockedDay, setLockedDay] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
