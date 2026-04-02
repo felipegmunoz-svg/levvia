@@ -23,6 +23,7 @@ interface LunchSlotProps {
   hydration?: HydrationSlotProps;
   completedRecipeId?: string;
   onComplete: (data: { recipe_choice_id?: string }) => void;
+  onReset?: () => void;
 }
 
 const LunchSlot = ({
