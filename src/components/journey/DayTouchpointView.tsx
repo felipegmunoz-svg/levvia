@@ -30,6 +30,7 @@ interface DayTouchpointViewProps {
   hydration?: HydrationProps;
   rescueMode?: string;
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
+  onResetSlot?: (slot: TouchpointSlot) => void;
   heatMapDay1?: Record<string, number> | null;
 }
 
@@ -82,6 +83,7 @@ const DayTouchpointView = ({
   hydration,
   rescueMode,
   onSlotComplete,
+  onResetSlot,
   heatMapDay1,
 }: DayTouchpointViewProps) => {
   const navigate = useNavigate();
@@ -354,6 +356,7 @@ const DayTouchpointView = ({
                                 hydration={hydrationProps}
                                 completedRecipeId={(progress?.lunch as any)?.recipe_choice_id}
                                 onComplete={(data) => handleSlotComplete("lunch", data)}
+                                onReset={() => onResetSlot?.("lunch")}
                               />
                             )}
                             {s.slot === "afternoon" && (

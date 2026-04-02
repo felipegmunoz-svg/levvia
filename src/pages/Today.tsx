@@ -76,7 +76,7 @@ const Today = () => {
 
   // Touchpoint progress for the active day (or replay day)
   const effectiveDay = replayDay ?? currentDay;
-  const { progress, activeSlot, isDayComplete, completedSlots, markSlotDone, loading: tpLoading } = useTouchpointProgress(effectiveDay);
+  const { progress, activeSlot, isDayComplete, completedSlots, markSlotDone, resetSlot, loading: tpLoading } = useTouchpointProgress(effectiveDay);
   const hydration = useHydration(profile?.weightKg ?? null, effectiveDay);
   // rescueMode already initialized above (line 37)
 
@@ -163,6 +163,7 @@ const Today = () => {
         hydration={hydration}
         rescueMode={rescueMode}
         onSlotComplete={handleSlotComplete}
+        onResetSlot={resetSlot}
         heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
       />
     );
