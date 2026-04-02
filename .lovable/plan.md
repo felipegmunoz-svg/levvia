@@ -1,49 +1,48 @@
 
 
-# Fix: AfternoonSlot micro-movement persistence + review mode
-
-MorningSlot already has `initialExerciseDone`/`initialShotDone` implemented (lines 27-28, 40-41, 46-47 in MorningSlot; lines 351-352 in DayTouchpointView). Only AfternoonSlot needs fixing.
+# Add review-mode completion indicators to MorningSlot and AfternoonSlot
 
 ## Changes
 
-### 1. `src/components/journey/touchpoints/AfternoonSlot.tsx`
+### 1. `src/components/journey/touchpoints/MorningSlot.tsx`
 
-**Interface (add after line 27):**
-```tsx
-initialMicroDone?: boolean;
-```
+**Import (line 2):** Add `CheckSquare` to lucide-react imports.
 
-**Destructuring (add after line 37):**
+**Exercise card (after line 115, after "Ver Exercício Completo →" button):** Add:
 ```tsx
-initialMicroDone,
-```
-
-**State init (line 41):** Change `useState(false)` to:
-```tsx
-const [microDone, setMicroDone] = useState(initialMicroDone ?? false);
-```
-
-**Checkbox (lines 151-157):** Wrap with `{!isReviewMode && (...)}`:
-```tsx
-{!isReviewMode && (
-  <div className="mt-3">
-    <CheckBox
-      checked={microDone}
-      onChange={() => setMicroDone(!microDone)}
-      label="Completei o micro-movimento"
-    />
+{isReviewMode && (
+  <div className="flex items-center gap-2 mt-3">
+    <CheckSquare size={14} className="text-primary" strokeWidth={1.5} />
+    <span className="text-sm text-primary font-body">Exercício concluído</span>
   </div>
 )}
 ```
 
-### 2. `src/components/journey/DayTouchpointView.tsx` (line 377)
-
-Add prop to `<AfternoonSlot>`:
+**Shot card (after line 158, after "Ver Receita →" button):** Add:
 ```tsx
-initialMicroDone={isDone || !!(progress?.afternoon as any)?.micro_challenge_id}
+{isReviewMode && (
+  <div className="flex items-center gap-2 mt-3">
+    <CheckSquare size={14} className="text-primary" strokeWidth={1.5} />
+    <span className="text-sm text-primary font-body">Shot tomado</span>
+  </div>
+)}
+```
+
+### 2. `src/components/journey/touchpoints/AfternoonSlot.tsx`
+
+**Import (line 2):** Add `CheckSquare` to lucide-react imports.
+
+**Micro-Movement card (after line 152, after "Ver Exercício →" button):** Add:
+```tsx
+{isReviewMode && (
+  <div className="flex items-center gap-2 mt-3">
+    <CheckSquare size={14} className="text-primary" strokeWidth={1.5} />
+    <span className="text-sm text-primary font-body">Movimento concluído</span>
+  </div>
+)}
 ```
 
 ## Files modified
+- `src/components/journey/touchpoints/MorningSlot.tsx`
 - `src/components/journey/touchpoints/AfternoonSlot.tsx`
-- `src/components/journey/DayTouchpointView.tsx`
 
