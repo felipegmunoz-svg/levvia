@@ -45,7 +45,8 @@ const LunchSlot = ({
         <RecipeDetail
           recipe={recipes[showRecipeIdx].recipe as any}
           onBack={() => setShowRecipeIdx(null)}
-          onMarkDone={() => {
+          isCompleted={completedRecipeId === recipes[showRecipeIdx].id}
+          onMarkDone={completedRecipeId === recipes[showRecipeIdx].id ? undefined : () => {
             setSelectedRecipeId(recipes[showRecipeIdx].id);
             setShowRecipeIdx(null);
           }}
