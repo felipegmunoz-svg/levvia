@@ -8,7 +8,7 @@ interface RecipeDetailProps {
   isCompleted?: boolean;
 }
 
-const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
+const RecipeDetail = ({ recipe, onBack, onMarkDone, isCompleted = false }: RecipeDetailProps) => {
   const imageUrl = (recipe as any).image_url;
 
   return (
