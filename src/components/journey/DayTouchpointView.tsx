@@ -281,6 +281,11 @@ const DayTouchpointView = ({
                     {s.label}
                   </p>
                   <p className="text-xs text-levvia-muted font-body">{s.time}</p>
+                  {isDone && completedItemLabel && (
+                    <p className="text-[11px] text-primary font-body mt-0.5 flex items-center gap-1">
+                      <Check size={10} /> {completedItemLabel}
+                    </p>
+                  )}
                   {SLOT_DESCRIPTIONS[dayNumber]?.[s.slot] && !isDone && (
                     <p className="text-[11px] text-gray-400 font-body mt-0.5 leading-snug pr-2">
                       {SLOT_DESCRIPTIONS[dayNumber]![s.slot]}
