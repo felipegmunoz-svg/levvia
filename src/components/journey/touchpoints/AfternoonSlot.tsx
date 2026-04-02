@@ -150,6 +150,12 @@ const AfternoonSlot = ({
           >
             Ver Exercício →
           </button>
+          {isReviewMode && (
+            <div className="flex items-center gap-2 mt-3">
+              <CheckSquare size={14} className="text-primary" strokeWidth={1.5} />
+              <span className="text-sm text-primary font-body">Movimento concluído</span>
+            </div>
+          )}
           {!isReviewMode && (
             <div className="mt-3">
               <CheckBox
