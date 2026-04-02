@@ -1,50 +1,35 @@
 
 
-# Three fixes: AfternoonSlot snack label, hollow check icon, M-A-T-N legend
+# Restore MorningSlot checkbox state after refresh
 
-## 1. AfternoonSlot — show snack name after completion
+## Changes
 
-**File:** `src/components/journey/DayTouchpointView.tsx` (line 291)
+### 1. `src/components/journey/touchpoints/MorningSlot.tsx`
 
-The `completedItemLabel` already reads `snack_id` from progress (line 247). The only issue is line 291 ignores it. Change:
+**Props (line 19-28):** Add `initialExerciseDone?: boolean` and `initialShotDone?: boolean` to interface and destructuring.
 
+**State init (lines 42-43):** Change:
 ```tsx
-{s.slot === "afternoon" && "Lanche concluído"}
+const [exerciseDone, setExerciseDone] = useState(false);
+const [shotDone, setShotDone] = useState(false);
 ```
 to:
 ```tsx
-{s.slot === "afternoon" && (completedItemLabel || "Lanche concluído")}
+const [exerciseDone, setExerciseDone] = useState(initialExerciseDone ?? false);
+const [shotDone, setShotDone] = useState(initialShotDone ?? false);
 ```
 
-The `onMarkDone` in `AfternoonSlot.tsx` already calls `onComplete({ hydration: true, snack_id: snackRecipe.id })` (lines 70-72), so saving works. This change makes the label display match the lunch pattern.
+**Exercise checkbox (~line 120-132):** Wrap with `{!isReviewMode && ( ... )}` to hide when slot is done, matching the shot checkbox pattern.
 
-## 2. Replace check icon with hollow circle
+### 2. `src/components/journey/DayTouchpointView.tsx` (lines 343-352)
 
-**File:** `src/components/journey/DayTouchpointView.tsx` (lines 301-302)
-
-Replace:
+Add two props to `<MorningSlot>`:
 ```tsx
-<Check size={16} strokeWidth={1.5} className="text-primary" />
-```
-with:
-```tsx
-<div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center">
-  <Check size={12} strokeWidth={2} className="text-primary" />
-</div>
-```
-
-## 3. M-A-T-N legend in HydrationModule
-
-**File:** `src/components/journey/touchpoints/HydrationModule.tsx` (after line 72)
-
-Add a legend line below the tick marks:
-```tsx
-<p className="text-[10px] text-center text-muted-foreground font-body mt-0.5">
-  Manhã · Almoço · Tarde · Noite
-</p>
+initialExerciseDone={isDone || !!(progress?.morning as any)?.exercise_id}
+initialShotDone={isDone || !!(progress?.morning as any)?.shot_id}
 ```
 
 ## Files modified
-- `src/components/journey/DayTouchpointView.tsx` (lines 291, 301-302)
-- `src/components/journey/touchpoints/HydrationModule.tsx` (after line 72)
+- `src/components/journey/touchpoints/MorningSlot.tsx`
+- `src/components/journey/DayTouchpointView.tsx`
 
