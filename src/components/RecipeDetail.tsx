@@ -5,6 +5,7 @@ interface RecipeDetailProps {
   recipe: Recipe;
   onBack: () => void;
   onMarkDone?: () => void;
+  isCompleted?: boolean;
 }
 
 const RecipeDetail = ({ recipe, onBack, onMarkDone }: RecipeDetailProps) => {
