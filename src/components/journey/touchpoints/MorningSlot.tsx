@@ -37,12 +37,14 @@ const MorningSlot = ({
   isReviewMode,
   hydration,
   completedShotId,
+  initialExerciseDone,
+  initialShotDone,
   onComplete,
 }: MorningSlotProps) => {
   const [showExercise, setShowExercise] = useState(false);
   const [showRecipe, setShowRecipe] = useState(false);
-  const [exerciseDone, setExerciseDone] = useState(false);
-  const [shotDone, setShotDone] = useState(false);
+  const [exerciseDone, setExerciseDone] = useState(initialExerciseDone ?? false);
+  const [shotDone, setShotDone] = useState(initialShotDone ?? false);
 
   // Full-screen overlays
   if (showExercise && exercise?.exercise) {
