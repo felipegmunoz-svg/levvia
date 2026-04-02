@@ -1,47 +1,28 @@
 
 
-# Add completion indicator to LunchSlot recipe cards
+# Implement "Trocar receita" in LunchSlot
 
-## Changes — `src/components/journey/touchpoints/LunchSlot.tsx`
+## Changes
 
-### Recipe card styling (lines 74–117)
+### 1. `src/hooks/useTouchpointProgress.ts`
+- Add `resetSlot` callback (after `markSlotDone`, ~line 199) that resets a slot to `{ done: false, doneAt: null }`, persists to localStorage and Supabase
+- Export `resetSlot` in the return object (line 218)
 
-When `isAlreadyCompleted` is true (slot done):
-- **Selected/completed recipe card**: Add `bg-primary/10` background, replace selection border with a checkbox-style completion indicator showing `☑ Receita preparada` (using `CheckSquare` from lucide-react) with green styling
-- **Non-selected recipe cards**: Add `opacity-40` to dim them, remove click handler
+### 2. `src/components/journey/DayTouchpointView.tsx`
+- Add `onResetSlot` prop to `DayTouchpointViewProps` (line 32)
+- Pass `onReset={() => onResetSlot?.("lunch")}` to `LunchSlot` (line 356)
 
-When `isAlreadyCompleted` is false, keep current behavior unchanged.
+### 3. `src/components/journey/touchpoints/LunchSlot.tsx`
+- Add `onReset?: () => void` to `LunchSlotProps`
+- When `isAlreadyCompleted` and recipe is the completed one: show "Receita preparada" badge + "Trocar receita" underline button that calls `setSelectedRecipeId(null); onReset?.()`
+- Non-selected recipe cards when completed: clickable to open RecipeDetail for reading (with `onMarkDone={undefined}`)
 
-### Implementation detail
-
-```tsx
-// Inside the recipes.map callback:
-const isSelected = selectedRecipeId === recipe.id;
-const isThisCompleted = isAlreadyCompleted && isSelected;
-const isNotChosen = isAlreadyCompleted && !isSelected;
-
-// Card className:
-className={`levvia-card p-4 transition-all ${
-  isThisCompleted
-    ? "bg-primary/10 border-primary/20"
-    : isNotChosen
-    ? "opacity-40 border-border"
-    : isSelected
-    ? "border-primary border-2 ring-1 ring-primary/20 cursor-pointer"
-    : "border-border cursor-pointer"
-}`}
-
-// Inside completed card, add after recipe label:
-{isThisCompleted && (
-  <div className="flex items-center gap-2 mt-2">
-    <CheckSquare size={16} className="text-green-500" />
-    <span className="text-sm text-green-600 font-medium">Receita preparada</span>
-  </div>
-)}
-```
-
-Import `CheckSquare` from `lucide-react`.
+### 4. Caller of `DayTouchpointView` (Today.tsx or DayTemplate.tsx)
+- Pass `resetSlot` from the hook as `onResetSlot` prop
 
 ## Files modified
+- `src/hooks/useTouchpointProgress.ts`
+- `src/components/journey/DayTouchpointView.tsx`
 - `src/components/journey/touchpoints/LunchSlot.tsx`
+- Caller component that uses `useTouchpointProgress` + `DayTouchpointView`
 
