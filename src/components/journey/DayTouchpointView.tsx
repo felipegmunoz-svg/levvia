@@ -288,7 +288,7 @@ const DayTouchpointView = ({
                       <Check size={10} />
                       {s.slot === "morning" && "Exercício + shot concluídos"}
                       {s.slot === "lunch" && (completedItemLabel || "Almoço concluído")}
-                      {s.slot === "afternoon" && "Lanche concluído"}
+                      {s.slot === "afternoon" && (completedItemLabel || "Lanche concluído")}
                       {s.slot === "night" && "Rotina noturna concluída"}
                     </p>
                   )}
@@ -299,7 +299,9 @@ const DayTouchpointView = ({
                   )}
                 </div>
                 {isDone ? (
-                  <Check size={16} strokeWidth={1.5} className="text-primary" />
+                  <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center">
+                    <Check size={12} strokeWidth={2} className="text-primary" />
+                  </div>
                 ) : (
                   <ChevronDown
                     size={18}

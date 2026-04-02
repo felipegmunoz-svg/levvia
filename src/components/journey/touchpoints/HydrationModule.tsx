@@ -70,6 +70,9 @@ const HydrationModule = ({
             </div>
           ))}
         </div>
+        <p className="text-[10px] text-center text-muted-foreground font-body mt-0.5">
+          Manhã · Almoço · Tarde · Noite
+        </p>
       </div>
 
       {/* Motivational Text + Sub-goal */}
