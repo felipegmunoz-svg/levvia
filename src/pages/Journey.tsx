@@ -9,6 +9,7 @@ import logoFull from "@/assets/logo_livvia_azul.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { getTouchpointConfig } from "@/data/touchpointConfig";
+import { DEV_BYPASS_DAY_LOCK } from "@/lib/config";
 
 const DAY_PREVIEWS: Record<number, string[]> = {
   1: ["Respiração diafragmática", "Refeição anti-inflamatória", "Mapa do Fogo Interno"],
