@@ -388,7 +388,7 @@ const DayTouchpointView = ({
       {/* Hydration warning modal */}
       {hydrationWarning && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center p-4">
-          <div className="w-full max-w-md bg-levvia-surface rounded-2xl p-6 shadow-xl">
+          <div className="w-full max-w-md bg-levvia-surface rounded-2xl p-6 shadow-xl" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 64px))' }}>
             <div className="flex items-center gap-2 mb-3">
               <Droplets size={18} className="text-primary" strokeWidth={1.5} />
               <h3 className="font-heading font-semibold text-levvia-fg text-base">
