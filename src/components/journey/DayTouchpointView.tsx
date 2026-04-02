@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import FlowSilhouette from "@/components/FlowSilhouette";
+import DayLockedScreen from "@/components/journey/DayLockedScreen";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, Sunrise, UtensilsCrossed, Droplets, Moon, Calendar, type LucideIcon } from "lucide-react";
 import { getTouchpointConfig, type TouchpointSlot } from "@/data/touchpointConfig";
