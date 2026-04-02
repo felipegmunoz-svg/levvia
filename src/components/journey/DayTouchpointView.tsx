@@ -348,6 +348,8 @@ const DayTouchpointView = ({
                                 isReviewMode={isReviewMode || isDone}
                                 hydration={hydrationProps}
                                 completedShotId={(progress?.morning as any)?.shot_id}
+                                initialExerciseDone={isDone || !!(progress?.morning as any)?.exercise_id}
+                                initialShotDone={isDone || !!(progress?.morning as any)?.shot_id}
                                 onComplete={(data) => handleSlotComplete("morning", data)}
                               />
                             )}
