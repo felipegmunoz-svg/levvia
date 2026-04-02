@@ -28,8 +28,40 @@ interface NightSlotProps {
   hydration?: HydrationSlotProps;
   isCheckpointDay?: boolean;
   heatMapDay1Data?: Record<string, number> | null;
-  onComplete: (data: { technique_done: boolean; journal?: DiaryData }) => void;
+  onComplete: (data: { technique_done: boolean; journal?: DiaryData; night_heat_map?: Record<string, number> }) => void;
 }
+
+/* ── Evolution Summary Card ── */
+const EvolutionSummaryCard = ({
+  morningData,
+  nightData,
+}: {
+  morningData: Record<string, number>;
+  nightData: Record<string, number>;
+}) => {
+  const countIntense = (data: Record<string, number>) =>
+    Object.values(data).filter((v) => typeof v === "number" && v >= 2).length;
+
+  const x = countIntense(morningData);
+  const y = countIntense(nightData);
+
+  let message: string;
+  if (y < x) {
+    message = `Você começou o dia com ${x} áreas em fogo intenso e termina com apenas ${y}. Seu corpo agradece o cuidado de hoje! 💙`;
+  } else if (y === x) {
+    message = "Você manteve sua consciência corporal hoje. Cada dia de prática conta. Continue! ✨";
+  } else {
+    message = "Seu corpo está pedindo mais atenção. Os próximos dias vão trazer mais alívio. Estamos juntas. 💙";
+  }
+
+  return (
+    <div className="levvia-card p-5 bg-primary/5 text-center">
+      <p className="text-sm text-foreground italic font-body leading-relaxed">
+        {message}
+      </p>
+    </div>
+  );
+};
 
 const NightSlot = ({
   dayNumber,
@@ -44,11 +76,12 @@ const NightSlot = ({
   const [techniqueDone, setTechniqueDone] = useState(isReviewMode);
   const [diaryData, setDiaryData] = useState<DiaryData | null>(null);
   const [showClosing, setShowClosing] = useState(false);
+  const [nightHeatMap, setNightHeatMap] = useState<Record<string, number> | null>(null);
 
   useEffect(() => {
     if (!showClosing) return;
     const timer = setTimeout(() => {
-      onComplete({ technique_done: true, journal: diaryData ?? undefined });
+      onComplete({ technique_done: true, journal: diaryData ?? undefined, night_heat_map: nightHeatMap ?? undefined });
     }, 5000);
     return () => clearTimeout(timer);
   }, [showClosing]);
@@ -83,7 +116,14 @@ const NightSlot = ({
               )}
             </div>
             <div className="min-h-[480px]">
-              <HeatMapInteractive onNext={() => setTechniqueDone(true)} />
+              <HeatMapInteractive
+                title="Como está o seu fogo agora?"
+                subtitle="Após as práticas de hoje, como você sente cada área? Toque para reduzir a intensidade onde o alívio chegou ou para marcar novos pontos de atenção."
+                onNext={(data) => {
+                  setNightHeatMap(data as Record<string, number>);
+                  setTechniqueDone(true);
+                }}
+              />
             </div>
           </div>
         );
@@ -205,6 +245,14 @@ const NightSlot = ({
 
       {/* Technique */}
       {renderTechnique()}
+
+      {/* Evolution Summary Card — after heatmap technique done */}
+      {techniqueDone && nightHeatMap && heatMapDay1Data && !isReviewMode && (
+        <EvolutionSummaryCard
+          morningData={heatMapDay1Data as Record<string, number>}
+          nightData={nightHeatMap}
+        />
+      )}
 
       {/* Diary — only after technique done and not review */}
       {techniqueDone && !isReviewMode && !diaryData && (
