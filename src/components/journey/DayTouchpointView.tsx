@@ -283,9 +283,13 @@ const DayTouchpointView = ({
                     {s.label}
                   </p>
                   <p className="text-xs text-levvia-muted font-body">{s.time}</p>
-                  {isDone && completedItemLabel && (
+                  {isDone && (
                     <p className="text-[11px] text-primary font-body mt-0.5 flex items-center gap-1">
-                      <Check size={10} /> {completedItemLabel}
+                      <Check size={10} />
+                      {s.slot === "morning" && "Exercício + shot concluídos"}
+                      {s.slot === "lunch" && (completedItemLabel || "Almoço concluído")}
+                      {s.slot === "afternoon" && "Lanche concluído"}
+                      {s.slot === "night" && "Rotina noturna concluída"}
                     </p>
                   )}
                   {SLOT_DESCRIPTIONS[dayNumber]?.[s.slot] && !isDone && (
@@ -295,9 +299,7 @@ const DayTouchpointView = ({
                   )}
                 </div>
                 {isDone ? (
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                    <Check size={14} className="text-primary-foreground" />
-                  </div>
+                  <Check size={16} strokeWidth={1.5} className="text-primary" />
                 ) : (
                   <ChevronDown
                     size={18}
