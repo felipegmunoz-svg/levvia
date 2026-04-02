@@ -21,6 +21,7 @@ interface LunchSlotProps {
   tip: string;
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
+  completedRecipeId?: string;
   onComplete: (data: { recipe_choice_id?: string }) => void;
 }
 
