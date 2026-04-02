@@ -23,6 +23,7 @@ interface AfternoonSlotProps {
   snackRecipe: ChallengeActivity | null;
   isReviewMode: boolean;
   hydration?: HydrationSlotProps;
+  completedSnackId?: string;
   onComplete: (data: { hydration: boolean; micro_challenge_id?: string; snack_id?: string }) => void;
 }
 
