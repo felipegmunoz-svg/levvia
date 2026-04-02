@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Utensils } from "lucide-react";
+import { Utensils, CheckSquare } from "lucide-react";
 import type { ChallengeActivity } from "@/hooks/useChallengeData";
 import RecipeDetail from "@/components/RecipeDetail";
 import HydrationModule from "./HydrationModule";
@@ -73,19 +73,31 @@ const LunchSlot = ({
       <div className="space-y-3">
         {recipes.map((recipe, i) => {
           const isSelected = selectedRecipeId === recipe.id;
+          const isThisCompleted = isAlreadyCompleted && isSelected;
+          const isNotChosen = isAlreadyCompleted && !isSelected;
           return (
             <div
               key={recipe.id}
-              onClick={() => setSelectedRecipeId(recipe.id)}
-              className={`levvia-card p-4 cursor-pointer transition-all ${
-                isSelected
-                  ? "border-primary border-2 ring-1 ring-primary/20"
-                  : "border-border"
+              onClick={isAlreadyCompleted ? undefined : () => setSelectedRecipeId(recipe.id)}
+              className={`levvia-card p-4 transition-all ${
+                isThisCompleted
+                  ? "bg-primary/10 border-primary/20"
+                  : isNotChosen
+                  ? "opacity-40 border-border"
+                  : isSelected
+                  ? "border-primary border-2 ring-1 ring-primary/20 cursor-pointer"
+                  : "border-border cursor-pointer"
               }`}
             >
               <p className="font-medium text-levvia-fg font-body text-sm">
                 {recipe.label}
               </p>
+              {isThisCompleted && (
+                <div className="flex items-center gap-2 mt-2">
+                  <CheckSquare size={16} className="text-primary" />
+                  <span className="text-sm text-primary font-medium font-body">Receita preparada</span>
+                </div>
+              )}
               {(recipe.recipe as any)?.por_que_resfria && (
                 <p className="mt-1 text-xs text-levvia-muted font-body line-clamp-2">
                   {(recipe.recipe as any).por_que_resfria}
