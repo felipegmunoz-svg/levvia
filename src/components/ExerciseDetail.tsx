@@ -11,6 +11,7 @@ interface ExerciseDetailProps {
 const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) => {
   const videoUrl = (exercise as any).video_url;
   const imageUrls: string[] = (exercise as any).image_urls || [];
+  const benefitsText = exercise.benefits || (exercise as any).clinical_benefit;
   const [currentImage, setCurrentImage] = useState(0);
 
   return (
@@ -140,13 +141,15 @@ const ExerciseDetail = ({ exercise, onBack, onMarkDone }: ExerciseDetailProps) =
           </div>
         </section>
 
-        <section className="levvia-card p-4 border-success/20">
-          <div className="flex items-center gap-2 mb-1">
-            <CheckCircle2 size={18} strokeWidth={1.5} className="text-success" />
-            <h2 className="text-sm font-medium text-foreground">Por que Funciona (para Lipedema)</h2>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">{exercise.benefits}</p>
-        </section>
+        {benefitsText && (
+          <section className="levvia-card p-4 border-success/20">
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle2 size={18} strokeWidth={1.5} className="text-success" />
+              <h2 className="text-sm font-medium text-foreground">Por que Funciona (para Lipedema)</h2>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{benefitsText}</p>
+          </section>
+        )}
 
         {exercise.safety && (
           <section className="levvia-card p-4 border-accent/20">
