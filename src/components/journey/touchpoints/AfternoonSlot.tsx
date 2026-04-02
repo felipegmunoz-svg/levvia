@@ -67,7 +67,10 @@ const AfternoonSlot = ({
           recipe={snackRecipe.recipe as any}
           onBack={() => setShowRecipe(false)}
           isCompleted={isSnackCompleted}
-          onMarkDone={isSnackCompleted ? undefined : undefined}
+          onMarkDone={isSnackCompleted ? undefined : () => {
+            setShowRecipe(false);
+            onComplete({ hydration: true, snack_id: snackRecipe.id });
+          }}
         />
       </div>
     );

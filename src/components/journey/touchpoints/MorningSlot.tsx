@@ -69,6 +69,7 @@ const MorningSlot = ({
           onMarkDone={isShotCompleted ? undefined : () => {
             setShotDone(true);
             setShowRecipe(false);
+            onComplete({ exercise_id: exercise?.id, shot_id: shotRecipe.id });
           }}
         />
       </div>
