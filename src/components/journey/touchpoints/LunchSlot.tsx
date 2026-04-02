@@ -31,9 +31,11 @@ const LunchSlot = ({
   tip,
   isReviewMode,
   hydration,
+  completedRecipeId,
   onComplete,
 }: LunchSlotProps) => {
-  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(completedRecipeId || null);
+  const isAlreadyCompleted = !!completedRecipeId;
   const [showRecipeIdx, setShowRecipeIdx] = useState<number | null>(null);
 
   // Full-screen recipe overlay
