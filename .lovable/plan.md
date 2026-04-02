@@ -1,28 +1,43 @@
 
 
-# Fix "Por que Funciona" section not showing text
+# Fix: Recipe completion not saving progress
 
 ## Problem
-The `ExerciseDetail` component renders `exercise.benefits`, but for DB exercises the actual explanatory text is often in `clinical_benefit` (a separate DB column), while `benefits` is null/empty. The section always renders — even when empty — showing just the title with no content.
+When clicking "Preparei esta refeição! ✨" in RecipeDetail, `onMarkDone` only updates local state but never calls `onComplete`, so `markSlotDone` is never triggered and progress is never persisted.
 
 ## Changes
 
-### 1. `src/components/ExerciseDetail.tsx` (lines 11-13, 143-149)
-- Read `clinical_benefit` from the exercise object (via `as any`, same pattern already used for `video_url` and `image_urls`)
-- Compute `benefitsText = exercise.benefits || (exercise as any).clinical_benefit`
-- Wrap the section in a conditional: only render when `benefitsText` is truthy
-- Display `benefitsText` in the paragraph
+### 1. `src/components/journey/touchpoints/LunchSlot.tsx` (lines 49-52)
+Add `onComplete` call:
+```tsx
+onMarkDone={completedRecipeId === recipes[showRecipeIdx].id ? undefined : () => {
+  setSelectedRecipeId(recipes[showRecipeIdx].id);
+  setShowRecipeIdx(null);
+  onComplete({ recipe_choice_id: recipes[showRecipeIdx].id });
+}}
+```
 
-### 2. `src/pages/HistoryExercises.tsx` (line 21)
-- In `toExerciseView`, map `benefits` with clinical_benefit fallback:
-  ```
-  benefits: ex.benefits || ex.clinical_benefit || ""
-  ```
+### 2. `src/components/journey/touchpoints/MorningSlot.tsx` (lines 69-72)
+Add `onComplete` call for shot recipe:
+```tsx
+onMarkDone={isShotCompleted ? undefined : () => {
+  setShotDone(true);
+  setShowRecipe(false);
+  onComplete({ exercise_id: exercise?.id, shot_id: shotRecipe.id });
+}}
+```
 
-### 3. `src/components/journey/touchpoints/MorningSlot.tsx` and `AfternoonSlot.tsx`
-- These pass `exercise.exercise as any` directly — the fix in ExerciseDetail reading `clinical_benefit` via `as any` covers these automatically. No changes needed.
+### 3. `src/components/journey/touchpoints/AfternoonSlot.tsx` (lines 70-71)
+Currently `onMarkDone` is always `undefined` — fix to actually handle completion:
+```tsx
+onMarkDone={isSnackCompleted ? undefined : () => {
+  setShowRecipe(false);
+  onComplete({ hydration: true, snack_id: snackRecipe.id });
+}}
+```
 
 ## Files modified
-- `src/components/ExerciseDetail.tsx`
-- `src/pages/HistoryExercises.tsx`
+- `src/components/journey/touchpoints/LunchSlot.tsx`
+- `src/components/journey/touchpoints/MorningSlot.tsx`
+- `src/components/journey/touchpoints/AfternoonSlot.tsx`
 
