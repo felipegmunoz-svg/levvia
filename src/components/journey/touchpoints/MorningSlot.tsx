@@ -34,6 +34,7 @@ const MorningSlot = ({
   shotRecipe,
   isReviewMode,
   hydration,
+  completedShotId,
   onComplete,
 }: MorningSlotProps) => {
   const [showExercise, setShowExercise] = useState(false);
