@@ -36,6 +36,7 @@ const AfternoonSlot = ({
   isReviewMode,
   hydration,
   completedSnackId,
+  initialMicroDone,
   onComplete,
 }: AfternoonSlotProps) => {
   const [hydrated, setHydrated] = useState(false);
