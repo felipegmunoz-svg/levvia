@@ -288,7 +288,7 @@ const DayTouchpointView = ({
                       <Check size={10} />
                       {s.slot === "morning" && "Exercício + shot concluídos"}
                       {s.slot === "lunch" && (completedItemLabel || "Almoço concluído")}
-                      {s.slot === "afternoon" && "Lanche concluído"}
+                      {s.slot === "afternoon" && (completedItemLabel || "Lanche concluído")}
                       {s.slot === "night" && "Rotina noturna concluída"}
                     </p>
                   )}
