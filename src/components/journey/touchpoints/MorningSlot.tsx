@@ -59,12 +59,14 @@ const MorningSlot = ({
   }
 
   if (showRecipe && shotRecipe?.recipe) {
+    const isShotCompleted = completedShotId === shotRecipe.id;
     return (
       <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <RecipeDetail
           recipe={shotRecipe.recipe as any}
           onBack={() => setShowRecipe(false)}
-          onMarkDone={() => {
+          isCompleted={isShotCompleted}
+          onMarkDone={isShotCompleted ? undefined : () => {
             setShotDone(true);
             setShowRecipe(false);
           }}

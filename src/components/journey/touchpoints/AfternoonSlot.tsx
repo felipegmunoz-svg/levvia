@@ -60,11 +60,14 @@ const AfternoonSlot = ({
 
   // Recipe overlay
   if (showRecipe && snackRecipe?.recipe) {
+    const isSnackCompleted = completedSnackId === snackRecipe.id;
     return (
       <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
         <RecipeDetail
           recipe={snackRecipe.recipe as any}
           onBack={() => setShowRecipe(false)}
+          isCompleted={isSnackCompleted}
+          onMarkDone={isSnackCompleted ? undefined : undefined}
         />
       </div>
     );

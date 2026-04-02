@@ -137,7 +137,7 @@ const LunchSlot = ({
       )}
 
       {/* Complete Button */}
-      {!isReviewMode && (
+      {!isReviewMode && !isAlreadyCompleted && (
         <>
           <button
             onClick={() => onComplete({ recipe_choice_id: selectedRecipeId || undefined })}
