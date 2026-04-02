@@ -49,6 +49,7 @@ const LunchSlot = ({
           onMarkDone={completedRecipeId === recipes[showRecipeIdx].id ? undefined : () => {
             setSelectedRecipeId(recipes[showRecipeIdx].id);
             setShowRecipeIdx(null);
+            onComplete({ recipe_choice_id: recipes[showRecipeIdx].id });
           }}
         />
       </div>
