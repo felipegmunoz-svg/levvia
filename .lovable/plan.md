@@ -1,23 +1,27 @@
 
 
-# Desbloquear acesso à página de importação
+# Limpeza pós-importação
 
-## 1. Remover `requireAdmin` da rota em `src/App.tsx` (linha 86)
-
-Alterar de:
-```tsx
-<Route path="/admin/import-guia" element={<ProtectedRoute requireAdmin><ImportGuia /></ProtectedRoute>} />
-```
-Para:
-```tsx
-<Route path="/admin/import-guia" element={<ProtectedRoute><ImportGuia /></ProtectedRoute>} />
+## 1. Migração SQL
+Remover as duas políticas temporárias de INSERT público:
+```sql
+DROP POLICY "Temp public insert ebook_sections" ON ebook_sections;
+DROP POLICY "Temp public insert sos_protocols" ON sos_protocols;
 ```
 
-## 2. Inserir role admin para felipegmunoz@gmail.com
+## 2. Remover `src/pages/admin/ImportGuia.tsx`
+Deletar o arquivo.
 
-O usuário não tem registro na tabela `user_roles`. Executar INSERT via ferramenta de inserção para adicionar a role `admin`.
+## 3. `src/App.tsx`
+- Remover import de `ImportGuia`
+- Remover a rota `/admin/import-guia`
+
+## 4. `src/components/AdminLayout.tsx`
+- Remover o item `{ label: "Importar Guia", icon: BookOpen, path: "/admin/import-guia" }` do array `navItems`
 
 ## Arquivos modificados
-- `src/App.tsx` (linha 86)
-- Tabela `user_roles` (inserção de dados)
+- Migração SQL (nova)
+- `src/pages/admin/ImportGuia.tsx` (deletado)
+- `src/App.tsx`
+- `src/components/AdminLayout.tsx`
 
