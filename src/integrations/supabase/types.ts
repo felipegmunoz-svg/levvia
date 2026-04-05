@@ -101,6 +101,104 @@ export type Database = {
         }
         Relationships: []
       }
+      ebook_chapters: {
+        Row: {
+          chapter_number: number
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          subtitle: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          chapter_number: number
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          chapter_number?: number
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ebook_sections: {
+        Row: {
+          chapter_id: string | null
+          chapter_number: number
+          content: string
+          content_type: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          keywords: string[] | null
+          section_title: string
+          situation: string[] | null
+          sort_order: number | null
+          subsection_title: string | null
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          chapter_id?: string | null
+          chapter_number: number
+          content: string
+          content_type?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          section_title: string
+          situation?: string[] | null
+          sort_order?: number | null
+          subsection_title?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          chapter_id?: string | null
+          chapter_number?: number
+          content?: string
+          content_type?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          section_title?: string
+          situation?: string[] | null
+          sort_order?: number | null
+          subsection_title?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ebook_sections_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "ebook_chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exercises: {
         Row: {
           benefits: string | null
@@ -644,6 +742,48 @@ export type Database = {
           tipo_refeicao?: string[] | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      sos_protocols: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          exercise_sequence: Json
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          situation: string
+          sort_order: number | null
+          title: string
+          total_time_minutes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          exercise_sequence?: Json
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          situation: string
+          sort_order?: number | null
+          title: string
+          total_time_minutes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          exercise_sequence?: Json
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          situation?: string
+          sort_order?: number | null
+          title?: string
+          total_time_minutes?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
