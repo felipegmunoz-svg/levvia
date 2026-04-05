@@ -1,44 +1,23 @@
 
 
-# Criar tabelas do Guia + página de importação admin
+# Desbloquear acesso à página de importação
 
-## 1. Migração SQL
+## 1. Remover `requireAdmin` da rota em `src/App.tsx` (linha 86)
 
-Criar 3 tabelas (`ebook_chapters`, `ebook_sections`, `sos_protocols`) com índices, RLS e políticas de leitura pública. Inserir os 13 capítulos. Adicionar políticas temporárias de INSERT público em `ebook_sections` e `sos_protocols` para importação.
-
-A migração inclui exatamente o SQL fornecido, mais:
-```sql
-CREATE POLICY "Temp public insert ebook_sections" ON ebook_sections FOR INSERT WITH CHECK (true);
-CREATE POLICY "Temp public insert sos_protocols" ON sos_protocols FOR INSERT WITH CHECK (true);
-```
-
-## 2. Nova página `src/pages/admin/ImportGuia.tsx`
-
-- Usa `AdminLayout`
-- 2 seções com file input (JSON) + botão de importação
-- **Importar Seções do Ebook**: lê JSON array, para cada item faz lookup do `chapter_id` via `chapter_number` na tabela `ebook_chapters`, depois insere em `ebook_sections`
-- **Importar Protocolos SOS**: lê JSON array, insere diretamente em `sos_protocols`
-- Mostra barra de progresso e resultado (sucesso/erro count)
-
-## 3. Rota em `src/App.tsx`
-
-Adicionar:
+Alterar de:
 ```tsx
-import ImportGuia from "./pages/admin/ImportGuia";
-// ...
 <Route path="/admin/import-guia" element={<ProtectedRoute requireAdmin><ImportGuia /></ProtectedRoute>} />
 ```
-
-## 4. Link no `AdminLayout.tsx`
-
-Adicionar item temporário na sidebar:
+Para:
 ```tsx
-{ label: "Importar Guia", icon: BookOpen, path: "/admin/import-guia" }
+<Route path="/admin/import-guia" element={<ProtectedRoute><ImportGuia /></ProtectedRoute>} />
 ```
 
+## 2. Inserir role admin para felipegmunoz@gmail.com
+
+O usuário não tem registro na tabela `user_roles`. Executar INSERT via ferramenta de inserção para adicionar a role `admin`.
+
 ## Arquivos modificados
-- Migração SQL (nova)
-- `src/pages/admin/ImportGuia.tsx` (novo)
-- `src/App.tsx`
-- `src/components/AdminLayout.tsx`
+- `src/App.tsx` (linha 86)
+- Tabela `user_roles` (inserção de dados)
 
