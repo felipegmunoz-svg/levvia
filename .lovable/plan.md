@@ -1,53 +1,29 @@
 
-# Corrigir o conteúdo da seção “Dedicatória e Prefácio” com substituição manual
+# Reimportar conteúdo do ebook — página temporária de update
 
-## O que encontrei
-A seção `bf31f496-9350-4ed7-9420-5df905ed8c6f` ainda contém o nome do autor no banco. O problema não é a tela: o texto salvo realmente inclui este trecho, com acentuação em Unicode decomposta e quebra de linha:
-
-```text
-Com carinho, respeito e compromisso,
-Luís Cláudio da 
-
-Viver com lipedema...
-```
-
-Além disso, `GuiaSection.tsx` normaliza quebras de linha ao renderizar:
-```ts
-.split(/\n\s*\n/)
-.map((block) => block.replace(/\n/g, " ").replace(/\s+/g, " ").trim())
-```
-Então esse trecho aparece na UI como uma frase contínua, mesmo quando buscas anteriores não encontraram o encoding corretamente.
-
-## Correção a aplicar
-Vou fazer exatamente a substituição manual pedida, apenas nessa seção:
-
-1. Ler o conteúdo completo atual da seção `bf31f496-9350-4ed7-9420-5df905ed8c6f`
-2. Identificar manualmente o bloco que começa em:
-   - `Com carinho, respeito e compromisso`
-   e termina imediatamente antes de:
-   - `Viver com lipedema`
-3. Montar um `UPDATE` com o conteúdo completo corrigido da seção, sem usar `REPLACE` nem `REGEXP_REPLACE`
-4. Salvar o novo conteúdo com este trecho exato:
-```text
-Com carinho, respeito e compromisso, Equipe Levvia.
-```
-5. Confirmar com uma consulta de verificação mostrando cerca de 50 caracteres ao redor de `compromisso`
-
-## SQL que será executado
-A implementação será um `UPDATE ebook_sections SET content = '...texto completo corrigido...' WHERE id = 'bf31f496-9350-4ed7-9420-5df905ed8c6f';`
-
-Depois, uma verificação como:
+## 1. Migração SQL
+Adicionar política temporária de UPDATE público na tabela `ebook_sections`:
 ```sql
-SELECT SUBSTRING(content FROM GREATEST(POSITION('compromisso' IN content) - 25, 1) FOR 100)
-FROM ebook_sections
-WHERE id = 'bf31f496-9350-4ed7-9420-5df905ed8c6f';
+CREATE POLICY "Temp public update ebook_sections" ON ebook_sections FOR UPDATE USING (true) WITH CHECK (true);
 ```
 
-## Resultado esperado
-Na tela `/guia/0/bf31f496-9350-4ed7-9420-5df905ed8c6f`, o nome do autor deixará de aparecer, porque ele será removido do conteúdo fonte salvo no banco.
+## 2. Criar `src/pages/admin/UpdateGuia.tsx`
+Página com:
+- Input de upload JSON
+- Ao carregar o JSON, itera sobre cada item do array
+- Para cada item, executa `supabase.from('ebook_sections').update({ content: item.content }).eq('section_title', item.section_title).eq('chapter_number', item.chapter_number)`
+- Exibe contador de sucesso/falha em tempo real
+- Mostra resultado final (X atualizados, Y falhas)
 
-## Detalhes técnicos
-- A causa raiz é texto salvo com caracteres Unicode combinados (`é`, `ã`, etc.), o que pode quebrar buscas simples e substituições parciais.
-- Não há necessidade de alterar `GuiaSection.tsx` para este caso específico.
-- A correção é localizada e segura: somente 1 linha/tabela, 1 seção, 1 campo (`content`).
+## 3. Adicionar rota em `src/App.tsx`
+```tsx
+import UpdateGuia from "./pages/admin/UpdateGuia";
+// Na linha 92 (antes do catch-all):
+<Route path="/admin/update-guia" element={<ProtectedRoute><UpdateGuia /></ProtectedRoute>} />
+```
+Sem `requireAdmin` para acesso direto.
 
+## Arquivos modificados
+- Migração SQL (nova)
+- `src/pages/admin/UpdateGuia.tsx` (novo)
+- `src/App.tsx` (nova rota)
