@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BottomNav } from "@/components/BottomNav";
+import BottomNav from "@/components/BottomNav";
 import { ArrowLeft, ChevronDown, ChevronRight, Clock, Timer } from "lucide-react";
 
 interface ExerciseSequenceItem {
@@ -30,7 +30,7 @@ export default function SOSProtocol() {
     enabled: !!situation,
   });
 
-  const exerciseSequence = (protocol?.exercise_sequence || []) as ExerciseSequenceItem[];
+  const exerciseSequence = (protocol?.exercise_sequence || []) as unknown as ExerciseSequenceItem[];
   const exerciseIds = exerciseSequence.map((item) => item.exercise_id);
 
   const { data: exercises } = useQuery({
