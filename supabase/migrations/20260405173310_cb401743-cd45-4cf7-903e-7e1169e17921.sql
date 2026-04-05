@@ -1,0 +1,1 @@
+DROP POLICY "Temp public update ebook_sections" ON ebook_sections;
