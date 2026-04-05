@@ -1,27 +1,25 @@
 
 
-# Limpeza pós-importação
+# Fix build errors in GitHub-synced files
 
-## 1. Migração SQL
-Remover as duas políticas temporárias de INSERT público:
-```sql
-DROP POLICY "Temp public insert ebook_sections" ON ebook_sections;
-DROP POLICY "Temp public insert sos_protocols" ON sos_protocols;
-```
+## Problem
+Three files use `{ BottomNav }` (named import) but `BottomNav` is a default export.
 
-## 2. Remover `src/pages/admin/ImportGuia.tsx`
-Deletar o arquivo.
+## Changes
 
-## 3. `src/App.tsx`
-- Remover import de `ImportGuia`
-- Remover a rota `/admin/import-guia`
+### 1. `src/pages/Guia.tsx` (line 5)
+Change `import { BottomNav } from "@/components/BottomNav"` to `import BottomNav from "@/components/BottomNav"`
 
-## 4. `src/components/AdminLayout.tsx`
-- Remover o item `{ label: "Importar Guia", icon: BookOpen, path: "/admin/import-guia" }` do array `navItems`
+### 2. `src/pages/GuiaSection.tsx` (line 4)
+Change `import { BottomNav } from "@/components/BottomNav"` to `import BottomNav from "@/components/BottomNav"`
 
-## Arquivos modificados
-- Migração SQL (nova)
-- `src/pages/admin/ImportGuia.tsx` (deletado)
-- `src/App.tsx`
-- `src/components/AdminLayout.tsx`
+### 3. `src/pages/SOSProtocol.tsx` (line 5)
+Change `import { BottomNav } from "@/components/BottomNav"` to `import BottomNav from "@/components/BottomNav"`
+
+The `exercise_sequence` type casting issue on line 33 of SOSProtocol.tsx should resolve once `types.ts` regenerates with the `sos_protocols` table schema (it already exists in the DB). If the error persists, we cast through `unknown` first: `as unknown as ExerciseSequenceItem[]`.
+
+## Files modified
+- `src/pages/Guia.tsx`
+- `src/pages/GuiaSection.tsx`
+- `src/pages/SOSProtocol.tsx`
 
