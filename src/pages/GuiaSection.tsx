@@ -4,9 +4,143 @@ import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 
+/** Parse table-like content into rows and columns */
+function parseTable(content: string) {
+  const lines = content.split("\n").map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) return null;
+
+  // Try to detect column count from first few lines
+  // Tables in the ebook have patterns like: Header1 \n Value1 \n Header2 \n Value2
+  // Or: Característica \n Lipedema \n Linfedema \n Obesidade
+
+  // Check if first line looks like a title (not a column header)
+  let startIdx = 0;
+  let title = "";
+  if (lines[0].length > 40 || !lines[1]) {
+    title = lines[0];
+    startIdx = 1;
+  }
+
+  // Detect number of columns by looking for repeating patterns
+  const remainingLines = lines.slice(startIdx);
+
+  // For the known tables, detect by content
+  const isThreeColTable = remainingLines.some((l) => l === "Lipedema") &&
+                          remainingLines.some((l) => l === "Linfedema");
+  const isTwoColTable = remainingLines.some((l) => l.includes("Drenagem Linfática")) &&
+                        remainingLines.some((l) => l.includes("Modeladora"));
+
+  if (isThreeColTable) {
+    // 4-column table: Característica, Lipedema, Linfedema, Obesidade
+    return parseFixedColumnTable(remainingLines, 4, title);
+  } else if (isTwoColTable) {
+    // 3-column table: Característica, DLM, Massagem
+    return parseFixedColumnTable(remainingLines, 3, title);
+  }
+
+  return null;
+}
+
+function parseFixedColumnTable(lines: string[], numCols: number, title: string) {
+  // Group lines into rows of numCols
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentCell = "";
+
+  for (const line of lines) {
+    // Heuristic: if the line is a known header or very short and matches pattern
+    const isNewCell = currentCell.length > 0 && (
+      line.length < 50 ||
+      /^[A-ZÁÉÍÓÚ]/.test(line)
+    );
+
+    if (currentCell && isNewCell) {
+      currentRow.push(currentCell.trim());
+      currentCell = line;
+
+      if (currentRow.length === numCols) {
+        rows.push(currentRow);
+        currentRow = [];
+      }
+    } else {
+      currentCell = currentCell ? currentCell + " " + line : line;
+    }
+  }
+
+  // Push remaining
+  if (currentCell) currentRow.push(currentCell.trim());
+  if (currentRow.length > 0) rows.push(currentRow);
+
+  return { title, rows, numCols };
+}
+
+function TableRenderer({ content }: { content: string }) {
+  const table = parseTable(content);
+
+  if (!table || table.rows.length < 2) {
+    // Fallback: render as formatted text blocks
+    const blocks = content.split("\n\n").filter(Boolean);
+    return (
+      <div className="space-y-3">
+        {blocks.map((block, i) => {
+          const lines = block.split("\n").filter((l) => l.trim());
+          if (lines.length === 1) {
+            return <p key={i} className="font-semibold text-levvia-fg">{lines[0]}</p>;
+          }
+          return (
+            <div key={i} className="levvia-card !p-3 space-y-1">
+              {lines.map((line, j) => (
+                <p key={j} className={j === 0 ? "font-semibold text-levvia-fg text-sm" : "text-levvia-fg/70 text-sm"}>
+                  {line}
+                </p>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  const [header, ...bodyRows] = table.rows;
+
+  return (
+    <div>
+      {table.title && (
+        <p className="font-heading font-bold text-levvia-fg mb-3">{table.title}</p>
+      )}
+      <div className="overflow-x-auto -mx-4 px-4">
+        <table className="w-full text-sm border-collapse min-w-[500px]">
+          <thead>
+            <tr className="bg-levvia-primary/10">
+              {header.map((cell, i) => (
+                <th key={i} className="text-left px-3 py-2.5 font-semibold text-levvia-fg border border-levvia-border text-xs">
+                  {cell}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {bodyRows.map((row, i) => (
+              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-levvia-bg"}>
+                {row.map((cell, j) => (
+                  <td key={j} className={`px-3 py-2.5 border border-levvia-border text-xs text-levvia-fg/80 ${j === 0 ? "font-medium" : ""}`}>
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function GuiaSection() {
   const { chapterId, sectionId } = useParams();
   const navigate = useNavigate();
+
+  const goBackToGuia = () => navigate(`/guia?cap=${chapterId}`);
 
   const { data: section } = useQuery({
     queryKey: ["ebook-section", sectionId],
@@ -55,13 +189,15 @@ export default function GuiaSection() {
   const prev = currentIdx > 0 ? siblings?.[currentIdx - 1] : null;
   const next = currentIdx >= 0 && siblings && currentIdx < siblings.length - 1 ? siblings[currentIdx + 1] : null;
 
+  const isTable = section?.content_type === "table";
+
   return (
     <div className="theme-light levvia-page min-h-screen pb-24">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-levvia-bg/95 backdrop-blur-sm border-b border-levvia-border px-4 py-3">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate("/guia")}
+            onClick={goBackToGuia}
             className="p-1.5 rounded-lg hover:bg-levvia-primary/10 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-levvia-fg" />
@@ -77,12 +213,12 @@ export default function GuiaSection() {
       <main className="px-4 py-4 max-w-lg mx-auto">
         {/* Breadcrumb */}
         <div className="flex items-center gap-1 text-xs text-levvia-muted mb-4 flex-wrap">
-          <button onClick={() => navigate("/guia")} className="hover:text-levvia-primary transition-colors">
+          <button onClick={goBackToGuia} className="hover:text-levvia-primary transition-colors">
             Guia
           </button>
           <span>›</span>
-          <button onClick={() => navigate("/guia")} className="hover:text-levvia-primary transition-colors">
-            {chapter?.chapter_number === 0 ? "Introdução" : `Cap ${chapterId}`}
+          <button onClick={goBackToGuia} className="hover:text-levvia-primary transition-colors">
+            Cap {chapterId}
           </button>
           <span>›</span>
           <span className="text-levvia-fg font-medium truncate max-w-[200px]">
@@ -113,16 +249,21 @@ export default function GuiaSection() {
         )}
 
         {/* Content */}
-        <div className="space-y-4 text-levvia-fg/90 leading-relaxed text-base font-body">
-          {section?.content &&
-            section.content
-              .split(/\n\s*\n/)
-              .map((block) => block.replace(/\n/g, " ").replace(/\s+/g, " ").trim())
-              .filter(Boolean)
-              .map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
-        </div>
+        {section?.content && (
+          isTable ? (
+            <TableRenderer content={section.content} />
+          ) : (
+            <div className="space-y-4 text-levvia-fg/90 leading-relaxed text-base font-body">
+              {section.content
+                .split(/\n\s*\n/)
+                .map((block) => block.replace(/\n/g, " ").replace(/\s+/g, " ").trim())
+                .filter(Boolean)
+                .map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+            </div>
+          )
+        )}
 
         {/* Prev/Next */}
         <div className="flex items-center justify-between mt-8 gap-3">

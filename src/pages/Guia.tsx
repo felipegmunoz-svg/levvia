@@ -1,13 +1,24 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 export default function Guia() {
-  const [expandedChapter, setExpandedChapter] = useState<number | null>(null);
+  const [searchParams] = useSearchParams();
+  const openChapter = searchParams.get("cap");
+  const [expandedChapter, setExpandedChapter] = useState<number | null>(
+    openChapter ? Number(openChapter) : null
+  );
   const navigate = useNavigate();
+
+  // Keep accordion open when returning from a section
+  useEffect(() => {
+    if (openChapter) {
+      setExpandedChapter(Number(openChapter));
+    }
+  }, [openChapter]);
 
   const { data: chapters, isLoading: loadingChapters } = useQuery({
     queryKey: ["ebook-chapters"],
