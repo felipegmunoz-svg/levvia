@@ -34,6 +34,7 @@ import Notifications from "./pages/admin/Notifications";
 import Financial from "./pages/admin/Financial";
 import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
+import ImportGuia from "./pages/admin/ImportGuia";
 import Day1Journey from "./pages/Day1Journey";
 import Celebration from "./pages/Celebration";
 import Diary from "./pages/Diary";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/admin/financial" element={<ProtectedRoute requireAdmin><Financial /></ProtectedRoute>} />
             <Route path="/admin/learn-modules" element={<ProtectedRoute requireAdmin><LearnModules /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/import-guia" element={<ProtectedRoute requireAdmin><ImportGuia /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

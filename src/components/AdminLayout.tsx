@@ -26,6 +26,7 @@ const navItems = [
   { label: "Financeiro", icon: DollarSign, path: "/admin/financial" },
   { label: "Notificações", icon: Bell, path: "/admin/notifications" },
   { label: "Administradores", icon: ShieldCheck, path: "/admin/users" },
+  { label: "Importar Guia", icon: BookOpen, path: "/admin/import-guia" },
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
