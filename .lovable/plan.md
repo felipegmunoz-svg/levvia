@@ -1,25 +1,53 @@
 
+# Corrigir o conteúdo da seção “Dedicatória e Prefácio” com substituição manual
 
-# Fix build errors in GitHub-synced files
+## O que encontrei
+A seção `bf31f496-9350-4ed7-9420-5df905ed8c6f` ainda contém o nome do autor no banco. O problema não é a tela: o texto salvo realmente inclui este trecho, com acentuação em Unicode decomposta e quebra de linha:
 
-## Problem
-Three files use `{ BottomNav }` (named import) but `BottomNav` is a default export.
+```text
+Com carinho, respeito e compromisso,
+Luís Cláudio da 
 
-## Changes
+Viver com lipedema...
+```
 
-### 1. `src/pages/Guia.tsx` (line 5)
-Change `import { BottomNav } from "@/components/BottomNav"` to `import BottomNav from "@/components/BottomNav"`
+Além disso, `GuiaSection.tsx` normaliza quebras de linha ao renderizar:
+```ts
+.split(/\n\s*\n/)
+.map((block) => block.replace(/\n/g, " ").replace(/\s+/g, " ").trim())
+```
+Então esse trecho aparece na UI como uma frase contínua, mesmo quando buscas anteriores não encontraram o encoding corretamente.
 
-### 2. `src/pages/GuiaSection.tsx` (line 4)
-Change `import { BottomNav } from "@/components/BottomNav"` to `import BottomNav from "@/components/BottomNav"`
+## Correção a aplicar
+Vou fazer exatamente a substituição manual pedida, apenas nessa seção:
 
-### 3. `src/pages/SOSProtocol.tsx` (line 5)
-Change `import { BottomNav } from "@/components/BottomNav"` to `import BottomNav from "@/components/BottomNav"`
+1. Ler o conteúdo completo atual da seção `bf31f496-9350-4ed7-9420-5df905ed8c6f`
+2. Identificar manualmente o bloco que começa em:
+   - `Com carinho, respeito e compromisso`
+   e termina imediatamente antes de:
+   - `Viver com lipedema`
+3. Montar um `UPDATE` com o conteúdo completo corrigido da seção, sem usar `REPLACE` nem `REGEXP_REPLACE`
+4. Salvar o novo conteúdo com este trecho exato:
+```text
+Com carinho, respeito e compromisso, Equipe Levvia.
+```
+5. Confirmar com uma consulta de verificação mostrando cerca de 50 caracteres ao redor de `compromisso`
 
-The `exercise_sequence` type casting issue on line 33 of SOSProtocol.tsx should resolve once `types.ts` regenerates with the `sos_protocols` table schema (it already exists in the DB). If the error persists, we cast through `unknown` first: `as unknown as ExerciseSequenceItem[]`.
+## SQL que será executado
+A implementação será um `UPDATE ebook_sections SET content = '...texto completo corrigido...' WHERE id = 'bf31f496-9350-4ed7-9420-5df905ed8c6f';`
 
-## Files modified
-- `src/pages/Guia.tsx`
-- `src/pages/GuiaSection.tsx`
-- `src/pages/SOSProtocol.tsx`
+Depois, uma verificação como:
+```sql
+SELECT SUBSTRING(content FROM GREATEST(POSITION('compromisso' IN content) - 25, 1) FOR 100)
+FROM ebook_sections
+WHERE id = 'bf31f496-9350-4ed7-9420-5df905ed8c6f';
+```
+
+## Resultado esperado
+Na tela `/guia/0/bf31f496-9350-4ed7-9420-5df905ed8c6f`, o nome do autor deixará de aparecer, porque ele será removido do conteúdo fonte salvo no banco.
+
+## Detalhes técnicos
+- A causa raiz é texto salvo com caracteres Unicode combinados (`é`, `ã`, etc.), o que pode quebrar buscas simples e substituições parciais.
+- Não há necessidade de alterar `GuiaSection.tsx` para este caso específico.
+- A correção é localizada e segura: somente 1 linha/tabela, 1 seção, 1 campo (`content`).
 
