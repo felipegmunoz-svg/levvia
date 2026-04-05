@@ -38,6 +38,9 @@ import LearnModules from "./pages/admin/LearnModules";
 import Day1Journey from "./pages/Day1Journey";
 import Celebration from "./pages/Celebration";
 import Diary from "./pages/Diary";
+import Guia from "./pages/Guia";
+import GuiaSection from "./pages/GuiaSection";
+import SOSProtocol from "./pages/SOSProtocol";
 import NotFound from "./pages/NotFound";
 
 // build v6 – review mode + SW fix
@@ -64,7 +67,10 @@ const App = () => (
             <Route path="/celebration" element={<ProtectedRoute><Celebration /></ProtectedRoute>} />
             <Route path="/journey" element={<ProtectedRoute><Journey /></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
+            <Route path="/guia" element={<ProtectedRoute><Guia /></ProtectedRoute>} />
+            <Route path="/guia/:chapterId/:sectionId" element={<ProtectedRoute><GuiaSection /></ProtectedRoute>} />
             <Route path="/practices" element={<ProtectedRoute><Practices /></ProtectedRoute>} />
+            <Route path="/practices/sos/:situation" element={<ProtectedRoute><SOSProtocol /></ProtectedRoute>} />
             <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
             <Route path="/diary" element={<ProtectedRoute><Diary /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

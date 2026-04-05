@@ -49,6 +49,8 @@
     /* Custom tokens */
     --success: 174 63% 47%;
     --success-foreground: 0 0% 100%;
+    --sos: 0 84% 60%;
+    --sos-foreground: 0 0% 100%;
     --primary-light: 212 59% 26% / 0.25;
     --primary-glow: 196 58% 42%;
     --glass-bg: 0 0% 100% / 0.06;
@@ -73,6 +75,8 @@
     --border: 0 0% 0% / 0.04;
     --input: 0 0% 0% / 0.08;
     --ring: 174 63% 47%;
+    --sos: 0 84% 60%;
+    --sos-foreground: 0 0% 100%;
     --glass-bg: 0 0% 100% / 0.80;
     --glass-border: 0 0% 0% / 0.04;
   }
