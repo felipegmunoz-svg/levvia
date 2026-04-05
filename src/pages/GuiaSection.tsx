@@ -114,11 +114,14 @@ export default function GuiaSection() {
 
         {/* Content */}
         <div className="space-y-4 text-levvia-fg/90 leading-relaxed text-base font-body">
-          {section?.content?.split("\n").map((paragraph, i) =>
-            paragraph.trim() ? (
-              <p key={i}>{paragraph}</p>
-            ) : null
-          )}
+          {section?.content &&
+            section.content
+              .split(/\n\s*\n/)
+              .map((block) => block.replace(/\n/g, " ").replace(/\s+/g, " ").trim())
+              .filter(Boolean)
+              .map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
         </div>
 
         {/* Prev/Next */}
