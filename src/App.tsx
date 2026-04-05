@@ -91,6 +91,7 @@ const App = () => (
             <Route path="/admin/financial" element={<ProtectedRoute requireAdmin><Financial /></ProtectedRoute>} />
             <Route path="/admin/learn-modules" element={<ProtectedRoute requireAdmin><LearnModules /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/update-guia" element={<ProtectedRoute><UpdateGuia /></ProtectedRoute>} />
             
             
             <Route path="*" element={<NotFound />} />
