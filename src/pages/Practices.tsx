@@ -194,7 +194,7 @@ const Practices = () => {
     return <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />;
   }
 
-  const currentTags = allExerciseTags;
+  
   const isPersonalized = !showAll && !profileLoading;
   const totalRaw = tab === "exercises" ? rawExercises.length : rawRecipes.length;
   const totalFiltered = tab === "exercises" ? personalizedExercises.length : personalizedRecipes.length;
