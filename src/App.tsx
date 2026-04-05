@@ -34,7 +34,7 @@ import Notifications from "./pages/admin/Notifications";
 import Financial from "./pages/admin/Financial";
 import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
-import UpdateGuia from "./pages/admin/UpdateGuia";
+
 
 import Day1Journey from "./pages/Day1Journey";
 import Celebration from "./pages/Celebration";
@@ -91,7 +91,7 @@ const App = () => (
             <Route path="/admin/financial" element={<ProtectedRoute requireAdmin><Financial /></ProtectedRoute>} />
             <Route path="/admin/learn-modules" element={<ProtectedRoute requireAdmin><LearnModules /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin/update-guia" element={<ProtectedRoute><UpdateGuia /></ProtectedRoute>} />
+            
             
             
             <Route path="*" element={<NotFound />} />
