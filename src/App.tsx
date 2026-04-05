@@ -83,7 +83,7 @@ const App = () => (
             <Route path="/admin/financial" element={<ProtectedRoute requireAdmin><Financial /></ProtectedRoute>} />
             <Route path="/admin/learn-modules" element={<ProtectedRoute requireAdmin><LearnModules /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin/import-guia" element={<ProtectedRoute requireAdmin><ImportGuia /></ProtectedRoute>} />
+            <Route path="/admin/import-guia" element={<ProtectedRoute><ImportGuia /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
