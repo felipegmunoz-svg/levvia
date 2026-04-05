@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import DayReview from "@/components/journey/DayReview";
+import TodaySearchOverlay from "@/components/TodaySearchOverlay";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Search, ShieldAlert } from "lucide-react";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import { toast } from "sonner";
 
@@ -33,6 +35,7 @@ const Today = () => {
     return () => debugUnmount("Today");
   }, []);
 
+  const [showSearch, setShowSearch] = useState(false);
   const { user, loading: authLoading } = useAuth();
   const { rescueMode, evaluateCheckpoint, isCheckpointDay } = useRescueMode();
 
@@ -204,7 +207,27 @@ const Today = () => {
           <div>tp:{todayTouchpoints ? 'yes' : 'no'} | replay:{String(replayDay)}</div>
         </div>
       )}
-      <div className="theme-light levvia-page">{content}</div>
+      {showSearch && <TodaySearchOverlay onClose={() => setShowSearch(false)} />}
+      <div className="theme-light levvia-page">
+        {/* Quick access bar */}
+        <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+          <button
+            onClick={() => setShowSearch(true)}
+            className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-muted-foreground text-sm hover:border-secondary/30 transition-all"
+          >
+            <Search className="w-4 h-4" />
+            <span>Buscar no Guia...</span>
+          </button>
+          <button
+            onClick={() => navTo("/practices?tab=exercises&sos=1")}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-sos/10 border border-sos/20 text-sos text-sm font-medium hover:bg-sos/20 transition-all"
+          >
+            <ShieldAlert className="w-4 h-4" />
+            SOS
+          </button>
+        </div>
+        {content}
+      </div>
     </>
   );
 };

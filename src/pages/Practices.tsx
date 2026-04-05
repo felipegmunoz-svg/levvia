@@ -88,7 +88,7 @@ const Practices = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [sosMode, setSosMode] = useState(false);
+  const [sosMode, setSosMode] = useState(searchParams.get("sos") === "1");
   const navigate = useNavigate();
   const [rawExercises, setRawExercises] = useState<DbExercise[]>([]);
   const [rawRecipes, setRawRecipes] = useState<DbRecipe[]>([]);
