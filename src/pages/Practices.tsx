@@ -165,10 +165,11 @@ const Practices = () => {
   const totalFiltered = tab === "exercises" ? personalizedExercises.length : personalizedRecipes.length;
 
   const MEAL_TYPES = [
-    { key: "cafe_da_manha", label: "Café da Manhã", icon: "☕" },
-    { key: "almoco", label: "Almoço", icon: "🍽️" },
-    { key: "lanche", label: "Lanche", icon: "🥤" },
-    { key: "jantar", label: "Jantar", icon: "🌙" },
+    { key: "Café da Manhã", label: "Café da Manhã", icon: "☕" },
+    { key: "Lanche da Manhã", label: "Lanche da Manhã", icon: "🍎" },
+    { key: "Almoço", label: "Almoço", icon: "🍽️" },
+    { key: "Lanche da Tarde", label: "Lanche da Tarde", icon: "🥤" },
+    { key: "Jantar", label: "Jantar", icon: "🌙" },
   ];
 
   const DIET_TYPES = [
