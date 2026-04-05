@@ -140,7 +140,7 @@ export default function GuiaSection() {
   const { chapterId, sectionId } = useParams();
   const navigate = useNavigate();
 
-  const goBackToGuia = () => navigate(`/guia?cap=${chapterId}`);
+  const goBackToGuia = () => navigate(`/guia?cap=${chapterId}&from=${sectionId}`);
 
   const { data: section } = useQuery({
     queryKey: ["ebook-section", sectionId],
