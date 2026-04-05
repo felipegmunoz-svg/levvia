@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { PenLine, Send, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { PenLine, Send, Clock, Book, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
@@ -12,6 +13,7 @@ interface DiaryEntry {
 }
 
 const Diary = () => {
+  const navTo = useNavigate();
   const { user } = useAuth();
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -84,9 +86,29 @@ const Diary = () => {
           </h1>
         </div>
         <p className="text-sm text-levvia-muted font-body mt-2 leading-relaxed max-w-xs mx-auto">
-          Este é o seu espaço. Como você está se sentindo agora? Quer registrar um
-          momento importante ou uma sensação da sua jornada para o seu relatório?
+          Este é o seu espaço. Como você está se sentindo agora?
         </p>
+
+        {/* Sub-tabs */}
+        <div className="flex gap-2 mt-4 justify-center">
+          <button
+            onClick={() => navTo("/journey")}
+            className="px-4 py-2 rounded-lg text-xs font-medium text-levvia-muted hover:bg-levvia-primary/5 transition-colors flex items-center gap-1.5"
+          >
+            <Book className="w-3.5 h-3.5" />
+            Jornada
+          </button>
+          <button
+            onClick={() => navTo("/progress")}
+            className="px-4 py-2 rounded-lg text-xs font-medium text-levvia-muted hover:bg-levvia-primary/5 transition-colors flex items-center gap-1.5"
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            Progresso
+          </button>
+          <button className="px-4 py-2 rounded-lg text-xs font-medium bg-levvia-primary/10 text-levvia-primary">
+            Diário
+          </button>
+        </div>
       </div>
 
       {/* Input Area */}

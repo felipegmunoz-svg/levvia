@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, TrendingUp, Droplets, Flame, Waves } from "lucide-react";
+import { ChevronLeft, TrendingUp, Droplets, Flame, Waves, Book, PenLine } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import FlowSilhouette, { calculateFlowScore } from "@/components/FlowSilhouette";
 import { useHydration } from "@/hooks/useHydration";
@@ -130,6 +130,27 @@ const Progress = () => {
         <p className="text-[13px] text-levvia-muted font-body mt-1">
           Acompanhe sua evolução
         </p>
+
+        {/* Sub-tabs */}
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={() => navigate("/journey")}
+            className="px-4 py-2 rounded-lg text-xs font-medium text-levvia-muted hover:bg-levvia-primary/5 transition-colors flex items-center gap-1.5"
+          >
+            <Book className="w-3.5 h-3.5" />
+            Jornada
+          </button>
+          <button className="px-4 py-2 rounded-lg text-xs font-medium bg-levvia-primary/10 text-levvia-primary">
+            Progresso
+          </button>
+          <button
+            onClick={() => navigate("/diary")}
+            className="px-4 py-2 rounded-lg text-xs font-medium text-levvia-muted hover:bg-levvia-primary/5 transition-colors flex items-center gap-1.5"
+          >
+            <PenLine className="w-3.5 h-3.5" />
+            Diário
+          </button>
+        </div>
       </header>
 
       <main className="px-5 space-y-5">

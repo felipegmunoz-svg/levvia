@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Check, Lock, ChevronRight } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Check, Lock, ChevronRight, BarChart3, PenLine } from "lucide-react";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ProgressCircle from "@/components/ui/ProgressCircle";
@@ -130,6 +130,27 @@ const Journey = () => {
         <p className="text-[13px] text-levvia-muted font-body mt-1 text-center">
           Jornada de Consciência
         </p>
+
+        {/* Sub-tabs */}
+        <div className="flex gap-2 mt-4 justify-center">
+          <button className="px-4 py-2 rounded-lg text-xs font-medium bg-levvia-primary/10 text-levvia-primary">
+            Jornada
+          </button>
+          <button
+            onClick={() => navigate("/progress")}
+            className="px-4 py-2 rounded-lg text-xs font-medium text-levvia-muted hover:bg-levvia-primary/5 transition-colors flex items-center gap-1.5"
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            Progresso
+          </button>
+          <button
+            onClick={() => navigate("/diary")}
+            className="px-4 py-2 rounded-lg text-xs font-medium text-levvia-muted hover:bg-levvia-primary/5 transition-colors flex items-center gap-1.5"
+          >
+            <PenLine className="w-3.5 h-3.5" />
+            Diário
+          </button>
+        </div>
       </header>
 
       <div className="flex justify-center mb-8">
