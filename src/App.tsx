@@ -41,6 +41,7 @@ import Diary from "./pages/Diary";
 import Guia from "./pages/Guia";
 import GuiaSection from "./pages/GuiaSection";
 import SOSProtocol from "./pages/SOSProtocol";
+import UpdateGuia from "./pages/admin/UpdateGuia";
 import NotFound from "./pages/NotFound";
 
 // build v6 – review mode + SW fix
@@ -90,6 +91,7 @@ const App = () => (
             <Route path="/admin/learn-modules" element={<ProtectedRoute requireAdmin><LearnModules /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
             
+            <Route path="/admin/update-guia" element={<ProtectedRoute><UpdateGuia /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

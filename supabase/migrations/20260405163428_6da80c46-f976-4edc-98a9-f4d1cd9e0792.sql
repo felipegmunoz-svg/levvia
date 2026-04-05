@@ -1,0 +1,1 @@
+CREATE POLICY "Temp public update ebook_sections" ON ebook_sections FOR UPDATE USING (true) WITH CHECK (true);
