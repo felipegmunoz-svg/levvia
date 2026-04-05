@@ -88,6 +88,8 @@ const Practices = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [mealFilter, setMealFilter] = useState<string | null>(null);
+  const [dietFilter, setDietFilter] = useState<string | null>(null);
   const navigate = useNavigate();
   const [rawExercises, setRawExercises] = useState<DbExercise[]>([]);
   const [rawRecipes, setRawRecipes] = useState<DbRecipe[]>([]);
@@ -134,9 +136,20 @@ const Practices = () => {
     ? exercises.filter((e) => e.category === activeTag || e.level === activeTag)
     : exercises;
 
-  const filteredRecipes = activeTag
-    ? recipes.filter((r) => r.tags.includes(activeTag) || r.category === activeTag)
-    : recipes;
+  const filteredRecipes = useMemo(() => {
+    let result = personalizedRecipes;
+    if (mealFilter) {
+      result = result.filter((r) =>
+        r.tipo_refeicao?.some((t: string) => t.toLowerCase().includes(mealFilter.toLowerCase()))
+      );
+    }
+    if (dietFilter) {
+      result = result.filter((r) =>
+        r.diet_profile?.some((d: string) => d.toLowerCase().includes(dietFilter.toLowerCase()))
+      );
+    }
+    return result.map(toRecipeView);
+  }, [personalizedRecipes, mealFilter, dietFilter]);
 
   if (selectedExercise) {
     return <ExerciseDetail exercise={selectedExercise} onBack={() => setSelectedExercise(null)} />;
@@ -146,10 +159,25 @@ const Practices = () => {
     return <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />;
   }
 
-  const currentTags = tab === "exercises" ? allExerciseTags : allRecipeTags;
+  const currentTags = allExerciseTags;
   const isPersonalized = !showAll && !profileLoading;
   const totalRaw = tab === "exercises" ? rawExercises.length : rawRecipes.length;
   const totalFiltered = tab === "exercises" ? personalizedExercises.length : personalizedRecipes.length;
+
+  const MEAL_TYPES = [
+    { key: "café", label: "Café da Manhã", icon: "☕" },
+    { key: "lanche_manha", label: "Lanche da Manhã", icon: "🍎" },
+    { key: "almoço", label: "Almoço", icon: "🍽️" },
+    { key: "lanche", label: "Lanche da Tarde", icon: "🥤" },
+    { key: "jantar", label: "Jantar", icon: "🌙" },
+  ];
+
+  const DIET_TYPES = [
+    { key: "vegana", label: "Vegana" },
+    { key: "vegetariana", label: "Vegetariana" },
+    { key: "onívora", label: "Onívora" },
+    { key: "gluten", label: "Sem Glúten" },
+  ];
 
   return (
     <div className="min-h-screen bg-background gradient-page pb-24">
@@ -221,92 +249,188 @@ const Practices = () => {
         </main>
       )}
 
-      {/* Personalization indicator - hidden in SOS mode */}
-      {tab !== "sos" && !loading && !profileLoading && (
-        <div className="px-5 mb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {isPersonalized && (
-                <Badge variant="secondary" className="bg-secondary/20 text-secondary border-0 text-xs gap-1">
-                  <Sparkles size={10} />
-                  Personalizado
-                </Badge>
-              )}
-              <span className="text-xs text-muted-foreground">
-                {isPersonalized && totalFiltered < totalRaw
-                  ? `${totalFiltered} de ${totalRaw} para seu perfil`
-                  : `${totalRaw} disponíveis`}
-              </span>
+      {/* === EXERCISES TAB === */}
+      {tab === "exercises" && (
+        <>
+          {/* Personalization indicator */}
+          {!loading && !profileLoading && (
+            <div className="px-5 mb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isPersonalized && (
+                    <Badge variant="secondary" className="bg-secondary/20 text-secondary border-0 text-xs gap-1">
+                      <Sparkles size={10} />
+                      Personalizado
+                    </Badge>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {isPersonalized && totalFiltered < totalRaw
+                      ? `${totalFiltered} de ${totalRaw} para seu perfil`
+                      : `${totalRaw} disponíveis`}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="text-xs text-secondary hover:underline"
+                >
+                  {showAll ? "Personalizar" : "Ver todos"}
+                </button>
+              </div>
             </div>
-            <button
-              onClick={() => setShowAll(!showAll)}
-              className="text-xs text-secondary hover:underline"
-            >
-              {showAll ? "Personalizar" : "Ver todos"}
-            </button>
+          )}
+
+          {/* Exercise tag filters */}
+          <div className="px-5 mb-4">
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setActiveTag(null)}
+                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+                  !activeTag
+                    ? "bg-secondary text-foreground"
+                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                }`}
+              >
+                Todos
+              </button>
+              {currentTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                  className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+                    activeTag === tag
+                      ? "bg-secondary text-foreground"
+                      : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+
+          {/* Exercise list */}
+          <main className="px-5 space-y-3">
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <>
+                {filteredExercises.map((ex, i) => (
+                  <ExerciseCard
+                    key={`ex-${i}`}
+                    exercise={ex}
+                    onClick={() => setSelectedExercise(ex)}
+                  />
+                ))}
+                {filteredExercises.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    Nenhum exercício encontrado para este filtro.
+                  </p>
+                )}
+              </>
+            )}
+          </main>
+        </>
       )}
 
-      {/* Tag filters - hidden in SOS mode */}
-      {tab !== "sos" && <div className="px-5 mb-4">
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => setActiveTag(null)}
-            className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
-              !activeTag
-                ? "bg-secondary text-foreground"
-                : "bg-white/[0.06] text-muted-foreground border border-white/10"
-            }`}
-          >
-            Todos
-          </button>
-          {currentTags.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-              className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
-                activeTag === tag
-                  ? "bg-secondary text-foreground"
-                  : "bg-white/[0.06] text-muted-foreground border border-white/10"
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-      </div>}
-
-      {tab !== "sos" && <main className="px-5 space-y-3">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+      {/* === RECIPES TAB === */}
+      {tab === "recipes" && (
+        <>
+          {/* Meal type filter */}
+          <div className="px-5 mb-3">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 font-medium">Tipo de Refeição</p>
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setMealFilter(null)}
+                className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
+                  !mealFilter
+                    ? "bg-secondary text-foreground"
+                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                }`}
+              >
+                Todas
+              </button>
+              {MEAL_TYPES.map((meal) => (
+                <button
+                  key={meal.key}
+                  onClick={() => setMealFilter(mealFilter === meal.key ? null : meal.key)}
+                  className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all flex items-center gap-1 ${
+                    mealFilter === meal.key
+                      ? "bg-secondary text-foreground"
+                      : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                  }`}
+                >
+                  <span>{meal.icon}</span>
+                  {meal.label}
+                </button>
+              ))}
+            </div>
           </div>
-        ) : tab === "exercises" ? (
-          filteredExercises.map((ex, i) => (
-            <ExerciseCard
-              key={`ex-${i}`}
-              exercise={ex}
-              onClick={() => setSelectedExercise(ex)}
-            />
-          ))
-        ) : (
-          filteredRecipes.map((recipe, i) => (
-            <RecipeCard
-              key={`rec-${i}`}
-              recipe={recipe}
-              onClick={() => setSelectedRecipe(recipe)}
-            />
-          ))
-        )}
-        {!loading &&
-          ((tab === "exercises" && filteredExercises.length === 0) ||
-            (tab === "recipes" && filteredRecipes.length === 0)) && (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Nenhum resultado encontrado para este filtro.
-            </p>
-          )}
-      </main>}
+
+          {/* Diet filter */}
+          <div className="px-5 mb-4">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 font-medium">Dieta</p>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setDietFilter(null)}
+                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+                  !dietFilter
+                    ? "bg-secondary text-foreground"
+                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                }`}
+              >
+                Todas
+              </button>
+              {DIET_TYPES.map((diet) => (
+                <button
+                  key={diet.key}
+                  onClick={() => setDietFilter(dietFilter === diet.key ? null : diet.key)}
+                  className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+                    dietFilter === diet.key
+                      ? "bg-secondary text-foreground"
+                      : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                  }`}
+                >
+                  {diet.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Recipe count */}
+          <div className="px-5 mb-3">
+            <span className="text-xs text-muted-foreground">
+              {filteredRecipes.length} receita{filteredRecipes.length !== 1 ? "s" : ""}
+              {mealFilter || dietFilter ? " encontrada" + (filteredRecipes.length !== 1 ? "s" : "") : ""}
+            </span>
+          </div>
+
+          {/* Recipe list */}
+          <main className="px-5 space-y-3">
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <>
+                {filteredRecipes.map((recipe, i) => (
+                  <RecipeCard
+                    key={`rec-${i}`}
+                    recipe={recipe}
+                    onClick={() => setSelectedRecipe(recipe)}
+                  />
+                ))}
+                {filteredRecipes.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    Nenhuma receita encontrada para este filtro.
+                  </p>
+                )}
+              </>
+            )}
+          </main>
+        </>
+      )}
 
       <BottomNav />
     </div>
