@@ -34,6 +34,7 @@ import Notifications from "./pages/admin/Notifications";
 import Financial from "./pages/admin/Financial";
 import AdminUsers from "./pages/admin/AdminUsers";
 import LearnModules from "./pages/admin/LearnModules";
+import UpdateGuia from "./pages/admin/UpdateGuia";
 
 import Day1Journey from "./pages/Day1Journey";
 import Celebration from "./pages/Celebration";
