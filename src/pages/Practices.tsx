@@ -340,7 +340,7 @@ const Practices = () => {
           {/* Meal type filter */}
           <div className="px-5 mb-3">
             <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 font-medium">Tipo de Refeição</p>
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setMealFilter(null)}
                 className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
