@@ -17,7 +17,16 @@ import {
   type UserProfile,
 } from "@/lib/profileEngine";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ShieldAlert } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+const SOS_SITUATIONS = [
+  { situation: "pernas_pesadas", icon: "🦵", title: "Pernas Pesadas e Inchadas", description: "Alívio para dias de alto edema" },
+  { situation: "dor_intensa", icon: "💥", title: "Dor Intensa", description: "Protocolo gentil para momentos de dor" },
+  { situation: "fadiga_extrema", icon: "😴", title: "Fadiga Extrema", description: "Exercícios mínimos para dias sem energia" },
+  { situation: "ansiedade", icon: "🧘", title: "Ansiedade ou Estresse", description: "Respiração e movimento para acalmar" },
+  { situation: "rigidez_matinal", icon: "🌅", title: "Rigidez Matinal", description: "Despertar o corpo com suavidade" },
+];
 
 // Convert DB types to view types
 function toExerciseView(ex: DbExercise): Exercise {
@@ -79,6 +88,8 @@ const Practices = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [sosMode, setSosMode] = useState(false);
+  const navigate = useNavigate();
   const [rawExercises, setRawExercises] = useState<DbExercise[]>([]);
   const [rawRecipes, setRawRecipes] = useState<DbRecipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -176,8 +187,61 @@ const Practices = () => {
         </div>
       </div>
 
-      {/* Personalization indicator */}
-      {!loading && !profileLoading && (
+      {/* SOS toggle - only visible on exercises tab */}
+      {tab === "exercises" && (
+        <div className="px-6 mb-4">
+          <div className="flex bg-white/[0.06] border border-white/10 rounded-xl p-1">
+            <button
+              onClick={() => setSosMode(false)}
+              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+                !sosMode
+                  ? "bg-white/[0.12] text-foreground"
+                  : "text-muted-foreground"
+              }`}
+            >
+              Biblioteca
+            </button>
+            <button
+              onClick={() => setSosMode(true)}
+              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1.5 ${
+                sosMode
+                  ? "bg-sos/20 text-sos"
+                  : "text-muted-foreground"
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5" />
+              Modo SOS
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* SOS Mode cards */}
+      {tab === "exercises" && sosMode && (
+        <main className="px-5 space-y-3 pb-4">
+          <p className="text-sm text-muted-foreground mb-2">
+            Como você está se sentindo agora?
+          </p>
+          {SOS_SITUATIONS.map((sos) => (
+            <button
+              key={sos.situation}
+              onClick={() => navigate(`/practices/sos/${sos.situation}`)}
+              className="w-full text-left p-4 rounded-2xl bg-white/[0.06] border border-white/10 hover:border-sos/30 hover:bg-sos/5 transition-all min-h-[72px]"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{sos.icon}</span>
+                <div>
+                  <p className="font-medium text-foreground text-sm">{sos.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{sos.description}</p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </main>
+      )}
+
+      {/* Personalization indicator - hidden in SOS mode */}
+      {!sosMode && !loading && !profileLoading && (
         <div className="px-5 mb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -203,8 +267,8 @@ const Practices = () => {
         </div>
       )}
 
-      {/* Tag filters */}
-      <div className="px-5 mb-4">
+      {/* Tag filters - hidden in SOS mode */}
+      {!sosMode && <div className="px-5 mb-4">
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setActiveTag(null)}
@@ -230,9 +294,9 @@ const Practices = () => {
             </button>
           ))}
         </div>
-      </div>
+      </div>}
 
-      <main className="px-5 space-y-3">
+      {!sosMode && <main className="px-5 space-y-3">
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
@@ -261,7 +325,7 @@ const Practices = () => {
               Nenhum resultado encontrado para este filtro.
             </p>
           )}
-      </main>
+      </main>}
 
       <BottomNav />
     </div>
