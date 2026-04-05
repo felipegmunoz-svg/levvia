@@ -88,6 +88,8 @@ const Practices = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [regionFilter, setRegionFilter] = useState<string | null>(null);
+  const [levelFilter, setLevelFilter] = useState<string | null>(null);
   const [mealFilter, setMealFilter] = useState<string | null>(null);
   const [dietFilter, setDietFilter] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -129,12 +131,45 @@ const Practices = () => {
   const exercises = useMemo(() => personalizedExercises.map(toExerciseView), [personalizedExercises]);
   const recipes = useMemo(() => personalizedRecipes.map(toRecipeView), [personalizedRecipes]);
 
-  const allExerciseTags = Array.from(new Set(exercises.flatMap((e) => [e.category, e.level])));
   const allRecipeTags = Array.from(new Set(recipes.flatMap((r) => r.tags)));
 
-  const filteredExercises = activeTag
-    ? exercises.filter((e) => e.category === activeTag || e.level === activeTag)
-    : exercises;
+  const BODY_REGIONS = [
+    { key: "panturrilha", label: "Panturrilha" },
+    { key: "tornozelo", label: "Tornozelo" },
+    { key: "coxa", label: "Coxa" },
+    { key: "quadril", label: "Quadril" },
+    { key: "gluteo", label: "Glúteo" },
+    { key: "core", label: "Core / Abdômen" },
+    { key: "corpo_todo", label: "Corpo Todo" },
+    { key: "relaxamento", label: "Relaxamento / Respiração" },
+  ];
+
+  const LEVELS = [
+    { key: "Muito Fácil", label: "Muito Fácil" },
+    { key: "Fácil", label: "Fácil" },
+    { key: "Moderado", label: "Moderado" },
+  ];
+
+  const filteredExercises = useMemo(() => {
+    let result = personalizedExercises;
+    if (regionFilter) {
+      if (regionFilter === "relaxamento") {
+        result = result.filter((e) =>
+          e.category?.toLowerCase().includes("relaxamento") ||
+          e.category?.toLowerCase().includes("respiração") ||
+          e.category?.toLowerCase().includes("respiracao")
+        );
+      } else {
+        result = result.filter((e) =>
+          (e.body_part || []).some((bp: string) => bp === regionFilter)
+        );
+      }
+    }
+    if (levelFilter) {
+      result = result.filter((e) => e.level === levelFilter);
+    }
+    return result.map(toExerciseView);
+  }, [personalizedExercises, regionFilter, levelFilter]);
 
   const filteredRecipes = useMemo(() => {
     let result = personalizedRecipes;
@@ -251,60 +286,80 @@ const Practices = () => {
       {/* === EXERCISES TAB === */}
       {tab === "exercises" && (
         <>
-          {/* Personalization indicator */}
-          {!loading && !profileLoading && (
-            <div className="px-5 mb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {isPersonalized && (
-                    <Badge variant="secondary" className="bg-secondary/20 text-secondary border-0 text-xs gap-1">
-                      <Sparkles size={10} />
-                      Personalizado
-                    </Badge>
-                  )}
-                  <span className="text-xs text-muted-foreground">
-                    {isPersonalized && totalFiltered < totalRaw
-                      ? `${totalFiltered} de ${totalRaw} para seu perfil`
-                      : `${totalRaw} disponíveis`}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setShowAll(!showAll)}
-                  className="text-xs text-secondary hover:underline"
-                >
-                  {showAll ? "Personalizar" : "Ver todos"}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Exercise tag filters */}
-          <div className="px-5 mb-4">
+          {/* Region filter */}
+          <div className="px-5 mb-3">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 font-medium">Região do Corpo</p>
             <div className="flex gap-2 flex-wrap">
               <button
-                onClick={() => setActiveTag(null)}
-                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
-                  !activeTag
+                onClick={() => setRegionFilter(null)}
+                className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
+                  !regionFilter
                     ? "bg-secondary text-foreground"
                     : "bg-white/[0.06] text-muted-foreground border border-white/10"
                 }`}
               >
-                Todos
+                Todas ({personalizedExercises.length})
               </button>
-              {currentTags.map((tag) => (
+              {BODY_REGIONS.map((region) => {
+                const count = personalizedExercises.filter((e) =>
+                  region.key === "relaxamento"
+                    ? e.category?.toLowerCase().includes("relaxamento") || e.category?.toLowerCase().includes("respiração") || e.category?.toLowerCase().includes("respiracao")
+                    : (e.body_part || []).some((bp: string) => bp === region.key)
+                ).length;
+                if (count === 0) return null;
+                return (
+                  <button
+                    key={region.key}
+                    onClick={() => setRegionFilter(regionFilter === region.key ? null : region.key)}
+                    className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
+                      regionFilter === region.key
+                        ? "bg-secondary text-foreground"
+                        : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                    }`}
+                  >
+                    {region.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Level filter */}
+          <div className="px-5 mb-4">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 font-medium">Dificuldade</p>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setLevelFilter(null)}
+                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+                  !levelFilter
+                    ? "bg-secondary text-foreground"
+                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                }`}
+              >
+                Todas
+              </button>
+              {LEVELS.map((lv) => (
                 <button
-                  key={tag}
-                  onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                  key={lv.key}
+                  onClick={() => setLevelFilter(levelFilter === lv.key ? null : lv.key)}
                   className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
-                    activeTag === tag
+                    levelFilter === lv.key
                       ? "bg-secondary text-foreground"
                       : "bg-white/[0.06] text-muted-foreground border border-white/10"
                   }`}
                 >
-                  {tag}
+                  {lv.label}
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Exercise count */}
+          <div className="px-5 mb-3">
+            <span className="text-xs text-muted-foreground">
+              {filteredExercises.length} exercício{filteredExercises.length !== 1 ? "s" : ""}
+              {regionFilter || levelFilter ? " encontrado" + (filteredExercises.length !== 1 ? "s" : "") : ""}
+            </span>
           </div>
 
           {/* Exercise list */}
