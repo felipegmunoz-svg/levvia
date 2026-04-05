@@ -140,12 +140,12 @@ const Practices = () => {
     let result = personalizedRecipes;
     if (mealFilter) {
       result = result.filter((r) =>
-        r.tipo_refeicao?.some((t: string) => t.toLowerCase().includes(mealFilter.toLowerCase()))
+        (r.tipo_refeicao || []).some((t) => t === mealFilter)
       );
     }
     if (dietFilter) {
       result = result.filter((r) =>
-        r.diet_profile?.some((d: string) => d.toLowerCase().includes(dietFilter.toLowerCase()))
+        (r.diet_profile || []).some((d) => d === dietFilter)
       );
     }
     return result.map(toRecipeView);
@@ -165,18 +165,16 @@ const Practices = () => {
   const totalFiltered = tab === "exercises" ? personalizedExercises.length : personalizedRecipes.length;
 
   const MEAL_TYPES = [
-    { key: "café", label: "Café da Manhã", icon: "☕" },
-    { key: "lanche_manha", label: "Lanche da Manhã", icon: "🍎" },
-    { key: "almoço", label: "Almoço", icon: "🍽️" },
-    { key: "lanche", label: "Lanche da Tarde", icon: "🥤" },
+    { key: "cafe_da_manha", label: "Café da Manhã", icon: "☕" },
+    { key: "almoco", label: "Almoço", icon: "🍽️" },
+    { key: "lanche", label: "Lanche", icon: "🥤" },
     { key: "jantar", label: "Jantar", icon: "🌙" },
   ];
 
   const DIET_TYPES = [
     { key: "vegana", label: "Vegana" },
     { key: "vegetariana", label: "Vegetariana" },
-    { key: "onívora", label: "Onívora" },
-    { key: "gluten", label: "Sem Glúten" },
+    { key: "onivora", label: "Onívora" },
   ];
 
   return (
