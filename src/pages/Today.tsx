@@ -219,7 +219,7 @@ const Today = () => {
             <span>Buscar no Guia...</span>
           </button>
           <button
-            onClick={() => navTo("/practices?tab=exercises&sos=1")}
+            onClick={() => navTo("/practices?tab=sos")}
             className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-sos/10 border border-sos/20 text-sos text-sm font-medium hover:bg-sos/20 transition-all"
           >
             <ShieldAlert className="w-4 h-4" />

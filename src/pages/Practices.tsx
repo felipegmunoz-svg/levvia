@@ -82,13 +82,12 @@ function filterExercisesForProfile(exercises: DbExercise[], profile: UserProfile
 const Practices = () => {
   const [searchParams] = useSearchParams();
   const { profile, loading: profileLoading } = useProfile();
-  const [tab, setTab] = useState<"exercises" | "recipes">(
-    (searchParams.get("tab") as "exercises" | "recipes") || "exercises"
+  const [tab, setTab] = useState<"exercises" | "recipes" | "sos">(
+    (searchParams.get("tab") as "exercises" | "recipes" | "sos") || "exercises"
   );
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [sosMode, setSosMode] = useState(searchParams.get("sos") === "1");
   const navigate = useNavigate();
   const [rawExercises, setRawExercises] = useState<DbExercise[]>([]);
   const [rawRecipes, setRawRecipes] = useState<DbRecipe[]>([]);
@@ -109,7 +108,7 @@ const Practices = () => {
 
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    if (tabParam === "exercises" || tabParam === "recipes") {
+    if (tabParam === "exercises" || tabParam === "recipes" || tabParam === "sos") {
       setTab(tabParam);
     }
   }, [searchParams]);
@@ -161,63 +160,45 @@ const Practices = () => {
         </p>
       </header>
 
-      {/* Tab switcher */}
+      {/* Tab switcher — 3 tabs */}
       <div className="px-6 mb-4">
         <div className="flex bg-white/[0.06] border border-white/10 rounded-xl p-1">
           <button
             onClick={() => { setTab("exercises"); setActiveTag(null); }}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
               tab === "exercises"
                 ? "bg-white/[0.12] text-foreground"
                 : "text-muted-foreground"
             }`}
           >
-            Exercícios
+            Exercícios ({rawExercises.length})
+          </button>
+          <button
+            onClick={() => { setTab("sos"); setActiveTag(null); }}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
+              tab === "sos"
+                ? "bg-sos/20 text-sos"
+                : "text-muted-foreground"
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            SOS (5)
           </button>
           <button
             onClick={() => { setTab("recipes"); setActiveTag(null); }}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
               tab === "recipes"
                 ? "bg-white/[0.12] text-foreground"
                 : "text-muted-foreground"
             }`}
           >
-            Receitas
+            Receitas ({rawRecipes.length})
           </button>
         </div>
       </div>
 
-      {/* SOS toggle - only visible on exercises tab */}
-      {tab === "exercises" && (
-        <div className="px-6 mb-4">
-          <div className="flex bg-white/[0.06] border border-white/10 rounded-xl p-1">
-            <button
-              onClick={() => setSosMode(false)}
-              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
-                !sosMode
-                  ? "bg-white/[0.12] text-foreground"
-                  : "text-muted-foreground"
-              }`}
-            >
-              Biblioteca
-            </button>
-            <button
-              onClick={() => setSosMode(true)}
-              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1.5 ${
-                sosMode
-                  ? "bg-sos/20 text-sos"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <ShieldAlert className="w-3.5 h-3.5" />
-              Modo SOS
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* SOS Mode cards */}
-      {tab === "exercises" && sosMode && (
+      {tab === "sos" && (
         <main className="px-5 space-y-3 pb-4">
           <p className="text-sm text-muted-foreground mb-2">
             Como você está se sentindo agora?
@@ -241,7 +222,7 @@ const Practices = () => {
       )}
 
       {/* Personalization indicator - hidden in SOS mode */}
-      {!sosMode && !loading && !profileLoading && (
+      {tab !== "sos" && !loading && !profileLoading && (
         <div className="px-5 mb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -268,7 +249,7 @@ const Practices = () => {
       )}
 
       {/* Tag filters - hidden in SOS mode */}
-      {!sosMode && <div className="px-5 mb-4">
+      {tab !== "sos" && <div className="px-5 mb-4">
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setActiveTag(null)}
@@ -296,7 +277,7 @@ const Practices = () => {
         </div>
       </div>}
 
-      {!sosMode && <main className="px-5 space-y-3">
+      {tab !== "sos" && <main className="px-5 space-y-3">
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" />
