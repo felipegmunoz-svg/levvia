@@ -128,7 +128,7 @@ const ImportGuia = () => {
   const ResultCard = ({ result }: { result: ImportResult }) => (
     <div className="mt-4 p-4 rounded-lg bg-muted/30 border border-white/10 space-y-2">
       <div className="flex items-center gap-2 text-sm">
-        <CheckCircle size={16} className="text-green-400" />
+        <CheckCircle size={16} className="text-primary" />
         <span>{result.success} importados com sucesso</span>
       </div>
       {result.errors > 0 && (
