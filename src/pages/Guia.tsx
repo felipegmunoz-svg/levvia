@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,10 +70,16 @@ export default function Guia() {
   );
   const [visited, setVisited] = useState<Set<string>>(getVisitedSections);
   const navigate = useNavigate();
+  const chapterRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (openChapter) {
-      setExpandedChapter(Number(openChapter));
+      const num = Number(openChapter);
+      setExpandedChapter(num);
+      // Scroll to the chapter after a short delay (to let accordion render)
+      setTimeout(() => {
+        chapterRefs.current[num]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     }
   }, [openChapter]);
 
@@ -169,6 +175,7 @@ export default function Guia() {
           return (
             <div
               key={chapter.id}
+              ref={(el) => { chapterRefs.current[chapter.chapter_number] = el; }}
               className="levvia-card !p-0 overflow-hidden"
             >
               {/* Chapter header */}
