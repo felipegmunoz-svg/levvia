@@ -143,7 +143,7 @@ const DayTouchpointView = ({
   };
 
   return (
-    <div className="theme-light levvia-page min-h-screen pb-24">
+    <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
       <div className="px-6 pt-8 pb-4 text-center">
         <img src={logoFull} alt="Levvia" className="h-8 mx-auto mb-4" />
@@ -294,7 +294,7 @@ const DayTouchpointView = ({
                     </p>
                   )}
                   {SLOT_DESCRIPTIONS[dayNumber]?.[s.slot] && !isDone && (
-                    <p className="text-[11px] text-gray-400 font-body mt-0.5 leading-snug pr-2">
+                    <p className="text-[11px] text-[#7a8ba0] font-body mt-0.5 leading-snug pr-2">
                       {SLOT_DESCRIPTIONS[dayNumber]![s.slot]}
                     </p>
                   )}

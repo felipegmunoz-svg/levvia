@@ -27,7 +27,7 @@ const ActivityCard = ({
       {onToggle && (
         <div
           className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${
-            completed ? "border-levvia-success" : "border-gray-300"
+            completed ? "border-levvia-success" : "border-white/[0.12]"
           }`}
         >
           {completed && (

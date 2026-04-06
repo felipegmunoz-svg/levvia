@@ -169,7 +169,7 @@ const LunchSlot = ({
           >
             Concluir Almoço →
           </button>
-          <p className="text-xs text-center text-gray-400 mt-2 italic px-4 font-body">
+          <p className="text-xs text-center text-[#7a8ba0] mt-2 italic px-4 font-body">
             Conclua todas as etapas para validar seu progresso de hoje e garantir seus resultados em 14 dias. Lembre-se: seu corpo precisa de tempo para processar cada estímulo.
           </p>
         </>
