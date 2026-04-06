@@ -161,6 +161,14 @@ const NightSlot = ({
             </div>
           );
         }
+        if (heatMapLoading) {
+          return (
+            <div className="levvia-card p-5 text-center">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-sm text-levvia-muted font-body">Carregando mapa...</p>
+            </div>
+          );
+        }
         return (
           <div className="space-y-4">
             <div className="levvia-card p-5 overflow-visible">
@@ -175,9 +183,10 @@ const NightSlot = ({
             </div>
             <div className="min-h-[480px]">
               <HeatMapInteractive
+                key={loadedHeatMap ? "loaded" : "empty"}
                 title="Como está o seu fogo agora?"
                 subtitle="Após as práticas de hoje, como você sente cada área? Toque para reduzir a intensidade onde o alívio chegou ou para marcar novos pontos de atenção."
-                initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}
+                initialData={loadedHeatMap || undefined}
                 onNext={(data) => {
                   setNightHeatMap(data as Record<string, number>);
                   setTechniqueDone(true);
