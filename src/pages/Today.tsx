@@ -3,6 +3,7 @@ import DayReview from "@/components/journey/DayReview";
 import TodaySearchOverlay from "@/components/TodaySearchOverlay";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Search, ShieldAlert } from "lucide-react";
+import confetti from "canvas-confetti";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import { toast } from "sonner";
 
@@ -90,13 +91,16 @@ const Today = () => {
       if (score != null) {
         evaluateCheckpoint(effectiveDay, score);
       }
+      // Celebration confetti
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#4fd1c5', '#2E86AB', '#10B981'] });
+
       if (effectiveDay === 14) {
         toast("Parabéns! Você completou os 14 dias. 🌊");
         setTimeout(() => {
           navTo('/celebration');
         }, 2000);
       } else {
-        toast("Sua jornada continua amanhã. Descanse — você merece.");
+        toast("Você deu mais um passo. Descanse — você merece.");
       }
     }
   }, [markSlotDone, evaluateCheckpoint, effectiveDay]);

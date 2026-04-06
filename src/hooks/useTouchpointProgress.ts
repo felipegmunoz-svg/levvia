@@ -241,8 +241,12 @@ export function useTouchpointProgress(dayNumber: number) {
   }, [progress]);
 
   const isDayComplete = useMemo(() => {
-    return progress.night.done === true;
-  }, [progress.night.done]);
+    if (!progress.night.done) return false;
+    // Require at least 2 of 3 daytime slots completed
+    const daytimeCompleted = [progress.morning.done, progress.lunch.done, progress.afternoon.done]
+      .filter(Boolean).length;
+    return daytimeCompleted >= 2;
+  }, [progress.morning.done, progress.lunch.done, progress.afternoon.done, progress.night.done]);
 
   const completedSlots = useMemo(() => {
     return (["morning", "lunch", "afternoon", "night"] as TouchpointSlot[]).filter(
