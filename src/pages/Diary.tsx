@@ -75,7 +75,7 @@ const Diary = () => {
   };
 
   return (
-    <div className="theme-light levvia-page min-h-screen pb-24">
+    <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
       <div className="px-6 pt-8 pb-6 text-center">
         <img src={logoFull} alt="Levvia" className="h-8 mx-auto mb-4" />
