@@ -313,7 +313,7 @@ const Profile = () => {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-xs px-3 py-2 rounded-full bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-destructive/30 hover:text-destructive transition-all"
+            className="flex items-center gap-2 text-xs px-3 py-2 rounded-full bg-white/[0.08] text-muted-foreground border border-white/[0.12] hover:border-destructive/30 hover:text-destructive transition-all cursor-pointer"
           >
             <LogOut size={14} strokeWidth={1.5} />
             Sair
@@ -331,7 +331,7 @@ const Profile = () => {
               className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-full font-medium transition-all ${
                 activeSection === s.id
                   ? "bg-secondary text-foreground"
-                  : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                  : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
               }`}
             >
               <s.icon size={14} strokeWidth={1.5} />
@@ -533,7 +533,7 @@ const Profile = () => {
                         transition={{ delay: 0.4 + i * 0.04, duration: 0.4, ease: "easeOut" }}
                         className={`w-full rounded-full ${
                           !hasData
-                            ? "bg-white/[0.06]"
+                            ? "bg-white/[0.08]"
                             : isComplete
                             ? "bg-gradient-to-t from-secondary to-success"
                             : percent > 0
@@ -568,7 +568,7 @@ const Profile = () => {
                       key={i}
                       className={`flex-1 h-2.5 rounded-full transition-all ${
                         !hasData
-                          ? "bg-white/[0.06]"
+                          ? "bg-white/[0.08]"
                           : isComplete
                           ? "bg-success"
                           : percent > 0

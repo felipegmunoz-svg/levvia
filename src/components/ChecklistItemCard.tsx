@@ -13,10 +13,10 @@ const ChecklistItemCard = ({ id, label, checked, onToggle, hasAction, actionType
   return (
     <button
       onClick={() => onToggle(id)}
-      className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl border backdrop-blur-[10px] transition-all duration-200 text-left ${
+      className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl border backdrop-blur-[10px] transition-all duration-200 ease-out text-left cursor-pointer ${
         checked
           ? "bg-white/[0.12] border-white/[0.15]"
-          : "bg-white/[0.06] border-white/10 hover:bg-white/[0.09]"
+          : "bg-white/[0.08] border-white/[0.12] hover:bg-white/[0.09]"
       }`}
     >
       <div

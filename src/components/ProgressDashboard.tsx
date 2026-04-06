@@ -118,7 +118,7 @@ const ProgressDashboard = ({ currentDay, progress }: ProgressDashboardProps) => 
                   transition={{ delay: 0.4 + i * 0.04, duration: 0.4, ease: "easeOut" }}
                   className={`w-full rounded-full ${
                     isFuture
-                      ? "bg-white/[0.06]"
+                      ? "bg-white/[0.08]"
                       : isComplete
                       ? "bg-gradient-to-t from-secondary to-success"
                       : isCurrent
@@ -169,7 +169,7 @@ const ProgressDashboard = ({ currentDay, progress }: ProgressDashboardProps) => 
                 key={i}
                 className={`flex-1 h-2.5 rounded-full transition-all ${
                   isFuture
-                    ? "bg-white/[0.06]"
+                    ? "bg-white/[0.08]"
                     : isComplete
                     ? "bg-success"
                     : isCurrent

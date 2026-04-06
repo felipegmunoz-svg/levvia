@@ -213,7 +213,7 @@ const Today = () => {
         <div className="flex items-center gap-2 px-4 pt-3 pb-1">
           <button
             onClick={() => setShowSearch(true)}
-            className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-muted-foreground text-sm hover:border-secondary/30 transition-all"
+            className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.08] border border-white/[0.12] text-muted-foreground text-sm hover:border-secondary/30 transition-all cursor-pointer"
           >
             <Search className="w-4 h-4" />
             <span>Buscar no Guia...</span>

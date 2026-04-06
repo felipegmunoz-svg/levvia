@@ -74,7 +74,7 @@ const PainReliefMode = ({ onSelectExercise }: PainReliefModeProps) => {
                 </div>
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center text-muted-foreground hover:text-foreground"
+                  className="w-9 h-9 rounded-xl bg-white/[0.08] flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-all duration-200 ease-out"
                 >
                   <X size={18} strokeWidth={1.5} />
                 </button>

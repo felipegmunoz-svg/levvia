@@ -98,7 +98,7 @@ const ResetPassword = () => {
               placeholder="••••••••"
               required
               minLength={6}
-              className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+              className="bg-white/[0.08] border-white/[0.12] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="space-y-2">
@@ -111,7 +111,7 @@ const ResetPassword = () => {
               placeholder="••••••••"
               required
               minLength={6}
-              className="bg-white/[0.06] border-white/10 text-foreground placeholder:text-muted-foreground"
+              className="bg-white/[0.08] border-white/[0.12] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <Button type="submit" disabled={loading} className="w-full gradient-primary text-foreground font-medium">
