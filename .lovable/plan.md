@@ -1,62 +1,129 @@
 
-# Solução definitiva: NightSlot carrega o mapa direto do backend
 
-## Diagnóstico
-O seu direcionamento está correto: a cadeia `Today → DayTouchpointView → NightSlot → HeatMapInteractive` é frágil porque `{}` passa como truthy.
+# Sprint 1.7: Janela de Preparação — Modo Leitura
 
-Há ainda um segundo ponto crítico: mesmo buscando no `NightSlot`, o `HeatMapInteractive` hoje inicializa o estado interno só no mount. Então, se o mapa chegar depois via `useEffect`, ele pode continuar visualmente vazio.
+## Resumo
+Após completar um dia, a mulher pode clicar "Preparar meu amanhã →" e ver o conteúdo do dia seguinte em modo read-only (sem marcar conclusões).
 
-## O que vou implementar
+## Alterações
 
-### 1. `src/components/journey/touchpoints/NightSlot.tsx`
-Adicionar carregamento direto dos dados no próprio componente:
-- importar `useAuth`
-- importar `supabase`
-- criar estado para o mapa carregado
-- criar `useEffect` que roda com `user?.id` e `dayNumber`
+### 1. `src/components/journey/DayTouchpointView.tsx`
 
-Fluxo da busca:
-1. buscar `heat_map_day1` e `challenge_progress` em `profiles`
-2. se `dayNumber >= 2`, tentar primeiro `challenge_progress.touchpoints.day{N-1}.night.night_heat_map`
-3. se não houver mapa válido, usar `heat_map_day1`
-4. considerar válido apenas mapa com ao menos 1 valor numérico `> 0`
-
-Observação técnica:
-- vou usar `.maybeSingle()` no lugar de `.single()` para evitar erro quando não houver linha retornada
-
-### 2. Evitar depender da cadeia de props no render do `HeatMapInteractive`
-No caso `technique.type === "heatmap"`:
-- trocar `initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}`
-- para usar o dado carregado diretamente no `NightSlot`
-
-## Ajuste essencial para funcionar de verdade
-Como o `HeatMapInteractive` não reage automaticamente a mudanças tardias em `initialData`, vou aplicar uma destas abordagens seguras:
-
-### Opção escolhida
-Montar o `HeatMapInteractive` apenas depois que a busca terminar, ou forçar remount com `key` baseada no mapa carregado.
-
-Isso evita o problema de:
-```text
-render vazio -> effect carrega dados -> prop muda -> estado interno do HeatMapInteractive não atualiza
+**Adicionar prop `readOnly?: boolean`** na interface (linha 26-37):
+```tsx
+readOnly?: boolean;
 ```
 
-## Escopo dos arquivos
-### Será alterado
-- `src/components/journey/touchpoints/NightSlot.tsx`
+**No componente** (linha 80-91), desestruturar `readOnly`:
+```tsx
+const DayTouchpointView = ({ ..., readOnly }: DayTouchpointViewProps) => {
+```
 
-### Não precisa alterar para esta solução
-- `src/pages/Today.tsx`
-- `src/components/journey/DayTouchpointView.tsx`
+**Banner no topo** — inserir logo após o header (antes dos slots, ~linha 230):
+```tsx
+{readOnly && (
+  <div className="mx-5 mb-3 px-4 py-3 rounded-xl bg-secondary/10 border border-secondary/20">
+    <p className="text-xs text-secondary font-body text-center">
+      Modo Preparação — Conheça seu dia de amanhã
+    </p>
+    <p className="text-[10px] text-levvia-muted font-body text-center mt-1">
+      As marcações serão liberadas às 00:00
+    </p>
+  </div>
+)}
+```
 
-Esses arquivos podem continuar passando props, mas o `NightSlot` deixará de depender delas para o mapa noturno.
+**Desabilitar conclusão de slots** — no `handleSlotComplete` (linha 103-115), adicionar guard:
+```tsx
+if (readOnly) return; // já existe guard para isReviewMode, adicionar readOnly
+```
 
-## Resultado esperado
-- Dia 1: o slot da noite usa diretamente `heat_map_day1`
-- Dia 2+ : o slot da noite prioriza o `night_heat_map` do dia anterior salvo em `challenge_progress`
-- se a cadeia de props falhar, o mapa continua funcionando
-- sem regressão na lógica de conclusão do slot, diário ou `onComplete`
+**Botão de conclusão nos slots** — onde passa `isReviewMode` a cada slot (linhas 348-397), adicionar `|| readOnly`:
+```tsx
+isReviewMode={isReviewMode || isDone || readOnly}
+```
+Isso faz cada slot renderizar em modo leitura (botões desabilitados).
 
-## Detalhes técnicos
-- manter validação: só aceitar mapa com valores numéricos maiores que zero
-- preservar o comportamento atual dos demais tipos de técnica (`breathing`, `food-traffic-light`, `heatmap-comparative`, etc.)
-- evitar mudanças amplas em componentes compartilhados para não reabrir regressões no Dia 1
+**Esconder card de celebração** — o bloco `{allDone && ...}` (linha 412-443) não deve aparecer em readOnly:
+```tsx
+{allDone && !readOnly && (
+```
+
+**Tooltip visual nos slots em readOnly** — quando `readOnly` e o slot não está done, mostrar texto "Disponível amanhã" no lugar do chevron:
+```tsx
+{readOnly && !isDone ? (
+  <span className="text-[10px] text-levvia-muted">Disponível amanhã</span>
+) : isDone ? (
+  // checkmark existente
+) : (
+  // chevron existente
+)}
+```
+
+### 2. `src/hooks/useChallengeData.tsx`
+
+**Expor função para gerar touchpoints de qualquer dia** — extrair a lógica do `useMemo` de `todayTouchpoints` para uma função reutilizável `buildTouchpoints(day, ...)` que aceita um número de dia. Usar essa função tanto para `currentDay` quanto para `currentDay + 1`.
+
+**Adicionar ao retorno:**
+```tsx
+nextDayTouchpoints: useMemo(() => {
+  if (currentDay >= 14 || dataLoading || profileLoading || !profile) return null;
+  return buildTouchpoints(currentDay + 1, exercises, filteredRecipes, profile, rescueMode);
+}, [currentDay, exercises, filteredRecipes, profile, dataLoading, profileLoading, rescueMode]),
+```
+
+### 3. `src/pages/Today.tsx`
+
+**Adicionar estado de preview:**
+```tsx
+const [showPreview, setShowPreview] = useState(false);
+```
+
+**Desestruturar `nextDayTouchpoints`** do `useChallengeData`.
+
+**No bloco principal** (linha 163-194), quando `isDayComplete` e `currentDay < 14` e `showPreview`:
+```tsx
+else if (isDayComplete && showPreview && nextDayTouchpoints && currentDay < 14) {
+  content = (
+    <DayTouchpointView
+      dayNumber={currentDay + 1}
+      touchpoints={nextDayTouchpoints}
+      progress={{ morning: { done: false }, lunch: { done: false }, afternoon: { done: false }, night: { done: false } }}
+      readOnly={true}
+      onSlotComplete={() => {}}
+    />
+  );
+}
+```
+
+**No card de celebração dentro do DayTouchpointView** (ou no Today.tsx após isDayComplete): substituir ou complementar o `DayLockedScreen` com o botão "Preparar meu amanhã →":
+- Isso já existe parcialmente no `DayTouchpointView` (linha 424-442)
+- Adicionar botão antes do `DayLockedScreen`:
+
+```tsx
+<button
+  onClick={() => setShowPreview(true)}
+  className="w-full py-3 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary font-medium text-sm font-body mt-3"
+>
+  Preparar meu amanhã →
+</button>
+```
+
+Para isso funcionar, precisamos passar um callback `onPreviewNext` ao `DayTouchpointView` e chamá-lo no botão. Alternativamente, mover a lógica de preview para o `Today.tsx` verificando `isDayComplete`.
+
+**Abordagem escolhida**: Detectar `isDayComplete` no Today.tsx e inserir o botão/preview lá, já que o Today.tsx controla o estado `showPreview`.
+
+Na seção onde `todayTouchpoints` é renderizado (linha 163-194), adicionar lógica condicional:
+- Se `isDayComplete` e `!showPreview`: mostrar o `DayTouchpointView` normal (com card de celebração) + botão extra
+- Se `isDayComplete` e `showPreview`: mostrar o `DayTouchpointView` do dia seguinte com `readOnly=true`
+- Adicionar botão "Voltar ao meu dia" no preview para sair
+
+## Arquivos modificados
+- `src/components/journey/DayTouchpointView.tsx` — prop `readOnly`, banner, guards
+- `src/hooks/useChallengeData.tsx` — extrair `buildTouchpoints`, expor `nextDayTouchpoints`
+- `src/pages/Today.tsx` — estado `showPreview`, lógica condicional, botão
+
+## Lógica inalterada
+- Conclusão de slots, confetti, navegação, paywall, debug — tudo preservado
+- O `DayLockedScreen` com countdown continua funcionando normalmente dentro do card de celebração
+
