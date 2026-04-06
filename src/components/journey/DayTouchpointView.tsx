@@ -28,12 +28,14 @@ interface DayTouchpointViewProps {
   touchpoints: TouchpointData;
   progress: DayTouchpointProgress;
   isReviewMode?: boolean;
+  readOnly?: boolean;
   hydration?: HydrationProps;
   rescueMode?: string;
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
   onResetSlot?: (slot: TouchpointSlot) => void;
   heatMapDay1?: Record<string, number> | null;
   previousHeatMap?: Record<string, number> | null;
+  onPreviewNext?: () => void;
 }
 
 const SLOTS: { slot: TouchpointSlot; label: string; Icon: LucideIcon; time: string }[] = [
@@ -82,12 +84,14 @@ const DayTouchpointView = ({
   touchpoints,
   progress,
   isReviewMode = false,
+  readOnly = false,
   hydration,
   rescueMode,
   onSlotComplete,
   onResetSlot,
   heatMapDay1,
   previousHeatMap,
+  onPreviewNext,
 }: DayTouchpointViewProps) => {
   const navigate = useNavigate();
   const config = getTouchpointConfig(dayNumber);
@@ -102,6 +106,7 @@ const DayTouchpointView = ({
   // Intercept slot completion to check hydration before confirming
   const handleSlotComplete = useCallback(
     (slot: TouchpointSlot, data: any) => {
+      if (readOnly) return;
       if (isReviewMode) { onSlotComplete(slot, data); return; }
       const slotIdx = SLOT_INDICES[slot];
       const pct = hydration?.slotPercent(slotIdx) ?? 1;
@@ -111,7 +116,7 @@ const DayTouchpointView = ({
         onSlotComplete(slot, data);
       }
     },
-    [hydration, isReviewMode, onSlotComplete]
+    [hydration, isReviewMode, readOnly, onSlotComplete]
   );
 
   // Compute active slot (first undone)
@@ -146,6 +151,18 @@ const DayTouchpointView = ({
 
   return (
     <div className="theme-light levvia-page min-h-screen pb-24">
+      {/* Read-only banner */}
+      {readOnly && (
+        <div className="mx-5 mt-4 mb-0 px-4 py-3 rounded-xl bg-secondary/10 border border-secondary/20">
+          <p className="text-xs text-secondary font-body text-center font-medium">
+            Modo Preparação — Conheça seu dia de amanhã
+          </p>
+          <p className="text-[10px] text-levvia-muted font-body text-center mt-1">
+            As marcações serão liberadas às 00:00
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="px-6 pt-8 pb-4 text-center">
         <img src={logoFull} alt="Levvia" className="h-8 mx-auto mb-4" />
@@ -303,7 +320,9 @@ const DayTouchpointView = ({
                     </p>
                   )}
                 </div>
-                {isDone ? (
+                {readOnly && !isDone ? (
+                  <span className="text-[10px] text-levvia-muted font-body whitespace-nowrap">Disponível amanhã</span>
+                ) : isDone ? (
                   <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center">
                     <Check size={12} strokeWidth={2} className="text-primary" />
                   </div>
@@ -350,7 +369,7 @@ const DayTouchpointView = ({
                                 affirmation={touchpoints.morning.affirmation}
                                 exercise={touchpoints.morning.exercise}
                                 shotRecipe={touchpoints.morning.shotRecipe}
-                                isReviewMode={isReviewMode || isDone}
+                                isReviewMode={isReviewMode || isDone || readOnly}
                                 hydration={hydrationProps}
                                 completedShotId={(progress?.morning as any)?.shot_id}
                                 initialExerciseDone={isDone || !!(progress?.morning as any)?.exercise_id}
@@ -363,7 +382,7 @@ const DayTouchpointView = ({
                                 dayNumber={dayNumber}
                                 recipes={touchpoints.lunch.recipes}
                                 tip={touchpoints.lunch.tip}
-                                isReviewMode={isReviewMode || isDone}
+                                isReviewMode={isReviewMode || isDone || readOnly}
                                 hydration={hydrationProps}
                                 completedRecipeId={(progress?.lunch as any)?.recipe_choice_id}
                                 onComplete={(data) => handleSlotComplete("lunch", data)}
@@ -376,7 +395,7 @@ const DayTouchpointView = ({
                                 hydrationText={hydration ? (touchpoints.afternoon.hydrationText || "").replace("{meta}", String(hydration.subGoalMl)) : (touchpoints.afternoon.hydrationText || "")}
                                 microMovement={touchpoints.afternoon.microMovement}
                                 snackRecipe={touchpoints.afternoon.snackRecipe}
-                                isReviewMode={isReviewMode || isDone}
+                                isReviewMode={isReviewMode || isDone || readOnly}
                                 hydration={hydrationProps}
                                 completedSnackId={(progress?.afternoon as any)?.snack_id}
                                 initialMicroDone={isDone || !!(progress?.afternoon as any)?.micro_challenge_id}
@@ -388,7 +407,7 @@ const DayTouchpointView = ({
                                 dayNumber={dayNumber}
                                 technique={touchpoints.night.technique}
                                 closingMessage={touchpoints.night.closingMessage}
-                                isReviewMode={isReviewMode || isDone}
+                                isReviewMode={isReviewMode || isDone || readOnly}
                                 hydration={hydrationProps}
                                 isCheckpointDay={CHECKPOINT_DAYS.includes(dayNumber)}
                                 heatMapDay1Data={touchpoints.night.heatMapDay1Data}
@@ -409,7 +428,7 @@ const DayTouchpointView = ({
       </div>
 
       {/* Celebration Card */}
-      {allDone && (
+      {allDone && !readOnly && (
         <div className="px-6 mt-6">
           <div className="levvia-card p-6 text-center">
             <img src={logoFull} alt="Levvia" className="h-6 mx-auto mb-3 opacity-60" />
@@ -421,7 +440,16 @@ const DayTouchpointView = ({
             </p>
           </div>
 
-          {dayNumber < 14 && (() => {
+          {dayNumber < 14 && onPreviewNext && (
+            <button
+              onClick={onPreviewNext}
+              className="w-full py-3 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary font-medium text-sm font-body mt-3"
+            >
+              Preparar meu amanhã →
+            </button>
+          )}
+
+          {dayNumber < 14 && !onPreviewNext && (() => {
             const nextDay = dayNumber + 1;
             const nextConfig = getTouchpointConfig(nextDay);
             const defaultPreview = [
