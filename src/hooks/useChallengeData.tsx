@@ -414,7 +414,9 @@ export function useChallengeData(rescueMode: string = "neutral") {
       night: {
         technique: effectiveNightTechnique,
         closingMessage: effectiveClosingMessage,
-        heatMapDay1Data: (profile.heatMapDay1 as Record<string, number>) || null,
+        heatMapDay1Data: profile.heatMapDay1 && typeof profile.heatMapDay1 === 'object' && Object.keys(profile.heatMapDay1).filter(k => k !== 'created_at').length > 0
+          ? (profile.heatMapDay1 as Record<string, number>)
+          : null,
       },
     };
   }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading, rescueMode]);
