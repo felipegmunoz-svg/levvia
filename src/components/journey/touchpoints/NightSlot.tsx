@@ -28,6 +28,7 @@ interface NightSlotProps {
   hydration?: HydrationSlotProps;
   isCheckpointDay?: boolean;
   heatMapDay1Data?: Record<string, number> | null;
+  previousHeatMapData?: Record<string, number> | null;
   onComplete: (data: { technique_done: boolean; journal?: DiaryData; night_heat_map?: Record<string, number> }) => void;
 }
 
@@ -71,6 +72,7 @@ const NightSlot = ({
   hydration,
   isCheckpointDay = false,
   heatMapDay1Data,
+  previousHeatMapData,
   onComplete,
 }: NightSlotProps) => {
   const [techniqueDone, setTechniqueDone] = useState(isReviewMode);
@@ -119,6 +121,7 @@ const NightSlot = ({
               <HeatMapInteractive
                 title="Como está o seu fogo agora?"
                 subtitle="Após as práticas de hoje, como você sente cada área? Toque para reduzir a intensidade onde o alívio chegou ou para marcar novos pontos de atenção."
+                initialData={previousHeatMapData || heatMapDay1Data || undefined}
                 onNext={(data) => {
                   setNightHeatMap(data as Record<string, number>);
                   setTechniqueDone(true);

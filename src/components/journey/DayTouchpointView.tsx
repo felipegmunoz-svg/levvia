@@ -33,6 +33,7 @@ interface DayTouchpointViewProps {
   onSlotComplete: (slot: TouchpointSlot, data: any) => void;
   onResetSlot?: (slot: TouchpointSlot) => void;
   heatMapDay1?: Record<string, number> | null;
+  previousHeatMap?: Record<string, number> | null;
 }
 
 const SLOTS: { slot: TouchpointSlot; label: string; Icon: LucideIcon; time: string }[] = [
@@ -86,6 +87,7 @@ const DayTouchpointView = ({
   onSlotComplete,
   onResetSlot,
   heatMapDay1,
+  previousHeatMap,
 }: DayTouchpointViewProps) => {
   const navigate = useNavigate();
   const config = getTouchpointConfig(dayNumber);
@@ -388,6 +390,7 @@ const DayTouchpointView = ({
                                 hydration={hydrationProps}
                                 isCheckpointDay={CHECKPOINT_DAYS.includes(dayNumber)}
                                 heatMapDay1Data={touchpoints.night.heatMapDay1Data}
+                                previousHeatMapData={previousHeatMap || heatMapDay1}
                                 onComplete={(data) => handleSlotComplete("night", data)}
                               />
                             )}

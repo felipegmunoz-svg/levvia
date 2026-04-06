@@ -158,6 +158,18 @@ const Today = () => {
 
   // Main path: new 4-touchpoint architecture
   else if (todayTouchpoints) {
+    // Get previous day's heat map for persistence
+    let prevHeatMap: Record<string, number> | null = null;
+    if (currentDay >= 2) {
+      try {
+        const prevDayData = localStorage.getItem(`levvia_tp_day_${currentDay - 1}`);
+        if (prevDayData) {
+          const parsed = JSON.parse(prevDayData);
+          prevHeatMap = parsed?.night?.night_heat_map || null;
+        }
+      } catch { /* ignore parse errors */ }
+    }
+
     content = (
       <DayTouchpointView
         dayNumber={currentDay}
@@ -168,6 +180,7 @@ const Today = () => {
         onSlotComplete={handleSlotComplete}
         onResetSlot={resetSlot}
         heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
+        previousHeatMap={prevHeatMap}
       />
     );
   }
