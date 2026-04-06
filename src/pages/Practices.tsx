@@ -117,11 +117,8 @@ const Practices = () => {
     }
   }, [searchParams]);
 
-  // Personalized filtering
-  const personalizedExercises = useMemo(() => {
-    if (showAll || profileLoading) return rawExercises;
-    return filterExercisesForProfile(rawExercises, profile);
-  }, [rawExercises, profile, profileLoading, showAll]);
+  // Always show all exercises — no pain-level filtering
+  const personalizedExercises = rawExercises;
 
   const personalizedRecipes = useMemo(() => {
     if (showAll || profileLoading) return rawRecipes;
