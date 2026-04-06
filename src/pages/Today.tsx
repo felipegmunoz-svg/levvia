@@ -162,6 +162,31 @@ const Today = () => {
     content = <PaywallModal onClose={() => setShowPaywall(false)} />;
   }
 
+  // Preview mode: show next day read-only
+  else if (isDayComplete && showPreview && nextDayTouchpoints && currentDay < 14) {
+    const emptyProgress = { morning: { done: false }, lunch: { done: false }, afternoon: { done: false }, night: { done: false } } as DayTouchpointProgress;
+    content = (
+      <>
+        <div className="px-4 pt-3">
+          <button
+            onClick={() => setShowPreview(false)}
+            className="flex items-center gap-1.5 text-sm text-secondary font-body"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar ao meu dia
+          </button>
+        </div>
+        <DayTouchpointView
+          dayNumber={currentDay + 1}
+          touchpoints={nextDayTouchpoints}
+          progress={emptyProgress}
+          readOnly={true}
+          onSlotComplete={() => {}}
+        />
+      </>
+    );
+  }
+
   // Main path: new 4-touchpoint architecture
   else if (todayTouchpoints) {
     // Get previous day's heat map for persistence
@@ -192,6 +217,7 @@ const Today = () => {
             : null
         }
         previousHeatMap={prevHeatMap}
+        onPreviewNext={() => setShowPreview(true)}
       />
     );
   }
