@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import DayReview from "@/components/journey/DayReview";
 import TodaySearchOverlay from "@/components/TodaySearchOverlay";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Search, ShieldAlert } from "lucide-react";
+import { Search, ShieldAlert, ArrowLeft } from "lucide-react";
 import confetti from "canvas-confetti";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ const Today = () => {
   }, []);
 
   const [showSearch, setShowSearch] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { user, loading: authLoading } = useAuth();
   const { rescueMode, evaluateCheckpoint, isCheckpointDay } = useRescueMode();
 
@@ -45,6 +46,7 @@ const Today = () => {
     currentDay,
     todayData,
     todayTouchpoints,
+    nextDayTouchpoints,
     dayTitle,
     dayObjective,
     loading,
@@ -160,6 +162,31 @@ const Today = () => {
     content = <PaywallModal onClose={() => setShowPaywall(false)} />;
   }
 
+  // Preview mode: show next day read-only
+  else if (isDayComplete && showPreview && nextDayTouchpoints && currentDay < 14) {
+    const emptyProgress = { morning: { done: false }, lunch: { done: false }, afternoon: { done: false }, night: { done: false } } as any;
+    content = (
+      <>
+        <div className="px-4 pt-3">
+          <button
+            onClick={() => setShowPreview(false)}
+            className="flex items-center gap-1.5 text-sm text-secondary font-body"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar ao meu dia
+          </button>
+        </div>
+        <DayTouchpointView
+          dayNumber={currentDay + 1}
+          touchpoints={nextDayTouchpoints}
+          progress={emptyProgress}
+          readOnly={true}
+          onSlotComplete={() => {}}
+        />
+      </>
+    );
+  }
+
   // Main path: new 4-touchpoint architecture
   else if (todayTouchpoints) {
     // Get previous day's heat map for persistence
@@ -190,6 +217,7 @@ const Today = () => {
             : null
         }
         previousHeatMap={prevHeatMap}
+        onPreviewNext={() => setShowPreview(true)}
       />
     );
   }

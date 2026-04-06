@@ -357,24 +357,23 @@ export function useChallengeData(rescueMode: string = "neutral") {
     };
   }, [exercises, filteredRecipes, habits, profile, currentDay, dataLoading, profileLoading]);
 
-  // Touchpoint-aware data for 4-slot architecture
-  const todayTouchpoints = useMemo((): TouchpointData | null => {
-    if (dataLoading || profileLoading || !profile) return null;
+  // Reusable touchpoint builder for any day
+  const buildTouchpoints = useCallback((day: number, rm: string): TouchpointData | null => {
+    if (!profile) return null;
 
-    const config = getTouchpointConfig(currentDay);
+    const config = getTouchpointConfig(day);
     const filteredEx = filterExercisesForProfile(exercises, profile);
 
-    const morningEx = selectMorningExercise(filteredEx, profile, currentDay, rescueMode);
-    const morningShot = selectShotRecipe(filteredRecipes, profile, currentDay, rescueMode);
-    const lunchRecs = selectLunchRecipes(filteredRecipes, profile, currentDay, rescueMode);
-    const microMov = selectMicroMovement(filteredEx, profile, currentDay, morningEx?.id, rescueMode);
-    const snack = selectSnackRecipe(filteredRecipes, profile, currentDay, rescueMode);
+    const morningEx = selectMorningExercise(filteredEx, profile, day, rm);
+    const morningShot = selectShotRecipe(filteredRecipes, profile, day, rm);
+    const lunchRecs = selectLunchRecipes(filteredRecipes, profile, day, rm);
+    const microMov = selectMicroMovement(filteredEx, profile, day, morningEx?.id, rm);
+    const snack = selectSnackRecipe(filteredRecipes, profile, day, rm);
 
-    // Use rescue-aware config fields
-    const effectiveAffirmation = (rescueMode === "resgate" && config.affirmationRescue) ? config.affirmationRescue : config.affirmation;
-    const effectiveLunchTip = (rescueMode === "resgate" && config.lunchTipRescue) ? config.lunchTipRescue : config.lunchTip;
-    const effectiveNightTechnique = (rescueMode === "resgate" && config.nightTechniqueRescue) ? config.nightTechniqueRescue : config.nightTechnique;
-    const effectiveClosingMessage = (rescueMode === "resgate" && config.closingMessageRescue) ? config.closingMessageRescue : config.closingMessage;
+    const effectiveAffirmation = (rm === "resgate" && config.affirmationRescue) ? config.affirmationRescue : config.affirmation;
+    const effectiveLunchTip = (rm === "resgate" && config.lunchTipRescue) ? config.lunchTipRescue : config.lunchTip;
+    const effectiveNightTechnique = (rm === "resgate" && config.nightTechniqueRescue) ? config.nightTechniqueRescue : config.nightTechnique;
+    const effectiveClosingMessage = (rm === "resgate" && config.closingMessageRescue) ? config.closingMessageRescue : config.closingMessage;
 
     const toActivity = (
       item: DbExercise | DbRecipe | null,
@@ -383,7 +382,7 @@ export function useChallengeData(rescueMode: string = "neutral") {
     ): ChallengeActivity | null => {
       if (!item) return null;
       return {
-        id: `day${currentDay}-${prefix}`,
+        id: `day${day}-${prefix}`,
         type,
         label: item.title,
         ...(type === "exercise" ? { exercise: item as DbExercise } : { recipe: item as DbRecipe }),
@@ -399,7 +398,7 @@ export function useChallengeData(rescueMode: string = "neutral") {
       },
       lunch: {
         recipes: lunchRecs.map((r, i) => ({
-          id: `day${currentDay}-lunch-${i}`,
+          id: `day${day}-lunch-${i}`,
           type: "recipe" as const,
           label: r.title,
           recipe: r,
@@ -419,7 +418,19 @@ export function useChallengeData(rescueMode: string = "neutral") {
           : null,
       },
     };
-  }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading, rescueMode]);
+  }, [exercises, filteredRecipes, profile]);
+
+  // Touchpoint-aware data for 4-slot architecture
+  const todayTouchpoints = useMemo((): TouchpointData | null => {
+    if (dataLoading || profileLoading) return null;
+    return buildTouchpoints(currentDay, rescueMode);
+  }, [buildTouchpoints, currentDay, dataLoading, profileLoading, rescueMode]);
+
+  // Next day touchpoints for preview mode
+  const nextDayTouchpoints = useMemo((): TouchpointData | null => {
+    if (currentDay >= 14 || dataLoading || profileLoading) return null;
+    return buildTouchpoints(currentDay + 1, rescueMode);
+  }, [buildTouchpoints, currentDay, dataLoading, profileLoading, rescueMode]);
 
   const dayTitle = dayTitles[(currentDay - 1) % dayTitles.length];
   const dayObjective = dayObjectives[(currentDay - 1) % dayObjectives.length];
@@ -429,6 +440,7 @@ export function useChallengeData(rescueMode: string = "neutral") {
     currentDay,
     todayData,
     todayTouchpoints,
+    nextDayTouchpoints,
     dayTitle,
     dayObjective,
     loading: dataLoading || profileLoading,
