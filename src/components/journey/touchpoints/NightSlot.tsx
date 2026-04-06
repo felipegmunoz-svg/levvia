@@ -3,6 +3,8 @@ import { Map, Wind, Activity, PersonStanding, BookOpen } from "lucide-react";
 import logoFull from "@/assets/logo_livvia_azul.png";
 import type { NightTechnique } from "@/data/touchpointConfig";
 import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import HeatMapComparative from "@/components/journey/HeatMapComparative";
