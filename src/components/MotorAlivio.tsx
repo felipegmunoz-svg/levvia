@@ -397,7 +397,7 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
                 </div>
                 <button
                   onClick={handleClose}
-                  className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center text-muted-foreground hover:text-foreground"
+                  className="w-9 h-9 rounded-xl bg-white/[0.08] flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-all duration-200 ease-out"
                 >
                   <X size={18} strokeWidth={1.5} />
                 </button>
@@ -443,7 +443,7 @@ const MotorAlivio = ({ onSelectExercise }: MotorAlivioProps) => {
                     </button>
                     <button
                       onClick={handleNewCheckIn}
-                      className="w-full py-3 rounded-2xl bg-white/[0.06] text-foreground font-medium text-sm border border-white/10 hover:border-secondary/30 transition-all"
+                      className="w-full py-3 rounded-2xl bg-white/[0.08] text-foreground font-medium text-sm border border-white/[0.12] hover:border-secondary/30 transition-all cursor-pointer"
                     >
                       Fazer novo check-in
                     </button>

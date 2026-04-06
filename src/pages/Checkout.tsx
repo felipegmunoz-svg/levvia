@@ -56,7 +56,7 @@ const Checkout = () => {
   if (!plan) return null;
 
   const inputClass =
-    "w-full px-4 py-3.5 rounded-2xl border border-white/10 bg-white/[0.06] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-colors backdrop-blur-[10px]";
+    "w-full px-4 py-3.5 rounded-2xl border border-white/[0.12] bg-white/[0.08] text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:border-secondary focus:outline-none transition-all duration-200 ease-out backdrop-blur-[10px]";
 
   return (
     <div className="min-h-screen bg-background gradient-page flex flex-col">

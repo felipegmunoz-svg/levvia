@@ -65,7 +65,7 @@ function ToggleChips({ options, selected, onChange }: { options: string[]; selec
           className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
             selected.includes(opt)
               ? "bg-secondary text-foreground border-secondary"
-              : "bg-white/[0.06] text-muted-foreground border-white/10 hover:border-white/20"
+              : "bg-white/[0.08] text-muted-foreground border-white/[0.12] hover:border-white/20"
           }`}
         >
           {opt}

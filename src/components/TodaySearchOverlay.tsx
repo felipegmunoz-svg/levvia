@@ -131,7 +131,7 @@ export default function TodaySearchOverlay({ onClose }: TodaySearchOverlayProps)
                 <button
                   key={result.id}
                   onClick={() => handleSelect(result.chapter_number, result.id)}
-                  className="w-full text-left p-3 rounded-xl bg-white/[0.06] border border-white/10 hover:border-secondary/30 transition-all"
+                  className="w-full text-left p-3 rounded-xl bg-white/[0.08] border border-white/[0.12] hover:border-secondary/30 transition-all cursor-pointer"
                 >
                   <p className="text-[10px] text-secondary font-medium">
                     Capítulo {result.chapter_number}

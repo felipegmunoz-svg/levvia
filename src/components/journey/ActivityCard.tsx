@@ -20,7 +20,7 @@ const ActivityCard = ({
   return (
     <button
       onClick={onToggle}
-      className={`levvia-card flex items-center gap-3 p-4 w-full text-left transition-all ${
+      className={`levvia-card flex items-center gap-3 p-4 w-full text-left transition-all duration-200 ease-out cursor-pointer ${
         completed ? "border-levvia-success/20" : ""
       }`}
     >

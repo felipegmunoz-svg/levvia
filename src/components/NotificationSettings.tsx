@@ -165,7 +165,7 @@ const NotificationSettings = () => {
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       morningTime === t
                         ? "bg-secondary text-foreground"
-                        : "bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-secondary/30"
+                      : "bg-white/[0.08] text-muted-foreground border border-white/[0.12] hover:border-secondary/30"
                     }`}
                   >
                     {t}
@@ -193,7 +193,7 @@ const NotificationSettings = () => {
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       eveningTime === t
                         ? "bg-secondary text-foreground"
-                        : "bg-white/[0.06] text-muted-foreground border border-white/10 hover:border-secondary/30"
+                        : "bg-white/[0.08] text-muted-foreground border border-white/[0.12] hover:border-secondary/30"
                     }`}
                   >
                     {t}
