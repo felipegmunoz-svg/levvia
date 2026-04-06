@@ -179,7 +179,12 @@ const Today = () => {
         rescueMode={rescueMode}
         onSlotComplete={handleSlotComplete}
         onResetSlot={resetSlot}
-        heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
+        heatMapDay1={
+          profile?.heatMapDay1 && typeof profile.heatMapDay1 === 'object' &&
+          Object.values(profile.heatMapDay1 as Record<string, unknown>).some(v => typeof v === 'number' && v > 0)
+            ? (profile.heatMapDay1 as Record<string, number>)
+            : null
+        }
         previousHeatMap={prevHeatMap}
       />
     );

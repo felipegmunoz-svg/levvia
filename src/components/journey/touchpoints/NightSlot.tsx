@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Map, Wind, Activity, PersonStanding, BookOpen } from "lucide-react";
 import logoFull from "@/assets/logo_livvia_azul.png";
 import type { NightTechnique } from "@/data/touchpointConfig";
+import { useProfile } from "@/hooks/useProfile";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import HeatMapComparative from "@/components/journey/HeatMapComparative";
@@ -80,6 +81,14 @@ const NightSlot = ({
   const [showClosing, setShowClosing] = useState(false);
   const [nightHeatMap, setNightHeatMap] = useState<Record<string, number> | null>(null);
 
+  // Direct profile fallback for heatmap data
+  const { profile } = useProfile();
+  const profileHeatMap = useMemo(() => {
+    if (!profile?.heatMapDay1 || typeof profile.heatMapDay1 !== 'object') return undefined;
+    const hasData = Object.values(profile.heatMapDay1 as Record<string, unknown>).some(v => typeof v === 'number' && (v as number) > 0);
+    return hasData ? (profile.heatMapDay1 as Record<string, number>) : undefined;
+  }, [profile?.heatMapDay1]);
+
   useEffect(() => {
     if (!showClosing) return;
     const timer = setTimeout(() => {
@@ -121,7 +130,7 @@ const NightSlot = ({
               <HeatMapInteractive
                 title="Como está o seu fogo agora?"
                 subtitle="Após as práticas de hoje, como você sente cada área? Toque para reduzir a intensidade onde o alívio chegou ou para marcar novos pontos de atenção."
-                initialData={previousHeatMapData || heatMapDay1Data || undefined}
+                initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}
                 onNext={(data) => {
                   setNightHeatMap(data as Record<string, number>);
                   setTechniqueDone(true);
