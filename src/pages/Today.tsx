@@ -164,7 +164,7 @@ const Today = () => {
 
   // Preview mode: show next day read-only
   else if (isDayComplete && showPreview && nextDayTouchpoints && currentDay < 14) {
-    const emptyProgress = { morning: { done: false }, lunch: { done: false }, afternoon: { done: false }, night: { done: false } } as DayTouchpointProgress;
+    const emptyProgress = { morning: { done: false }, lunch: { done: false }, afternoon: { done: false }, night: { done: false } } as any;
     content = (
       <>
         <div className="px-4 pt-3">
