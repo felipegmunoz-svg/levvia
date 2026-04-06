@@ -1,58 +1,62 @@
 
+# Solução definitiva: NightSlot carrega o mapa direto do backend
 
-# Fix: Mapa de calor noturno recebe `{}` em vez de dados reais
+## Diagnóstico
+O seu direcionamento está correto: a cadeia `Today → DayTouchpointView → NightSlot → HeatMapInteractive` é frágil porque `{}` passa como truthy.
 
-## Causa raiz
+Há ainda um segundo ponto crítico: mesmo buscando no `NightSlot`, o `HeatMapInteractive` hoje inicializa o estado interno só no mount. Então, se o mapa chegar depois via `useEffect`, ele pode continuar visualmente vazio.
 
-A cadeia de dados tem **dois pontos de falha** onde objetos vazios `{}` passam como truthy:
+## O que vou implementar
 
-1. **Today.tsx linha 182**: `(profile?.heatMapDay1 as Record<string, number>) ?? null` — o `??` só captura `null`/`undefined`, não `{}`. Resultado: `heatMapDay1 = {}`.
+### 1. `src/components/journey/touchpoints/NightSlot.tsx`
+Adicionar carregamento direto dos dados no próprio componente:
+- importar `useAuth`
+- importar `supabase`
+- criar estado para o mapa carregado
+- criar `useEffect` que roda com `user?.id` e `dayNumber`
 
-2. **DayTouchpointView.tsx linha 395**: `previousHeatMap || heatMapDay1` = `null || {}` = `{}`. O `{}` é truthy.
+Fluxo da busca:
+1. buscar `heat_map_day1` e `challenge_progress` em `profiles`
+2. se `dayNumber >= 2`, tentar primeiro `challenge_progress.touchpoints.day{N-1}.night.night_heat_map`
+3. se não houver mapa válido, usar `heat_map_day1`
+4. considerar válido apenas mapa com ao menos 1 valor numérico `> 0`
 
-3. **NightSlot.tsx linha 124**: `previousHeatMapData || heatMapDay1Data || undefined` = `{} || null || undefined` = `{}`. O HeatMapInteractive recebe `initialData = {}`, que se espalha sobre `defaultAreas` sem mudar nada — mapa vazio.
+Observação técnica:
+- vou usar `.maybeSingle()` no lugar de `.single()` para evitar erro quando não houver linha retornada
 
-O FlowSilhouette na Home funciona porque lê `heatMapData` diretamente com lógica própria que ignora zeros.
+### 2. Evitar depender da cadeia de props no render do `HeatMapInteractive`
+No caso `technique.type === "heatmap"`:
+- trocar `initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}`
+- para usar o dado carregado diretamente no `NightSlot`
 
-## Solução (2 pontos de correção)
+## Ajuste essencial para funcionar de verdade
+Como o `HeatMapInteractive` não reage automaticamente a mudanças tardias em `initialData`, vou aplicar uma destas abordagens seguras:
 
-### 1. `src/pages/Today.tsx` — linha 182
-Validar o objeto antes de passar como prop:
-```tsx
-// De:
-heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
-// Para:
-heatMapDay1={
-  profile?.heatMapDay1 && Object.values(profile.heatMapDay1).some(v => typeof v === 'number' && v > 0)
-    ? (profile.heatMapDay1 as Record<string, number>)
-    : null
-}
-```
-Isso garante que `{}` e objetos com todos os valores em 0 retornem `null`.
+### Opção escolhida
+Montar o `HeatMapInteractive` apenas depois que a busca terminar, ou forçar remount com `key` baseada no mapa carregado.
 
-### 2. `src/components/journey/touchpoints/NightSlot.tsx` — fallback direto via useProfile
-Adicionar importação de `useProfile` e usar como último fallback:
-```tsx
-import { useProfile } from "@/hooks/useProfile";
-
-// Dentro do componente:
-const { profile } = useProfile();
-const profileHeatMap = useMemo(() => {
-  if (!profile?.heatMapDay1 || typeof profile.heatMapDay1 !== 'object') return undefined;
-  const hasData = Object.values(profile.heatMapDay1).some(v => typeof v === 'number' && v > 0);
-  return hasData ? (profile.heatMapDay1 as Record<string, number>) : undefined;
-}, [profile?.heatMapDay1]);
-
-// Na linha 124, atualizar:
-initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}
+Isso evita o problema de:
+```text
+render vazio -> effect carrega dados -> prop muda -> estado interno do HeatMapInteractive não atualiza
 ```
 
-### Lógica inalterada
-- HeatMapInteractive continua recebendo `initialData` da mesma forma
-- Nenhum outro componente afetado
-- Se os dados do onboarding têm todos zeros (usuária não marcou dor), o mapa continua vazio — isso é correto
+## Escopo dos arquivos
+### Será alterado
+- `src/components/journey/touchpoints/NightSlot.tsx`
 
-## Arquivos modificados
-- `src/pages/Today.tsx` (1 edição, linha 182)
-- `src/components/journey/touchpoints/NightSlot.tsx` (3 edições: import, useMemo, initialData)
+### Não precisa alterar para esta solução
+- `src/pages/Today.tsx`
+- `src/components/journey/DayTouchpointView.tsx`
 
+Esses arquivos podem continuar passando props, mas o `NightSlot` deixará de depender delas para o mapa noturno.
+
+## Resultado esperado
+- Dia 1: o slot da noite usa diretamente `heat_map_day1`
+- Dia 2+ : o slot da noite prioriza o `night_heat_map` do dia anterior salvo em `challenge_progress`
+- se a cadeia de props falhar, o mapa continua funcionando
+- sem regressão na lógica de conclusão do slot, diário ou `onComplete`
+
+## Detalhes técnicos
+- manter validação: só aceitar mapa com valores numéricos maiores que zero
+- preservar o comportamento atual dos demais tipos de técnica (`breathing`, `food-traffic-light`, `heatmap-comparative`, etc.)
+- evitar mudanças amplas em componentes compartilhados para não reabrir regressões no Dia 1
