@@ -1,29 +1,43 @@
 
-# Reverter mudanças do Dia 1 (e Day2-5Flow)
 
-## Diagnóstico
-A remoção de `theme-light` do `DayTouchpointView.tsx` é a causa principal. Essa classe força variáveis CSS claras (`--background`, `--foreground`, etc.) — sem ela, todos os componentes internos (cards `levvia-card`, textos `text-levvia-fg`) passam a usar o tema escuro, quebrando o layout que foi desenhado para tema claro.
+# 3 correções no Dia 1
 
-## Arquivos a reverter (7 arquivos)
-
-### 1. `DayTouchpointView.tsx` — linha 146
-```
-"levvia-page min-h-screen"  →  "theme-light levvia-page min-h-screen"
-```
-
-### 2. `Day1Flow.tsx` — linha 249
-```
-border-white/[0.08] bg-background/80 backdrop-blur-sm  →  border-levvia-border bg-white
+## 1. `src/hooks/useChallengeData.tsx` — linha 417-419
+Remover condicional do `heatMapDay1Data`:
+```tsx
+// De:
+heatMapDay1Data: effectiveNightTechnique.type === "heatmap-comparative"
+  ? ((profile.heatMapDay1 as Record<string, number>) || null)
+  : undefined,
+// Para:
+heatMapDay1Data: (profile.heatMapDay1 as Record<string, number>) || null,
 ```
 
-### 3-6. `Day2Flow.tsx`, `Day3Flow.tsx`, `Day4Flow.tsx`, `Day5Flow.tsx`
-Mesma reversão do header sticky.
+## 2. `src/pages/Progress.tsx` — linha 63
+Tornar `scoreLabel` contextual com `hasJourneyProgress`:
+```tsx
+const scoreLabel = !hasHeatMapData
+  ? "⏳ Aguardando dados"
+  : !hasJourneyProgress
+  ? "📍 Seu Ponto de Partida"
+  : flowScore <= 40 ? "🔥 Fogo Ativo"
+  : flowScore <= 70 ? "🌊 Em Transição"
+  : "💧 Fluxo Ativo";
+```
+Nota: `hasJourneyProgress` (linha 93) depende de `evoData` — precisa mover `scoreLabel` para depois de `evoData`. Reorganizar: mover a declaração de `scoreLabel` para após linha 93.
 
-### 7. Slots (MorningSlot, LunchSlot, AfternoonSlot, NightSlot)
-Reverter `text-[#7a8ba0]` → `text-gray-400` (mudança mínima, mas mantém consistência com o `theme-light` que força tema claro).
+## 3. `src/pages/Progress.tsx` — linhas 197-237
+Trocar o card de evolução para só renderizar com 2+ dias:
+```tsx
+{evoData.length > 1 && (
+  <div className="levvia-card p-6">
+    ...card inteiro...
+  </div>
+)}
+```
+Remove o estado vazio (mensagem "Complete os dias...") — o card simplesmente não aparece até haver 2+ dias.
 
-## Arquivos que NÃO serão alterados (mantêm correções)
-- `DiaryReflection.tsx` — inputs corrigidos ✓
-- `ActivityCard.tsx` — border corrigido ✓
-- `DayDashboard.tsx` — border corrigido ✓
-- `DayReview.tsx` — `theme-light` removido ✓ (esse tinha problema real)
+## Arquivos modificados
+- `src/hooks/useChallengeData.tsx` (1 linha)
+- `src/pages/Progress.tsx` (2 edições)
+
