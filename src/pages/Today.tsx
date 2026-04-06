@@ -208,7 +208,7 @@ const Today = () => {
         </div>
       )}
       {showSearch && <TodaySearchOverlay onClose={() => setShowSearch(false)} />}
-      <div className="theme-light levvia-page">
+      <div className="levvia-page">
         {/* Quick access bar */}
         <div className="flex items-center gap-2 px-4 pt-3 pb-1">
           <button

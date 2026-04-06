@@ -108,7 +108,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="theme-light min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0a2540] flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Success overlay */}
       <AnimatePresence>
         {success && (
