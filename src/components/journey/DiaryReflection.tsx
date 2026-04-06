@@ -48,7 +48,7 @@ const DiaryReflection = ({ dayNumber, onSave }: DiaryReflectionProps) => {
         <select
           value={legSensation}
           onChange={(e) => setLegSensation(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-levvia-border bg-white text-[13px] font-body text-levvia-fg focus:border-levvia-primary focus:outline-none"
+          className="w-full px-4 py-3 rounded-xl border border-white/[0.1] bg-white/[0.06] text-[13px] font-body text-levvia-fg focus:border-levvia-primary focus:outline-none"
         >
           <option value="">Selecione... (opcional)</option>
           {LEG_OPTIONS.map((opt) => (
@@ -93,7 +93,7 @@ const DiaryReflection = ({ dayNumber, onSave }: DiaryReflectionProps) => {
               className={`w-10 h-10 rounded-full border-[1.5px] text-[13px] font-medium font-body transition-all ${
                 energyLevel === level
                   ? "border-levvia-primary bg-levvia-primary/10 text-levvia-primary"
-                  : "border-gray-200 text-levvia-muted hover:border-levvia-primary/30"
+                  : "border-white/[0.1] text-levvia-muted hover:border-levvia-primary/30"
               }`}
             >
               {level}
@@ -112,7 +112,7 @@ const DiaryReflection = ({ dayNumber, onSave }: DiaryReflectionProps) => {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Como você se sentiu hoje? Algo que notou..."
           rows={3}
-          className="w-full px-4 py-3 rounded-xl border border-levvia-border bg-white text-[13px] font-body text-levvia-fg placeholder:text-levvia-muted/60 focus:border-levvia-primary focus:outline-none resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-white/[0.1] bg-white/[0.06] text-[13px] font-body text-levvia-fg placeholder:text-levvia-muted/60 focus:border-levvia-primary focus:outline-none resize-none"
         />
       </div>
 

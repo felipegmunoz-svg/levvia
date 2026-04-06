@@ -177,7 +177,7 @@ const DayReview = () => {
 
   if (loading) {
     return (
-      <div className="theme-light levvia-page min-h-screen flex items-center justify-center">
+      <div className="levvia-page min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -548,7 +548,7 @@ const DayReview = () => {
   };
 
   return (
-    <div className="theme-light levvia-page min-h-screen pb-24">
+    <div className="levvia-page min-h-screen pb-24">
       <header className="px-6 pt-8 pb-4">
         <div className="flex justify-center">
           <img src={logoFull} alt="Levvia" className="h-10" />

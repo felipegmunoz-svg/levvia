@@ -26,7 +26,7 @@ const DayDashboard = ({ dayNumber, activities = [] }: DayDashboardProps) => {
               <div key={i} className="flex items-center gap-3">
                 <div
                   className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${
-                    act.completed ? "border-levvia-success" : "border-gray-300"
+                    act.completed ? "border-levvia-success" : "border-white/[0.12]"
                   }`}
                 >
                   {act.completed && (
