@@ -96,7 +96,7 @@ const Practices = () => {
   const [rawExercises, setRawExercises] = useState<DbExercise[]>([]);
   const [rawRecipes, setRawRecipes] = useState<DbRecipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(true);
 
   // Fetch from Supabase
   useEffect(() => {
