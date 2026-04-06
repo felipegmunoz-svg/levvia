@@ -78,7 +78,7 @@ const Day3Flow = ({ onComplete, isReviewMode = false }: Day3FlowProps) => {
   if (isReviewMode) {
     return (
       <div className="levvia-page min-h-screen pb-24">
-        <div className="p-4 border-b border-white/[0.08] bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="p-4 border-b border-levvia-border bg-white sticky top-0 z-10">
           <div className="flex justify-center">
             <img src={logoFull} alt="Levvia" className="h-10" />
           </div>
