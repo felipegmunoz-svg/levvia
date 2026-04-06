@@ -81,6 +81,14 @@ const NightSlot = ({
   const [showClosing, setShowClosing] = useState(false);
   const [nightHeatMap, setNightHeatMap] = useState<Record<string, number> | null>(null);
 
+  // Direct profile fallback for heatmap data
+  const { profile } = useProfile();
+  const profileHeatMap = useMemo(() => {
+    if (!profile?.heatMapDay1 || typeof profile.heatMapDay1 !== 'object') return undefined;
+    const hasData = Object.values(profile.heatMapDay1 as Record<string, unknown>).some(v => typeof v === 'number' && (v as number) > 0);
+    return hasData ? (profile.heatMapDay1 as Record<string, number>) : undefined;
+  }, [profile?.heatMapDay1]);
+
   useEffect(() => {
     if (!showClosing) return;
     const timer = setTimeout(() => {
