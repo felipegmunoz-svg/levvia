@@ -414,9 +414,7 @@ export function useChallengeData(rescueMode: string = "neutral") {
       night: {
         technique: effectiveNightTechnique,
         closingMessage: effectiveClosingMessage,
-        heatMapDay1Data: effectiveNightTechnique.type === "heatmap-comparative"
-          ? ((profile.heatMapDay1 as Record<string, number>) || null)
-          : undefined,
+        heatMapDay1Data: (profile.heatMapDay1 as Record<string, number>) || null,
       },
     };
   }, [exercises, filteredRecipes, profile, currentDay, dataLoading, profileLoading, rescueMode]);
