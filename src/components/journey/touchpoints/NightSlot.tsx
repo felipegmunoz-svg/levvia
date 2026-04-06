@@ -3,6 +3,8 @@ import { Map, Wind, Activity, PersonStanding, BookOpen } from "lucide-react";
 import logoFull from "@/assets/logo_livvia_azul.png";
 import type { NightTechnique } from "@/data/touchpointConfig";
 import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import DiaryReflection, { type DiaryData } from "@/components/journey/DiaryReflection";
 import HeatMapInteractive from "@/components/journey/HeatMapInteractive";
 import HeatMapComparative from "@/components/journey/HeatMapComparative";
@@ -80,14 +82,59 @@ const NightSlot = ({
   const [diaryData, setDiaryData] = useState<DiaryData | null>(null);
   const [showClosing, setShowClosing] = useState(false);
   const [nightHeatMap, setNightHeatMap] = useState<Record<string, number> | null>(null);
+  const [loadedHeatMap, setLoadedHeatMap] = useState<Record<string, number> | null>(null);
+  const [heatMapLoading, setHeatMapLoading] = useState(technique.type === "heatmap");
 
-  // Direct profile fallback for heatmap data
   const { profile } = useProfile();
-  const profileHeatMap = useMemo(() => {
-    if (!profile?.heatMapDay1 || typeof profile.heatMapDay1 !== 'object') return undefined;
-    const hasData = Object.values(profile.heatMapDay1 as Record<string, unknown>).some(v => typeof v === 'number' && (v as number) > 0);
-    return hasData ? (profile.heatMapDay1 as Record<string, number>) : undefined;
-  }, [profile?.heatMapDay1]);
+  const { user } = useAuth();
+
+  // Load heatmap data directly from Supabase
+  useEffect(() => {
+    if (technique.type !== "heatmap" || !user?.id) return;
+    const load = async () => {
+      setHeatMapLoading(true);
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("heat_map_day1, challenge_progress")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (!data) { setHeatMapLoading(false); return; }
+
+        let prevMap: Record<string, number> | null = null;
+
+        // Try previous day's night heat map
+        if (dayNumber >= 2) {
+          const cp = data.challenge_progress as Record<string, any> | null;
+          const prevDayKey = `day${dayNumber - 1}`;
+          const nightMap = cp?.touchpoints?.[prevDayKey]?.night?.night_heat_map;
+          if (nightMap && typeof nightMap === 'object') {
+            const vals = Object.values(nightMap as Record<string, unknown>);
+            if (vals.some(v => typeof v === 'number' && (v as number) > 0)) {
+              prevMap = nightMap as Record<string, number>;
+            }
+          }
+        }
+
+        // Fallback: onboarding heat_map_day1
+        if (!prevMap && data.heat_map_day1 && typeof data.heat_map_day1 === 'object') {
+          const hm = data.heat_map_day1 as Record<string, unknown>;
+          const vals = Object.values(hm);
+          if (vals.some(v => typeof v === 'number' && (v as number) > 0)) {
+            prevMap = data.heat_map_day1 as Record<string, number>;
+          }
+        }
+
+        if (prevMap) setLoadedHeatMap(prevMap);
+      } catch (e) {
+        console.error("NightSlot: failed to load heatmap", e);
+      } finally {
+        setHeatMapLoading(false);
+      }
+    };
+    load();
+  }, [user?.id, dayNumber, technique.type]);
 
   useEffect(() => {
     if (!showClosing) return;
@@ -114,6 +161,14 @@ const NightSlot = ({
             </div>
           );
         }
+        if (heatMapLoading) {
+          return (
+            <div className="levvia-card p-5 text-center">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-sm text-levvia-muted font-body">Carregando mapa...</p>
+            </div>
+          );
+        }
         return (
           <div className="space-y-4">
             <div className="levvia-card p-5 overflow-visible">
@@ -128,9 +183,10 @@ const NightSlot = ({
             </div>
             <div className="min-h-[480px]">
               <HeatMapInteractive
+                key={loadedHeatMap ? "loaded" : "empty"}
                 title="Como está o seu fogo agora?"
                 subtitle="Após as práticas de hoje, como você sente cada área? Toque para reduzir a intensidade onde o alívio chegou ou para marcar novos pontos de atenção."
-                initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}
+                initialData={loadedHeatMap || undefined}
                 onNext={(data) => {
                   setNightHeatMap(data as Record<string, number>);
                   setTechniqueDone(true);
