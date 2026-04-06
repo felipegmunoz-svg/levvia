@@ -20,12 +20,12 @@ export default {
     extend: {
       colors: {
         'levvia-bg': '#0a2540',
-        'levvia-surface': 'rgba(255,255,255,0.04)',
+        'levvia-surface': 'rgba(255,255,255,0.08)',
         'levvia-fg': '#e2e8f0',
         'levvia-primary': '#4fd1c5',
         'levvia-secondary': '#2E86AB',
-        'levvia-muted': '#7a8ba0',
-        'levvia-border': 'rgba(255,255,255,0.06)',
+        'levvia-muted': '#94a3b8',
+        'levvia-border': 'rgba(255,255,255,0.12)',
         'levvia-success': '#10B981',
         'levvia-warning': '#F59E0B',
         'levvia-error': '#EF4444',

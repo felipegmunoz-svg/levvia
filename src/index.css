@@ -23,7 +23,7 @@
     --secondary-foreground: 214 32% 91%;
 
     --muted: 210 40% 18%;
-    --muted-foreground: 210 33% 65%;
+    --muted-foreground: 213 27% 70%;
 
     --accent: 36 90% 58%;
     --accent-foreground: 36 90% 15%;
@@ -53,8 +53,8 @@
     --sos-foreground: 0 0% 100%;
     --primary-light: 212 59% 26% / 0.25;
     --primary-glow: 196 58% 42%;
-    --glass-bg: 0 0% 100% / 0.06;
-    --glass-border: 0 0% 100% / 0.10;
+    --glass-bg: 0 0% 100% / 0.08;
+    --glass-border: 0 0% 100% / 0.12;
   }
 
   .theme-light {
@@ -102,15 +102,20 @@
   }
 
   .levvia-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
     padding: 18px;
+    transition: all 200ms ease-out;
   }
 
   .levvia-card:hover {
-    border-color: rgba(79, 209, 197, 0.15);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(79, 209, 197, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .levvia-card:active {
+    transform: scale(0.98);
   }
 
   .gradient-primary {
@@ -122,10 +127,15 @@
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
     backdrop-filter: blur(20px);
+    transition: all 200ms ease-out;
+  }
+
+  .glass-card:active {
+    transform: scale(0.98);
   }
 
   .shadow-soft {
@@ -134,5 +144,20 @@
 
   .shadow-card {
     box-shadow: 0 1px 8px -1px rgba(0, 0, 0, 0.2), 0 1px 3px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Accessibility: respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .levvia-card:active,
+  .glass-card:active {
+    transform: none !important;
   }
 }

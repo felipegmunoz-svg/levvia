@@ -17,15 +17,15 @@ import {
   type UserProfile,
 } from "@/lib/profileEngine";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, ShieldAlert } from "lucide-react";
+import { Sparkles, ShieldAlert, Footprints, Flame, BatteryLow, Wind, Sunrise } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const SOS_SITUATIONS = [
-  { situation: "pernas_pesadas", icon: "🦵", title: "Pernas Pesadas e Inchadas", description: "Alívio para dias de alto edema" },
-  { situation: "dor_intensa", icon: "💥", title: "Dor Intensa", description: "Protocolo gentil para momentos de dor" },
-  { situation: "fadiga_extrema", icon: "😴", title: "Fadiga Extrema", description: "Exercícios mínimos para dias sem energia" },
-  { situation: "ansiedade", icon: "🧘", title: "Ansiedade ou Estresse", description: "Respiração e movimento para acalmar" },
-  { situation: "rigidez_matinal", icon: "🌅", title: "Rigidez Matinal", description: "Despertar o corpo com suavidade" },
+  { situation: "pernas_pesadas", icon: Footprints, title: "Pernas Pesadas e Inchadas", description: "Alívio para dias de alto edema" },
+  { situation: "dor_intensa", icon: Flame, title: "Dor Intensa", description: "Protocolo gentil para momentos de dor" },
+  { situation: "fadiga_extrema", icon: BatteryLow, title: "Fadiga Extrema", description: "Exercícios mínimos para dias sem energia" },
+  { situation: "ansiedade", icon: Wind, title: "Ansiedade ou Estresse", description: "Respiração e movimento para acalmar" },
+  { situation: "rigidez_matinal", icon: Sunrise, title: "Rigidez Matinal", description: "Despertar o corpo com suavidade" },
 ];
 
 // Convert DB types to view types
@@ -221,7 +221,7 @@ const Practices = () => {
 
       {/* Tab switcher — 3 tabs */}
       <div className="px-6 mb-4">
-        <div className="flex bg-white/[0.06] border border-white/10 rounded-xl p-1">
+        <div className="flex bg-white/[0.08] border border-white/[0.12] rounded-xl p-1">
           <button
             onClick={() => { setTab("exercises"); setActiveTag(null); }}
             className={`flex-1 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
@@ -266,10 +266,12 @@ const Practices = () => {
             <button
               key={sos.situation}
               onClick={() => navigate(`/practices/sos/${sos.situation}`)}
-              className="w-full text-left p-4 rounded-2xl bg-white/[0.06] border border-white/10 hover:border-sos/30 hover:bg-sos/5 transition-all min-h-[72px]"
+              className="w-full text-left p-4 rounded-2xl bg-white/[0.08] border border-white/[0.12] hover:border-sos/30 hover:bg-sos/5 transition-all duration-200 ease-out active:scale-[0.98] min-h-[72px] cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{sos.icon}</span>
+                <div className="w-10 h-10 rounded-xl bg-sos/10 flex items-center justify-center text-sos shrink-0">
+                  <sos.icon size={20} strokeWidth={1.5} />
+                </div>
                 <div>
                   <p className="font-medium text-foreground text-sm">{sos.title}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{sos.description}</p>
@@ -293,7 +295,7 @@ const Practices = () => {
                 className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
                   !regionFilter
                     ? "bg-secondary text-foreground"
-                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                    : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                 }`}
               >
                 Todas ({personalizedExercises.length})
@@ -312,7 +314,7 @@ const Practices = () => {
                     className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
                       regionFilter === region.key
                         ? "bg-secondary text-foreground"
-                        : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                        : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                     }`}
                   >
                     {region.label} ({count})
@@ -331,7 +333,7 @@ const Practices = () => {
                 className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
                   !levelFilter
                     ? "bg-secondary text-foreground"
-                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                    : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                 }`}
               >
                 Todas
@@ -343,7 +345,7 @@ const Practices = () => {
                   className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
                     levelFilter === lv.key
                       ? "bg-secondary text-foreground"
-                      : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                      : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                   }`}
                 >
                   {lv.label}
@@ -398,7 +400,7 @@ const Practices = () => {
                 className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all ${
                   !mealFilter
                     ? "bg-secondary text-foreground"
-                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                    : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                 }`}
               >
                 Todas
@@ -410,7 +412,7 @@ const Practices = () => {
                   className={`flex-shrink-0 text-xs px-3 py-2 rounded-full font-medium transition-all flex items-center gap-1 ${
                     mealFilter === meal.key
                       ? "bg-secondary text-foreground"
-                      : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                      : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                   }`}
                 >
                   <span>{meal.icon}</span>
@@ -429,7 +431,7 @@ const Practices = () => {
                 className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
                   !dietFilter
                     ? "bg-secondary text-foreground"
-                    : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                    : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                 }`}
               >
                 Todas
@@ -441,7 +443,7 @@ const Practices = () => {
                   className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
                     dietFilter === diet.key
                       ? "bg-secondary text-foreground"
-                      : "bg-white/[0.06] text-muted-foreground border border-white/10"
+                      : "bg-white/[0.08] text-muted-foreground border border-white/[0.12]"
                   }`}
                 >
                   {diet.label}
