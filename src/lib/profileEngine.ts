@@ -201,7 +201,16 @@ export async function parseOnboardingFromSupabase(userId: string): Promise<UserP
     antiInflammatoryAllies: ((onb.raw as any)?.['12'] as string[]) || (onb.allies as string[]) || [],
     pantryItems: (data as any).pantry_items || [],
     avatarUrl: (data as any).avatar_url || null,
-    heatMapDay1: (data as any).heat_map_day1 && typeof (data as any).heat_map_day1 === 'object' ? (data as any).heat_map_day1 as Record<string, number> : {},
+    heatMapDay1: (() => {
+      const raw = (data as any).heat_map_day1;
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+      // Filter out non-numeric keys like created_at
+      const filtered: Record<string, number> = {};
+      for (const [k, v] of Object.entries(raw)) {
+        if (typeof v === 'number') filtered[k] = v;
+      }
+      return Object.keys(filtered).length > 0 ? filtered : {};
+    })(),
   };
 }
 
