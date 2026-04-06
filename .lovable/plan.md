@@ -1,52 +1,58 @@
 
 
-# Diagnóstico: Mapa de calor da noite vem vazio
+# Fix: Mapa de calor noturno recebe `{}` em vez de dados reais
 
-## Causa raiz encontrada (sem precisar de console.log)
+## Causa raiz
 
-Consultei o banco de dados diretamente. Existem **dois problemas**:
+A cadeia de dados tem **dois pontos de falha** onde objetos vazios `{}` passam como truthy:
 
-### Problema 1: Dados são todos zero
-Os profiles que TÊM `heat_map_day1` preenchido contêm valores como `{"abdomen": 0, "braco_dir": 0, "coxa_dir": 0, ...}` — todas as zonas com intensidade **0**. Isso significa que o onboarding salvou o mapa, mas a usuária não marcou nenhuma dor (ou o componente salvou o estado default).
+1. **Today.tsx linha 182**: `(profile?.heatMapDay1 as Record<string, number>) ?? null` — o `??` só captura `null`/`undefined`, não `{}`. Resultado: `heatMapDay1 = {}`.
 
-O `HeatMapInteractive` inicializa com `{...defaultAreas, ...(initialData || {})}` — como `initialData` é `{abdomen:0, braco_dir:0,...}`, o mapa aparece visualmente "vazio" (tudo sem cor) porque intensidade 0 = sem preenchimento.
+2. **DayTouchpointView.tsx linha 395**: `previousHeatMap || heatMapDay1` = `null || {}` = `{}`. O `{}` é truthy.
 
-**Isso é comportamento correto** — se a usuária não marcou dor no onboarding, o mapa noturno começa limpo.
+3. **NightSlot.tsx linha 124**: `previousHeatMapData || heatMapDay1Data || undefined` = `{} || null || undefined` = `{}`. O HeatMapInteractive recebe `initialData = {}`, que se espalha sobre `defaultAreas` sem mudar nada — mapa vazio.
 
-### Problema 2: Maioria dos profiles tem `heat_map_day1: {}`
-3 dos 5 profiles com dados não-nulos têm `heat_map_day1` como objeto vazio `{}`. Isso indica que o sync do onboarding **não está salvando o heat map** para a maioria das usuárias. O problema está no `syncOnboarding.ts` — o `answers[9]` pode estar vindo como undefined/array em vez de Record.
+O FlowSilhouette na Home funciona porque lê `heatMapData` diretamente com lógica própria que ignora zeros.
 
-### Problema 3: `{}` passa como truthy
-No `useChallengeData.tsx`, a linha `(profile.heatMapDay1 as Record<string, number>) || null` — um objeto vazio `{}` é **truthy** em JavaScript, então nunca cai no fallback `null`. O `HeatMapInteractive` recebe `initialData = {}` que se espalha sobre `defaultAreas` sem mudar nada.
+## Solução (2 pontos de correção)
 
-## Plano de correção (sem console.logs)
-
-### 1. `src/hooks/useChallengeData.tsx` — linha 417
-Verificar se o objeto tem chaves antes de passá-lo:
+### 1. `src/pages/Today.tsx` — linha 182
+Validar o objeto antes de passar como prop:
 ```tsx
 // De:
-heatMapDay1Data: (profile.heatMapDay1 as Record<string, number>) || null,
+heatMapDay1={(profile?.heatMapDay1 as Record<string, number>) ?? null}
 // Para:
-heatMapDay1Data: profile.heatMapDay1 && Object.keys(profile.heatMapDay1).length > 0
-  ? (profile.heatMapDay1 as Record<string, number>)
-  : null,
+heatMapDay1={
+  profile?.heatMapDay1 && Object.values(profile.heatMapDay1).some(v => typeof v === 'number' && v > 0)
+    ? (profile.heatMapDay1 as Record<string, number>)
+    : null
+}
 ```
+Isso garante que `{}` e objetos com todos os valores em 0 retornem `null`.
 
-### 2. `src/lib/profileEngine.ts` — linha 204
-Filtrar `created_at` e verificar se tem dados reais:
+### 2. `src/components/journey/touchpoints/NightSlot.tsx` — fallback direto via useProfile
+Adicionar importação de `useProfile` e usar como último fallback:
 ```tsx
-// De:
-heatMapDay1: (data as any).heat_map_day1 && typeof ... === 'object' ? ... : {},
-// Para: filtrar created_at e keys não-numéricas
+import { useProfile } from "@/hooks/useProfile";
+
+// Dentro do componente:
+const { profile } = useProfile();
+const profileHeatMap = useMemo(() => {
+  if (!profile?.heatMapDay1 || typeof profile.heatMapDay1 !== 'object') return undefined;
+  const hasData = Object.values(profile.heatMapDay1).some(v => typeof v === 'number' && v > 0);
+  return hasData ? (profile.heatMapDay1 as Record<string, number>) : undefined;
+}, [profile?.heatMapDay1]);
+
+// Na linha 124, atualizar:
+initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}
 ```
 
-### 3. `src/lib/syncOnboarding.ts` — verificar que `answers[9]` está sendo capturado
-Investigar se o passo 9 do onboarding (heat map) está realmente populando o objeto antes do sync.
+### Lógica inalterada
+- HeatMapInteractive continua recebendo `initialData` da mesma forma
+- Nenhum outro componente afetado
+- Se os dados do onboarding têm todos zeros (usuária não marcou dor), o mapa continua vazio — isso é correto
 
-### 4. Adicionar console.logs temporários (como pedido)
-Nos 3 arquivos indicados, para confirmar o fluxo em runtime.
-
-## Recomendação
-
-Antes de adicionar console.logs, posso aplicar a correção do `{}` truthy (problema 3) que é a causa técnica imediata. Quer que eu siga com as correções ou prefere os console.logs primeiro para validar?
+## Arquivos modificados
+- `src/pages/Today.tsx` (1 edição, linha 182)
+- `src/components/journey/touchpoints/NightSlot.tsx` (3 edições: import, useMemo, initialData)
 
