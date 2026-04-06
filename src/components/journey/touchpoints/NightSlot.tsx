@@ -130,7 +130,7 @@ const NightSlot = ({
               <HeatMapInteractive
                 title="Como está o seu fogo agora?"
                 subtitle="Após as práticas de hoje, como você sente cada área? Toque para reduzir a intensidade onde o alívio chegou ou para marcar novos pontos de atenção."
-                initialData={previousHeatMapData || heatMapDay1Data || undefined}
+                initialData={previousHeatMapData || heatMapDay1Data || profileHeatMap || undefined}
                 onNext={(data) => {
                   setNightHeatMap(data as Record<string, number>);
                   setTechniqueDone(true);
