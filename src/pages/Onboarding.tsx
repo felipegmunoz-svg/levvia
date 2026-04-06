@@ -979,7 +979,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a2540] flex flex-col">
+    <div className="min-h-screen gradient-page flex flex-col">
       {/* Progress bar */}
       <div className="px-6 pt-4">
         <div className="flex items-center justify-between mb-2">
