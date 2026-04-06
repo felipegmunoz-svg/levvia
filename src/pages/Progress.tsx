@@ -60,7 +60,6 @@ const Progress = () => {
   const hasHeatMapData = Object.keys(currentHeatMap).length > 0;
   const flowScore = calculateFlowScore(currentHeatMap || {});
   const scoreColor = !hasHeatMapData ? "#9CA3AF" : flowScore <= 40 ? "#EF4444" : flowScore <= 70 ? "#F59E0B" : "#2EC4B6";
-  const scoreLabel = !hasHeatMapData ? "⏳ Aguardando dados" : flowScore <= 40 ? "🔥 Fogo Ativo" : flowScore <= 70 ? "🌊 Em Transição" : "💧 Fluxo Ativo";
 
   // Build evolution data from challenge_progress — only real completed days
   const evoData = useMemo(() => {
@@ -92,8 +91,15 @@ const Progress = () => {
     return days;
   }, [challengeProgress]);
 
-  // Score message — contextual based on journey progress
+  // Score label & message — contextual based on journey progress
   const hasJourneyProgress = evoData.length > 0;
+  const scoreLabel = !hasHeatMapData
+    ? "⏳ Aguardando dados"
+    : !hasJourneyProgress
+    ? "📍 Seu Ponto de Partida"
+    : flowScore <= 40 ? "🔥 Fogo Ativo"
+    : flowScore <= 70 ? "🌊 Em Transição"
+    : "💧 Fluxo Ativo";
   const scoreMessage = !hasHeatMapData
     ? "Complete o mapa de calor para entendermos juntas como você está hoje."
     : !hasJourneyProgress
@@ -194,47 +200,40 @@ const Progress = () => {
           </div>
         </div>
 
-        {/* Evolução Mapa de Calor */}
-        <div className="levvia-card p-6">
-          <h2 className="text-[14px] font-heading font-semibold text-levvia-fg mb-5 flex items-center gap-2">
-            <TrendingUp size={15} className="text-levvia-muted" strokeWidth={1.5} />
-            Evolução do Fluxo
-          </h2>
-
-          {evoData.length === 0 ? (
-            <p className="text-[13px] text-levvia-muted font-body text-center py-4">
-              Complete os dias da sua jornada para ver sua evolução aqui. 🌊
-            </p>
-          ) : (
-            <>
-              <div className="space-y-3">
-                {evoData.map((item) => (
-                  <div key={item.day} className="flex items-center gap-3">
-                    <span className="text-[12px] font-medium text-levvia-fg font-body w-12 shrink-0">
-                      {item.day}:
-                    </span>
-                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${item.value}%`, background: item.color }}
-                      />
-                    </div>
-                    <span className="text-[11px] text-levvia-muted font-body w-8 text-right">
-                      {item.value}%
-                    </span>
+        {/* Evolução Mapa de Calor — só aparece com 2+ dias */}
+        {evoData.length > 1 && (
+          <div className="levvia-card p-6">
+            <h2 className="text-[14px] font-heading font-semibold text-levvia-fg mb-5 flex items-center gap-2">
+              <TrendingUp size={15} className="text-levvia-muted" strokeWidth={1.5} />
+              Evolução do Fluxo
+            </h2>
+            <div className="space-y-3">
+              {evoData.map((item) => (
+                <div key={item.day} className="flex items-center gap-3">
+                  <span className="text-[12px] font-medium text-levvia-fg font-body w-12 shrink-0">
+                    {item.day}:
+                  </span>
+                  <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${item.value}%`, background: item.color }}
+                    />
                   </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-center gap-2 mt-5 text-[11px] text-levvia-muted font-body">
-                <Flame size={12} className="text-orange-400" strokeWidth={1.5} />
-                <span>Fogo diminuindo</span>
-                <span>→</span>
-                <span>Fluxo aumentando</span>
-                <Droplets size={12} className="text-primary" strokeWidth={1.5} />
-              </div>
-            </>
-          )}
-        </div>
+                  <span className="text-[11px] text-levvia-muted font-body w-8 text-right">
+                    {item.value}%
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center gap-2 mt-5 text-[11px] text-levvia-muted font-body">
+              <Flame size={12} className="text-orange-400" strokeWidth={1.5} />
+              <span>Fogo diminuindo</span>
+              <span>→</span>
+              <span>Fluxo aumentando</span>
+              <Droplets size={12} className="text-primary" strokeWidth={1.5} />
+            </div>
+          </div>
+        )}
 
         {/* Hydration Summary */}
         <div className="levvia-card p-5">
