@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import DayReview from "@/components/journey/DayReview";
 import TodaySearchOverlay from "@/components/TodaySearchOverlay";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Search, ShieldAlert } from "lucide-react";
+import { Search, ShieldAlert, ArrowLeft } from "lucide-react";
 import confetti from "canvas-confetti";
 import { debugRender, debugMount, debugUnmount, isDebugActive, getDebugCounters } from "@/lib/renderDebug";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ const Today = () => {
   }, []);
 
   const [showSearch, setShowSearch] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { user, loading: authLoading } = useAuth();
   const { rescueMode, evaluateCheckpoint, isCheckpointDay } = useRescueMode();
 
@@ -45,6 +46,7 @@ const Today = () => {
     currentDay,
     todayData,
     todayTouchpoints,
+    nextDayTouchpoints,
     dayTitle,
     dayObjective,
     loading,
