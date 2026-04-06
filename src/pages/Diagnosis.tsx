@@ -80,7 +80,7 @@ const Diagnosis = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen gradient-page flex flex-col">
       {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
