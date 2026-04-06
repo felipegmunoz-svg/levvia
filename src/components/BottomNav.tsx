@@ -14,7 +14,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-levvia-surface border-t border-levvia-border" style={{ height: 68 }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[rgba(10,37,64,0.92)] backdrop-blur-[20px] border-t border-levvia-border" style={{ height: 68 }}>
       <div className="flex items-center justify-around max-w-md mx-auto h-full px-5">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path

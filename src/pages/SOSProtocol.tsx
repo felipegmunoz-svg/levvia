@@ -53,9 +53,9 @@ export default function SOSProtocol() {
   }, {} as Record<string, (typeof exercises)[number]>) || {};
 
   return (
-    <div className="theme-light levvia-page min-h-screen pb-24">
+    <div className="levvia-page min-h-screen pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-levvia-bg/95 backdrop-blur-sm border-b border-levvia-border px-4 py-3">
+      <div className="sticky top-0 z-10 bg-[#0a2540]/95 backdrop-blur-sm border-b border-levvia-border px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/practices?tab=sos")}

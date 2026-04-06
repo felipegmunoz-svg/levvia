@@ -15,7 +15,7 @@ export function SearchBar({ placeholder = "Buscar...", value, onChange }: Search
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full h-12 pl-12 pr-10 rounded-xl bg-white border border-levvia-border text-levvia-fg placeholder:text-levvia-muted focus:outline-none focus:ring-2 focus:ring-levvia-primary/30 focus:border-levvia-primary/30 transition-all font-body text-sm"
+        className="w-full h-12 pl-12 pr-10 rounded-xl bg-[rgba(79,209,197,0.06)] border border-[rgba(79,209,197,0.1)] text-levvia-fg placeholder:text-levvia-muted focus:outline-none focus:ring-2 focus:ring-levvia-primary/30 focus:border-levvia-primary/30 transition-all font-body text-sm"
       />
       {value && (
         <button
