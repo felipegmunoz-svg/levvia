@@ -143,7 +143,7 @@ const DayTouchpointView = ({
   };
 
   return (
-    <div className="levvia-page min-h-screen pb-24">
+    <div className="theme-light levvia-page min-h-screen pb-24">
       {/* Header */}
       <div className="px-6 pt-8 pb-4 text-center">
         <img src={logoFull} alt="Levvia" className="h-8 mx-auto mb-4" />
