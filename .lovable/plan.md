@@ -1,56 +1,55 @@
 
+# Grid compacto de 14 dias na Journey.tsx
 
-# Polimento visual: opacidades e interações
+## O que será feito
+Adicionar um grid 7×2 entre o progress ring (linha 166) e o `<main>` (linha 168), usando a mesma lógica `isDayCompleted`/`isDayUnlocked`/`handleDayClick`.
 
-## Escopo
-Atualizar `bg-white/[0.06]` → `bg-white/[0.08]` e `border-white/10` → `border-white/[0.12]` em todos os componentes user-facing, adicionar `cursor-pointer` e `transition-all duration-200 ease-out` onde ausentes.
+## Implementação
 
-**Nota:** ExerciseCard e RecipeCard já usam `glass-card` (que define seu próprio bg/border) e já têm `transition-all duration-200`. FilterChip já está atualizado. Esses não precisam de mudanças.
+### Arquivo: `src/pages/Journey.tsx`
 
-## Arquivos a modificar (12 arquivos)
+Inserir após linha 166 (`</div>` do progress ring) e antes de linha 168 (`<main>`):
 
-### 1. `src/pages/Today.tsx` — linha 216
-Search bar: `bg-white/[0.06]` → `bg-white/[0.08]`, `border-white/10` → `border-white/[0.12]`
+```tsx
+{/* Grid compacto 7x2 */}
+<div className="px-5 mb-6">
+  <div className="grid grid-cols-7 gap-[6px]">
+    {Array.from({ length: 14 }, (_, i) => {
+      const day = i + 1;
+      const completed = isDayCompleted(day);
+      const unlocked = isDayUnlocked(day);
+      const isNext = unlocked && !completed && (day === 1 || isDayCompleted(day - 1));
+      const locked = !unlocked;
 
-### 2. `src/components/ChecklistItemCard.tsx` — linha 19
-`bg-white/[0.06] border-white/10` → `bg-white/[0.08] border-white/[0.12]`
-Adicionar `cursor-pointer` e `duration-200 ease-out` à classe do button.
+      return (
+        <button
+          key={`grid-${day}`}
+          onClick={() => handleDayClick(day)}
+          disabled={locked}
+          className={`aspect-square rounded-[10px] flex items-center justify-center text-[13px] font-semibold font-body transition-all duration-200 ease-out cursor-pointer ${
+            completed
+              ? "bg-[rgba(79,209,197,0.12)] text-[#4fd1c5]"
+              : isNext
+              ? "bg-[#4fd1c5] text-white shadow-[0_0_16px_rgba(79,209,197,0.25)]"
+              : locked
+              ? "bg-[rgba(255,255,255,0.04)] text-[#4a5568] opacity-40 cursor-default"
+              : "bg-[rgba(255,255,255,0.06)] text-white/60"
+          }`}
+        >
+          {day}
+        </button>
+      );
+    })}
+  </div>
+</div>
+```
 
-### 3. `src/components/TodaySearchOverlay.tsx` — linha 134
-`bg-white/[0.06] border border-white/10` → `bg-white/[0.08] border border-white/[0.12]`
-Adicionar `cursor-pointer`.
+### Detalhes
+- 7 colunas via `grid-cols-7`, naturalmente gera 2 linhas para 14 itens
+- `aspect-square` garante células quadradas
+- `px-5` = 20px de margem horizontal (mesmo que o `<main>`)
+- Estado "disponível mas não é próximo" usa `bg-white/[0.06]` para não ficar invisível
+- Lista vertical abaixo permanece inalterada
 
-### 4. `src/components/EditProfileDialog.tsx` — linha 68
-`bg-white/[0.06]` → `bg-white/[0.08]`, `border-white/10` → `border-white/[0.12]`
-
-### 5. `src/components/NotificationSettings.tsx` — linhas 168, 196
-`bg-white/[0.06]` → `bg-white/[0.08]`, `border-white/10` → `border-white/[0.12]`
-
-### 6. `src/components/PainReliefMode.tsx` — linha 77
-`bg-white/[0.06]` → `bg-white/[0.08]`
-
-### 7. `src/components/MotorAlivio.tsx`
-`bg-white/[0.06]` → `bg-white/[0.08]` em botões close/interativos
-
-### 8. `src/components/ProgressDashboard.tsx` — linhas 121, 172
-`bg-white/[0.06]` → `bg-white/[0.08]` (barras de progresso)
-
-### 9. `src/pages/Profile.tsx` — linhas 316, 334, 536, 571
-`bg-white/[0.06]` → `bg-white/[0.08]`, `border-white/10` → `border-white/[0.12]`
-
-### 10. `src/pages/Checkout.tsx` — linha 59
-`bg-white/[0.06]` → `bg-white/[0.08]`, `border-white/10` → `border-white/[0.12]`
-
-### 11. `src/pages/ResetPassword.tsx` — linhas 101, 114
-`bg-white/[0.06]` → `bg-white/[0.08]`, `border-white/10` → `border-white/[0.12]`
-
-### 12. `src/components/journey/ActivityCard.tsx` — linha 23
-Adicionar `duration-200 ease-out cursor-pointer` ao button.
-
-## Fora do escopo
-- Páginas admin (não são user-facing)
-- ExerciseCard, RecipeCard, FilterChip (já atualizados)
-- `glass-card` class (definida no CSS, não nos componentes)
-
-## Nenhuma lógica alterada — apenas classes CSS.
-
+### Arquivo modificado
+- `src/pages/Journey.tsx` (inserção de ~25 linhas)
