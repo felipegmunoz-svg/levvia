@@ -286,6 +286,33 @@ const Practices = () => {
       {/* === EXERCISES TAB === */}
       {tab === "exercises" && (
         <>
+          {/* Personalization toggle */}
+          {!loading && !profileLoading && (
+            <div className="px-5 mb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isPersonalized && (
+                    <Badge variant="secondary" className="bg-secondary/20 text-secondary border-0 text-xs gap-1">
+                      <Sparkles size={10} />
+                      Personalizado
+                    </Badge>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {isPersonalized && personalizedExercises.length < rawExercises.length
+                      ? `${personalizedExercises.length} de ${rawExercises.length} para seu perfil`
+                      : `${rawExercises.length} disponíveis`}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="text-xs text-secondary hover:underline"
+                >
+                  {showAll ? "Personalizar" : "Ver todos"}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Region filter */}
           <div className="px-5 mb-3">
             <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 font-medium">Região do Corpo</p>
