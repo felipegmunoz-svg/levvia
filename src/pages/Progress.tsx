@@ -92,21 +92,21 @@ const Progress = () => {
     return days;
   }, [challengeProgress]);
 
-  // Score message — depends on whether the user has journey progress or not
+  // Score message — contextual based on journey progress
   const hasJourneyProgress = evoData.length > 0;
   const scoreMessage = !hasHeatMapData
-    ? "Preencha o mapa de calor no Dia 1 para ver seu score de fluxo."
+    ? "Complete o mapa de calor para entendermos juntas como você está hoje."
     : !hasJourneyProgress
     ? flowScore <= 40
-      ? "Seu score inicial indica atenção necessária. A jornada vai ajudar a resfriar o fogo."
+      ? "Este é o seu ponto de partida. Suas áreas de atenção foram mapeadas — a jornada começa aqui."
       : flowScore <= 70
-      ? "Seu score inicial está moderado. Complete a jornada para evoluir."
-      : "Este é seu score inicial — antes da jornada. Complete os dias para ver sua evolução real."
+      ? "Este é o seu ponto de partida. Ao longo dos dias, vamos acompanhar como seu corpo responde aos cuidados."
+      : "Este é o seu ponto de partida. Você está começando com uma base boa — vamos mantê-la e melhorar juntas."
     : flowScore <= 40
-    ? "Sua inflamação precisa de atenção. Continue a jornada, cada ação conta."
+    ? "Seu corpo está pedindo mais cuidado. Continue — cada dia faz diferença."
     : flowScore <= 70
-    ? "Você está no caminho certo. O fogo está diminuindo."
-    : "Excelente! Seu fluxo está ativo e a inflamação controlada.";
+    ? "Você está no caminho certo. O alívio está chegando, um passo de cada vez."
+    : "Seu corpo está respondendo. O cuidado diário está trazendo resultado.";
 
   const hydrationPercent = dailyGoalMl > 0 ? Math.min(currentIntakeMl / dailyGoalMl, 1) : 0;
   const goalReached = currentIntakeMl >= dailyGoalMl && dailyGoalMl > 0;
@@ -128,7 +128,7 @@ const Progress = () => {
           Seu Progresso
         </h1>
         <p className="text-[13px] text-levvia-muted font-body mt-1">
-          Acompanhe sua evolução
+          Aqui você acompanha como seu corpo responde aos cuidados
         </p>
 
         {/* Sub-tabs */}

@@ -170,11 +170,13 @@ const DayTouchpointView = ({
               <FlowSilhouette heatMapData={heatMapDay1} waterIntakeMl={hydration?.currentIntakeMl ?? 0} waterGoalMl={hydration?.dailyGoalMl ?? 2000} size="small" animated={false} />
             </div>
             <div>
-              <p className="text-sm font-heading font-semibold text-levvia-fg">Seu Fogo Interno</p>
+              <p className="text-sm font-heading font-semibold text-levvia-fg">Sua Jornada de Alívio</p>
               <p className="text-xs text-levvia-muted font-body mt-0.5">
-                {completedSlots === 0
-                  ? "Seu estado inicial registrado →"
-                  : "Toque para ver sua evolução →"}
+                {dayNumber === 1 && completedSlots === 0
+                  ? "Veja como mapeamos seu corpo hoje →"
+                  : dayNumber === 1
+                  ? "Seu ponto de partida está registrado →"
+                  : "Acompanhe como seu corpo responde →"}
               </p>
             </div>
           </button>
