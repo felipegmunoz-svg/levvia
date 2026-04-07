@@ -1,165 +1,218 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { useChallengeData } from "../hooks/useChallengeData";
+import { useTouchpointProgress } from "../hooks/useTouchpointProgress";
+import { touchpointConfig } from "../data/touchpointConfig";
+import { supabase } from "../lib/supabaseClient";
 
-const STOP_WORDS = new Set([
-  "que", "como", "para", "com", "por", "uma", "uns", "umas", "dos", "das",
-  "nos", "nas", "aos", "pela", "pelo", "pelas", "pelos", "num", "numa",
-  "este", "esta", "esse", "essa", "isso", "isto", "aqui", "ali",
-  "meu", "minha", "meus", "minhas", "seu", "sua", "seus", "suas",
-  "nosso", "nossa", "nossos", "nossas", "dele", "dela", "deles", "delas",
-  "qual", "quais", "quem", "onde", "quando", "porque", "porquê",
-  "fazer", "faz", "fez", "pode", "posso", "devo", "tem", "tenho", "havia",
-  "ser", "são", "foi", "era", "será", "está", "estar", "estou",
-  "ter", "teve", "tinha", "sobre", "entre", "mais", "menos", "muito",
-  "bem", "mal", "sim", "não", "também", "ainda", "apenas", "mesmo",
-  "ela", "ele", "eles", "elas", "você", "vocês", "gente",
-  "todo", "toda", "todos", "todas", "cada", "outro", "outra",
-  "depois", "antes", "agora", "sempre", "nunca", "já",
-  "preciso", "quero", "gostaria", "significa", "quer", "dizer",
-  "corpo", "dia", "vez", "coisa", "forma", "tipo", "lado",
-]);
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import DayProgress from "../components/DayProgress";
+import TouchpointCard from "../components/TouchpointCard";
+import HydrationTracker from "../components/HydrationTracker";
+import DailyAffirmation from "../components/DailyAffirmation";
+import DaySummary from "../components/DaySummary";
+import JourneyMap from "../components/JourneyMap";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 
-interface TodaySearchOverlayProps {
-  onClose: () => void;
-}
-
-export default function TodaySearchOverlay({ onClose }: TodaySearchOverlayProps) {
-  const [search, setSearch] = useState("");
+const Today = () => {
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const forcedDay = searchParams.get("day");
 
-  const { data: results } = useQuery({
-    queryKey: ["home-search", search],
-    queryFn: async () => {
-      if (!search || search.length < 3) return [];
-      const words = search
-        .toLowerCase()
-        .replace(/[?!.,;:()""'']/g, "")
-        .split(/\s+/)
-        .filter((w) => w.length >= 3 && !STOP_WORDS.has(w));
-      if (words.length === 0) return [];
+  const [currentDay, setCurrentDay] = useState<number>(1);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-      const filters = words.flatMap((word) => [
-        `content.ilike.%${word}%`,
-        `section_title.ilike.%${word}%`,
-      ]);
+  const {
+    challengeData,
+    loading: challengeLoading,
+    error: challengeError,
+    refetchChallengeData,
+  } = useChallengeData(user?.id, currentDay);
 
-      const { data, error } = await supabase
-        .from("ebook_sections")
-        .select("id, chapter_number, section_title, content, tags, keywords")
-        .or(filters.join(","))
-        .limit(30);
-      if (error) throw error;
-      if (!data) return [];
+  const {
+    progress,
+    loading: progressLoading,
+    error: progressError,
+    updateProgress,
+  } = useTouchpointProgress(user?.id, currentDay);
 
-      const scored = data.map((item) => {
-        let score = 0;
-        const title = item.section_title?.toLowerCase() || "";
-        const content = item.content?.toLowerCase() || "";
-        const tags = (item.tags as string[])?.map((t) => t.toLowerCase()) || [];
-        const keywords = (item.keywords as string[])?.map((k) => k.toLowerCase()) || [];
-
-        for (const word of words) {
-          if (title.includes(word)) score += 10;
-          if (tags.some((t) => t.includes(word))) score += 8;
-          if (keywords.some((k) => k.includes(word))) score += 8;
-          if (content.slice(0, 200).includes(word)) score += 5;
-          if (content.includes(word)) score += 1;
-        }
-        return { ...item, score };
-      });
-
-      return scored.sort((a, b) => b.score - a.score).slice(0, 5);
-    },
-    enabled: search.length >= 3,
-  });
-
-  const getSnippet = (text: string) => {
-    const words = search
-      .toLowerCase()
-      .replace(/[?!.,;:]/g, "")
-      .split(/\s+/)
-      .filter((w) => w.length >= 3 && !STOP_WORDS.has(w));
-    for (const word of words) {
-      const idx = text.toLowerCase().indexOf(word);
-      if (idx !== -1) {
-        const sentenceStart = text.lastIndexOf(".", Math.max(0, idx - 40));
-        const start = sentenceStart > 0 ? sentenceStart + 2 : Math.max(0, idx - 30);
-        const end = Math.min(text.length, start + 140);
-        const prefix = start > 0 ? "..." : "";
-        const suffix = end < text.length ? "..." : "";
-        return prefix + text.slice(start, end).trim() + suffix;
-      }
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
     }
-    return text.slice(0, 120) + "...";
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    const initializeDay = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (user) {
+          let userProfile = localStorage.getItem(`levvia_profile_${user.id}`);
+          if (!userProfile) {
+            const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+
+            if (error) throw error;
+            userProfile = JSON.stringify(data);
+            localStorage.setItem(`levvia_profile_${user.id}`, userProfile);
+          }
+
+          const profile = JSON.parse(userProfile);
+          let storedCurrentDay = profile.current_day || 1;
+
+          if (forcedDay) {
+            storedCurrentDay = parseInt(forcedDay, 10);
+            // Optionally, update the backend if a day is forced for testing
+            await supabase.from("profiles").update({ current_day: storedCurrentDay }).eq("id", user.id);
+            profile.current_day = storedCurrentDay;
+            localStorage.setItem(`levvia_profile_${user.id}`, JSON.stringify(profile));
+          }
+
+          setCurrentDay(storedCurrentDay);
+
+          // Check if onboarding is complete
+          const onboardingComplete = profile.onboarding_complete;
+          if (!onboardingComplete) {
+            setShowOnboarding(true);
+            navigate("/onboarding");
+            return;
+          }
+        }
+      } catch (err: any) {
+        console.error("Error initializing day:", err.message);
+        setError("Erro ao carregar o dia. Tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      initializeDay();
+    }
+  }, [user, forcedDay, navigate]);
+
+  useEffect(() => {
+    if (challengeError) {
+      setError("Erro ao carregar os dados do desafio. Tente novamente.");
+    }
+    if (progressError) {
+      setError("Erro ao carregar o progresso. Tente novamente.");
+    }
+  }, [challengeError, progressError]);
+
+  const handleCompleteTouchpoint = async (touchpointId: string) => {
+    await updateProgress(touchpointId, true);
+    refetchChallengeData(); // Refresh data after updating progress
   };
 
-  const handleSelect = (chapterNumber: number, sectionId: string) => {
-    onClose();
-    navigate(`/guia/${chapterNumber}/${sectionId}`);
+  const handleHydrationUpdate = async (amount: number) => {
+    const newHydration = (challengeData?.hydration || 0) + amount;
+    await supabase
+      .from("challenge_data")
+      .update({ hydration: newHydration })
+      .eq("user_id", user?.id)
+      .eq("day", currentDay);
+    refetchChallengeData();
   };
+
+  const handleAdvanceDay = async () => {
+    if (user) {
+      const nextDay = currentDay + 1;
+      await supabase.from("profiles").update({ current_day: nextDay }).eq("id", user.id);
+
+      // Clear current day's challenge data to ensure fresh load for next day
+      await supabase.from("challenge_data").delete().eq("user_id", user.id).eq("day", currentDay);
+
+      setCurrentDay(nextDay);
+      navigate(`/today?day=${nextDay}`);
+    }
+  };
+
+  if (authLoading || loading || challengeLoading || progressLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
+
+  if (showOnboarding) {
+    return null; // Onboarding component will handle navigation
+  }
+
+  const dayConfig = touchpointConfig[currentDay];
+
+  if (!dayConfig) {
+    return <ErrorMessage message="Conteúdo para este dia não encontrado." />;
+  }
+
+  const isDayComplete = challengeData?.touchpoints.every((tp) => progress[tp.id]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-background min-h-screen">
-        {/* Search header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-          <Search className="w-5 h-5 text-muted-foreground shrink-0" />
-          <input
-            autoFocus
-            type="text"
-            placeholder="O que você precisa saber?"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm"
+    <div className="min-h-screen bg-dark-blue text-white flex flex-col">
+      <Header />
+      <main className="flex-grow p-4">
+        <h1 className="text-2xl font-bold mb-2">Dia {currentDay}</h1>
+        <h2 className="text-xl text-mint-green mb-4">{dayConfig.title}</h2>
+
+        <DayProgress currentDay={currentDay} totalDays={14} />
+
+        <div className="space-y-6 mt-6">
+          {dayConfig.affirmation && <DailyAffirmation affirmation={dayConfig.affirmation} />}
+
+          {dayConfig.touchpoints.map((touchpoint, index) => (
+            <TouchpointCard
+              key={touchpoint.id}
+              touchpoint={touchpoint}
+              isComplete={progress[touchpoint.id] || false}
+              onComplete={() => handleCompleteTouchpoint(touchpoint.id)}
+              currentDay={currentDay}
+            />
+          ))}
+
+          <HydrationTracker
+            currentHydration={challengeData?.hydration || 0}
+            targetHydration={dayConfig.hydrationTarget}
+            onUpdate={handleHydrationUpdate}
           />
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10">
-            <X className="w-5 h-5 text-muted-foreground" />
-          </button>
-        </div>
 
-        {/* Results */}
-        <div className="px-4 py-3 space-y-2 max-h-[80vh] overflow-y-auto">
-          {search.length >= 3 && results && results.length > 0 && (
-            <>
-              <p className="text-xs text-muted-foreground mb-2">
-                {results.length} resultado{results.length !== 1 ? "s" : ""}
+          {isDayComplete && currentDay < 14 && (
+            <button
+              onClick={handleAdvanceDay}
+              className="w-full bg-mint-green text-dark-blue font-bold py-3 px-4 rounded-lg mt-6 transition-colors hover:bg-opacity-90"
+            >
+              Concluir Dia {currentDay} e Ir para o Dia {currentDay + 1} →
+            </button>
+          )}
+
+          {currentDay === 14 && isDayComplete && (
+            <DaySummary
+              day={currentDay}
+              title={dayConfig.title}
+              message={dayConfig.completionMessage}
+              onGenerateReport={() => alert("Gerar Relatório Médico (em breve)")} // Placeholder
+            />
+          )}
+
+          {currentDay < 14 && (
+            <div className="mt-8 p-4 bg-gray-800 rounded-lg">
+              <h3 className="text-lg font-semibold text-mint-green">Prévia do Dia {currentDay + 1}</h3>
+              <p className="text-sm text-gray-400">
+                {touchpointConfig[currentDay + 1]?.previewText || "Conteúdo em breve..."}
               </p>
-              {results.map((result) => (
-                <button
-                  key={result.id}
-                  onClick={() => handleSelect(result.chapter_number, result.id)}
-                  className="w-full text-left p-3 rounded-xl bg-white/[0.08] border border-white/[0.12] hover:border-secondary/30 transition-all cursor-pointer"
-                >
-                  <p className="text-[10px] text-secondary font-medium">
-                    Capítulo {result.chapter_number}
-                  </p>
-                  <p className="font-medium text-foreground text-sm mt-0.5">
-                    {result.section_title}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {getSnippet(result.content)}
-                  </p>
-                </button>
-              ))}
-            </>
-          )}
-
-          {search.length >= 3 && results && results.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Nenhum resultado encontrado
-            </p>
-          )}
-
-          {search.length < 3 && (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Digite 3 ou mais letras para buscar no Guia
-            </p>
+            </div>
           )}
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
-}
+};
+
+export default Today;
