@@ -17,7 +17,8 @@
   }
 
   body {
-    @apply bg-dark-blue text-white;
+    background-color: var(--color-dark-blue);
+    color: var(--color-white);
   }
 
   /* Custom styles for improved contrast and visual appeal */
