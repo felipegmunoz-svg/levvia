@@ -164,15 +164,17 @@ const DayTouchpointView = ({
       )}
 
       {/* Header */}
-      <div className="px-6 pt-8 pb-4 text-center">
+      <div className="px-6 pt-6 pb-6 text-center bg-gradient-to-b from-slate-800/40 to-transparent rounded-b-2xl border-b border-slate-700/30">
         <img src={logoFull} alt="Levvia" className="h-8 mx-auto mb-4" />
-        <p className="text-xs uppercase tracking-wider text-levvia-muted font-body">
-          Dia {dayNumber}
-        </p>
-        <h1 className="text-2xl font-heading font-semibold text-levvia-fg mt-1">
+        <div className="inline-block mb-3">
+          <span className="text-xs uppercase tracking-widest text-cyan-400 font-body font-bold bg-cyan-400/10 px-3 py-1 rounded-full border border-cyan-400/20">
+            Dia {dayNumber} de 14
+          </span>
+        </div>
+        <h1 className="text-3xl font-heading font-bold text-slate-100 mt-2 leading-tight">
           {config.theme}
         </h1>
-        <p className="text-sm text-levvia-muted font-body mt-1">
+        <p className="text-sm text-slate-300 font-body mt-3 leading-relaxed">
           {config.purpose}
         </p>
       </div>
@@ -279,32 +281,38 @@ const DayTouchpointView = ({
           }
 
           return (
-            <div key={s.slot} className="levvia-card overflow-hidden transition-all duration-300">
+            <div key={s.slot} className={`overflow-hidden transition-all duration-300 rounded-lg border-2 ${
+              isDone
+                ? "bg-slate-800/50 border-primary/30 shadow-lg shadow-primary/10"
+                : isActive
+                ? "bg-slate-800/70 border-cyan-400/50 shadow-lg shadow-cyan-400/20"
+                : "bg-slate-800/40 border-slate-700/50 hover:border-slate-600/70"
+            }`}>
               {/* Card Header */}
               <button
                 onClick={() => toggleSlot(s.slot)}
-                className="w-full p-4 flex items-center gap-3"
+                className="w-full p-4 flex items-center gap-3 hover:bg-slate-700/20 transition-colors"
               >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                     isDone
-                      ? "bg-primary/10"
+                      ? "bg-primary/20 shadow-lg shadow-primary/30"
                       : isActive
-                      ? "bg-secondary/10"
-                      : "bg-muted"
+                      ? "bg-cyan-400/20 shadow-lg shadow-cyan-400/30"
+                      : "bg-slate-700/50"
                   }`}
                 >
                   <s.Icon
                     size={18}
-                    className={isDone ? "text-primary" : isActive ? "text-secondary" : "text-levvia-muted"}
-                    strokeWidth={1.5}
+                    className={isDone ? "text-primary" : isActive ? "text-cyan-400" : "text-slate-400"}
+                    strokeWidth={2}
                   />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-medium text-levvia-fg font-body text-sm">
+                  <p className="font-semibold text-slate-100 font-body text-sm">
                     {s.label}
                   </p>
-                  <p className="text-xs text-levvia-muted font-body">{s.time}</p>
+                  <p className="text-xs text-slate-400 font-body">{s.time}</p>
                   {isDone && (
                     <p className="text-[11px] text-primary font-body mt-0.5 flex items-center gap-1">
                       <Check size={10} />
