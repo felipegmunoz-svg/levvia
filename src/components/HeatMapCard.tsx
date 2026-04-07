@@ -104,10 +104,10 @@ interface HeatMapCardProps {
 
 const HeatMapCard = ({ profile }: HeatMapCardProps) => {
   const [showModal, setShowModal] = useState(false);
-  const heatMap = profile.heatMapDay1 || {};
-  const profileName = getFireProfile(heatMap);
-  const affected = getAffectedAreas(heatMap);
-  const hasData = affected.length > 0;
+  const heatMap = (typeof profile.heatMapDay1 === 'object' && profile.heatMapDay1 !== null) ? profile.heatMapDay1 : {};
+  const profileName = getFireProfile(heatMap || {});
+  const affected = getAffectedAreas(heatMap || {});
+  const hasData = (Array.isArray(affected) ? affected : []).length > 0;
 
   return (
     <>

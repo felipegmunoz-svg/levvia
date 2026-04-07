@@ -40,9 +40,9 @@ const SymptomEvolutionChart = () => {
   }, [entries]);
 
   const summary = useMemo(() => {
-    if (entries.length < 2) return null;
-    const first = entries[0].pain_level;
-    const last = entries[entries.length - 1].pain_level;
+    if (!entries || entries.length < 2) return null;
+    const first = entries[0]?.pain_level ?? 0;
+    const last = entries[entries.length - 1]?.pain_level ?? 0;
     const diff = first - last;
     const avg = entries.reduce((s, e) => s + e.pain_level, 0) / entries.length;
     return { first, last, diff, avg: Math.round(avg * 10) / 10 };

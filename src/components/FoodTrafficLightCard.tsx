@@ -10,9 +10,9 @@ interface FoodTrafficLightCardProps {
 const FoodTrafficLightCard = ({ profile }: FoodTrafficLightCardProps) => {
   const [showModal, setShowModal] = useState(false);
 
-  const greenFoods = profile.antiInflammatoryAllies || [];
-  const yellowFoods = profile.dietaryPreferences || [];
-  const redFoods = profile.inflammatoryEnemies || [];
+  const greenFoods = (Array.isArray(profile.antiInflammatoryAllies) ? profile.antiInflammatoryAllies : []) || [];
+  const yellowFoods = (Array.isArray(profile.dietaryPreferences) ? profile.dietaryPreferences : []) || [];
+  const redFoods = (Array.isArray(profile.inflammatoryEnemies) ? profile.inflammatoryEnemies : []) || [];
 
   return (
     <>

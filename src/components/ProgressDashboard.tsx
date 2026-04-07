@@ -13,8 +13,11 @@ const ProgressDashboard = ({ currentDay, progress }: ProgressDashboardProps) => 
   // Calculate completion % for each day
   const dailyCompletion = useMemo(() => {
     return challengeDays.slice(0, currentDay).map((day) => {
-      const dayActivities = [...day.exercises, ...day.recipes, ...day.habits];
-      const total = dayActivities.length;
+      const exercises = Array.isArray(day.exercises) ? day.exercises : [];
+      const recipes = Array.isArray(day.recipes) ? day.recipes : [];
+      const habits = Array.isArray(day.habits) ? day.habits : [];
+      const dayActivities = [...exercises, ...recipes, ...habits];
+      const total = dayActivities.length || 0;
       const dayProgress = progress[day.day] || {};
       const completed = dayActivities.filter((a) => dayProgress[a.id]).length;
       const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
