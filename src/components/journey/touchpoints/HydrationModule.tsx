@@ -51,26 +51,26 @@ const HydrationModule = ({
 
       {/* Progress Bar */}
       <div>
-        <div className="relative h-3 rounded-full bg-muted overflow-hidden">
+        <div className="relative h-4 rounded-full bg-slate-700/50 overflow-hidden border border-slate-600">
           <div
-            className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all duration-500"
+            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-cyan-400 to-primary rounded-full transition-all duration-500 shadow-lg shadow-primary/50"
             style={{ width: `${Math.round(dailyPercent * 100)}%` }}
           />
         </div>
         {/* Tick marks */}
-        <div className="relative h-4 mt-1">
+        <div className="relative h-5 mt-2">
           {TICK_LABELS.map((label, i) => (
             <div
               key={label}
               className="absolute flex flex-col items-center"
               style={{ left: `${(i + 1) * 25}%`, transform: "translateX(-50%)" }}
             >
-              <div className="w-px h-1.5 bg-border" />
-              <span className="text-[8px] text-levvia-muted font-body">{label}</span>
+              <div className="w-0.5 h-2 bg-slate-500" />
+              <span className="text-[9px] text-slate-300 font-body font-semibold mt-0.5">{label}</span>
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-center text-muted-foreground font-body mt-0.5">
+        <p className="text-[11px] text-center text-slate-300 font-body mt-1 font-medium">
           Manhã · Almoço · Tarde · Noite
         </p>
       </div>
@@ -100,17 +100,17 @@ const HydrationModule = ({
             <div className="flex gap-3 relative">
               <button
                 onClick={() => handleAdd(250)}
-                className="flex-1 levvia-card p-3 text-center cursor-pointer hover:border-primary transition-all active:scale-95"
+                className="flex-1 bg-slate-700/70 hover:bg-slate-600/90 border-2 border-slate-600 hover:border-cyan-400 rounded-lg p-3 text-center cursor-pointer transition-all active:scale-95 shadow-md"
               >
-                <Droplets size={18} className="mx-auto text-primary mb-1" />
-                <span className="text-sm font-medium text-levvia-fg font-body">+250ml</span>
+                <Droplets size={18} className="mx-auto text-cyan-400 mb-1" />
+                <span className="text-sm font-semibold text-slate-100 font-body">+250ml</span>
               </button>
               <button
                 onClick={() => handleAdd(500)}
-                className="flex-1 levvia-card p-3 text-center cursor-pointer hover:border-primary transition-all active:scale-95"
+                className="flex-1 bg-slate-700/70 hover:bg-slate-600/90 border-2 border-slate-600 hover:border-cyan-400 rounded-lg p-3 text-center cursor-pointer transition-all active:scale-95 shadow-md"
               >
-                <Droplets size={22} className="mx-auto text-primary mb-1" />
-                <span className="text-sm font-medium text-levvia-fg font-body">+500ml</span>
+                <Droplets size={22} className="mx-auto text-cyan-400 mb-1" />
+                <span className="text-sm font-semibold text-slate-100 font-body">+500ml</span>
               </button>
 
               {/* Check animation */}
