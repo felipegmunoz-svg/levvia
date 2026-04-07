@@ -194,7 +194,7 @@ const HeatMapInteractive = ({
           </div>
 
           <p className="text-foreground/50 text-center italic mb-8 max-w-xs" style={{ fontWeight: 300, fontSize: "0.85rem" }}>
-            Seja honesta consigo mesma. Este é o seu mapa para a leveza.
+            Seja honesta consigo mesma. Este é o seu mapa para a leveza.{" "}
           </p>
 
           <button
