@@ -8,9 +8,7 @@ import { debugMount, debugUnmount, isDebugActive } from "@/lib/renderDebug";
 import { toast } from "sonner";
 
 import DayTouchpointView from "@/components/journey/DayTouchpointView";
-import PaywallModal from "@/components/journey/PaywallModal";
 import { useAuth } from "@/hooks/useAuth";
-import { usePremium } from "@/hooks/usePremium";
 import { useChallengeData } from "@/hooks/useChallengeData";
 import { useTouchpointProgress } from "@/hooks/useTouchpointProgress";
 import { useHydration } from "@/hooks/useHydration";
@@ -43,13 +41,6 @@ const Today = () => {
     nextDayTouchpoints,
     loading,
   } = useChallengeData(rescueMode);
-
-  const { hasPremium, loading: premiumLoading } = usePremium();
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  const DEBUG_EMAILS = ['felipegmunoz@gmail.com', 'teste_levvia_dia3_2026@gmail.com', 'teste00@oi.com'];
-  const isAuthorized = !!user?.email && DEBUG_EMAILS.includes(user.email.toLowerCase());
-  const isDev = (import.meta.env.MODE === 'development' || localStorage.getItem('levvia_debug') === 'true') && isAuthorized;
 
   const [replayDay, setReplayDay] = useState<number | null>(null);
 
@@ -89,7 +80,7 @@ const Today = () => {
         particleCount: 150, 
         spread: 70, 
         origin: { y: 0.6 }, 
-        colors: ['#2DD4BF', '#38BDF8', '#FFFFFF'] 
+        colors: ['#00C49A', '#38BDF8', '#FFFFFF'] 
       });
 
       if (effectiveDay === 14) {
@@ -112,20 +103,15 @@ const Today = () => {
   let content: React.ReactNode = null;
 
   // Loading state
-  if ((loading && !forceReady) || tpLoading || premiumLoading || authLoading) {
+  if ((loading && !forceReady) || tpLoading || authLoading) {
     content = (
-      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A1128] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#2DD4BF] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#CBD5E1]">Preparando sua jornada de alívio...</p>
+          <div className="w-8 h-8 border-2 border-[#00C49A] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-[#E0E0E0]">Preparando sua jornada de alívio...</p>
         </div>
       </div>
     );
-  }
-
-  // Paywall gate for day 4+
-  else if (effectiveDay > 3 && !hasPremium) {
-    content = <PaywallModal onClose={() => setShowPaywall(false)} />;
   }
 
   // Preview mode: show next day read-only
@@ -136,7 +122,7 @@ const Today = () => {
         <div className="px-4 pt-3">
           <button
             onClick={() => setShowPreview(false)}
-            className="flex items-center gap-1.5 text-sm text-[#2DD4BF] font-body"
+            className="flex items-center gap-1.5 text-sm text-[#00C49A] font-body"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar ao meu dia
@@ -191,10 +177,10 @@ const Today = () => {
   // Fallback loading
   else {
     content = (
-      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A1128] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#2DD4BF] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#CBD5E1]">Sincronizando seu progresso...</p>
+          <div className="w-8 h-8 border-2 border-[#00C49A] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-[#E0E0E0]">Sincronizando seu progresso...</p>
         </div>
       </div>
     );
@@ -202,33 +188,24 @@ const Today = () => {
 
   return (
     <>
-      {isDev && (
-        <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
-          <span className="font-semibold text-yellow-800">🐛 Debug:</span>
-          {[1, 2, 3, 4, 5, 6, 7, 14].map(d => (
-            <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
-              Dia {d}
-            </button>
-          ))}
-          <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded hover:bg-red-400 transition-colors ml-auto">
-            Resetar Tudo
+      <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
+        <span className="font-semibold text-yellow-800">🐛 Debug:</span>
+        {[1, 2, 3, 4, 5, 6, 7, 14].map(d => (
+          <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
+            Dia {d}
           </button>
-        </div>
-      )}
-      {isDebugActive() && (
-        <div style={{ position: 'fixed', bottom: 70, right: 8, zIndex: 9999, background: 'rgba(0,0,0,0.85)', color: '#0f0', padding: '8px 12px', borderRadius: 8, fontSize: 10, fontFamily: 'monospace', maxWidth: 260, pointerEvents: 'none' }}>
-          <div>🔄 Today #{renderCount.current}</div>
-          <div>day: {effectiveDay} | slots: {completedSlots}/4</div>
-          <div>premium:{String(hasPremium)} | auth:{String(!authLoading)}</div>
-        </div>
-      )}
+        ))}
+        <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded hover:bg-red-400 transition-colors ml-auto">
+          Resetar Tudo
+        </button>
+      </div>
       {showSearch && <TodaySearchOverlay onClose={() => setShowSearch(false)} />}
-      <div className="levvia-page bg-[#0F172A]">
+      <div className="levvia-page bg-[#0A1128]">
         {/* Quick access bar */}
         <div className="flex items-center gap-2 px-4 pt-3 pb-1">
           <button
             onClick={() => setShowSearch(true)}
-            className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.1] text-[#CBD5E1] text-sm hover:border-[#2DD4BF]/30 transition-all cursor-pointer"
+            className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.1] text-[#E0E0E0] text-sm hover:border-[#00C49A]/30 transition-all cursor-pointer"
           >
             <Search className="w-4 h-4" />
             <span>Buscar no Guia...</span>
