@@ -157,7 +157,7 @@ const Today = () => {
       <DayTouchpointView
         dayNumber={effectiveDay}
         touchpoints={todayTouchpoints}
-        progress={progress}
+        progress={progress || { morning: { done: false }, lunch: { done: false }, afternoon: { done: false }, night: { done: false } }}
         hydration={hydration}
         rescueMode={rescueMode}
         onSlotComplete={handleSlotComplete}
