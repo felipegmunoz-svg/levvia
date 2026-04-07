@@ -3,6 +3,7 @@ export type TouchpointSlot = "morning" | "lunch" | "afternoon" | "night";
 export interface NightTechnique {
   type: string;
   name: string;
+  title?: string;
   description: string;
   details?: string;
   duration?: string;
@@ -10,6 +11,7 @@ export interface NightTechnique {
   benefits?: string[];
   zones?: string[];
   previousDayKey?: string;
+  [key: string]: any;
 }
 
 export function getTouchpointConfig(day: number) {
