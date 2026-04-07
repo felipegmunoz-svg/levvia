@@ -1,218 +1,69 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { useChallengeData } from "../hooks/useChallengeData";
-import { useTouchpointProgress } from "../hooks/useTouchpointProgress";
-import { touchpointConfig } from "../data/touchpointConfig";
-import { supabase } from "../lib/supabaseClient";
+import { useState, useMemo } from "react";
+import { Search, X } from "lucide-react";
+import { touchpointConfig } from "@/data/touchpointConfig";
 
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import DayProgress from "../components/DayProgress";
-import TouchpointCard from "../components/TouchpointCard";
-import HydrationTracker from "../components/HydrationTracker";
-import DailyAffirmation from "../components/DailyAffirmation";
-import DaySummary from "../components/DaySummary";
-import JourneyMap from "../components/JourneyMap";
-import LoadingSpinner from "../components/LoadingSpinner";
-import ErrorMessage from "../components/ErrorMessage";
+interface TodaySearchOverlayProps {
+  onClose: () => void;
+}
 
-const Today = () => {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const forcedDay = searchParams.get("day");
+const TodaySearchOverlay = ({ onClose }: TodaySearchOverlayProps) => {
+  const [query, setQuery] = useState("");
 
-  const [currentDay, setCurrentDay] = useState<number>(1);
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const results = useMemo(() => {
+    if (!query || query.length < 2) return [];
 
-  const {
-    challengeData,
-    loading: challengeLoading,
-    error: challengeError,
-    refetchChallengeData,
-  } = useChallengeData(user?.id, currentDay);
+    const q = query.toLowerCase();
+    const matches: { day: number; name: string; type: string; description: string }[] = [];
 
-  const {
-    progress,
-    loading: progressLoading,
-    error: progressError,
-    updateProgress,
-  } = useTouchpointProgress(user?.id, currentDay);
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth");
-    }
-  }, [user, authLoading, navigate]);
-
-  useEffect(() => {
-    const initializeDay = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        if (user) {
-          let userProfile = localStorage.getItem(`levvia_profile_${user.id}`);
-          if (!userProfile) {
-            const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-
-            if (error) throw error;
-            userProfile = JSON.stringify(data);
-            localStorage.setItem(`levvia_profile_${user.id}`, userProfile);
-          }
-
-          const profile = JSON.parse(userProfile);
-          let storedCurrentDay = profile.current_day || 1;
-
-          if (forcedDay) {
-            storedCurrentDay = parseInt(forcedDay, 10);
-            // Optionally, update the backend if a day is forced for testing
-            await supabase.from("profiles").update({ current_day: storedCurrentDay }).eq("id", user.id);
-            profile.current_day = storedCurrentDay;
-            localStorage.setItem(`levvia_profile_${user.id}`, JSON.stringify(profile));
-          }
-
-          setCurrentDay(storedCurrentDay);
-
-          // Check if onboarding is complete
-          const onboardingComplete = profile.onboarding_complete;
-          if (!onboardingComplete) {
-            setShowOnboarding(true);
-            navigate("/onboarding");
-            return;
-          }
+    for (const [dayStr, config] of Object.entries(touchpointConfig)) {
+      const day = Number(dayStr);
+      const touchpoints = (config as any).touchpoints ?? [];
+      for (const tp of touchpoints) {
+        const name = tp.name ?? "";
+        const desc = tp.description ?? "";
+        if (name.toLowerCase().includes(q) || desc.toLowerCase().includes(q)) {
+          matches.push({ day, name, type: tp.type, description: desc });
         }
-      } catch (err: any) {
-        console.error("Error initializing day:", err.message);
-        setError("Erro ao carregar o dia. Tente novamente.");
-      } finally {
-        setLoading(false);
       }
-    };
-
-    if (user) {
-      initializeDay();
     }
-  }, [user, forcedDay, navigate]);
 
-  useEffect(() => {
-    if (challengeError) {
-      setError("Erro ao carregar os dados do desafio. Tente novamente.");
-    }
-    if (progressError) {
-      setError("Erro ao carregar o progresso. Tente novamente.");
-    }
-  }, [challengeError, progressError]);
-
-  const handleCompleteTouchpoint = async (touchpointId: string) => {
-    await updateProgress(touchpointId, true);
-    refetchChallengeData(); // Refresh data after updating progress
-  };
-
-  const handleHydrationUpdate = async (amount: number) => {
-    const newHydration = (challengeData?.hydration || 0) + amount;
-    await supabase
-      .from("challenge_data")
-      .update({ hydration: newHydration })
-      .eq("user_id", user?.id)
-      .eq("day", currentDay);
-    refetchChallengeData();
-  };
-
-  const handleAdvanceDay = async () => {
-    if (user) {
-      const nextDay = currentDay + 1;
-      await supabase.from("profiles").update({ current_day: nextDay }).eq("id", user.id);
-
-      // Clear current day's challenge data to ensure fresh load for next day
-      await supabase.from("challenge_data").delete().eq("user_id", user.id).eq("day", currentDay);
-
-      setCurrentDay(nextDay);
-      navigate(`/today?day=${nextDay}`);
-    }
-  };
-
-  if (authLoading || loading || challengeLoading || progressLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
-
-  if (showOnboarding) {
-    return null; // Onboarding component will handle navigation
-  }
-
-  const dayConfig = touchpointConfig[currentDay];
-
-  if (!dayConfig) {
-    return <ErrorMessage message="Conteúdo para este dia não encontrado." />;
-  }
-
-  const isDayComplete = challengeData?.touchpoints.every((tp) => progress[tp.id]);
+    return matches.slice(0, 20);
+  }, [query]);
 
   return (
-    <div className="min-h-screen bg-dark-blue text-white flex flex-col">
-      <Header />
-      <main className="flex-grow p-4">
-        <h1 className="text-2xl font-bold mb-2">Dia {currentDay}</h1>
-        <h2 className="text-xl text-mint-green mb-4">{dayConfig.title}</h2>
+    <div className="fixed inset-0 z-50 bg-[#0F172A]/95 backdrop-blur-sm flex flex-col">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+        <Search className="w-5 h-5 text-white/50" />
+        <input
+          autoFocus
+          type="text"
+          placeholder="Buscar exercícios, receitas..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="flex-1 bg-transparent text-white placeholder:text-white/40 outline-none text-sm"
+        />
+        <button onClick={onClose} className="text-white/50 hover:text-white">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
 
-        <DayProgress currentDay={currentDay} totalDays={14} />
-
-        <div className="space-y-6 mt-6">
-          {dayConfig.affirmation && <DailyAffirmation affirmation={dayConfig.affirmation} />}
-
-          {dayConfig.touchpoints.map((touchpoint, index) => (
-            <TouchpointCard
-              key={touchpoint.id}
-              touchpoint={touchpoint}
-              isComplete={progress[touchpoint.id] || false}
-              onComplete={() => handleCompleteTouchpoint(touchpoint.id)}
-              currentDay={currentDay}
-            />
-          ))}
-
-          <HydrationTracker
-            currentHydration={challengeData?.hydration || 0}
-            targetHydration={dayConfig.hydrationTarget}
-            onUpdate={handleHydrationUpdate}
-          />
-
-          {isDayComplete && currentDay < 14 && (
-            <button
-              onClick={handleAdvanceDay}
-              className="w-full bg-mint-green text-dark-blue font-bold py-3 px-4 rounded-lg mt-6 transition-colors hover:bg-opacity-90"
-            >
-              Concluir Dia {currentDay} e Ir para o Dia {currentDay + 1} →
-            </button>
-          )}
-
-          {currentDay === 14 && isDayComplete && (
-            <DaySummary
-              day={currentDay}
-              title={dayConfig.title}
-              message={dayConfig.completionMessage}
-              onGenerateReport={() => alert("Gerar Relatório Médico (em breve)")} // Placeholder
-            />
-          )}
-
-          {currentDay < 14 && (
-            <div className="mt-8 p-4 bg-gray-800 rounded-lg">
-              <h3 className="text-lg font-semibold text-mint-green">Prévia do Dia {currentDay + 1}</h3>
-              <p className="text-sm text-gray-400">
-                {touchpointConfig[currentDay + 1]?.previewText || "Conteúdo em breve..."}
-              </p>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {query.length >= 2 && results.length === 0 && (
+          <p className="text-white/40 text-sm text-center mt-8">Nenhum resultado encontrado.</p>
+        )}
+        {results.map((r, i) => (
+          <div key={i} className="bg-white/5 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-medium text-emerald-400 uppercase">{r.type}</span>
+              <span className="text-[10px] text-white/30">Dia {r.day}</span>
             </div>
-          )}
-        </div>
-      </main>
-      <Footer />
+            <p className="text-sm text-white font-medium">{r.name}</p>
+            <p className="text-xs text-white/50 mt-0.5 line-clamp-2">{r.description}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default Today;
+export default TodaySearchOverlay;

@@ -1,3 +1,23 @@
+export type TouchpointSlot = "morning" | "lunch" | "afternoon" | "night";
+
+export interface NightTechnique {
+  type: string;
+  name: string;
+  title?: string;
+  description: string;
+  details?: string;
+  duration?: string;
+  steps?: string[];
+  benefits?: string[];
+  zones?: string[];
+  previousDayKey?: string;
+  [key: string]: any;
+}
+
+export function getTouchpointConfig(day: number) {
+  return touchpointConfig[day] ?? null;
+}
+
 export const touchpointConfig: { [key: number]: any } = {
   1: {
     title: "Consciência Corporal",

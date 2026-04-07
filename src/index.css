@@ -17,7 +17,8 @@
   }
 
   body {
-    @apply bg-dark-blue text-white;
+    background-color: var(--color-dark-blue);
+    color: var(--color-white);
   }
 
   /* Custom styles for improved contrast and visual appeal */
@@ -30,7 +31,9 @@
   }
 
   .btn-primary {
-    @apply bg-mint-green text-dark-blue font-bold py-3 px-4 rounded-lg transition-colors hover:bg-opacity-90;
+    background-color: var(--color-mint-green);
+    color: var(--color-dark-blue);
+    @apply font-bold py-3 px-4 rounded-lg transition-colors hover:bg-opacity-90;
   }
 
   .btn-secondary {
