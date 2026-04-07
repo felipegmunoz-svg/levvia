@@ -234,23 +234,23 @@ export function useTouchpointProgress(dayNumber: number) {
   );
 
   const activeSlot = useMemo<TouchpointSlot>(() => {
-    if (!progress.morning.done) return "morning";
-    if (!progress.lunch.done) return "lunch";
-    if (!progress.afternoon.done) return "afternoon";
+    if (!progress.morning?.done) return "morning";
+    if (!progress.lunch?.done) return "lunch";
+    if (!progress.afternoon?.done) return "afternoon";
     return "night";
   }, [progress]);
 
   const isDayComplete = useMemo(() => {
-    if (!progress.night.done) return false;
+    if (!progress.night?.done) return false;
     // Require at least 2 of 3 daytime slots completed
-    const daytimeCompleted = [progress.morning.done, progress.lunch.done, progress.afternoon.done]
+    const daytimeCompleted = [progress.morning?.done, progress.lunch?.done, progress.afternoon?.done]
       .filter(Boolean).length;
     return daytimeCompleted >= 2;
-  }, [progress.morning.done, progress.lunch.done, progress.afternoon.done, progress.night.done]);
+  }, [progress.morning?.done, progress.lunch?.done, progress.afternoon?.done, progress.night?.done]);
 
   const completedSlots = useMemo(() => {
     return (["morning", "lunch", "afternoon", "night"] as TouchpointSlot[]).filter(
-      (s) => progress[s].done
+      (s) => progress[s]?.done
     ).length;
   }, [progress]);
 
