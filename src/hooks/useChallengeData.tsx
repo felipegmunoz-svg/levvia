@@ -179,16 +179,20 @@ export function useChallengeData(rescueMode: string = "neutral") {
   const [challengeProgress, setChallengeProgress] = useState<Record<string, Record<string, boolean>>>({});
 
   const [challengeStart, setChallengeStart] = useState<string | null>(null);
+  const [testDayOverride, setTestDayOverride] = useState<number | null>(null);
 
   // Compute currentDay — prioritize backend state, localStorage is only a temporary fallback
   const currentDay = useMemo(() => {
+    // Allow test override for development
+    if (testDayOverride !== null) return Math.min(Math.max(testDayOverride, 1), 14);
+    
     // Prefer in-memory state (loaded from Supabase) over localStorage
     const start = challengeStart ?? localStorage.getItem("levvia_challenge_start");
     if (!start) return 1;
     const diff = Date.now() - new Date(start).getTime();
     const day = Math.floor(diff / 86400000) + 1;
     return Math.min(Math.max(day, 1), 14);
-  }, [challengeStart]);
+  }, [challengeStart, testDayOverride]);
 
   debugRender("useChallengeData", { 
     renderNum: renderCount.current, profileLoading, dataLoading, currentDay, 
@@ -450,5 +454,7 @@ export function useChallengeData(rescueMode: string = "neutral") {
     allHabits: habits,
     challengeProgress,
     saveProgress,
+    testDayOverride,
+    setTestDay: (day: number | null) => setTestDayOverride(day),
   };
 }
