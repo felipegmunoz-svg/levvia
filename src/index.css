@@ -1,159 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 13%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 174 63% 47%;
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 199 89% 48%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 174 63% 47%;
-    --accent-foreground: 222 47% 11%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 174 63% 47%;
-
-    --radius: 1rem;
-
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 174 63% 47%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 174 63% 47%;
-
-    /* Custom tokens */
-    --success: 174 63% 47%;
-    --success-foreground: 222 47% 11%;
-    --sos: 0 84% 60%;
-    --sos-foreground: 210 40% 98%;
-    --primary-light: 174 63% 47% / 0.15;
-    --primary-glow: 174 63% 47%;
-    --glass-bg: 255 255% 255% / 0.05;
-    --glass-border: 255 255% 255% / 0.1;
-  }
-
-  .theme-light {
-    --background: 220 20% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 174 63% 47%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 199 89% 48%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 210 10% 55%;
-    --accent: 174 63% 47%;
-    --accent-foreground: 222 47% 11%;
-    --border: 0 0% 0% / 0.04;
-    --input: 0 0% 0% / 0.08;
-    --ring: 174 63% 47%;
-    --sos: 0 84% 60%;
-    --sos-foreground: 0 0% 100%;
-    --glass-bg: 0 0% 100% / 0.80;
-    --glass-border: 0 0% 0% / 0.04;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+    --color-dark-blue: #0a1128;
+    --color-mint-green: #00c49a;
+    --color-light-gray: #e0e0e0;
+    --color-white: #ffffff;
+    --color-red-500: #ef4444;
+    --color-yellow-500: #f59e0b;
+    --color-green-500: #10b981;
+    --color-blue-500: #3b82f6;
+    --color-purple-500: #8b5cf6;
+    --color-pink-500: #ec4899;
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Inter', sans-serif;
-  }
-}
-
-@layer utilities {
-  .levvia-page {
-    background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
-    color: #F8FAFC;
-    font-family: 'Inter', system-ui, sans-serif;
-    min-height: 100vh;
+    @apply bg-dark-blue text-white;
   }
 
-  .levvia-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 18px;
-    transition: all 200ms ease-out;
+  /* Custom styles for improved contrast and visual appeal */
+  .text-gray-400 {
+    color: var(--color-light-gray); /* Ensure better contrast for secondary text */
   }
 
-  .levvia-card:hover {
-    border-color: rgba(45, 212, 191, 0.3);
-    background: rgba(255, 255, 255, 0.08);
+  .bg-gray-800 {
+    background-color: #1a202c; /* Slightly lighter dark background for cards/sections */
   }
 
-  .levvia-card:active {
-    transform: scale(0.98);
+  .btn-primary {
+    @apply bg-mint-green text-dark-blue font-bold py-3 px-4 rounded-lg transition-colors hover:bg-opacity-90;
   }
 
-  .gradient-primary {
-    background: linear-gradient(135deg, #2DD4BF, #0EA5E9);
+  .btn-secondary {
+    @apply bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition-colors hover:bg-opacity-90;
   }
 
-  .glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    backdrop-filter: blur(20px);
-    transition: all 200ms ease-out;
-  }
-
-  .glass-card:active {
-    transform: scale(0.98);
-  }
-
-  .shadow-soft {
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-  }
-
-  .shadow-card {
-    box-shadow: 0 2px 10px -1px rgba(0, 0, 0, 0.3);
-  }
-}
-
-/* Accessibility: respect reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .levvia-card:active,
-  .glass-card:active {
-    transform: none !important;
+  /* Specific adjustments for text within buttons if needed */
+  button {
+    color: inherit; /* Ensure text color is inherited or explicitly set for contrast */
   }
 }
