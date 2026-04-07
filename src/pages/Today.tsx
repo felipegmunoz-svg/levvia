@@ -40,6 +40,7 @@ const Today = () => {
     todayTouchpoints,
     nextDayTouchpoints,
     loading,
+    setTestDay,
   } = useChallengeData(rescueMode);
 
   const [replayDay, setReplayDay] = useState<number | null>(null);
@@ -188,14 +189,30 @@ const Today = () => {
 
   return (
     <>
-      <div className="bg-yellow-100 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50">
-        <span className="font-semibold text-yellow-800">🐛 Debug:</span>
+      <div className="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 px-3 py-2 flex flex-wrap gap-2 items-center text-xs sticky top-0 z-50 border-b border-purple-700/50">
+        <span className="font-bold text-purple-300">🧪 Teste de Dias:</span>
         {[1, 2, 3, 4, 5, 6, 7, 14].map(d => (
-          <button key={d} onClick={() => setReplayDay(d)} className="px-2 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition-colors">
+          <button 
+            key={d} 
+            onClick={() => {
+              setTestDay(d);
+              setReplayDay(d);
+            }} 
+            className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded transition-colors font-semibold text-[11px]"
+          >
             Dia {d}
           </button>
         ))}
-        <button onClick={handleResetLocal} className="px-2 py-1 bg-red-300 text-red-900 rounded hover:bg-red-400 transition-colors ml-auto">
+        <button 
+          onClick={() => {
+            setTestDay(null);
+            setReplayDay(null);
+          }} 
+          className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded transition-colors font-semibold text-[11px]"
+        >
+          Hoje
+        </button>
+        <button onClick={handleResetLocal} className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded transition-colors ml-auto font-semibold text-[11px]">
           Resetar Tudo
         </button>
       </div>
