@@ -392,7 +392,7 @@ export function useChallengeData(rescueMode: string = "neutral") {
     return {
       morning: {
         affirmation: effectiveAffirmation,
-        schedule: config.schedule,
+        schedule: (Array.isArray(config?.schedule) ? config.schedule : []),
         exercise: toActivity(morningEx, "exercise", "morning-ex"),
         shotRecipe: toActivity(morningShot, "recipe", "morning-shot"),
       },
