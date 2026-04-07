@@ -201,7 +201,7 @@ const DayTouchpointView = ({
       )}
 
       {/* Jornada de Alívio hoje — schedule external to MorningSlot */}
-      {touchpoints.morning.schedule.length > 0 && (
+      {(Array.isArray(touchpoints?.morning?.schedule) ? touchpoints.morning.schedule : []).length > 0 && (
         <div className="px-6 pb-2">
           <div className="levvia-card p-4">
             <h3 className="font-semibold text-levvia-fg font-body text-sm mb-3 flex items-center gap-2">
@@ -216,7 +216,7 @@ const DayTouchpointView = ({
                   <div
                     key={item.slot}
                     className={`flex items-center gap-3 py-2 ${
-                      i < touchpoints.morning.schedule.length - 1 ? "border-b border-border" : ""
+                      i < (Array.isArray(touchpoints?.morning?.schedule) ? touchpoints.morning.schedule : []).length - 1 ? "border-b border-border" : ""
                     }`}
                   >
                     <span className="text-xs text-levvia-muted w-12 font-body shrink-0">
